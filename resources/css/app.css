@@ -1,0 +1,142 @@
+@import "bootstrap/dist/css/bootstrap.min.css";
+@import "bootstrap-icons/font/bootstrap-icons.css";
+
+:root{
+
+    --sidebar-width:270px;
+
+    --sidebar:#151f33;
+
+    --body:#0c1323;
+
+    --card:#192438;
+
+    --border:#27344d;
+
+    --primary:#2f80ed;
+
+    --text:#fff;
+
+    --muted:#94a3b8;
+
+}
+
+body{
+
+    background:var(--body);
+
+    color:var(--text);
+
+    margin:0;
+
+    font-family:Inter,Arial,sans-serif;
+
+}
+
+/* SIDEBAR */
+
+.sidebar{
+
+    width:var(--sidebar-width);
+
+    height:100vh;
+
+    position:fixed;
+
+    left:0;
+
+    top:0;
+
+    background:var(--sidebar);
+
+    border-right:1px solid var(--border);
+
+    padding:25px;
+
+    z-index:1000;
+
+}
+
+/* CONTENIDO */
+
+.main-content{
+
+    margin-left:var(--sidebar-width);
+
+    min-height:100vh;
+
+}
+
+/* NAVBAR */
+
+.top-navbar{
+
+    height:72px;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:0 30px;
+
+    border-bottom:1px solid var(--border);
+
+    background:var(--body);
+
+}
+
+/* CONTENIDO */
+
+.content-wrapper{
+
+    padding:30px;
+
+}
+
+/* CARDS */
+
+.card-dashboard{
+
+    background:var(--card);
+
+    border:1px solid var(--border);
+
+    border-radius:18px;
+
+    padding:25px;
+
+    transition:.2s;
+
+    height:100%;
+
+}
+
+.card-dashboard:hover{
+
+    transform:translateY(-4px);
+
+}
+
+.card-dashboard h2{
+
+    margin-top:15px;
+
+    font-weight:700;
+
+}
+
+.text-muted{
+
+    color:var(--muted)!important;
+
+}
+
+/* LINKS */
+
+.sidebar a{
+
+    margin-bottom:10px;
+
+}

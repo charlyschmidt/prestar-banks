@@ -1,0 +1,108 @@
+:root{
+
+    --bg:#104072;
+
+    --card:#02284f;
+
+    --text:#ffffff;
+
+    --muted:#b8c7d9;
+
+
+    /* acciones */
+
+    --primary:#ffffff;
+
+    --primary-text:#02284f;
+
+    --primary-hover:#e5e7eb;
+
+
+    /* bordes */
+
+    --border:rgba(255,255,255,.08);
+
+
+    /* estados */
+
+    --success:#4ade80;
+
+    --danger:#f87171;
+
+}
+
+/* ==========================
+   PRIMARY ACTION BUTTON
+========================== */
+
+
+.primary-action-button {
+
+    display:flex;
+
+    align-items:center;
+
+    gap:8px;
+
+    height:40px;
+
+    padding:0 16px;
+
+    background:var(--primary);
+
+    color:var(--primary-text);
+
+    border-radius:12px;
+
+    text-decoration:none;
+
+    font-size:13px;
+
+    font-weight:600;
+
+    border:none;
+
+    cursor:pointer;
+
+    transition:.2s;
+
+}
+
+
+
+.primary-action-button i {
+
+    font-size:16px;
+
+}
+
+
+
+.primary-action-button:hover {
+
+    background:var(--primary-hover);
+
+    color:var(--primary-text);
+
+    transform:translateY(-1px);
+
+}
+
+.alert-error {
+    background: #fff1f2;
+    border: 1px solid #fecdd3;
+    color: #b42318;
+    border-radius: 12px;
+    padding: 12px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 4px 12px rgba(180, 35, 24, 0.06);
+}
+
+.alert-error i {
+    font-size: 18px;
+    color: #dc2626;
+}
