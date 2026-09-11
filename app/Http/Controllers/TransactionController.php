@@ -9,6 +9,8 @@ use App\Events\TransactionCreated;
 use App\Services\FinancialDayService;
 use App\Models\AccountDailyBalance;
 use Illuminate\Support\Facades\DB;
+use App\Exports\TransactionsExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 
 class TransactionController extends Controller
@@ -603,4 +605,32 @@ class TransactionController extends Controller
                 'Movimiento eliminado'
             );
     }
+
+    public function export(
+    FinancialDayService $financialDayService
+)
+{
+    $day = $financialDayService->current();
+
+    if (!$day) {
+
+        return back()->with(
+            'error',
+            'No hay una jornada abierta.'
+        );
+
+    }
+
+    return Excel::download(
+
+        new TransactionsExport(
+            $day->id,
+            $day,
+            auth()->user()
+        ),
+
+        'Movimientos-'.$day->date->format('Y-m-d').'.xlsx'
+
+    );
+}
 }

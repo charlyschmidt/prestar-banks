@@ -8,6 +8,8 @@ use App\Models\FinancialDay;
 use App\Models\AccountDailyBalance;
 use App\Models\Transaction;
 use App\Services\FinancialDayService;
+use App\Exports\AccountTransactionsExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class AccountController extends Controller
 {
@@ -182,6 +184,38 @@ class AccountController extends Controller
                 'balance',
                 'movements'
             )
+        );
+    }
+
+    public function export(
+        Account $account,
+        FinancialDayService $financialDayService
+    ) {
+
+        $day = $financialDayService->current();
+
+
+        if (!$day) {
+
+            return back()
+                ->with(
+                    'error',
+                    'No hay jornada abierta.'
+                );
+        }
+
+
+
+        return Excel::download(
+
+            new AccountTransactionsExport(
+                $account->id,
+                $day,
+                auth()->user()
+            ),
+
+            'Movimientos-' . $account->name . '-' . $day->date->format('Y-m-d') . '.xlsx'
+
         );
     }
 }

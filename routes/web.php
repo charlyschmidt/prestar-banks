@@ -30,7 +30,7 @@ Route::get('/', function () {
 */
 
 Route::middleware('auth')->group(function () {
-    
+
     Route::resource(
         'usuarios',
         UserController::class
@@ -48,16 +48,26 @@ Route::middleware('auth')->group(function () {
         'accounts',
         AccountController::class
     );
+    Route::get(
+        '/accounts/{account}/export',
+        [
+            AccountController::class,
+            'export'
+        ]
+    )
+        ->name('accounts.export');
 
     Route::get(
         '/accounts/{account}/movements',
         [AccountController::class, 'movements']
     )->name('accounts.movements');
 
-    Route::resource(
-        'transactions',
-        TransactionController::class
-    );
+    Route::get(
+        'transactions/export',
+        [TransactionController::class, 'export']
+    )->name('transactions.export');
+
+    Route::resource('transactions', TransactionController::class);
 
     Route::get(
         '/jornada/apertura',

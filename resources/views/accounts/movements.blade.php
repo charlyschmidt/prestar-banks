@@ -29,13 +29,29 @@
 
 
 
-            <a href="{{ route('dashboard') }}" class="secondary-button">
+            <div class="d-flex gap-2">
 
-                <i class="bi bi-arrow-left"></i>
 
-                Volver
+                <a href="{{ route('accounts.export', $account->id) }}" class="primary-action-button">
 
-            </a>
+                    <i class="bi bi-file-earmark-excel"></i>
+
+                    Exportar
+
+                </a>
+
+
+
+                <a href="{{ route('dashboard') }}" class="secondary-button">
+
+                    <i class="bi bi-arrow-left"></i>
+
+                    Volver
+
+                </a>
+
+
+            </div>
 
 
         </div>

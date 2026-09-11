@@ -22,6 +22,13 @@
 
             </div>
 
+            <a href="{{ route('transactions.export') }}" class="primary-action-button">
+
+                <i class="bi bi-file-earmark-excel"></i>
+
+                Exportar Excel
+
+            </a>
 
 
             <a href="{{ route('transactions.create') }}" class="primary-action-button">
