@@ -297,8 +297,15 @@ class TransactionController extends Controller
 
     public function edit(Transaction $transaction)
     {
+        $day = app(\App\Services\FinancialDayService::class)->current();
 
-        $accounts = Account::all();
+
+        $accounts = Account::with([
+            'dailyBalances' => function ($q) use ($day) {
+                $q->where('financial_day_id', $day->id);
+            }
+        ])->get();
+
 
 
         return view(

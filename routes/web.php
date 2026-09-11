@@ -5,7 +5,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\FinancialDayController;
-
+use App\Http\Controllers\Admin\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,7 +20,6 @@ Route::get('/', function () {
     }
 
     return redirect()->route('login');
-
 });
 
 
@@ -31,6 +30,14 @@ Route::get('/', function () {
 */
 
 Route::middleware('auth')->group(function () {
+    
+    Route::resource(
+        'usuarios',
+        UserController::class
+    )
+        ->except([
+            'show'
+        ]);
 
     Route::get(
         '/dashboard',
@@ -61,7 +68,6 @@ Route::middleware('auth')->group(function () {
         '/jornada/apertura',
         [FinancialDayController::class, 'store']
     )->name('financial-days.store');
-
 });
 
 
@@ -71,4 +77,4 @@ Route::middleware('auth')->group(function () {
 |--------------------------------------------------------------------------
 */
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

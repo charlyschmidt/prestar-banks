@@ -4,10 +4,7 @@
 
         <a href="{{ route('dashboard') }}">
 
-            <img
-                src="{{ asset('images/logo.png') }}"
-                alt="Finanzas"
-            >
+            <img src="{{ asset('images/logo.png') }}" alt="Finanzas">
 
         </a>
 
@@ -43,6 +40,17 @@
         </a>
 
 
+        @if (auth()->user()->is_admin)
+            <a href="{{ route('usuarios.index') }}">
+
+                <i class="bi bi-people"></i>
+
+                Usuarios
+
+            </a>
+        @endif
+
+
         <a href="#">
 
             <i class="bi bi-gear"></i>
@@ -50,6 +58,22 @@
             Configuración
 
         </a>
+
+
+        <form method="POST" action="{{ route('logout') }}">
+
+            @csrf
+
+            <button type="submit" class="sidebar-link-button">
+
+                <i class="bi bi-box-arrow-right"></i>
+
+                Salir
+
+            </button>
+
+        </form>
+
 
     </nav>
 

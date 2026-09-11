@@ -24,7 +24,7 @@
 
 
 
-            <a href="{{ route('transactions.create') }}" class="action-button">
+            <a href="{{ route('transactions.create') }}" class="primary-action-button">
 
                 <i class="bi bi-plus"></i>
 

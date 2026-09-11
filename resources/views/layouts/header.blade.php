@@ -58,9 +58,20 @@
         </a>
 
 
-        <div class="user-avatar">
+        <div class="user-profile-badge">
 
-            C
+            <span class="role-badge {{ auth()->user()->is_admin ? 'admin' : 'user' }}">
+
+                {{ auth()->user()->is_admin ? 'ADMIN' : 'USUARIO' }}
+
+            </span>
+
+
+            <div class="user-avatar">
+
+                {{ strtoupper(substr(auth()->user()->name ?? auth()->user()->username, 0, 1)) }}
+
+            </div>
 
         </div>
 
