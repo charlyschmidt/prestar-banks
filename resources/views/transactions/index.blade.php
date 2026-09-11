@@ -9,35 +9,70 @@
         <div class="page-header">
 
 
-            <div>
-
-                <h1>
-                    Movimientos
-                </h1>
+            <div class="d-flex align-items-center gap-3">
 
 
-                <p>
-                    Jornada actual
-                </p>
+                <a href="{{ route('dashboard') }}" class="secondary-button back-button">
+
+                    <i class="bi bi-arrow-left"></i>
+
+                    Volver
+
+                </a>
+
+
+
+                <div>
+
+                    <h1>
+                        Movimientos
+                    </h1>
+
+
+                    <p>
+                        Jornada actual
+                    </p>
+
+                </div>
+
 
             </div>
 
-            <a href="{{ route('transactions.export') }}" class="primary-action-button">
-
-                <i class="bi bi-file-earmark-excel"></i>
-
-                Exportar Excel
-
-            </a>
 
 
-            <a href="{{ route('transactions.create') }}" class="primary-action-button">
 
-                <i class="bi bi-plus"></i>
 
-                Nuevo
+            <div class="d-flex gap-2">
+                
+                <a href="{{ route('transactions.create') }}" class="primary-action-button">
 
-            </a>
+
+                    <i class="bi bi-plus"></i>
+
+                    Nuevo
+
+
+                </a>
+
+                <a href="{{ route('transactions.export') }}" class="primary-action-button">
+
+
+                    <i class="bi bi-file-earmark-arrow-down"></i>
+
+
+                    Exportar Excel
+
+
+                </a>
+
+
+
+
+
+
+
+
+            </div>
 
 
 

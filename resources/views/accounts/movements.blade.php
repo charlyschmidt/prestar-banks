@@ -10,39 +10,8 @@
 
             <div class="d-flex align-items-center gap-3">
 
-                @if ($account->logo)
-                    <img src="{{ asset('storage/' . $account->logo) }}" alt="{{ $account->name }}"
-                        style="height:45px;object-fit:contain;">
-                @endif
 
-                <div>
-                    <h1 class="mb-1">
-                        {{ $account->name }}
-                    </h1>
-
-                    <p class="mb-0">
-                        Movimientos de la jornada actual
-                    </p>
-                </div>
-
-            </div>
-
-
-
-            <div class="d-flex gap-2">
-
-
-                <a href="{{ route('accounts.export', $account->id) }}" class="primary-action-button">
-
-                    <i class="bi bi-file-earmark-excel"></i>
-
-                    Exportar
-
-                </a>
-
-
-
-                <a href="{{ route('dashboard') }}" class="secondary-button">
+                <a href="{{ route('dashboard') }}" class="secondary-button back-button">
 
                     <i class="bi bi-arrow-left"></i>
 
@@ -50,6 +19,42 @@
 
                 </a>
 
+
+
+                @if ($account->logo)
+                    <img src="{{ asset('storage/' . $account->logo) }}" alt="{{ $account->name }}"
+                        style="height:45px; width:45px; object-fit:contain;">
+                @endif
+
+
+
+                <div>
+
+                    <h1 class="mb-1">
+                        {{ $account->name }}
+                    </h1>
+
+
+                    <p class="mb-0">
+                        Movimientos de la jornada actual
+                    </p>
+
+                </div>
+
+
+            </div>
+
+
+
+            <div>
+
+                <a href="{{ route('accounts.export', $account->id) }}" class="primary-action-button">
+
+                    <i class="bi bi-file-earmark-arrow-down"></i>
+
+                    Exportar a Excel
+
+                </a>
 
             </div>
 
