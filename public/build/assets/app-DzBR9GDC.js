@@ -97,9 +97,13 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
 
 <tr>
 
+
 <td>
-    Hoy
+
+Hoy
+
 </td>
+
 
 
 <td>
@@ -112,7 +116,9 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
 
 
     <span>
+
         ${n.name}
+
     </span>
 
 </div>
@@ -121,25 +127,31 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
 
 
 
+
+
 <td>
 
 ${i?`
-<span class="movement-income">
+    <span class="movement-income">
 
-<i class="bi bi-arrow-up"></i>
-Ingreso
+        <i class="bi bi-arrow-up"></i>
 
-</span>
-`:`
-<span class="movement-expense">
+        Ingreso
 
-<i class="bi bi-arrow-down"></i>
-Egreso
+    </span>
+    `:`
+    <span class="movement-expense">
 
-</span>
-`}
+        <i class="bi bi-arrow-down"></i>
+
+        Egreso
+
+    </span>
+    `}
 
 </td>
+
+
 
 
 
@@ -152,29 +164,49 @@ ${t.description??`Sin descripción`}
 
 
 
+
 <td class="text-end">
 
 
 ${i?`
-<span class="amount-income">
-+
-$${Number(t.amount).toLocaleString(`es-AR`)}
-</span>
-`:`
-<span class="amount-expense">
--
-$${Number(t.amount).toLocaleString(`es-AR`)}
-</span>
-`}
+    <span class="amount-income">
+
+        +
+        $${Number(t.amount).toLocaleString(`es-AR`)}
+
+    </span>
+    `:`
+    <span class="amount-expense">
+
+        -
+        $${Number(t.amount).toLocaleString(`es-AR`)}
+
+    </span>
+    `}
 
 
 </td>
+
+
+
 
 
 <td>
 
+$${Number(e.initialBalance).toLocaleString(`es-AR`)}
 
 </td>
+
+
+
+
+
+<td>
+
+$${Number(e.balance).toLocaleString(`es-AR`)}
+
+</td>
+
 
 
 </tr>

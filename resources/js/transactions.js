@@ -40,9 +40,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
 <tr>
 
+
 <td>
-    Hoy
+
+Hoy
+
 </td>
+
 
 
 <td>
@@ -60,12 +64,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     <span>
+
         ${account.name}
+
     </span>
 
 </div>
 
 </td>
+
+
 
 
 
@@ -75,28 +83,32 @@ ${isIncome
 
                     ?
                     `
-<span class="movement-income">
+    <span class="movement-income">
 
-<i class="bi bi-arrow-up"></i>
-Ingreso
+        <i class="bi bi-arrow-up"></i>
 
-</span>
-`
+        Ingreso
+
+    </span>
+    `
 
                     :
 
                     `
-<span class="movement-expense">
+    <span class="movement-expense">
 
-<i class="bi bi-arrow-down"></i>
-Egreso
+        <i class="bi bi-arrow-down"></i>
 
-</span>
-`
+        Egreso
+
+    </span>
+    `
 
                 }
 
 </td>
+
+
 
 
 
@@ -109,6 +121,7 @@ ${transaction.description ?? 'Sin descripción'}
 
 
 
+
 <td class="text-end">
 
 
@@ -117,22 +130,26 @@ ${isIncome
                     ?
 
                     `
-<span class="amount-income">
-+
-$${Number(transaction.amount)
+    <span class="amount-income">
+
+        +
+        $${Number(transaction.amount)
                         .toLocaleString('es-AR')}
-</span>
-`
+
+    </span>
+    `
 
                     :
 
                     `
-<span class="amount-expense">
--
-$${Number(transaction.amount)
+    <span class="amount-expense">
+
+        -
+        $${Number(transaction.amount)
                         .toLocaleString('es-AR')}
-</span>
-`
+
+    </span>
+    `
 
                 }
 
@@ -140,10 +157,27 @@ $${Number(transaction.amount)
 </td>
 
 
+
+
+
 <td>
 
+$${Number(event.initialBalance)
+                    .toLocaleString('es-AR')}
 
 </td>
+
+
+
+
+
+<td>
+
+$${Number(event.balance)
+                    .toLocaleString('es-AR')}
+
+</td>
+
 
 
 </tr>

@@ -228,6 +228,11 @@ class BalanceDayService
             }
 
 
+            // guardamos saldo inicial de la cuenta
+            $movement->initial_balance =
+                $balances[$movement->account_id];
+
+
             if (in_array($movement->type, [
                 'income',
                 'transfer_in'
@@ -240,6 +245,7 @@ class BalanceDayService
             }
 
 
+            // saldo luego del movimiento
             $movement->balance_after =
                 $balances[$movement->account_id];
         }

@@ -188,14 +188,6 @@
                 <tbody id="movements-body">
 
                     @foreach ($summary['movements'] as $movement)
-                        @php
-
-                            $dailyBalance = $movement->account->dailyBalances
-                                ->where('financial_day_id', $movement->financial_day_id)
-                                ->first();
-
-                        @endphp
-
                         <tr>
 
                             <td>
@@ -218,7 +210,7 @@
                             <td>
 
                                 <strong>
-                                    {{ $movement->description }}
+                                    {{ $movement->description ?? 'Sin descripción' }}
                                 </strong>
 
                             </td>
@@ -237,6 +229,7 @@
                                     <span class="tag income-tag">
 
                                         <i class="bi bi-arrow-up"></i>
+
                                         Ingreso
 
                                     </span>
@@ -244,6 +237,7 @@
                                     <span class="tag expense-tag">
 
                                         <i class="bi bi-arrow-down"></i>
+
                                         Egreso
 
                                     </span>
@@ -254,15 +248,22 @@
 
                             <td class="amount">
 
-                                ${{ number_format($movement->amount, 0, ',', '.') }}
+                                @if (in_array($movement->type, ['income', 'transfer_in']))
+                                    <span class="amount-income">
 
-                            </td>
+                                        +
 
+                                        ${{ number_format($movement->amount, 0, ',', '.') }}
 
-                            <td>
+                                    </span>
+                                @else
+                                    <span class="amount-expense">
 
-                                @if ($dailyBalance)
-                                    ${{ number_format($dailyBalance->initial_balance, 0, ',', '.') }}
+                                        -
+
+                                        ${{ number_format($movement->amount, 0, ',', '.') }}
+
+                                    </span>
                                 @endif
 
                             </td>
@@ -270,11 +271,17 @@
 
                             <td>
 
-                                @if ($movement->balance_after)
-                                    ${{ number_format($movement->balance_after, 0, ',', '.') }}
-                                @endif
+                                ${{ number_format($movement->initial_balance ?? 0, 0, ',', '.') }}
 
                             </td>
+
+
+                            <td>
+
+                                ${{ number_format($movement->balance_after ?? 0, 0, ',', '.') }}
+
+                            </td>
+
 
                         </tr>
                     @endforeach

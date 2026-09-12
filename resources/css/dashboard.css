@@ -797,6 +797,26 @@ td {
     animation: balanceUpdated 0.7s ease;
 }
 
+.income-tag {
+    color: #22c55e;
+}
+
+
+.income-tag i {
+    color: #22c55e;
+}
+
+
+
+.expense-tag {
+    color: #ef4444;
+}
+
+
+.expense-tag i {
+    color: #ef4444;
+}
+
 @keyframes balanceUpdated {
 
     0% {

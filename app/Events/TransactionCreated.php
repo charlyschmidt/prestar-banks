@@ -160,27 +160,29 @@ class TransactionCreated implements ShouldBroadcastNow
             |--------------------------------------------------------------------------
             */
             'dayDate' =>
-                $this->transaction->financialDay->date,
+            $this->transaction->financialDay->date,
 
             'transaction' => [
 
                 'id' =>
-                    $this->transaction->id,
+                $this->transaction->id,
 
                 'amount' =>
-                    $this->transaction->amount,
+                $this->transaction->amount,
 
                 'type' =>
-                    $this->transaction->type,
+                $this->transaction->type,
 
                 'description' =>
-                    $this->transaction->description,
+                $this->transaction->description,
 
                 'date' =>
-                    $this->transaction->date,
+                $this->transaction->date,
 
                 'balance_after' =>
-                    $this->transaction->balance_after,
+                $balance
+                    ? $balance->current_balance
+                    : 0,
 
             ],
 
@@ -194,13 +196,13 @@ class TransactionCreated implements ShouldBroadcastNow
             'account' => [
 
                 'id' =>
-                    $account->id,
+                $account->id,
 
                 'name' =>
-                    $account->name,
+                $account->name,
 
                 'logo' =>
-                    $account->logo,
+                $account->logo,
 
             ],
 
@@ -212,21 +214,20 @@ class TransactionCreated implements ShouldBroadcastNow
             */
 
             'balance' =>
-                $balance
-                    ? $balance->current_balance
-                    : 0,
+            $balance
+                ? $balance->current_balance
+                : 0,
 
             'initialBalance' =>
-                $initialBalance,
+            $initialBalance,
 
-            'movements' =>
-                (clone $transactions)->count(),
+            'movements' => (clone $transactions)->count(),
 
             'income' =>
-                $income,
+            $income,
 
             'expense' =>
-                $expense,
+            $expense,
 
 
             /*
@@ -236,13 +237,13 @@ class TransactionCreated implements ShouldBroadcastNow
             */
 
             'balanceTotal' =>
-                $balanceTotal,
+            $balanceTotal,
 
             'dayIncome' =>
-                $dayIncome,
+            $dayIncome,
 
             'dayExpense' =>
-                $dayExpense,
+            $dayExpense,
 
         ];
     }
