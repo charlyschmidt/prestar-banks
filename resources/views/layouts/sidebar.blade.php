@@ -4,7 +4,7 @@
 
         <a href="{{ route('dashboard') }}">
 
-            <img src="{{ asset('images/logo.png') }}" alt="Finanzas">
+            <img src="{{ asset('images/logo.svg') }}" alt="Finanzas">
 
         </a>
 

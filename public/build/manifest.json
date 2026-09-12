@@ -21,12 +21,12 @@
     ]
   },
   "resources/js/app.js": {
-    "file": "assets/app-DzBR9GDC.js",
+    "file": "assets/app-BXkMePke.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
     "css": [
-      "assets/app-CGnn4d65.css"
+      "assets/app-BzdPHDHD.css"
     ],
     "assets": [
       "assets/bootstrap-icons-mSm7cUeB.woff2",

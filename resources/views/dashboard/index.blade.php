@@ -251,17 +251,13 @@
                                 @if (in_array($movement->type, ['income', 'transfer_in']))
                                     <span class="amount-income">
 
-                                        +
-
-                                        ${{ number_format($movement->amount, 0, ',', '.') }}
+                                        + ${{ number_format($movement->amount, 0, ',', '.') }}
 
                                     </span>
                                 @else
                                     <span class="amount-expense">
 
-                                        -
-
-                                        ${{ number_format($movement->amount, 0, ',', '.') }}
+                                        - ${{ number_format($movement->amount, 0, ',', '.') }}
 
                                     </span>
                                 @endif

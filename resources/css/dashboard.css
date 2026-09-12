@@ -339,26 +339,23 @@ body {
 
 /* MOVIMIENTOS */
 
-
 .movements {
 
     margin-top: 25px;
-
     background: #02284f;
-
     border: 1px solid #27272a;
-
     border-radius: 18px;
-
     padding: 20px;
 
 }
 
+
 .movements table {
 
+    width: 100%;
     border-collapse: separate;
-
     border-spacing: 0;
+    table-layout: auto;
 
 }
 
@@ -376,74 +373,72 @@ body {
 
 }
 
+
+/* Fecha */
+
 .movements th:nth-child(1),
 .movements td:nth-child(1) {
 
-    width: 120px;
+    width: 90px;
+    white-space: nowrap;
 
 }
 
 
+/* Concepto toma el espacio disponible */
 
 .movements th:nth-child(2),
 .movements td:nth-child(2) {
 
-    width: 35%;
+    width: auto;
 
 }
 
 
+/* Banco */
 
 .movements th:nth-child(3),
 .movements td:nth-child(3) {
 
-    width: 20%;
+    width: 160px;
+    white-space: nowrap;
 
 }
 
 
+/* Tipo */
 
 .movements th:nth-child(4),
 .movements td:nth-child(4) {
 
     width: 120px;
+    white-space: nowrap;
 
 }
 
 
+/* Monto */
 
-.movements th:last-child,
-.movements td:last-child {
+.movements th:nth-child(5),
+.movements td:nth-child(5) {
 
+    width: 130px;
+    white-space: nowrap;
     text-align: right;
 
 }
 
-.movement-date {
 
-    display: flex;
+/* Saldo inicial y saldo después */
 
-    align-items: center;
+.movements th:nth-child(6),
+.movements td:nth-child(6),
+.movements th:nth-child(7),
+.movements td:nth-child(7) {
 
-    gap: 8px;
-
-}
-
-.movement-date strong {
-
-    color: white;
-
-    font-size: 14px;
-
-    font-weight: 600;
-
-}
-
-.movement-date small {
-
-    color: #9fb3c8;
-
-    font-size: 12px;
+    width: 140px;
+    white-space: nowrap;
+    text-align: right;
 
 }
 
