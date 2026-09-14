@@ -11,32 +11,25 @@ use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 
 class AccountTransactionsExport implements FromCollection, ShouldAutoSize
 {
-
     protected $accountId;
     protected $day;
     protected $user;
-
 
 
     public function __construct(
         $accountId,
         $day,
         $user
-    )
-    {
+    ) {
         $this->accountId = $accountId;
         $this->day = $day;
         $this->user = $user;
     }
 
 
-
-
     public function collection(): Collection
     {
-
         $rows = collect();
-
 
 
         $accountBalance = AccountDailyBalance::with('account')
@@ -51,9 +44,9 @@ class AccountTransactionsExport implements FromCollection, ShouldAutoSize
             ->first();
 
 
-
         $rows->push([
             'PRESTAR FINANZAS',
+            '',
             '',
             '',
             '',
@@ -66,6 +59,7 @@ class AccountTransactionsExport implements FromCollection, ShouldAutoSize
             $accountBalance->account->name,
             '',
             '',
+            '',
             ''
         ]);
 
@@ -73,6 +67,7 @@ class AccountTransactionsExport implements FromCollection, ShouldAutoSize
         $rows->push([
             'Fecha jornada',
             $this->day->date,
+            '',
             '',
             '',
             ''
@@ -84,6 +79,7 @@ class AccountTransactionsExport implements FromCollection, ShouldAutoSize
             $this->day->opened_at,
             '',
             '',
+            '',
             ''
         ]);
 
@@ -93,9 +89,9 @@ class AccountTransactionsExport implements FromCollection, ShouldAutoSize
             $this->user->username,
             '',
             '',
+            '',
             ''
         ]);
-
 
 
         $rows->push([
@@ -103,9 +99,9 @@ class AccountTransactionsExport implements FromCollection, ShouldAutoSize
             '',
             '',
             '',
+            '',
             ''
         ]);
-
 
 
         $rows->push([
@@ -113,25 +109,19 @@ class AccountTransactionsExport implements FromCollection, ShouldAutoSize
             '',
             '',
             '',
+            '',
             ''
         ]);
 
 
-
         $rows->push([
-
             'Saldo inicial',
-
             $accountBalance->initial_balance,
-
+            '',
             '',
             '',
             ''
-
         ]);
-
-
-
 
 
         $rows->push([
@@ -139,9 +129,9 @@ class AccountTransactionsExport implements FromCollection, ShouldAutoSize
             '',
             '',
             '',
+            '',
             ''
         ]);
-
 
 
         $rows->push([
@@ -149,34 +139,26 @@ class AccountTransactionsExport implements FromCollection, ShouldAutoSize
             '',
             '',
             '',
+            '',
             ''
         ]);
 
 
-
         $rows->push([
-
             'Fecha',
-
             'Concepto',
-
+            'Usuario',
             'Tipo',
-
             'Monto',
-
             'Saldo después'
-
         ]);
-
-
-
 
 
         $balance = $accountBalance->initial_balance;
 
 
-
-        $transactions = Transaction::where(
+        $transactions = Transaction::with('user')
+            ->where(
                 'financial_day_id',
                 $this->day->id
             )
@@ -189,40 +171,33 @@ class AccountTransactionsExport implements FromCollection, ShouldAutoSize
             ->get();
 
 
-
-
         foreach ($transactions as $transaction) {
 
-
-            if (in_array(
-                $transaction->type,
-                [
-                    'income',
-                    'transfer_in'
-                ]
-            )) {
-
+            if (
+                in_array(
+                    $transaction->type,
+                    [
+                        'income',
+                        'transfer_in'
+                    ]
+                )
+            ) {
                 $balance += $transaction->amount;
-
             } else {
-
                 $balance -= $transaction->amount;
-
             }
-
-
 
 
             $rows->push([
 
-
                 Carbon::parse($transaction->date)
                     ->format('d/m/Y H:i'),
-
 
                 $transaction->description
                     ?? 'Sin descripción',
 
+                $transaction->user?->name
+                    ?? 'Sin registro',
 
                 in_array(
                     $transaction->type,
@@ -234,21 +209,14 @@ class AccountTransactionsExport implements FromCollection, ShouldAutoSize
                     ? 'Ingreso'
                     : 'Egreso',
 
-
                 $transaction->amount,
-
 
                 $balance
 
-
             ]);
-
         }
 
 
-
         return $rows;
-
     }
-
 }

@@ -155,7 +155,7 @@
                             <div class="bank-balance" data-balance>
 
 
-                                ${{ number_format($account['balance'], 0, ',', '.') }}
+                                ${{ number_format($account['balance'], 2, ',', '.') }}
 
 
                             </div>
@@ -172,7 +172,7 @@
 
                                 Inicial:
 
-                                ${{ number_format($account['initial_balance'], 0, ',', '.') }}
+                                ${{ number_format($account['initial_balance'], 2, ',', '.') }}
 
 
                             </div>
@@ -194,7 +194,7 @@
                                     <i class="bi bi-arrow-up"></i>
 
 
-                                    ${{ number_format($account['income'], 0, ',', '.') }}
+                                    ${{ number_format($account['income'], 2, ',', '.') }}
 
 
 
@@ -211,7 +211,7 @@
                                     <i class="bi bi-arrow-down"></i>
 
 
-                                    ${{ number_format($account['expense'], 0, ',', '.') }}
+                                    ${{ number_format($account['expense'], 2, ',', '.') }}
 
 
 

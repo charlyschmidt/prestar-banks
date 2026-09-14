@@ -12,7 +12,6 @@ use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 
 class TransactionsExport implements FromCollection, WithHeadings, ShouldAutoSize
 {
-
     protected int $financialDayId;
 
     protected $day;
@@ -20,27 +19,20 @@ class TransactionsExport implements FromCollection, WithHeadings, ShouldAutoSize
     protected $user;
 
 
-
     public function __construct(
         int $financialDayId,
         $day,
         $user
     ) {
-
         $this->financialDayId = $financialDayId;
-
         $this->day = $day;
-
         $this->user = $user;
     }
 
 
-
     public function collection(): Collection
     {
-
         $rows = collect();
-
 
 
         /*
@@ -49,13 +41,14 @@ class TransactionsExport implements FromCollection, WithHeadings, ShouldAutoSize
         |--------------------------------------------------------------------------
         */
 
-
         $rows->push([
             'PRESTAR FINANZAS',
             '',
             '',
             '',
             '',
+            '',
+            ''
         ]);
 
 
@@ -65,6 +58,8 @@ class TransactionsExport implements FromCollection, WithHeadings, ShouldAutoSize
             '',
             '',
             '',
+            '',
+            ''
         ]);
 
 
@@ -74,6 +69,8 @@ class TransactionsExport implements FromCollection, WithHeadings, ShouldAutoSize
             '',
             '',
             '',
+            '',
+            ''
         ]);
 
 
@@ -83,6 +80,8 @@ class TransactionsExport implements FromCollection, WithHeadings, ShouldAutoSize
             '',
             '',
             '',
+            '',
+            ''
         ]);
 
 
@@ -92,8 +91,9 @@ class TransactionsExport implements FromCollection, WithHeadings, ShouldAutoSize
             '',
             '',
             '',
+            '',
+            ''
         ]);
-
 
 
         $rows->push([
@@ -102,9 +102,9 @@ class TransactionsExport implements FromCollection, WithHeadings, ShouldAutoSize
             '',
             '',
             '',
+            '',
+            ''
         ]);
-
-
 
 
         /*
@@ -113,15 +113,15 @@ class TransactionsExport implements FromCollection, WithHeadings, ShouldAutoSize
         |--------------------------------------------------------------------------
         */
 
-
         $rows->push([
             'SALDOS INICIALES',
             '',
             '',
             '',
             '',
+            '',
+            ''
         ]);
-
 
 
         $rows->push([
@@ -130,8 +130,9 @@ class TransactionsExport implements FromCollection, WithHeadings, ShouldAutoSize
             '',
             '',
             '',
+            '',
+            ''
         ]);
-
 
 
         $balances = AccountDailyBalance::with('account')
@@ -142,27 +143,18 @@ class TransactionsExport implements FromCollection, WithHeadings, ShouldAutoSize
             ->get();
 
 
-
         foreach ($balances as $balance) {
 
-
             $rows->push([
-
                 $balance->account->name,
-
                 $balance->initial_balance,
-
                 '',
-
                 '',
-
                 '',
-
+                '',
+                ''
             ]);
         }
-
-
-
 
 
         /*
@@ -171,15 +163,15 @@ class TransactionsExport implements FromCollection, WithHeadings, ShouldAutoSize
         |--------------------------------------------------------------------------
         */
 
-
         $rows->push([
             '',
             '',
             '',
             '',
             '',
+            '',
+            ''
         ]);
-
 
 
         $rows->push([
@@ -188,23 +180,26 @@ class TransactionsExport implements FromCollection, WithHeadings, ShouldAutoSize
             '',
             '',
             '',
+            '',
+            ''
         ]);
-
 
 
         $rows->push([
             'Fecha',
             'Concepto',
             'Banco',
+            'Usuario',
             'Tipo',
             'Monto',
             'Saldo después'
         ]);
 
 
-
-
-        $transactions = Transaction::with('account')
+        $transactions = Transaction::with([
+            'account',
+            'user'
+        ])
             ->where(
                 'financial_day_id',
                 $this->financialDayId
@@ -212,7 +207,6 @@ class TransactionsExport implements FromCollection, WithHeadings, ShouldAutoSize
             ->orderBy('date')
             ->orderBy('id')
             ->get();
-
 
 
         $balances = AccountDailyBalance::where(
@@ -225,24 +219,21 @@ class TransactionsExport implements FromCollection, WithHeadings, ShouldAutoSize
             );
 
 
-
         foreach ($transactions as $transaction) {
 
-
-            if (in_array(
-                $transaction->type,
-                [
-                    'income',
-                    'transfer_in'
-                ]
-            )) {
-
+            if (
+                in_array(
+                    $transaction->type,
+                    [
+                        'income',
+                        'transfer_in'
+                    ]
+                )
+            ) {
                 $balances[$transaction->account_id] += $transaction->amount;
             } else {
-
                 $balances[$transaction->account_id] -= $transaction->amount;
             }
-
 
 
             $rows->push([
@@ -250,13 +241,13 @@ class TransactionsExport implements FromCollection, WithHeadings, ShouldAutoSize
                 Carbon::parse($transaction->date)
                     ->format('d/m/Y H:i'),
 
-
                 $transaction->description
                     ?? 'Sin descripción',
 
-
                 $transaction->account->name,
 
+                $transaction->user?->name
+                    ?? 'Sin registro',
 
                 in_array(
                     $transaction->type,
@@ -268,9 +259,7 @@ class TransactionsExport implements FromCollection, WithHeadings, ShouldAutoSize
                     ? 'Ingreso'
                     : 'Egreso',
 
-
                 $transaction->amount,
-
 
                 $balances[$transaction->account_id],
 
@@ -280,9 +269,6 @@ class TransactionsExport implements FromCollection, WithHeadings, ShouldAutoSize
 
         return $rows;
     }
-
-
-
 
 
     public function headings(): array
