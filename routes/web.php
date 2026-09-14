@@ -30,9 +30,9 @@ Route::get('/', function () {
 */
 
 Route::middleware('auth')->group(function () {
-Route::get('/configuracion', function () {
+    Route::get('/configuracion', function () {
 
-    return view('settings.index');
+        return view('settings.index');
     })->name('settings.index');
 
     Route::resource(
@@ -42,6 +42,13 @@ Route::get('/configuracion', function () {
         ->except([
             'show'
         ]);
+
+    Route::get(
+        '/dashboard/sync',
+        [DashboardController::class, 'sync']
+    )
+        ->middleware('auth')
+        ->name('dashboard.sync');
 
     Route::get(
         '/dashboard',

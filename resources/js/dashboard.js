@@ -9,6 +9,47 @@ document.addEventListener('DOMContentLoaded', () => {
 
     console.log('Dashboard JS cargado');
 
+    /*
+   |--------------------------------------------------------------------------
+   | Resincronización al volver a la pestaña
+   |--------------------------------------------------------------------------
+   */
+
+    document.addEventListener(
+        'visibilitychange',
+        () => {
+
+            if (
+                document.visibilityState === 'visible'
+            ) {
+
+                syncDashboard();
+
+            }
+
+        }
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Back Forward Cache
+    |--------------------------------------------------------------------------
+    */
+
+    window.addEventListener(
+        'pageshow',
+        event => {
+
+            if (event.persisted) {
+
+                syncDashboard();
+
+            }
+
+        }
+    );
+
     if (!window.Echo) {
         console.error('Laravel Echo no está disponible');
         return;
@@ -229,6 +270,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         });
 
+
+
+
 });
 
 /*
@@ -236,7 +280,10 @@ Agregar movimiento a la tabla
 --------------------------------------------------------------------------
 */
 
-function addMovementToTable(event) {
+function addMovementToTable(
+    event,
+    animate = true
+) {
 
     const tbody = document.querySelector(
         '#movements-body'
@@ -386,8 +433,8 @@ function addMovementToTable(event) {
     <td>
 
         ${escapeHtml(
-            event.account.name
-        )}
+        event.account.name
+    )}
 
     </td>
 
@@ -400,8 +447,8 @@ function addMovementToTable(event) {
 
             <span>
                 ${escapeHtml(
-                    movement.user?.name || 'Sin registro'
-                )}
+        movement.user?.name || 'Sin registro'
+    )}
             </span>
 
         </div>
@@ -465,18 +512,291 @@ function addMovementToTable(event) {
     |--------------------------------------------------------------------------
     */
 
-    row.classList.add(
-        'movement-new'
-    );
+    if (animate) {
 
-
-    setTimeout(() => {
-
-        row.classList.remove(
+        row.classList.add(
             'movement-new'
         );
 
-    }, 1000);
+
+        setTimeout(() => {
+
+            row.classList.remove(
+                'movement-new'
+            );
+
+        }, 1000);
+
+    }
+
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Sincronizar dashboard con la base de datos
+|--------------------------------------------------------------------------
+*/
+
+async function syncDashboard() {
+
+    if (!document.querySelector('.dashboard')) {
+        return;
+    }
+
+
+    console.log('Sincronizando dashboard...');
+
+
+    try {
+
+        const response = await fetch(
+            '/dashboard/sync',
+            {
+                method: 'GET',
+
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+
+                cache: 'no-store'
+            }
+        );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                `Error HTTP ${response.status}`
+            );
+
+        }
+
+
+        const data = await response.json();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | No hay jornada
+        |--------------------------------------------------------------------------
+        */
+
+        if (!data.has_day) {
+
+            window.location.reload();
+
+            return;
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | HEADER
+        |--------------------------------------------------------------------------
+        */
+
+        const headerBalance =
+            document.querySelector(
+                '[data-header-balance]'
+            );
+
+        if (headerBalance) {
+
+            headerBalance.textContent =
+                '$' + formatMoney(
+                    data.balance_total
+                );
+
+        }
+
+
+        const headerIncome =
+            document.querySelector(
+                '[data-header-income]'
+            );
+
+        if (headerIncome) {
+
+            headerIncome.textContent =
+                '+ $' + formatMoney(
+                    data.day_income
+                );
+
+        }
+
+
+        const headerExpense =
+            document.querySelector(
+                '[data-header-expense]'
+            );
+
+        if (headerExpense) {
+
+            headerExpense.textContent =
+                '- $' + formatMoney(
+                    data.day_expense
+                );
+
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | CARDS
+        |--------------------------------------------------------------------------
+        */
+
+        data.accounts.forEach(account => {
+
+            const card =
+                document.querySelector(
+                    `.bank-card[data-account-id="${account.id}"]`
+                );
+
+
+            if (!card) {
+                return;
+            }
+
+
+            const balanceElement =
+                card.querySelector(
+                    '[data-balance]'
+                );
+
+            if (balanceElement) {
+
+                balanceElement.textContent =
+                    '$' + formatMoney(
+                        account.balance
+                    );
+
+            }
+
+
+            const incomeElement =
+                card.querySelector(
+                    '[data-income]'
+                );
+
+            if (incomeElement) {
+
+                incomeElement.innerHTML = `
+                    <i class="bi bi-arrow-up"></i>
+                    $${formatMoney(account.income)}
+                `;
+
+            }
+
+
+            const expenseElement =
+                card.querySelector(
+                    '[data-expense]'
+                );
+
+            if (expenseElement) {
+
+                expenseElement.innerHTML = `
+                    <i class="bi bi-arrow-down"></i>
+                    $${formatMoney(account.expense)}
+                `;
+
+            }
+
+
+            const movementsElement =
+                card.querySelector(
+                    '[data-movements]'
+                );
+
+            if (movementsElement) {
+
+                movementsElement.innerHTML = `
+                    <i class="bi bi-arrow-left-right"></i>
+                    ${account.movements}
+                `;
+
+            }
+
+        });
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | TABLA
+        |--------------------------------------------------------------------------
+        */
+
+        const tbody =
+            document.querySelector(
+                '#movements-body'
+            );
+
+
+        if (tbody) {
+
+            /*
+             * Limpiamos la tabla porque ahora
+             * la verdad viene nuevamente de la BD.
+             */
+
+            tbody.innerHTML = '';
+
+
+            /*
+             * addMovementToTable usa prepend().
+             *
+             * Recorremos al revés para que finalmente
+             * el movimiento más nuevo quede arriba.
+             */
+
+            [...data.movements]
+                .reverse()
+                .forEach(movement => {
+
+                    addMovementToTable(
+                        {
+                            transaction: {
+                                id: movement.id,
+                                type: movement.type,
+                                amount: movement.amount,
+                                description: movement.description,
+                                date: movement.date,
+                                balance_after:
+                                    movement.balance_after,
+
+                                user: movement.user
+                            },
+
+                            account:
+                                movement.account,
+
+                            initialBalance:
+                                movement.initial_balance
+
+                        },
+                        false
+                    );
+
+                });
+
+        }
+
+
+        console.log(
+            'Dashboard sincronizado correctamente'
+        );
+
+    } catch (error) {
+
+        console.error(
+            'Error sincronizando dashboard:',
+            error
+        );
+
+    }
 
 }
 
