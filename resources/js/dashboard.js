@@ -386,8 +386,25 @@ function addMovementToTable(event) {
     <td>
 
         ${escapeHtml(
-        event.account.name
-    )}
+            event.account.name
+        )}
+
+    </td>
+
+
+    <td>
+
+        <div class="movement-user">
+
+            <i class="bi bi-person-circle"></i>
+
+            <span>
+                ${escapeHtml(
+                    movement.user?.name || 'Sin registro'
+                )}
+            </span>
+
+        </div>
 
     </td>
 
@@ -467,19 +484,17 @@ function addMovementToTable(event) {
 Formatear dinero
 --------------------------------------------------------------------------
 */
-
 function formatMoney(value) {
 
     return Number(value || 0).toLocaleString(
         'es-AR',
         {
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 0
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
         }
     );
 
 }
-
 /*
 Escapar HTML
 --------------------------------------------------------------------------

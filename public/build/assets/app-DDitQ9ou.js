@@ -68,6 +68,21 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
 
     <td>
 
+        <div class="movement-user">
+
+            <i class="bi bi-person-circle"></i>
+
+            <span>
+                ${j(n.user?.name||`Sin registro`)}
+            </span>
+
+        </div>
+
+    </td>
+
+
+    <td>
+
         ${u}
 
     </td>
@@ -93,7 +108,7 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
 
     </td>
 
-`,t.prepend(d),d.classList.add(`movement-new`),setTimeout(()=>{d.classList.remove(`movement-new`)},1e3)}function A(e){return Number(e||0).toLocaleString(`es-AR`,{minimumFractionDigits:0,maximumFractionDigits:0})}function j(e){let t=document.createElement(`div`);return t.textContent=e,t.innerHTML}document.addEventListener(`DOMContentLoaded`,()=>{document.getElementById(`transactions-body`)&&Echo.channel(`dashboard`).listen(`.transaction.created`,e=>{console.log(`Nuevo movimiento:`,e);let t=e.transaction,n=e.account,r=document.getElementById(`transactions-body`),i=[`income`,`transfer_in`].includes(t.type),a=`
+`,t.prepend(d),d.classList.add(`movement-new`),setTimeout(()=>{d.classList.remove(`movement-new`)},1e3)}function A(e){return Number(e||0).toLocaleString(`es-AR`,{minimumFractionDigits:2,maximumFractionDigits:2})}function j(e){let t=document.createElement(`div`);return t.textContent=e,t.innerHTML}document.addEventListener(`DOMContentLoaded`,()=>{document.getElementById(`transactions-body`)&&Echo.channel(`dashboard`).listen(`.transaction.created`,e=>{console.log(`Nuevo movimiento:`,e);let t=e.transaction,n=e.account,r=document.getElementById(`transactions-body`),i=[`income`,`transfer_in`].includes(t.type),a=`
 
 <tr>
 

@@ -183,6 +183,10 @@ class TransactionCreated implements ShouldBroadcastNow
                 $balance
                     ? $balance->current_balance
                     : 0,
+                'user' => [
+                    'id' => $this->transaction->user?->id,
+                    'name' => $this->transaction->user?->name ?? 'Sin registro',
+                ],
 
             ],
 
