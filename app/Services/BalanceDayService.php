@@ -190,7 +190,10 @@ class BalanceDayService
     public function getLastMovement(FinancialDay $day)
     {
 
-        return Transaction::with('account')
+        return Transaction::with([
+            'account',
+            'user'
+        ])
             ->where(
                 'financial_day_id',
                 $day->id
@@ -203,7 +206,10 @@ class BalanceDayService
     public function getLatestMovements(FinancialDay $day)
     {
 
-        $movements = Transaction::with('account')
+        $movements = Transaction::with([
+            'account',
+            'user'
+        ])
             ->where('financial_day_id', $day->id)
             ->orderBy('date', 'asc')
             ->orderBy('id', 'asc')

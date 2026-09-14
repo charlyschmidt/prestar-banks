@@ -266,50 +266,32 @@
 
                                 </td>
 
-
-
-
-
-
-
-
                                 <td>
-
 
                                     <div class="table-actions">
 
-
-                                        <a href="{{ route('transactions.edit', $transaction) }}" class="icon-button">
-
-                                            <i class="bi bi-pencil"></i>
-
-                                        </a>
-
+                                        @if (auth()->user()->is_admin || $transaction->user_id === auth()->id())
+                                            <a href="{{ route('transactions.edit', $transaction) }}" class="icon-button"
+                                                title="Editar movimiento">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
 
 
+                                            <form method="POST" action="{{ route('transactions.destroy', $transaction) }}"
+                                                onsubmit="return confirm('¿Seguro que querés eliminar este movimiento?')">
 
+                                                @csrf
+                                                @method('DELETE')
 
-                                        <form method="POST" action="{{ route('transactions.destroy', $transaction) }}">
+                                                <button type="submit" class="icon-button danger"
+                                                    title="Eliminar movimiento">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
 
-
-                                            @csrf
-                                            @method('DELETE')
-
-
-                                            <button class="icon-button danger">
-
-                                                <i class="bi bi-trash"></i>
-
-                                            </button>
-
-
-                                        </form>
-
-
+                                            </form>
+                                        @endif
 
                                     </div>
-
-
 
                                 </td>
 

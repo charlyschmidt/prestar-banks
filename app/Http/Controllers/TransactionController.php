@@ -33,7 +33,10 @@ class TransactionController extends Controller
         }
 
 
-        $transactions = Transaction::with('account')
+        $transactions = Transaction::with([
+            'account',
+            'user'
+        ])
             ->where(
                 'financial_day_id',
                 $day->id
@@ -165,7 +168,6 @@ class TransactionController extends Controller
 
 
 
-
         /*
     |--------------------------------------------------------------------------
     | Validar saldo disponible
@@ -186,7 +188,6 @@ class TransactionController extends Controller
             $balance->current_balance < $data['amount']
         ) {
 
-
             return back()
                 ->withInput()
                 ->with(
@@ -203,6 +204,14 @@ class TransactionController extends Controller
 
 
 
+        /*
+    |--------------------------------------------------------------------------
+    | Usuario creador
+    |--------------------------------------------------------------------------
+    */
+
+        $data['user_id'] = auth()->id();
+
 
 
         /*
@@ -218,15 +227,12 @@ class TransactionController extends Controller
             &$transaction
         ) {
 
-
             $data['financial_day_id'] = $day->id;
-
 
 
             $transaction = Transaction::create(
                 $data
             );
-
 
 
             if (
@@ -252,7 +258,11 @@ class TransactionController extends Controller
             }
 
 
-            // guardamos el saldo después del movimiento
+            /*
+        |--------------------------------------------------------------------------
+        | Guardar saldo después del movimiento
+        |--------------------------------------------------------------------------
+        */
 
             $transaction->update([
 
@@ -263,11 +273,9 @@ class TransactionController extends Controller
 
 
 
-
-
         /*
     |--------------------------------------------------------------------------
-    | Evento
+    | Evento realtime
     |--------------------------------------------------------------------------
     */
 
@@ -277,7 +285,6 @@ class TransactionController extends Controller
         event(
             new TransactionCreated($transaction)
         );
-
 
 
 
@@ -299,12 +306,46 @@ class TransactionController extends Controller
 
     public function edit(Transaction $transaction)
     {
+        /*
+    |--------------------------------------------------------------------------
+    | Solo puede editarlo el usuario que lo creó
+    |--------------------------------------------------------------------------
+    */
+
+        if (
+            !auth()->user()->is_admin &&
+            $transaction->user_id !== auth()->id()
+        ) {
+
+            return redirect()
+                ->route('transactions.index')
+                ->with(
+                    'error',
+                    'No tenés permisos para editar este movimiento.'
+                );
+        }
+
+
         $day = app(\App\Services\FinancialDayService::class)->current();
+
+
+        if (!$day) {
+
+            return redirect()
+                ->route('transactions.index')
+                ->with(
+                    'error',
+                    'No hay una jornada abierta actualmente.'
+                );
+        }
 
 
         $accounts = Account::with([
             'dailyBalances' => function ($q) use ($day) {
-                $q->where('financial_day_id', $day->id);
+                $q->where(
+                    'financial_day_id',
+                    $day->id
+                );
             }
         ])->get();
 
@@ -332,13 +373,34 @@ class TransactionController extends Controller
         FinancialDayService $financialDayService
     ) {
 
+        /*
+    |--------------------------------------------------------------------------
+    | Solo puede editarlo el usuario que lo creó
+    |--------------------------------------------------------------------------
+    */
+
+        if (
+            !auth()->user()->is_admin &&
+            $transaction->user_id !== auth()->id()
+        ) {
+
+            return redirect()
+                ->route('transactions.index')
+                ->with(
+                    'error',
+                    'No tenés permisos para editar este movimiento.'
+                );
+        }
+
+
+
         $data = $request->validate([
 
             'account_id' => 'required|exists:accounts,id',
 
             'type' => 'required|in:income,expense,transfer_in,transfer_out',
 
-            'amount' => 'required|numeric|min:0',
+            'amount' => 'required|numeric|min:0.01',
 
             'description' => 'nullable|string',
 
@@ -354,8 +416,13 @@ class TransactionController extends Controller
         if (!$day) {
 
             return back()
-                ->with('error', 'No hay jornada abierta');
+                ->withInput()
+                ->with(
+                    'error',
+                    'No hay una jornada abierta actualmente.'
+                );
         }
+
 
 
         try {
@@ -366,13 +433,11 @@ class TransactionController extends Controller
                 $day
             ) {
 
-
                 /*
-        |--------------------------------------------------------------------------
-        | 1. Revertir movimiento anterior
-        |--------------------------------------------------------------------------
-        */
-
+            |--------------------------------------------------------------------------
+            | 1. Revertir movimiento anterior
+            |--------------------------------------------------------------------------
+            */
 
                 $oldBalance = AccountDailyBalance::where(
                     'financial_day_id',
@@ -382,44 +447,49 @@ class TransactionController extends Controller
                         'account_id',
                         $transaction->account_id
                     )
+                    ->lockForUpdate()
                     ->first();
 
 
 
-                if ($oldBalance) {
+                if (!$oldBalance) {
+
+                    throw new \Exception(
+                        'No existe el saldo diario del movimiento anterior.'
+                    );
+                }
 
 
-                    if (
-                        in_array(
-                            $transaction->type,
-                            [
-                                'income',
-                                'transfer_in'
-                            ]
-                        )
-                    ) {
 
-                        $oldBalance->decrement(
-                            'current_balance',
-                            $transaction->amount
-                        );
-                    } else {
+                if (
+                    in_array(
+                        $transaction->type,
+                        [
+                            'income',
+                            'transfer_in'
+                        ]
+                    )
+                ) {
 
-                        $oldBalance->increment(
-                            'current_balance',
-                            $transaction->amount
-                        );
-                    }
+                    $oldBalance->decrement(
+                        'current_balance',
+                        $transaction->amount
+                    );
+                } else {
+
+                    $oldBalance->increment(
+                        'current_balance',
+                        $transaction->amount
+                    );
                 }
 
 
 
                 /*
-        |--------------------------------------------------------------------------
-        | 2. Buscar nueva cuenta
-        |--------------------------------------------------------------------------
-        */
-
+            |--------------------------------------------------------------------------
+            | 2. Buscar saldo de la nueva cuenta
+            |--------------------------------------------------------------------------
+            */
 
                 $newBalance = AccountDailyBalance::where(
                     'financial_day_id',
@@ -429,6 +499,7 @@ class TransactionController extends Controller
                         'account_id',
                         $data['account_id']
                     )
+                    ->lockForUpdate()
                     ->first();
 
 
@@ -436,46 +507,50 @@ class TransactionController extends Controller
                 if (!$newBalance) {
 
                     throw new \Exception(
-                        'La cuenta no pertenece a la jornada actual'
+                        'La cuenta no pertenece a la jornada actual.'
                     );
                 }
 
 
 
-
                 /*
-        |--------------------------------------------------------------------------
-        | 3. Validar saldo nuevo
-        |--------------------------------------------------------------------------
-        */
+            |--------------------------------------------------------------------------
+            | 3. Validar saldo disponible
+            |--------------------------------------------------------------------------
+            */
+
+                $isExpense = in_array(
+                    $data['type'],
+                    [
+                        'expense',
+                        'transfer_out'
+                    ]
+                );
 
 
                 if (
-                    in_array(
-                        $data['type'],
-                        [
-                            'expense',
-                            'transfer_out'
-                        ]
-                    )
-                    &&
+                    $isExpense &&
                     $newBalance->current_balance < $data['amount']
                 ) {
 
                     throw new \Exception(
-                        'Saldo insuficiente en la cuenta'
+                        'Saldo insuficiente. Disponible: $' .
+                            number_format(
+                                $newBalance->current_balance,
+                                0,
+                                ',',
+                                '.'
+                            )
                     );
                 }
 
 
 
-
                 /*
-        |--------------------------------------------------------------------------
-        | 4. Aplicar nuevo movimiento
-        |--------------------------------------------------------------------------
-        */
-
+            |--------------------------------------------------------------------------
+            | 4. Aplicar nuevo movimiento
+            |--------------------------------------------------------------------------
+            */
 
                 if (
                     in_array(
@@ -493,7 +568,6 @@ class TransactionController extends Controller
                     );
                 } else {
 
-
                     $newBalance->decrement(
                         'current_balance',
                         $data['amount']
@@ -502,15 +576,15 @@ class TransactionController extends Controller
 
 
 
-
                 /*
-        |--------------------------------------------------------------------------
-        | 5. Actualizar transaction
-        |--------------------------------------------------------------------------
-        */
-
+            |--------------------------------------------------------------------------
+            | 5. Actualizar movimiento
+            |--------------------------------------------------------------------------
+            */
 
                 $data['financial_day_id'] = $day->id;
+
+                $data['balance_after'] = $newBalance->current_balance;
 
 
                 $transaction->update($data);
@@ -518,119 +592,174 @@ class TransactionController extends Controller
         } catch (\Exception $e) {
 
             return back()
-                ->with('error', $e->getMessage());
+                ->withInput()
+                ->with(
+                    'error',
+                    $e->getMessage()
+                );
         }
+
+
 
         return redirect()
             ->route('transactions.index')
             ->with(
                 'success',
-                'Movimiento actualizado'
+                'Movimiento actualizado correctamente.'
             );
     }
 
     public function destroy(Transaction $transaction)
     {
+        /*
+    |--------------------------------------------------------------------------
+    | Solo puede eliminarlo el usuario que lo creó
+    |--------------------------------------------------------------------------
+    */
 
-        DB::transaction(function () use ($transaction) {
+        if (
+            !auth()->user()->is_admin &&
+            $transaction->user_id !== auth()->id()
+        ) {
+
+            return back()
+                ->with(
+                    'error',
+                    'No tenés permisos para eliminar este movimiento.'
+                );
+        }
 
 
-            $balance = AccountDailyBalance::where(
-                'financial_day_id',
-                $transaction->financial_day_id
-            )
-                ->where(
-                    'account_id',
-                    $transaction->account_id
+
+        try {
+
+            DB::transaction(function () use ($transaction) {
+
+
+                $balance = AccountDailyBalance::where(
+                    'financial_day_id',
+                    $transaction->financial_day_id
                 )
-                ->lockForUpdate()
-                ->first();
+                    ->where(
+                        'account_id',
+                        $transaction->account_id
+                    )
+                    ->lockForUpdate()
+                    ->first();
 
 
 
-            if (!$balance) {
+                if (!$balance) {
 
-                throw new \Exception(
-                    'No existe saldo diario'
+                    throw new \Exception(
+                        'No existe saldo diario'
+                    );
+                }
+
+
+
+                /*
+            |--------------------------------------------------------------------------
+            | Revertir movimiento
+            |--------------------------------------------------------------------------
+            */
+
+                if (
+                    in_array(
+                        $transaction->type,
+                        [
+                            'income',
+                            'transfer_in'
+                        ]
+                    )
+                ) {
+
+                    /*
+                 * Si eliminamos un ingreso,
+                 * debemos restarlo del saldo.
+                 */
+
+                    $balance->decrement(
+                        'current_balance',
+                        $transaction->amount
+                    );
+                } else {
+
+                    /*
+                 * Si eliminamos un egreso,
+                 * debemos devolver el dinero al saldo.
+                 */
+
+                    $balance->increment(
+                        'current_balance',
+                        $transaction->amount
+                    );
+                }
+
+
+
+                /*
+            |--------------------------------------------------------------------------
+            | Eliminación lógica
+            |--------------------------------------------------------------------------
+            |
+            | Como Transaction usa SoftDeletes,
+            | esto completa deleted_at y NO borra el registro físicamente.
+            |
+            */
+
+                $transaction->delete();
+            });
+
+
+            return back()
+                ->with(
+                    'success',
+                    'Movimiento eliminado correctamente.'
                 );
-            }
+        } catch (\Exception $e) {
 
-
-
-
-
-
-            /*
-        Revertir movimiento
-        */
-
-
-            if (
-                in_array(
-                    $transaction->type,
-                    [
-                        'income',
-                        'transfer_in'
-                    ]
-                )
-            ) {
-
-
-                $balance->decrement(
-                    'current_balance',
-                    $transaction->amount
-                );
-            } else {
-
-
-                $balance->increment(
-                    'current_balance',
-                    $transaction->amount
-                );
-            }
-
-
-
-
-
-            $transaction->delete();
-        });
-
-
-
-
-        return back()
-            ->with(
-                'success',
-                'Movimiento eliminado'
+            \Log::error(
+                'Error al eliminar movimiento',
+                [
+                    'transaction_id' => $transaction->id,
+                    'user_id'        => auth()->id(),
+                    'mensaje'        => $e->getMessage(),
+                ]
             );
+
+
+            return back()
+                ->with(
+                    'error',
+                    'Ocurrió un error al eliminar el movimiento.'
+                );
+        }
     }
 
     public function export(
-    FinancialDayService $financialDayService
-)
-{
-    $day = $financialDayService->current();
+        FinancialDayService $financialDayService
+    ) {
+        $day = $financialDayService->current();
 
-    if (!$day) {
+        if (!$day) {
 
-        return back()->with(
-            'error',
-            'No hay una jornada abierta.'
+            return back()->with(
+                'error',
+                'No hay una jornada abierta.'
+            );
+        }
+
+        return Excel::download(
+
+            new TransactionsExport(
+                $day->id,
+                $day,
+                auth()->user()
+            ),
+
+            'Movimientos-' . $day->date->format('Y-m-d') . '.xlsx'
+
         );
-
     }
-
-    return Excel::download(
-
-        new TransactionsExport(
-            $day->id,
-            $day,
-            auth()->user()
-        ),
-
-        'Movimientos-'.$day->date->format('Y-m-d').'.xlsx'
-
-    );
-}
 }
