@@ -43,6 +43,7 @@ import '../css/movement.css';
 
 import '../css/login.css';
 
+import '../css/settings.css';
 
 
 /*
@@ -56,3 +57,5 @@ import './dashboard';
 import './transactions';
 
 import './money-input';
+
+import './settings';

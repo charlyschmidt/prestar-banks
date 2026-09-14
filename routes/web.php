@@ -30,6 +30,10 @@ Route::get('/', function () {
 */
 
 Route::middleware('auth')->group(function () {
+Route::get('/configuracion', function () {
+
+    return view('settings.index');
+    })->name('settings.index');
 
     Route::resource(
         'usuarios',

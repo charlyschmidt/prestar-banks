@@ -1,6 +1,4 @@
-<div class="offcanvas offcanvas-start sidebar-offcanvas"
-     tabindex="-1"
-     id="mobileSidebar">
+<div class="offcanvas offcanvas-start sidebar-offcanvas" tabindex="-1" id="mobileSidebar">
 
 
     <div class="offcanvas-header">
@@ -22,9 +20,7 @@
 
 
 
-        <button type="button"
-                class="btn-close btn-close-white"
-                data-bs-dismiss="offcanvas">
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas">
         </button>
 
 
@@ -84,8 +80,6 @@
 
 
             @if (auth()->user()->is_admin)
-
-
                 <a href="{{ route('usuarios.index') }}">
 
 
@@ -95,8 +89,6 @@
 
 
                 </a>
-
-
             @endif
 
 
@@ -127,8 +119,7 @@
 
 
 
-                <button type="submit"
-                        class="sidebar-link-button">
+                <button type="submit" class="sidebar-link-button">
 
 
                     <i class="bi bi-box-arrow-right"></i>
@@ -234,8 +225,6 @@
 
 
         @if (auth()->user()->is_admin)
-
-
             <a href="{{ route('usuarios.index') }}">
 
 
@@ -245,8 +234,6 @@
 
 
             </a>
-
-
         @endif
 
 
@@ -254,14 +241,9 @@
 
 
 
-        <a href="#">
-
-
+        <a href="{{ route('settings.index') }}">
             <i class="bi bi-gear"></i>
-
             Configuración
-
-
         </a>
 
 
@@ -277,8 +259,7 @@
 
 
 
-            <button type="submit"
-                    class="sidebar-link-button">
+            <button type="submit" class="sidebar-link-button">
 
 
                 <i class="bi bi-box-arrow-right"></i>

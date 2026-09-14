@@ -1,3 +1,5 @@
+import { playRealtimeSound } from './realtime-sound';
+
 document.addEventListener('DOMContentLoaded', () => {
 
     // Solo ejecutar en el dashboard
@@ -223,7 +225,7 @@ document.addEventListener('DOMContentLoaded', () => {
             */
 
             addMovementToTable(event);
-
+            playRealtimeSound();
 
         });
 

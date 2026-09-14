@@ -3,7 +3,7 @@
 
 @section('content')
 
-<div class="page-container">
+<div class="page-container dashboard">
 
 
 
