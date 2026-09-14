@@ -478,7 +478,7 @@
 
                                             +
 
-                                            ${{ number_format($movement->amount, 0, ',', '.') }}
+                                            ${{ number_format($movement->amount, 2, ',', '.') }}
 
 
                                         </span>
@@ -487,7 +487,7 @@
 
                                             -
 
-                                            ${{ number_format($movement->amount, 0, ',', '.') }}
+                                            ${{ number_format($movement->amount, 2, ',', '.') }}
 
 
                                         </span>
@@ -506,7 +506,7 @@
                                 <td>
 
 
-                                    ${{ number_format($movement->initial_balance ?? 0, 0, ',', '.') }}
+                                    ${{ number_format($movement->initial_balance ?? 0, 2, ',', '.') }}
 
 
                                 </td>
@@ -520,7 +520,7 @@
                                 <td>
 
 
-                                    ${{ number_format($movement->balance_after ?? 0, 0, ',', '.') }}
+                                    ${{ number_format($movement->balance_after ?? 0, 2, ',', '.') }}
 
 
                                 </td>

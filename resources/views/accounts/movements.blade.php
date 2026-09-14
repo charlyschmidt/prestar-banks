@@ -319,7 +319,7 @@
                                                 -
                                     @endif
 
-                                    ${{ number_format($movement->amount, 0, ',', '.') }}
+                                    ${{ number_format($movement->amount, 2, ',', '.') }}
 
                                     </span>
 
