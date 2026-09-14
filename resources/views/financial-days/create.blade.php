@@ -2,149 +2,106 @@
 
 
 @section('content')
-
-<div class="page-container">
-
-
-    <div class="page-header">
-
-        <div>
-
-            <h1>
-                Apertura de jornada
-            </h1>
+    <div class="page-container">
 
 
-            <p>
-                Cargá los saldos iniciales de tus cuentas para comenzar el día.
-            </p>
+        <div class="page-header">
+
+            <div>
+
+                <h1>
+                    Apertura de jornada
+                </h1>
+
+                <p>
+                    Cargá los saldos iniciales de tus cuentas para comenzar el día.
+                </p>
+
+            </div>
 
         </div>
 
 
-    </div>
+
+        <form method="POST" action="{{ route('financial-days.store') }}">
+
+            @csrf
 
 
+            <div class="row g-3">
+
+                @foreach ($accounts as $account)
+                    <div class="col-12 col-sm-6 col-xl-3">
+
+                        <div class="account-card h-100">
 
 
-    <form method="POST" action="{{ route('financial-days.store') }}">
+                            <div class="w-100">
 
-        @csrf
+                                <div class="account-top">
 
+                                    @if ($account->logo)
+                                        <img class="account-logo" src="{{ Storage::url($account->logo) }}"
+                                            alt="{{ $account->name }}">
+                                    @else
+                                        <div class="account-logo empty">
 
+                                            <i class="bi bi-bank"></i>
 
-        <div class="accounts-grid">
-
-
-            @foreach ($accounts as $account)
-
-
-                <div class="account-card">
-
-
-                    <div>
+                                        </div>
+                                    @endif
 
 
-                        <div class="account-top">
+                                    <div>
 
+                                        <h3>
+                                            {{ $account->name }}
+                                        </h3>
 
-                            @if($account->logo)
+                                        <span>
+                                            Saldo inicial
+                                        </span>
 
-                                <img 
-                                    class="account-logo"
-                                    src="{{ Storage::url($account->logo) }}"
-                                >
-
-                            @else
-
-                                <div class="account-logo empty">
-
-                                    <i class="bi bi-bank"></i>
+                                    </div>
 
                                 </div>
 
-                            @endif
 
+                                <div class="mt-4">
 
+                                    <input type="text" class="dark-input w-100 money-input"
+                                        name="balances[{{ $account->id }}]" placeholder="0" inputmode="decimal"
+                                        autocomplete="off" required>
 
-                            <div>
-
-                                <h3>
-                                    {{ $account->name }}
-                                </h3>
-
-
-                                <span>
-                                    Saldo inicial
-                                </span>
+                                </div>
 
                             </div>
 
 
                         </div>
 
-
-
-                        <div style="margin-top:20px">
-
-
-                            <input
-
-                                type="number"
-
-                                step="0.01"
-
-                                class="dark-input"
-
-                                name="balances[{{ $account->id }}]"
-
-                                placeholder="0.00"
-
-                                required
-
-                            >
-
-
-                        </div>
-
-
                     </div>
+                @endforeach
 
-
-                </div>
-
-
-            @endforeach
-
-
-        </div>
+            </div>
 
 
 
+            <div class="opening-day-actions mt-4 d-flex justify-content-center">
 
-        <div class="form-actions">
+                <button type="submit" class="primary-action-button">
 
+                    <i class="bi bi-play-circle"></i>
 
-            <button class="primary-action-button">
+                    Abrir jornada
 
+                </button>
 
-                <i class="bi bi-play-circle"></i>
-
-                Abrir jornada
-
-
-            </button>
+            </div>
 
 
-        </div>
+        </form>
 
 
-
-    </form>
-
-
-
-</div>
-
-
+    </div>
 @endsection

@@ -3,20 +3,26 @@
 
 @section('content')
 
-<div class="dashboard">
+<div class="page-container">
 
 
-    <div class="dashboard-header">
+    <div class="page-header no-day-header">
 
-        <h1>
-            Dashboard
-        </h1>
+        <div>
 
-        <p>
-            No hay una jornada financiera abierta para hoy.
-        </p>
+            <h1>
+                Dashboard
+            </h1>
+
+            <p>
+                No hay una jornada financiera abierta para hoy.
+            </p>
+
+        </div>
 
     </div>
+
+
 
 
 
@@ -28,7 +34,6 @@
             <i class="bi bi-calendar-check"></i>
 
         </div>
-
 
 
         <div class="start-day-content">
@@ -44,16 +49,14 @@
             </p>
 
 
-
             <a href="{{ route('financial-days.create') }}"
                class="start-day-button">
 
                 <i class="bi bi-play-circle"></i>
 
-                Iniciar jornada
+                Cargar saldos iniciales
 
             </a>
-
 
         </div>
 
@@ -62,6 +65,5 @@
 
 
 </div>
-
 
 @endsection

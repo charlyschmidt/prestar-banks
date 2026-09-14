@@ -9,14 +9,15 @@
         <div class="page-header">
 
 
-            <div class="d-flex align-items-center gap-3">
-
+            <div class="d-flex align-items-center gap-3 movement-title">
 
                 <a href="{{ route('dashboard') }}" class="secondary-button back-button">
 
                     <i class="bi bi-arrow-left"></i>
 
-                    Volver
+                    <span>
+                        Volver
+                    </span>
 
                 </a>
 
@@ -42,34 +43,34 @@
 
 
 
-            <div class="d-flex gap-2">
-                
+            <div class="d-flex gap-2 movement-actions">
+
+
                 <a href="{{ route('transactions.create') }}" class="primary-action-button">
 
 
                     <i class="bi bi-plus"></i>
 
-                    Nuevo
+                    <span>
+                        Nuevo
+                    </span>
 
 
                 </a>
+
+
 
                 <a href="{{ route('transactions.export') }}" class="primary-action-button">
 
 
                     <i class="bi bi-file-earmark-arrow-down"></i>
 
-
-                    Exportar Excel
+                    <span>
+                        Exportar Excel
+                    </span>
 
 
                 </a>
-
-
-
-
-
-
 
 
             </div>

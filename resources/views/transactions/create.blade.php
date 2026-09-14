@@ -126,7 +126,8 @@
                         </label>
 
 
-                        <input type="number" step="0.01" name="amount" class="dark-input" placeholder="0.00" required>
+                        <input type="text" name="amount" class="dark-input money-input" placeholder="0"
+                            inputmode="decimal" autocomplete="off" required>
 
 
                     </div>

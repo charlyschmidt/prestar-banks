@@ -2,61 +2,74 @@
 
 
 @section('content')
-    <div class="page-container">
 
-
-        <div class="page-header">
-
-
-            <div class="d-flex align-items-center gap-3">
-
-
-                <a href="{{ route('dashboard') }}" class="secondary-button back-button">
-
-                    <i class="bi bi-arrow-left"></i>
-
-                    Volver
-
-                </a>
+<div class="page-container">
 
 
 
-                @if ($account->logo)
-                    <img src="{{ asset('storage/' . $account->logo) }}" alt="{{ $account->name }}"
-                        style="height:45px; width:45px; object-fit:contain;">
-                @endif
+    <div class="page-header d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
 
 
 
-                <div>
-
-                    <h1 class="mb-1">
-                        {{ $account->name }}
-                    </h1>
 
 
-                    <p class="mb-0">
-                        Movimientos de la jornada actual
-                    </p>
-
-                </div>
+        <div class="d-flex align-items-center gap-3 flex-wrap">
 
 
-            </div>
+
+            <a href="{{ route('dashboard') }}"
+               class="secondary-button back-button">
+
+
+                <i class="bi bi-arrow-left"></i>
+
+                Volver
+
+
+            </a>
+
+
+
+
+
+            @if ($account->logo)
+
+                <img
+                    src="{{ asset('storage/' . $account->logo) }}"
+                    alt="{{ $account->name }}"
+                    style="
+                        height:45px;
+                        width:45px;
+                        object-fit:contain;
+                    ">
+
+            @endif
+
+
+
 
 
 
             <div>
 
-                <a href="{{ route('accounts.export', $account->id) }}" class="primary-action-button">
 
-                    <i class="bi bi-file-earmark-arrow-down"></i>
+                <h1 class="mb-1">
 
-                    Exportar a Excel
+                    {{ $account->name }}
 
-                </a>
+                </h1>
+
+
+
+                <p class="mb-0">
+
+                    Movimientos de la jornada actual
+
+                </p>
+
 
             </div>
+
 
 
         </div>
@@ -65,16 +78,51 @@
 
 
 
-        {{-- RESUMEN CUENTA --}}
+
+        <div>
 
 
-        <div class="accounts-grid">
+            <a href="{{ route('accounts.export', $account->id) }}"
+               class="primary-action-button">
 
 
-            <div class="account-card">
+                <i class="bi bi-file-earmark-arrow-down"></i>
+
+                Exportar a Excel
+
+
+            </a>
+
+
+        </div>
+
+
+
+    </div>
+
+
+
+
+
+
+
+
+    {{-- RESUMEN CUENTA --}}
+
+
+
+    <div class="row g-3">
+
+
+
+        <div class="col-12 col-md-6">
+
+
+            <div class="account-card h-100">
 
 
                 <div>
+
 
                     <span>
                         Saldo inicial
@@ -87,29 +135,6 @@
 
                     </h3>
 
-                </div>
-
-
-            </div>
-
-
-
-            <div class="account-card">
-
-
-                <div>
-
-                    <span>
-                        Saldo actual
-                    </span>
-
-
-                    <h3 class="green">
-
-                        ${{ number_format($balance->current_balance ?? 0, 0, ',', '.') }}
-
-                    </h3>
-
 
                 </div>
 
@@ -124,24 +149,70 @@
 
 
 
-
-        {{-- MOVIMIENTOS --}}
-
-
-        <div class="movements">
+        <div class="col-12 col-md-6">
 
 
-            <div class="section-title">
+            <div class="account-card h-100">
 
-                <h3>
 
-                    Movimientos
+                <div>
 
-                </h3>
+
+                    <span>
+                        Saldo actual
+                    </span>
+
+
+                    <h3 class="green">
+
+
+                        ${{ number_format($balance->current_balance ?? 0, 0, ',', '.') }}
+
+
+                    </h3>
+
+
+                </div>
+
 
             </div>
 
 
+        </div>
+
+
+
+    </div>
+
+
+
+
+
+
+
+
+
+    {{-- MOVIMIENTOS --}}
+
+
+
+    <div class="movements mt-4">
+
+
+
+        <div class="section-title">
+
+            <h3>
+                Movimientos
+            </h3>
+
+        </div>
+
+
+
+
+
+        <div class="table-responsive">
 
 
             <table class="modern-table">
@@ -149,11 +220,14 @@
 
                 <thead>
 
+
                     <tr>
+
 
                         <th>
                             Fecha
                         </th>
+
 
                         <th>
                             Concepto
@@ -172,15 +246,22 @@
 
                     </tr>
 
+
                 </thead>
+
+
 
 
 
                 <tbody>
 
 
+
                     @forelse($movements as $movement)
+
+
                         <tr>
+
 
 
                             <td>
@@ -212,8 +293,8 @@
 
 
 
-                            <td>
 
+                            <td>
 
                                 {{ $movement->description }}
 
@@ -224,10 +305,14 @@
 
 
 
+
                             <td>
 
 
+
                                 @if (in_array($movement->type, ['income', 'transfer_in']))
+
+
                                     <span class="tag income-tag">
 
 
@@ -237,7 +322,11 @@
 
 
                                     </span>
+
+
                                 @else
+
+
                                     <span class="tag expense-tag">
 
 
@@ -247,7 +336,10 @@
 
 
                                     </span>
+
+
                                 @endif
+
 
 
                             </td>
@@ -256,22 +348,30 @@
 
 
 
+
                             <td class="amount">
 
 
+
                                 @if (in_array($movement->type, ['income', 'transfer_in']))
+
+
                                     <span class="green">
 
                                         +
-                                    @else
-                                        <span class="red">
 
-                                            -
+                                @else
+
+
+                                    <span class="red">
+
+                                        -
+
                                 @endif
 
 
 
-                                ${{ number_format($movement->amount, 0, ',', '.') }}
+                                    ${{ number_format($movement->amount, 0, ',', '.') }}
 
 
                                 </span>
@@ -282,6 +382,7 @@
 
 
                         </tr>
+
 
 
 
@@ -296,8 +397,9 @@
 
                             </td>
 
-
                         </tr>
+
+
                     @endforelse
 
 
@@ -308,9 +410,15 @@
             </table>
 
 
+
         </div>
 
 
-
     </div>
+
+
+
+</div>
+
+
 @endsection

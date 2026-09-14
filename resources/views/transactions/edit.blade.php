@@ -137,8 +137,8 @@
                         </label>
 
 
-                        <input type="number" step="0.01" name="amount" class="dark-input"
-                            value="{{ $transaction->amount }}" required>
+                        <input type="text" name="amount" class="dark-input money-input"
+                            value="{{ $transaction->amount }}" inputmode="decimal" autocomplete="off" required>
 
 
                     </div>

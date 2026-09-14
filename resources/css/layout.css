@@ -1,319 +1,240 @@
-body {
+/* =====================
+   APP LAYOUT
+===================== */
 
-    background: #104072;
-
-    color: #e4e4e7;
-
-}
-
-
-/* APP */
 
 .app-layout {
 
-    display: flex;
-
-    min-height: 100vh;
+    min-height:100vh;
 
 }
 
 
-/* SIDEBAR */
+/* =====================
+   SIDEBAR
+===================== */
+
 
 .sidebar {
 
-    width: 220px;
+    position:fixed;
 
-    background: #104072;
+    left:0;
 
-    border-right: 1px solid #27272a;
+    top:0;
 
-    padding: 25px;
+    width:220px;
 
-    position: fixed;
+    height:100vh;
 
-    height: 100vh;
+    background:var(--bg);
+
+    border-right:1px solid var(--border);
+
+    padding:25px;
+
+    z-index:1000;
 
 }
 
 
-/* LOGO */
 
 .logo {
 
-    margin-bottom: 40px;
+    margin-bottom:40px;
 
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
+    text-align:center;
 
 }
 
-
-.logo a {
-
-    display: block;
-
-    width: 150px;
-
-}
 
 
 .logo img {
 
-    width: 100%;
+    width:150px;
 
-    height: auto;
-
-    display: block;
+    max-width:100%;
 
 }
 
 
-/* NAV */
 
-.sidebar a {
 
-    display: flex;
+.sidebar a,
+.sidebar-link-button {
 
-    gap: 12px;
 
-    align-items: center;
+    width:100%;
 
-    padding: 12px;
+    display:flex;
 
-    border-radius: 12px;
+    align-items:center;
 
-    color: #ffffff;
+    gap:12px;
 
-    text-decoration: none;
+    padding:12px;
 
-    font-size: 14px;
+    border-radius:12px;
 
-    margin-bottom: 5px;
+    color:white;
+
+    text-decoration:none;
+
+    background:none;
+
+    border:none;
+
+    font-size:14px;
+
+    margin-bottom:5px;
+
+    cursor:pointer;
+
 
 }
 
 
-.sidebar a:hover {
 
-    background: #18181b;
+.sidebar a:hover,
+.sidebar-link-button:hover,
+.sidebar a.active {
 
-    color: white;
+
+    background:rgba(255,255,255,.10);
+
+    color:white;
 
 }
 
 
-/* MAIN */
+
+/* =====================
+   MAIN
+===================== */
+
 
 .main-area {
 
-    margin-left: 220px;
+    margin-left:220px;
 
-    width: calc(100% - 220px);
+    width:calc(100% - 220px);
+
+    min-height:100vh;
+
+    background:var(--bg);
 
 }
 
 
-/* HEADER */
+
+/* =====================
+   HEADER
+===================== */
+
 
 .top-header {
 
-    height: 75px;
 
-    border-bottom: 1px solid #27272a;
+    height:75px;
 
-    background: #104072;
+    background:var(--bg);
 
-    display: flex;
+    border-bottom:1px solid var(--border);
 
-    justify-content: space-between;
+    display:flex;
 
-    align-items: center;
+    align-items:center;
 
-    padding: 0 30px;
+    justify-content:space-between;
 
-    position: sticky;
+    padding:0 30px;
 
-    top: 0;
+    position:sticky;
 
-    z-index: 20;
+    top:0;
+
+    z-index:50;
+
+
+}
+
+
+
+.header-balance span,
+.header-item span {
+
+
+    display:block;
+
+    color:var(--muted);
+
+    font-size:11px;
+
 
 }
 
-
-.header-balance span {
-
-    display: block;
-
-    font-size: 11px;
-
-    color: #ffffff;
-
-}
 
 
 .header-balance strong {
 
-    font-size: 20px;
+    display:block;
+
+    font-size:22px;
+
+    font-weight:700;
+
+    color:var(--text);
 
 }
+
+
+.header-balance strong.positive {
+    color:var(--green);
+}
+
+.header-balance strong.negative {
+    color:var(--red);
+}
+
+.header-balance strong.zero {
+    color:var(--text);
+}
+
+.header-item strong {
+
+
+    display:block;
+
+    font-size:14px;
+
+    margin-top:2px;
+
+
+}
+
 
 
 .header-actions {
 
-    display: flex;
 
-    align-items: center;
+    display:flex;
 
-    gap: 20px;
+    align-items:center;
 
-}
+    gap:20px;
 
-
-.header-item span {
-
-    display: block;
-
-    font-size: 11px;
-
-    color: #ffffff;
-
-}
-
-
-.header-item strong {
-
-    font-size: 14px;
-
-}
-
-
-.header-button {
-
-    width: 38px;
-
-    height: 38px;
-
-    border-radius: 12px;
-
-    background: #18181b;
-
-    border: 1px solid #27272a;
-
-    color: white;
-
-}
-
-
-.user-avatar {
-
-    width: 38px;
-
-    height: 38px;
-
-    border-radius: 50%;
-
-    background: #27272a;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    font-weight: 600;
-
-}
-
-/* LOGOUT SIDEBAR */
-
-.sidebar form {
-
-    margin: 0;
-
-}
-
-
-.sidebar-link-button {
-
-    width: 100%;
-
-    display: flex;
-
-    gap: 12px;
-
-    align-items: center;
-
-    padding: 12px;
-
-    border-radius: 12px;
-
-    color: #ffffff;
-
-    background: transparent;
-
-    border: none;
-
-    font-size: 14px;
-
-    margin-bottom: 5px;
-
-    cursor: pointer;
-
-    text-align: left;
 
 }
 
 
 
-.sidebar-link-button:hover {
-
-    background: #18181b;
-
-    color: white;
-
-}
-
-.table-actions {
-
-    display: flex;
-
-    justify-content: flex-end;
-
-    align-items: center;
-
-    gap: 8px;
-
-}
+/* =====================
+   USER
+===================== */
 
 
-.table-actions form {
+.user-profile-badge {
 
-    margin: 0;
-
-}
-
-
-.action-button.danger {
-
-    background: #f87171;
-
-    color: white;
-
-
-}
-
-.users-table {
-
-    width: max-content;
-
-    min-width: 600px;
-
-}
-.user-profile-badge{
 
     display:flex;
 
@@ -321,10 +242,39 @@ body {
 
     gap:8px;
 
+
 }
 
 
-.role-badge{
+
+.user-avatar {
+
+
+    width:38px;
+
+    height:38px;
+
+    border-radius:50%;
+
+    background:var(--card);
+
+    color:white;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    font-weight:700;
+
+
+}
+
+
+
+.role-badge {
+
 
     padding:4px 8px;
 
@@ -334,49 +284,120 @@ body {
 
     font-weight:700;
 
-    letter-spacing:.5px;
 
 }
 
 
-.role-badge.admin{
+
+.role-badge.admin {
+
 
     background:#dcfce7;
 
     color:#166534;
 
+
 }
 
 
-.role-badge.user{
+
+.role-badge.user {
+
 
     background:#e5e7eb;
 
     color:#374151;
 
+
 }
 
 
-.user-avatar{
 
-    width:38px;
 
-    height:38px;
 
-    border-radius:50%;
+/* =====================
+   MOBILE
+===================== */
 
-    background:#27272a;
 
-    color:white;
+@media(max-width:768px){
 
-    display:flex;
 
-    align-items:center;
+    .sidebar {
 
-    justify-content:center;
+        display:none;
 
-    font-weight:700;
+    }
 
-    font-size:15px;
+
+
+    .main-area {
+
+
+        margin-left:0;
+
+        width:100%;
+
+
+    }
+
+
+
+    .top-header {
+
+
+        min-height:70px;
+
+        height:auto;
+
+        padding:15px;
+
+        flex-wrap:wrap;
+
+        gap:12px;
+
+
+    }
+
+
+
+    .header-actions {
+
+
+        gap:10px;
+
+
+    }
+
+
+
+    .header-item {
+
+
+        display:none;
+
+
+    }
+
+
+
+    .new-movement-button span {
+
+
+        display:none;
+
+
+    }
+
+
+
+    .user-profile-badge {
+
+
+        display:none;
+
+
+    }
+
 
 }

@@ -8,7 +8,7 @@
 
 
 
-    <div class="page-header">
+    <div class="page-header d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
 
 
         <div>
@@ -39,31 +39,119 @@
 
 
 
-        <form method="POST" 
-        action="{{ route('accounts.store') }}" 
-        enctype="multipart/form-data">
+        <form method="POST"
+              action="{{ route('accounts.store') }}"
+              enctype="multipart/form-data">
 
 
             @csrf
 
 
 
+            <div class="row g-3">
 
 
-            <div class="form-group">
+
+                <div class="col-12">
 
 
-                <label>
-                    Nombre de la cuenta
-                </label>
+                    <div class="form-group">
 
 
-                <input 
-                type="text"
-                name="name"
-                placeholder="Ej: Banco Galicia"
-                class="dark-input"
-                required>
+                        <label>
+                            Nombre de la cuenta
+                        </label>
+
+
+                        <input
+                            type="text"
+                            name="name"
+                            placeholder="Ej: Banco Galicia"
+                            class="dark-input"
+                            required>
+
+
+                    </div>
+
+
+                </div>
+
+
+
+
+
+
+                <div class="col-12 col-md-6">
+
+
+                    <div class="form-group">
+
+
+                        <label>
+                            Tipo de cuenta
+                        </label>
+
+
+                        <select
+                            name="type"
+                            class="dark-input">
+
+
+                            <option value="bank">
+                                Banco
+                            </option>
+
+
+                            <option value="wallet">
+                                Billetera virtual
+                            </option>
+
+
+                            <option value="cash">
+                                Efectivo
+                            </option>
+
+
+                        </select>
+
+
+                    </div>
+
+
+                </div>
+
+
+
+
+
+
+                <div class="col-12 col-md-6">
+
+
+                    <div class="form-group">
+
+
+                        <label>
+                            Logo
+                        </label>
+
+
+                        <input
+                            type="file"
+                            name="logo"
+                            class="dark-input">
+
+
+                        <small>
+                            PNG o JPG recomendado
+                        </small>
+
+
+                    </div>
+
+
+                </div>
+
 
 
             </div>
@@ -74,83 +162,18 @@
 
 
 
-            <div class="form-group">
-
-
-                <label>
-                    Tipo de cuenta
-                </label>
-
-
-                <select 
-                name="type"
-                class="dark-input">
-
-
-                    <option value="bank">
-                        Banco
-                    </option>
-
-
-                    <option value="wallet">
-                        Billetera virtual
-                    </option>
-
-
-                    <option value="cash">
-                        Efectivo
-                    </option>
-
-
-                </select>
-
-
-            </div>
-
-
-
-
-
-
-
-
-            <div class="form-group">
-
-
-                <label>
-                    Logo
-                </label>
-
-
-
-                <input 
-                type="file"
-                name="logo"
-                class="dark-input">
-
-
-                <small>
-                    PNG o JPG recomendado
-                </small>
-
-
-            </div>
-
-
-
-
-
-
-
-            <div class="form-actions">
+            <div class="form-actions d-flex flex-column flex-md-row justify-content-end gap-2 mt-4">
 
 
                 <a href="{{ route('accounts.index') }}"
-                class="secondary-button">
+                   class="secondary-button text-center">
+
 
                     Cancelar
 
+
                 </a>
+
 
 
 

@@ -12,60 +12,109 @@
 
     <title>Ingresar | Prestar</title>
 
+
     @vite([
         'resources/js/app.js'
     ])
 
+
 </head>
+
 
 <body class="login-page">
 
+
     <div class="login-wrapper">
+
+
 
         <div class="login-card">
 
+
+
             <div class="login-logo">
-                <img src="{{ asset('images/logo.png') }}">
+
+
+                <img src="{{ asset('images/logo.png') }}"
+                     alt="Prestar">
+
+
             </div>
+
+
+
+
 
 
             <h1 class="login-title">
+
                 Prestar
+
             </h1>
 
 
+
+
+
             <div class="login-subtitle">
+
                 Ingresá a tu panel financiero
+
             </div>
+
+
+
+
+
+
 
 
             @if ($errors->any())
 
+
                 <div class="login-error">
+
 
                     {{ $errors->first() }}
 
+
                 </div>
+
 
             @endif
 
 
-            <form
-                method="POST"
-                action="{{ route('login') }}"
-            >
+
+
+
+
+
+            <form method="POST"
+                  action="{{ route('login') }}">
+
+
 
                 @csrf
 
 
+
+
+
+
                 <div class="mb-3">
+
 
                     <label
                         for="username"
-                        class="login-label"
-                    >
+                        class="login-label">
+
                         Usuario
+
                     </label>
+
+
+
+
 
                     <input
                         id="username"
@@ -75,20 +124,35 @@
                         class="login-input"
                         required
                         autofocus
-                        autocomplete="username"
-                    >
+                        autocomplete="username">
+
+
 
                 </div>
 
 
+
+
+
+
+
+
                 <div class="mb-3">
+
 
                     <label
                         for="password"
-                        class="login-label"
-                    >
+                        class="login-label">
+
+
                         Contraseña
+
+
                     </label>
+
+
+
+
 
                     <input
                         id="password"
@@ -96,40 +160,72 @@
                         name="password"
                         class="login-input"
                         required
-                        autocomplete="current-password"
-                    >
+                        autocomplete="current-password">
+
+
 
                 </div>
+
+
+
+
+
 
 
                 <div class="login-remember mb-4">
 
+
                     <input
                         id="remember"
                         type="checkbox"
-                        name="remember"
-                    >
+                        name="remember">
+
+
 
                     <label for="remember">
+
                         Recordarme
+
                     </label>
+
 
                 </div>
 
 
+
+
+
+
+
                 <button
                     type="submit"
-                    class="login-button"
-                >
+                    class="login-button">
+
+
                     Ingresar
+
+
                 </button>
+
+
+
+
 
             </form>
 
+
+
+
         </div>
+
+
 
     </div>
 
+
+
+
 </body>
+
 
 </html>

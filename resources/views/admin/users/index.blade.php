@@ -1,41 +1,31 @@
 @extends('layouts.app')
 
+
 @section('content')
-    <div class="dashboard">
 
-
-        {{-- HEADER --}}
-
-        <div class="dashboard-header">
-
-            <div>
-
-                <h1>
-                    Usuarios
-                </h1>
-
-
-                <p class="mt-2">
-
-                    Administración de accesos al sistema
-
-                </p>
-
-            </div>
+<div class="page-container">
 
 
 
-            <div class="header-action">
+    {{-- HEADER --}}
 
-                <a href="{{ route('usuarios.create') }}" class="primary-action-button">
 
-                    <i class="bi bi-person-plus"></i>
+    <div class="page-header d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
 
-                    Nuevo usuario
 
-                </a>
+        <div>
 
-            </div>
+
+            <h1>
+                Usuarios
+            </h1>
+
+
+            <p class="mt-2">
+
+                Administración de accesos al sistema
+
+            </p>
 
 
         </div>
@@ -44,29 +34,74 @@
 
 
 
-        {{-- LISTADO --}}
+        <div>
 
-        <div class="section-title mb-4">
 
-            <h2>
-                Usuarios registrados
-            </h2>
+            <a href="{{ route('usuarios.create') }}"
+               class="primary-action-button">
+
+
+                <i class="bi bi-person-plus"></i>
+
+
+                Nuevo usuario
+
+
+            </a>
+
 
         </div>
 
 
 
+    </div>
 
 
-       <div class="movements users-table">
 
 
-            <table>
+
+
+
+
+    {{-- LISTADO --}}
+
+
+
+    <div class="section-title mb-4">
+
+
+        <h2>
+
+            Usuarios registrados
+
+        </h2>
+
+
+    </div>
+
+
+
+
+
+
+
+
+    <div class="movements users-table">
+
+
+
+        <div class="table-responsive">
+
+
+            <table class="modern-table">
+
 
 
                 <thead>
 
+
                     <tr>
+
 
                         <th>
                             Usuario
@@ -90,18 +125,27 @@
 
                     </tr>
 
+
                 </thead>
+
+
+
 
 
 
                 <tbody>
 
 
+
                     @foreach ($users as $user)
+
+
                         <tr>
 
 
+
                             <td>
+
 
                                 <strong>
 
@@ -115,26 +159,48 @@
 
 
 
+
+
+
                             <td>
 
 
+
                                 @if ($user->is_admin)
+
+
                                     <span class="tag income-tag">
+
 
                                         <i class="bi bi-shield-check"></i>
 
+
                                         Administrador
 
+
                                     </span>
+
+
+
                                 @else
+
+
+
                                     <span class="tag">
+
 
                                         <i class="bi bi-person"></i>
 
+
                                         Usuario
 
+
                                     </span>
+
+
+
                                 @endif
+
 
 
                             </td>
@@ -142,7 +208,12 @@
 
 
 
+
+
+
+
                             <td>
+
 
                                 {{ $user->created_at?->format('d/m/Y') }}
 
@@ -152,38 +223,65 @@
 
 
 
+
+
+
+
                             <td class="actions-cell">
 
 
-                                <div class="table-actions">
+                                <div class="table-actions justify-content-end">
 
 
-                                    <a href="{{ route('usuarios.edit', $user->id) }}" class="action-button">
+
+
+
+                                    <a href="{{ route('usuarios.edit', $user->id) }}"
+                                       class="action-button">
+
 
                                         <i class="bi bi-key"></i>
+
 
                                     </a>
 
 
 
+
+
+
+
                                     @if ($user->username !== 'ivantorio')
-                                        <form action="{{ route('usuarios.destroy', $user->id) }}" method="POST">
+
+
+                                        <form action="{{ route('usuarios.destroy', $user->id) }}"
+                                              method="POST">
+
 
                                             @csrf
 
                                             @method('DELETE')
 
 
-                                            <button type="submit" class="action-button danger"
-                                                onclick="return confirm('¿Eliminar usuario?')">
+
+                                            <button type="submit"
+                                                    class="action-button danger"
+                                                    onclick="return confirm('¿Eliminar usuario?')">
+
 
                                                 <i class="bi bi-trash"></i>
+
 
                                             </button>
 
 
+
                                         </form>
+
+
+
                                     @endif
+
 
 
                                 </div>
@@ -194,7 +292,11 @@
 
 
                         </tr>
+
+
+
                     @endforeach
+
 
 
                 </tbody>
@@ -204,8 +306,17 @@
             </table>
 
 
+
         </div>
 
 
+
     </div>
+
+
+
+
+</div>
+
+
 @endsection

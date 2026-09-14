@@ -19,59 +19,104 @@
 </head>
 
 
+
 <body>
 
 
-    <div class="app-layout">
-
-
-
-        {{-- SIDEBAR --}}
-
-        @include('layouts.sidebar')
+<div class="app-layout">
 
 
 
 
-        {{-- CONTENIDO PRINCIPAL --}}
 
-        <div class="main-area">
+    {{-- SIDEBAR DESKTOP / MOBILE --}}
 
 
-            {{-- HEADER GLOBAL --}}
-
-            @include('layouts.header')
+    @include('layouts.sidebar')
 
 
 
-            <main>
-                @if (session('error'))
-                    <div class="alert-error m-4">
-
-                        <i class="bi bi-exclamation-triangle"></i>
-
-                        {{ session('error') }}
-
-                    </div>
-                @endif
-
-
-                @if (session('success'))
-                    <div class="alert-success m-4">
-
-                        <i class="bi bi-check-circle"></i>
-
-                        {{ session('success') }}
-
-                    </div>
-                @endif
-                @yield('content')
-
-            </main>
 
 
 
-        </div>
+
+    <div class="main-area">
+
+
+
+
+
+
+        {{-- HEADER GLOBAL --}}
+
+
+        @include('layouts.header')
+
+
+
+
+
+
+
+
+        <main class="main-content">
+
+
+            @if (session('error'))
+
+                <div class="alert-error m-3 m-md-4">
+
+
+                    <i class="bi bi-exclamation-triangle"></i>
+
+
+                    {{ session('error') }}
+
+
+                </div>
+
+
+            @endif
+
+
+
+
+
+
+
+            @if (session('success'))
+
+
+                <div class="alert-success m-3 m-md-4">
+
+
+                    <i class="bi bi-check-circle"></i>
+
+
+                    {{ session('success') }}
+
+
+                </div>
+
+
+            @endif
+
+
+
+
+
+
+            @yield('content')
+
+
+
+
+
+
+        </main>
+
+
+
 
 
 
@@ -79,6 +124,14 @@
 
 
 
+
+
+</div>
+
+
+
+
 </body>
+
 
 </html>
