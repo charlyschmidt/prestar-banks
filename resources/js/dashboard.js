@@ -463,13 +463,28 @@ function addMovementToTable(
     </td>
 
 
-    <td class="amount">
+   <td class="amount">
 
-        $${formatMoney(
-        movement.amount
-    )}
+    ${isIncome
+            ? `
+                <span class="amount-income">
+                    +
+                    $${formatMoney(
+                movement.amount
+            )}
+                </span>
+            `
+            : `
+                <span class="amount-expense">
+                    -
+                    $${formatMoney(
+                movement.amount
+            )}
+                </span>
+            `
+        }
 
-    </td>
+</td>
 
 
     <td>

@@ -17,7 +17,7 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
                     ${M(e.transaction.description||``)}
                     ·
                     ${M(e.account.name)}
-                `}re(e),k()})}});function re(e,t=!0){let n=document.querySelector(`#movements-body`);if(!n)return;let r=e.transaction;if(!r||n.querySelector(`tr[data-movement-id="${r.id}"]`))return;let i=new Date(r.date),a=String(i.getDate()).padStart(2,`0`),o=String(i.getMonth()+1).padStart(2,`0`),s=String(i.getHours()).padStart(2,`0`),c=String(i.getMinutes()).padStart(2,`0`),l=`${a}/${o}`,u=`${s}:${c}`,d=[`income`,`transfer_in`].includes(r.type)?`
+                `}re(e),k()})}});function re(e,t=!0){let n=document.querySelector(`#movements-body`);if(!n)return;let r=e.transaction;if(!r||n.querySelector(`tr[data-movement-id="${r.id}"]`))return;let i=new Date(r.date),a=String(i.getDate()).padStart(2,`0`),o=String(i.getMonth()+1).padStart(2,`0`),s=String(i.getHours()).padStart(2,`0`),c=String(i.getMinutes()).padStart(2,`0`),l=`${a}/${o}`,u=`${s}:${c}`,d=[`income`,`transfer_in`].includes(r.type),f=d?`
         <span class="tag income-tag">
 
             <i class="bi bi-arrow-up"></i>
@@ -31,7 +31,7 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
             Egreso
 
         </span>
-    `,f=document.createElement(`tr`);f.dataset.movementId=r.id,f.innerHTML=`
+    `,p=document.createElement(`tr`);p.dataset.movementId=r.id,p.innerHTML=`
 
     <td>
 
@@ -83,16 +83,26 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
 
     <td>
 
-        ${d}
+        ${f}
 
     </td>
 
 
-    <td class="amount">
+   <td class="amount">
 
-        $${j(r.amount)}
+    ${d?`
+                <span class="amount-income">
+                    +
+                    $${j(r.amount)}
+                </span>
+            `:`
+                <span class="amount-expense">
+                    -
+                    $${j(r.amount)}
+                </span>
+            `}
 
-    </td>
+</td>
 
 
     <td>
@@ -108,7 +118,7 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
 
     </td>
 
-`,n.prepend(f),t&&(f.classList.add(`movement-new`),setTimeout(()=>{f.classList.remove(`movement-new`)},1e3))}async function A(){if(document.querySelector(`.dashboard`)){console.log(`Sincronizando dashboard...`);try{let e=await fetch(`/dashboard/sync`,{method:`GET`,headers:{Accept:`application/json`,"X-Requested-With":`XMLHttpRequest`},cache:`no-store`});if(!e.ok)throw Error(`Error HTTP ${e.status}`);let t=await e.json();if(!t.has_day){window.location.reload();return}let n=document.querySelector(`[data-header-balance]`);n&&(n.textContent=`$`+j(t.balance_total));let r=document.querySelector(`[data-header-income]`);r&&(r.textContent=`+ $`+j(t.day_income));let i=document.querySelector(`[data-header-expense]`);i&&(i.textContent=`- $`+j(t.day_expense)),t.accounts.forEach(e=>{let t=document.querySelector(`.bank-card[data-account-id="${e.id}"]`);if(!t)return;let n=t.querySelector(`[data-balance]`);n&&(n.textContent=`$`+j(e.balance));let r=t.querySelector(`[data-income]`);r&&(r.innerHTML=`
+`,n.prepend(p),t&&(p.classList.add(`movement-new`),setTimeout(()=>{p.classList.remove(`movement-new`)},1e3))}async function A(){if(document.querySelector(`.dashboard`)){console.log(`Sincronizando dashboard...`);try{let e=await fetch(`/dashboard/sync`,{method:`GET`,headers:{Accept:`application/json`,"X-Requested-With":`XMLHttpRequest`},cache:`no-store`});if(!e.ok)throw Error(`Error HTTP ${e.status}`);let t=await e.json();if(!t.has_day){window.location.reload();return}let n=document.querySelector(`[data-header-balance]`);n&&(n.textContent=`$`+j(t.balance_total));let r=document.querySelector(`[data-header-income]`);r&&(r.textContent=`+ $`+j(t.day_income));let i=document.querySelector(`[data-header-expense]`);i&&(i.textContent=`- $`+j(t.day_expense)),t.accounts.forEach(e=>{let t=document.querySelector(`.bank-card[data-account-id="${e.id}"]`);if(!t)return;let n=t.querySelector(`[data-balance]`);n&&(n.textContent=`$`+j(e.balance));let r=t.querySelector(`[data-income]`);r&&(r.innerHTML=`
                     <i class="bi bi-arrow-up"></i>
                     $${j(e.income)}
                 `);let i=t.querySelector(`[data-expense]`);i&&(i.innerHTML=`
