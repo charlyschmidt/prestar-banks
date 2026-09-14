@@ -52,22 +52,6 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
 
     <td>
 
-        <strong>
-            ${M(r.description||``)}
-        </strong>
-
-    </td>
-
-
-    <td>
-
-        ${M(e.account.name)}
-
-    </td>
-
-
-    <td>
-
         <div class="movement-user">
 
             <i class="bi bi-person-circle"></i>
@@ -77,6 +61,22 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
             </span>
 
         </div>
+
+    </td>
+
+
+    <td>
+
+        <strong>
+            ${M(r.description||`Sin descripción`)}
+        </strong>
+
+    </td>
+
+
+    <td>
+
+        ${M(e.account.name)}
 
     </td>
 
@@ -97,7 +97,7 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
 
     <td>
 
-        ${j(e.initialBalance)===`0`?``:`$`+j(e.initialBalance)}
+        ${j(e.initialBalance)===`0,00`?``:`$`+j(e.initialBalance)}
 
     </td>
 

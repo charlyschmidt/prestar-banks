@@ -421,26 +421,6 @@ function addMovementToTable(
 
     <td>
 
-        <strong>
-            ${escapeHtml(
-        movement.description || ''
-    )}
-        </strong>
-
-    </td>
-
-
-    <td>
-
-        ${escapeHtml(
-        event.account.name
-    )}
-
-    </td>
-
-
-    <td>
-
         <div class="movement-user">
 
             <i class="bi bi-person-circle"></i>
@@ -452,6 +432,26 @@ function addMovementToTable(
             </span>
 
         </div>
+
+    </td>
+
+
+    <td>
+
+        <strong>
+            ${escapeHtml(
+        movement.description || 'Sin descripción'
+    )}
+        </strong>
+
+    </td>
+
+
+    <td>
+
+        ${escapeHtml(
+        event.account.name
+    )}
 
     </td>
 
@@ -474,9 +474,7 @@ function addMovementToTable(
 
     <td>
 
-        ${formatMoney(
-        event.initialBalance
-    ) === '0'
+        ${formatMoney(event.initialBalance) === '0,00'
             ? ''
             : '$' + formatMoney(
                 event.initialBalance
