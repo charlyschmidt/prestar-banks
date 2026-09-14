@@ -87,17 +87,11 @@
 
         <div class="movements-card">
 
-
-
             <div class="table-responsive">
-
 
                 <table class="modern-table">
 
-
-
                     <thead>
-
 
                         <tr>
 
@@ -105,66 +99,56 @@
                                 Fecha
                             </th>
 
-
                             <th>
                                 Cuenta
                             </th>
 
+                            <th>
+                                Usuario
+                            </th>
 
                             <th>
                                 Tipo
                             </th>
 
-
                             <th>
                                 Descripción
                             </th>
-
 
                             <th class="text-end">
                                 Monto
                             </th>
 
-
-                            <th></th>
-
+                            <th class="text-end">
+                                Acciones
+                            </th>
 
                         </tr>
-
 
                     </thead>
 
 
-
-
-
-
                     <tbody id="transactions-body">
 
-
-
-                        @foreach ($transactions as $transaction)
+                        @forelse ($transactions as $transaction)
                             <tr>
 
-
+                                {{-- FECHA --}}
                                 <td>
 
-                                    {{ \Carbon\Carbon::parse($transaction->date)->format('d/m/Y') }}
+                                    {{ \Carbon\Carbon::parse($transaction->date)->format('d/m/Y H:i') }}
 
                                 </td>
 
 
-
-
-
+                                {{-- CUENTA --}}
                                 <td>
-
 
                                     <div class="account-cell">
 
-
                                         @if ($transaction->account->logo)
-                                            <img src="{{ Storage::url($transaction->account->logo) }}">
+                                            <img src="{{ Storage::url($transaction->account->logo) }}"
+                                                alt="{{ $transaction->account->name }}">
                                         @else
                                             <div class="mini-logo">
 
@@ -174,30 +158,35 @@
                                         @endif
 
 
-
                                         <span>
 
                                             {{ $transaction->account->name }}
 
                                         </span>
 
-
-
                                     </div>
-
-
 
                                 </td>
 
 
-
-
-
-
-
-
+                                {{-- USUARIO --}}
                                 <td>
 
+                                    <div class="movement-user">
+
+                                        <i class="bi bi-person-circle"></i>
+
+                                        <span>
+                                            {{ $transaction->user?->name ?? 'Sin registro' }}
+                                        </span>
+
+                                    </div>
+
+                                </td>
+
+
+                                {{-- TIPO --}}
+                                <td>
 
                                     @if (in_array($transaction->type, ['income', 'transfer_in']))
                                         <span class="movement-income">
@@ -217,55 +206,38 @@
                                         </span>
                                     @endif
 
-
-
                                 </td>
 
 
-
-
-
-
-
+                                {{-- DESCRIPCIÓN --}}
                                 <td>
-
 
                                     {{ $transaction->description ?? 'Sin descripción' }}
 
-
                                 </td>
 
 
-
-
-
-
-
-
+                                {{-- MONTO --}}
                                 <td class="text-end">
-
 
                                     @if (in_array($transaction->type, ['income', 'transfer_in']))
                                         <span class="amount-income">
 
-                                            +
-                                            ${{ number_format($transaction->amount, 2, ',', '.') }}
+                                            + ${{ number_format($transaction->amount, 2, ',', '.') }}
 
                                         </span>
                                     @else
                                         <span class="amount-expense">
 
-                                            -
-                                            ${{ number_format($transaction->amount, 2, ',', '.') }}
-
+                                            - ${{ number_format($transaction->amount, 2, ',', '.') }}
 
                                         </span>
                                     @endif
 
-
-
                                 </td>
 
+
+                                {{-- ACCIONES --}}
                                 <td>
 
                                     <div class="table-actions">
@@ -273,7 +245,9 @@
                                         @if (auth()->user()->is_admin || $transaction->user_id === auth()->id())
                                             <a href="{{ route('transactions.edit', $transaction) }}" class="icon-button"
                                                 title="Editar movimiento">
+
                                                 <i class="bi bi-pencil"></i>
+
                                             </a>
 
 
@@ -285,35 +259,42 @@
 
                                                 <button type="submit" class="icon-button danger"
                                                     title="Eliminar movimiento">
+
                                                     <i class="bi bi-trash"></i>
+
                                                 </button>
 
                                             </form>
+                                        @else
+                                            <span class="text-muted">
+                                                —
+                                            </span>
                                         @endif
 
                                     </div>
 
                                 </td>
 
+                            </tr>
 
+                        @empty
+
+                            <tr>
+
+                                <td colspan="7" class="text-center">
+
+                                    Sin movimientos en esta jornada
+
+                                </td>
 
                             </tr>
-                        @endforeach
-
-
+                        @endforelse
 
                     </tbody>
 
-
-
-
                 </table>
 
-
-
             </div>
-
-
 
         </div>
 
