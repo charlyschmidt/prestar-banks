@@ -851,19 +851,20 @@ class TransactionController extends Controller
 
         /*
     |--------------------------------------------------------------------------
-    | Solo usuarios del área Administración
+    | Permisos
     |--------------------------------------------------------------------------
     |
-    | El Super Admin sigue siendo un concepto separado y no ejecuta
-    | transferencias desde esta función.
+    | Pueden ejecutar:
+    |
+    | - Super Admin
+    | - Administración
     |
     */
 
         if (
-            $user->is_admin ||
+            !$user->is_admin &&
             $user->role !== 'administration'
         ) {
-
             return response()->json([
                 'success' => false,
                 'message' => 'No tenés permisos para ejecutar movimientos.'
@@ -903,7 +904,7 @@ class TransactionController extends Controller
 
         /*
     |--------------------------------------------------------------------------
-    | Evitar ejecutar dos veces
+    | No ejecutar dos veces
     |--------------------------------------------------------------------------
     */
 
@@ -918,38 +919,23 @@ class TransactionController extends Controller
 
         /*
     |--------------------------------------------------------------------------
-    | Marcar como ejecutado
+    | Ejecutar
     |--------------------------------------------------------------------------
     */
 
         $transaction->update([
-
             'executed_at' => now(),
-
             'executed_by' => $user->id,
-
         ]);
 
 
-        /*
-    |--------------------------------------------------------------------------
-    | Respuesta AJAX
-    |--------------------------------------------------------------------------
-    */
-
         return response()->json([
-
             'success' => true,
-
             'message' => 'Transferencia ejecutada correctamente.',
-
             'transaction_id' => $transaction->id,
-
             'executed_at' => $transaction->executed_at
                 ->format('d/m/Y H:i'),
-
             'executed_by' => $user->name,
-
         ]);
     }
 }

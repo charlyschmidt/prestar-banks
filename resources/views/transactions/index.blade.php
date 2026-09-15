@@ -303,7 +303,14 @@
                                             </button>
                                         @endif
 
-
+                                        {{-- VER DETALLE DE TRANSFERENCIA EJECUTADA --}}
+                                        @if ($transaction->type === 'expense' && $transaction->executed_at)
+                                            <button type="button" class="icon-button" data-bs-toggle="modal"
+                                                data-bs-target="#transactionDetailModal{{ $transaction->id }}"
+                                                title="Ver detalle de transferencia">
+                                                <i class="bi bi-eye"></i>
+                                            </button>
+                                        @endif
 
                                         {{-- EDITAR / ELIMINAR --}}
                                         @if (auth()->user()->is_admin || $transaction->user_id === auth()->id())
@@ -373,6 +380,290 @@
 
 
 
+        {{-- =========================================================
+    MODALES DE TRANSFERENCIAS EJECUTADAS
+========================================================= --}}
 
+        @foreach ($transactions as $transaction)
+            @if ($transaction->type === 'expense' && $transaction->executed_at)
+                <div class="modal fade transaction-detail-modal" id="transactionDetailModal{{ $transaction->id }}"
+                    tabindex="-1" aria-hidden="true">
+
+                    <div class="modal-dialog modal-dialog-centered">
+
+                        <div class="modal-content transaction-detail-content">
+
+
+                            {{-- =====================================================
+                        HEADER
+                    ====================================================== --}}
+
+                            <div class="transaction-detail-header">
+
+                                <div class="transaction-detail-title">
+
+                                    <div class="transaction-detail-icon">
+                                        <i class="bi bi-check2-circle"></i>
+                                    </div>
+
+                                    <div>
+
+                                        <span class="transaction-detail-label">
+                                            TRANSFERENCIA EJECUTADA
+                                        </span>
+
+                                        <h3>
+                                            ${{ number_format($transaction->amount, 2, ',', '.') }}
+                                        </h3>
+
+                                    </div>
+
+                                </div>
+
+
+                                <button type="button" class="transaction-modal-close" data-bs-dismiss="modal"
+                                    aria-label="Cerrar">
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+
+                            </div>
+
+
+                            {{-- =====================================================
+                        ESTADO
+                    ====================================================== --}}
+
+                            <div class="transaction-detail-status">
+
+                                <i class="bi bi-check-circle-fill"></i>
+
+                                <div>
+
+                                    <strong>
+                                        Transferencia realizada
+                                    </strong>
+
+                                    <span>
+                                        Ejecutada el
+                                        {{ $transaction->executed_at->format('d/m/Y H:i') }}
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+
+                            {{-- =====================================================
+                        ORIGEN / DESTINO
+                    ====================================================== --}}
+
+                            <div class="transaction-detail-section">
+
+                                <span class="transaction-section-title">
+                                    Transferencia
+                                </span>
+
+
+                                <div class="transaction-bank-route">
+
+
+                                    {{-- ORIGEN --}}
+
+                                    <div class="transaction-bank">
+
+                                        <span class="transaction-bank-label">
+                                            ORIGEN
+                                        </span>
+
+                                        <div class="transaction-bank-info">
+
+                                            @if ($transaction->account?->logo)
+                                                <img src="{{ Storage::url($transaction->account->logo) }}"
+                                                    alt="{{ $transaction->account->name }}">
+                                            @else
+                                                <div class="transaction-bank-placeholder">
+                                                    <i class="bi bi-bank"></i>
+                                                </div>
+                                            @endif
+
+
+                                            <div>
+
+                                                <strong>
+                                                    {{ $transaction->account?->name ?? 'Cuenta eliminada' }}
+                                                </strong>
+
+                                                <span>
+                                                    Cuenta de origen
+                                                </span>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+
+                                    {{-- FLECHA --}}
+
+                                    <div class="transaction-route-arrow">
+
+                                        <i class="bi bi-arrow-right"></i>
+
+                                    </div>
+
+
+                                    {{-- DESTINO --}}
+
+                                    <div class="transaction-bank">
+
+                                        <span class="transaction-bank-label">
+                                            DESTINO
+                                        </span>
+
+                                        <div class="transaction-bank-info">
+
+                                            <div class="transaction-bank-placeholder">
+                                                <i class="bi bi-bank"></i>
+                                            </div>
+
+                                            <div>
+
+                                                <strong>
+                                                    {{ $transaction->destination_bank }}
+                                                </strong>
+
+                                                <span>
+                                                    Banco destino
+                                                </span>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+
+                                </div>
+
+                            </div>
+
+
+                            {{-- =====================================================
+                        DETALLE DEL MOVIMIENTO
+                    ====================================================== --}}
+
+                            <div class="transaction-detail-section">
+
+                                <span class="transaction-section-title">
+                                    Detalle del movimiento
+                                </span>
+
+
+                                <div class="transaction-detail-grid transaction-detail-grid-compact">
+
+
+                                    {{-- FECHA Y HORA --}}
+
+                                    <div class="transaction-detail-item">
+
+                                        <span>
+                                            Fecha y hora
+                                        </span>
+
+                                        <strong>
+                                            {{ \Carbon\Carbon::parse($transaction->date)->format('d/m/Y H:i') }}
+                                        </strong>
+
+                                    </div>
+
+
+                                    {{-- TIPO --}}
+
+                                    <div class="transaction-detail-item">
+
+                                        <span>
+                                            Tipo
+                                        </span>
+
+                                        <strong class="red">
+                                            Egreso
+                                        </strong>
+
+                                    </div>
+
+
+                                    {{-- CONCEPTO --}}
+
+                                    <div class="transaction-detail-item transaction-detail-concept">
+
+                                        <span>
+                                            Concepto
+                                        </span>
+
+                                        <strong>
+                                            {{ $transaction->description ?? 'Sin descripción' }}
+                                        </strong>
+
+                                    </div>
+
+
+                                </div>
+
+                            </div>
+
+
+                            {{-- =====================================================
+                        EJECUCIÓN
+                    ====================================================== --}}
+
+                            <div class="transaction-detail-section transaction-execution-section">
+
+                                <span class="transaction-section-title">
+                                    Ejecución
+                                </span>
+
+
+                                <div class="transaction-execution-info">
+
+                                    <i class="bi bi-check-circle-fill"></i>
+
+                                    <div>
+
+                                        <span>
+                                            Fecha y hora de ejecución
+                                        </span>
+
+                                        <strong>
+                                            {{ $transaction->executed_at->format('d/m/Y H:i') }}
+                                        </strong>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            {{-- =====================================================
+                        FOOTER
+                    ====================================================== --}}
+
+                            <div class="transaction-detail-footer">
+
+                                <button type="button" class="secondary-button" data-bs-dismiss="modal">
+                                    Cerrar
+                                </button>
+
+                            </div>
+
+
+                        </div>
+
+                    </div>
+
+                </div>
+            @endif
+        @endforeach
     </div>
 @endsection
