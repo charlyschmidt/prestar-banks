@@ -473,6 +473,83 @@
     margin: 0;
 }
 
+/* =========================================================
+   BUSCADOR GLOBAL
+========================================================= */
+
+.header-global-search {
+    position: relative;
+
+    width: 240px;
+
+    margin-left: auto;
+    margin-right: 20px;
+}
+
+
+.header-global-search > i {
+    position: absolute;
+
+    left: 12px;
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    color: var(--muted);
+
+    font-size: 12px;
+
+    pointer-events: none;
+}
+
+
+.header-global-search input[type="text"] {
+    width: 100%;
+    height: 36px;
+
+    padding: 0 12px 0 35px;
+
+    background: rgba(255, 255, 255, .06);
+
+    border: 1px solid var(--border);
+    border-radius: 10px;
+
+    outline: none;
+
+    color: white;
+
+    font-size: 12px;
+
+    transition: .15s;
+}
+
+
+.header-global-search input::placeholder {
+    color: var(--muted);
+}
+
+
+.header-global-search input:focus {
+    background: rgba(255, 255, 255, .09);
+
+    border-color: rgba(255, 255, 255, .20);
+}
+
+
+/* MOBILE */
+
+@media (max-width: 768px) {
+
+    .header-global-search {
+        order: 3;
+
+        width: 100%;
+
+        margin: 0;
+    }
+
+}
+
 /* =====================
    MOBILE
 ===================== */

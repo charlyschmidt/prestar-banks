@@ -386,7 +386,7 @@
             CABECERA TABLA
         ========================================================== --}}
 
-        <div class="history-results-header">
+        <div class="history-results-header" id="history-results">
 
             <div>
 
@@ -413,328 +413,218 @@
             </div>
 
 
-<div class="history-results-actions">
-
-    <div class="history-active-filters">
-
-        {{-- DESDE --}}
-        @if (request('date_from'))
-
-            <a
-                href="{{ route(
-                    'history.index',
-                    request()->except(['date_from', 'page'])
-                ) }}"
-                class="history-filter-chip"
-                title="Quitar filtro"
-            >
-                <span>
-                    Desde:
-                    <strong>
-                        {{ \Carbon\Carbon::parse(request('date_from'))->format('d/m/Y') }}
-                    </strong>
-                </span>
-
-                <i class="bi bi-x"></i>
-            </a>
-
-        @endif
-
-
-        {{-- HASTA --}}
-        @if (request('date_to'))
-
-            <a
-                href="{{ route(
-                    'history.index',
-                    request()->except(['date_to', 'page'])
-                ) }}"
-                class="history-filter-chip"
-                title="Quitar filtro"
-            >
-                <span>
-                    Hasta:
-                    <strong>
-                        {{ \Carbon\Carbon::parse(request('date_to'))->format('d/m/Y') }}
-                    </strong>
-                </span>
-
-                <i class="bi bi-x"></i>
-            </a>
-
-        @endif
-
-
-        {{-- CUENTA --}}
-        @if (request('account_id'))
-
-            @php
-                $activeAccount = $accounts->firstWhere(
-                    'id',
-                    request('account_id')
-                );
-            @endphp
-
-            <a
-                href="{{ route(
-                    'history.index',
-                    request()->except(['account_id', 'page'])
-                ) }}"
-                class="history-filter-chip"
-                title="Quitar filtro"
-            >
-                <span>
-                    Cuenta:
-                    <strong>
-                        {{ $activeAccount?->name ?? 'Cuenta' }}
-                    </strong>
-                </span>
-
-                <i class="bi bi-x"></i>
-            </a>
-
-        @endif
-
-
-        {{-- USUARIO --}}
-        @if (request('user_id'))
-
-            @php
-                $activeUser = $users->firstWhere(
-                    'id',
-                    request('user_id')
-                );
-            @endphp
-
-            <a
-                href="{{ route(
-                    'history.index',
-                    request()->except(['user_id', 'page'])
-                ) }}"
-                class="history-filter-chip"
-                title="Quitar filtro"
-            >
-                <span>
-                    Usuario:
-                    <strong>
-                        {{ $activeUser?->name ?? $activeUser?->username ?? 'Usuario' }}
-                    </strong>
-                </span>
-
-                <i class="bi bi-x"></i>
-            </a>
-
-        @endif
-
-
-        {{-- TIPO --}}
-        @if (request('type'))
-
-            @php
-                $typeLabels = [
-                    'income' => 'Ingreso',
-                    'expense' => 'Egreso',
-                    'reserve' => 'Reserva',
-                ];
-            @endphp
-
-            <a
-                href="{{ route(
-                    'history.index',
-                    request()->except(['type', 'page'])
-                ) }}"
-                class="history-filter-chip"
-                title="Quitar filtro"
-            >
-                <span>
-                    Tipo:
-                    <strong>
-                        {{ $typeLabels[request('type')] ?? request('type') }}
-                    </strong>
-                </span>
-
-                <i class="bi bi-x"></i>
-            </a>
-
-        @endif
-
-
-        {{-- BANCO DESTINO --}}
-        @if (request('destination_bank'))
-
-            <a
-                href="{{ route(
-                    'history.index',
-                    request()->except(['destination_bank', 'page'])
-                ) }}"
-                class="history-filter-chip"
-                title="Quitar filtro"
-            >
-                <span>
-                    Destino:
-                    <strong>
-                        {{ request('destination_bank') }}
-                    </strong>
-                </span>
-
-                <i class="bi bi-x"></i>
-            </a>
-
-        @endif
-
-
-        {{-- ESTADO --}}
-        @if (request('execution'))
-
-            <a
-                href="{{ route(
-                    'history.index',
-                    request()->except(['execution', 'page'])
-                ) }}"
-                class="history-filter-chip"
-                title="Quitar filtro"
-            >
-                <span>
-                    Estado:
-                    <strong>
-                        {{ request('execution') === 'executed'
-                            ? 'Ejecutado'
-                            : 'Pendiente' }}
-                    </strong>
-                </span>
-
-                <i class="bi bi-x"></i>
-            </a>
-
-        @endif
-
-
-        {{-- MONTO MÍNIMO --}}
-        @if (request('amount_min'))
-
-            <a
-                href="{{ route(
-                    'history.index',
-                    request()->except(['amount_min', 'page'])
-                ) }}"
-                class="history-filter-chip"
-                title="Quitar filtro"
-            >
-                <span>
-                    Desde $
-                    <strong>
-                        {{ number_format(
-                            (float) request('amount_min'),
-                            2,
-                            ',',
-                            '.'
-                        ) }}
-                    </strong>
-                </span>
-
-                <i class="bi bi-x"></i>
-            </a>
-
-        @endif
-
-
-        {{-- MONTO MÁXIMO --}}
-        @if (request('amount_max'))
-
-            <a
-                href="{{ route(
-                    'history.index',
-                    request()->except(['amount_max', 'page'])
-                ) }}"
-                class="history-filter-chip"
-                title="Quitar filtro"
-            >
-                <span>
-                    Hasta $
-                    <strong>
-                        {{ number_format(
-                            (float) request('amount_max'),
-                            2,
-                            ',',
-                            '.'
-                        ) }}
-                    </strong>
-                </span>
-
-                <i class="bi bi-x"></i>
-            </a>
-
-        @endif
-
-
-        {{-- BÚSQUEDA --}}
-        @if (request('search'))
-
-            <a
-                href="{{ route(
-                    'history.index',
-                    request()->except(['search', 'page'])
-                ) }}"
-                class="history-filter-chip"
-                title="Quitar filtro"
-            >
-                <span>
-                    Búsqueda:
-                    <strong>
-                        {{ request('search') }}
-                    </strong>
-                </span>
-
-                <i class="bi bi-x"></i>
-            </a>
-
-        @endif
-
-
-        {{-- LIMPIAR TODOS --}}
-        @if (request()->hasAny([
-            'date_from',
-            'date_to',
-            'account_id',
-            'user_id',
-            'type',
-            'destination_bank',
-            'execution',
-            'search',
-            'amount_min',
-            'amount_max'
-        ]))
-
-            <a
-                href="{{ route('history.index') }}"
-                class="history-clear-filters"
-            >
-                Limpiar todos
-            </a>
-
-        @endif
-
-    </div>
-
-
-    {{-- EXPORTAR --}}
-
-    @if ($transactions->total() > 0)
-
-        <a
-            href="{{ route(
-                'history.export',
-                request()->query()
-            ) }}"
-            class="history-export-button"
-        >
-            <i class="bi bi-file-earmark-arrow-down"></i>
-            Exportar Excel
-        </a>
-
-    @endif
-
-</div>
+            <div class="history-results-actions">
+
+                <div class="history-active-filters">
+
+                    {{-- DESDE --}}
+                    @if (request('date_from'))
+                        <a href="{{ route('history.index', request()->except(['date_from', 'page'])) }}"
+                            class="history-filter-chip" title="Quitar filtro">
+                            <span>
+                                Desde:
+                                <strong>
+                                    {{ \Carbon\Carbon::parse(request('date_from'))->format('d/m/Y') }}
+                                </strong>
+                            </span>
+
+                            <i class="bi bi-x"></i>
+                        </a>
+                    @endif
+
+
+                    {{-- HASTA --}}
+                    @if (request('date_to'))
+                        <a href="{{ route('history.index', request()->except(['date_to', 'page'])) }}"
+                            class="history-filter-chip" title="Quitar filtro">
+                            <span>
+                                Hasta:
+                                <strong>
+                                    {{ \Carbon\Carbon::parse(request('date_to'))->format('d/m/Y') }}
+                                </strong>
+                            </span>
+
+                            <i class="bi bi-x"></i>
+                        </a>
+                    @endif
+
+
+                    {{-- CUENTA --}}
+                    @if (request('account_id'))
+                        @php
+                            $activeAccount = $accounts->firstWhere('id', request('account_id'));
+                        @endphp
+
+                        <a href="{{ route('history.index', request()->except(['account_id', 'page'])) }}"
+                            class="history-filter-chip" title="Quitar filtro">
+                            <span>
+                                Cuenta:
+                                <strong>
+                                    {{ $activeAccount?->name ?? 'Cuenta' }}
+                                </strong>
+                            </span>
+
+                            <i class="bi bi-x"></i>
+                        </a>
+                    @endif
+
+
+                    {{-- USUARIO --}}
+                    @if (request('user_id'))
+                        @php
+                            $activeUser = $users->firstWhere('id', request('user_id'));
+                        @endphp
+
+                        <a href="{{ route('history.index', request()->except(['user_id', 'page'])) }}"
+                            class="history-filter-chip" title="Quitar filtro">
+                            <span>
+                                Usuario:
+                                <strong>
+                                    {{ $activeUser?->name ?? ($activeUser?->username ?? 'Usuario') }}
+                                </strong>
+                            </span>
+
+                            <i class="bi bi-x"></i>
+                        </a>
+                    @endif
+
+
+                    {{-- TIPO --}}
+                    @if (request('type'))
+                        @php
+                            $typeLabels = [
+                                'income' => 'Ingreso',
+                                'expense' => 'Egreso',
+                                'reserve' => 'Reserva',
+                            ];
+                        @endphp
+
+                        <a href="{{ route('history.index', request()->except(['type', 'page'])) }}"
+                            class="history-filter-chip" title="Quitar filtro">
+                            <span>
+                                Tipo:
+                                <strong>
+                                    {{ $typeLabels[request('type')] ?? request('type') }}
+                                </strong>
+                            </span>
+
+                            <i class="bi bi-x"></i>
+                        </a>
+                    @endif
+
+
+                    {{-- BANCO DESTINO --}}
+                    @if (request('destination_bank'))
+                        <a href="{{ route('history.index', request()->except(['destination_bank', 'page'])) }}"
+                            class="history-filter-chip" title="Quitar filtro">
+                            <span>
+                                Destino:
+                                <strong>
+                                    {{ request('destination_bank') }}
+                                </strong>
+                            </span>
+
+                            <i class="bi bi-x"></i>
+                        </a>
+                    @endif
+
+
+                    {{-- ESTADO --}}
+                    @if (request('execution'))
+                        <a href="{{ route('history.index', request()->except(['execution', 'page'])) }}"
+                            class="history-filter-chip" title="Quitar filtro">
+                            <span>
+                                Estado:
+                                <strong>
+                                    {{ request('execution') === 'executed' ? 'Ejecutado' : 'Pendiente' }}
+                                </strong>
+                            </span>
+
+                            <i class="bi bi-x"></i>
+                        </a>
+                    @endif
+
+
+                    {{-- MONTO MÍNIMO --}}
+                    @if (request('amount_min'))
+                        <a href="{{ route('history.index', request()->except(['amount_min', 'page'])) }}"
+                            class="history-filter-chip" title="Quitar filtro">
+                            <span>
+                                Desde $
+                                <strong>
+                                    {{ number_format((float) request('amount_min'), 2, ',', '.') }}
+                                </strong>
+                            </span>
+
+                            <i class="bi bi-x"></i>
+                        </a>
+                    @endif
+
+
+                    {{-- MONTO MÁXIMO --}}
+                    @if (request('amount_max'))
+                        <a href="{{ route('history.index', request()->except(['amount_max', 'page'])) }}"
+                            class="history-filter-chip" title="Quitar filtro">
+                            <span>
+                                Hasta $
+                                <strong>
+                                    {{ number_format((float) request('amount_max'), 2, ',', '.') }}
+                                </strong>
+                            </span>
+
+                            <i class="bi bi-x"></i>
+                        </a>
+                    @endif
+
+
+                    {{-- BÚSQUEDA --}}
+                    @if (request('search'))
+                        <a href="{{ route('history.index', request()->except(['search', 'page'])) }}"
+                            class="history-filter-chip" title="Quitar filtro">
+                            <span>
+                                Búsqueda:
+                                <strong>
+                                    {{ request('search') }}
+                                </strong>
+                            </span>
+
+                            <i class="bi bi-x"></i>
+                        </a>
+                    @endif
+
+
+                    {{-- LIMPIAR TODOS --}}
+                    @if (request()->hasAny([
+                            'date_from',
+                            'date_to',
+                            'account_id',
+                            'user_id',
+                            'type',
+                            'destination_bank',
+                            'execution',
+                            'search',
+                            'amount_min',
+                            'amount_max',
+                        ]))
+                        <a href="{{ route('history.index') }}" class="history-clear-filters">
+                            Limpiar todos
+                        </a>
+                    @endif
+
+                </div>
+
+
+                {{-- EXPORTAR --}}
+
+                @if ($transactions->total() > 0)
+                    <a href="{{ route('history.export', request()->query()) }}"
+                        class="history-export-button">
+                        <i class="bi bi-file-earmark-arrow-down"></i>
+                        Exportar Excel
+                    </a>
+                @endif
+
+            </div>
 
         </div>
 
@@ -1060,3 +950,33 @@
     </div>
 
 @endsection
+@if (request('results'))
+
+    <script>
+        document.addEventListener(
+            'DOMContentLoaded',
+            function () {
+
+                const results =
+                    document.getElementById(
+                        'history-results'
+                    );
+
+                if (!results) {
+                    return;
+                }
+
+                setTimeout(() => {
+
+                    results.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+
+                }, 150);
+
+            }
+        );
+    </script>
+
+@endif

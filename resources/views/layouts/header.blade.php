@@ -24,6 +24,18 @@
 
 
 
+    @if (auth()->user()->is_admin)
+        <form action="{{ route('history.index') }}" method="GET" class="header-global-search">
+
+            <i class="bi bi-search"></i>
+
+            <input type="text" name="search" value="{{ request()->routeIs('history.*') ? request('search') : '' }}"
+                placeholder="Buscar movimientos..." autocomplete="off">
+
+            <input type="hidden" name="results" value="1">
+
+        </form>
+    @endif
 
     <div class="header-actions d-flex flex-column flex-md-row align-items-stretch align-items-md-center gap-3">
 
