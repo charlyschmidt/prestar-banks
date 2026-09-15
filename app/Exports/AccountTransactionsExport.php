@@ -177,8 +177,7 @@ class AccountTransactionsExport implements FromCollection, ShouldAutoSize
                 in_array(
                     $transaction->type,
                     [
-                        'income',
-                        'transfer_in'
+                        'income'
                     ]
                 )
             ) {
@@ -202,8 +201,7 @@ class AccountTransactionsExport implements FromCollection, ShouldAutoSize
                 in_array(
                     $transaction->type,
                     [
-                        'income',
-                        'transfer_in'
+                        'income'
                     ]
                 )
                     ? 'Ingreso'

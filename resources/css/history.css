@@ -1,0 +1,617 @@
+/* =========================================================
+   HISTORIAL
+========================================================= */
+
+.history-page {
+    padding-bottom: 50px;
+}
+
+
+/* =========================================================
+   FILTROS
+========================================================= */
+
+.history-filter-card {
+    width: 100%;
+    padding: 20px;
+    margin-bottom: 20px;
+
+    background: var(--card);
+
+    border: 1px solid var(--border);
+    border-radius: 18px;
+}
+
+
+.history-search-row {
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    margin-bottom: 20px;
+}
+
+
+.history-search {
+    position: relative;
+
+    flex: 1;
+}
+
+
+.history-search i {
+    position: absolute;
+
+    left: 14px;
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    color: var(--muted);
+
+    pointer-events: none;
+}
+
+
+.history-search input {
+    width: 100%;
+    height: 42px;
+
+    padding: 0 15px 0 42px;
+
+    background: rgba(255,255,255,.05);
+
+    border: 1px solid var(--border);
+    border-radius: 11px;
+
+    outline: none;
+
+    color: white;
+
+    font-size: 13px;
+}
+
+
+.history-search input::placeholder {
+    color: var(--muted);
+}
+
+
+.history-search input:focus {
+    border-color: rgba(255,255,255,.30);
+}
+
+
+.history-filters-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 15px;
+}
+
+
+.history-filters-grid .form-group {
+    margin: 0;
+}
+
+
+.history-filters-grid label {
+    display: block;
+
+    margin-bottom: 7px;
+
+    color: var(--muted);
+
+    font-size: 11px;
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   RESUMEN
+========================================================= */
+
+.history-summary-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+
+    gap: 15px;
+
+    margin-bottom: 30px;
+}
+
+
+.history-summary-card {
+    min-width: 0;
+
+    padding: 17px 18px;
+
+    background: var(--card);
+
+    border: 1px solid var(--border);
+    border-radius: 15px;
+}
+
+
+.history-summary-card span {
+    display: block;
+
+    margin-bottom: 8px;
+
+    color: var(--muted);
+
+    font-size: 11px;
+}
+
+
+.history-summary-card strong {
+    display: block;
+
+    color: white;
+
+    font-size: 20px;
+    font-weight: 700;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+}
+
+
+.history-summary-card small {
+    display: block;
+
+    margin-top: 6px;
+
+    color: var(--muted);
+
+    font-size: 10px;
+}
+
+
+.history-reserve-color {
+    color: #fbbf24 !important;
+}
+
+
+/* =========================================================
+   RESULTADOS
+========================================================= */
+
+.history-results-header {
+    display: flex;
+
+    justify-content: space-between;
+    align-items: center;
+
+    gap: 15px;
+
+    margin-bottom: 12px;
+}
+
+
+.history-results-header h3 {
+    margin: 0;
+
+    color: white;
+
+    font-size: 17px;
+    font-weight: 700;
+}
+
+
+.history-results-header span {
+    display: block;
+
+    margin-top: 4px;
+
+    color: var(--muted);
+
+    font-size: 11px;
+}
+
+/* =========================================================
+   FILTROS ACTIVOS
+========================================================= */
+
+.history-results-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+}
+
+
+.history-active-filters {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 7px;
+
+    min-width: 0;
+}
+
+
+.history-filter-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    padding: 6px 7px 9px 10px;
+
+    background: rgba(255, 255, 255, .08);
+
+    border: 1px solid var(--border);
+    border-radius: 20px;
+
+    color: var(--muted);
+
+    font-size: 10px;
+    font-weight: 500;
+
+    text-decoration: none;
+
+    transition: .15s;
+}
+
+
+.history-filter-chip strong {
+    color: white;
+    font-weight: 600;
+}
+
+
+.history-filter-chip i {
+    width: 16px;
+    height: 16px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: rgba(255, 255, 255, .10);
+
+    color: var(--muted);
+
+    font-size: 13px;
+    line-height: 1;
+
+    transition: .15s;
+}
+
+
+.history-filter-chip:hover {
+    background: rgba(255, 255, 255, .11);
+
+    border-color: rgba(255, 255, 255, .18);
+
+    color: white;
+}
+
+
+.history-filter-chip:hover i {
+    background: rgba(248, 113, 113, .15);
+
+    color: var(--danger);
+}
+
+
+.history-clear-filters {
+    padding: 6px 4px;
+
+    color: var(--muted);
+
+    font-size: 10px;
+    font-weight: 600;
+
+    text-decoration: none;
+}
+
+
+.history-clear-filters:hover {
+    color: white;
+}
+
+
+/* =========================================================
+   TABLA
+========================================================= */
+
+.history-table-card {
+    overflow: hidden;
+
+    background: var(--card);
+
+    border: 1px solid var(--border);
+    border-radius: 16px;
+}
+
+
+.history-table {
+    margin-bottom: 0;
+}
+
+
+.history-description {
+    min-width: 160px;
+    max-width: 300px;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+    white-space: nowrap;
+}
+
+
+.history-reserve-amount {
+    color: #fbbf24;
+
+    font-weight: 600;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   ESTADOS
+========================================================= */
+
+.history-status {
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 5px;
+
+    padding: 5px 8px;
+
+    border-radius: 7px;
+
+    font-size: 10px;
+    font-weight: 700;
+
+    white-space: nowrap;
+}
+
+
+.history-status.executed {
+    background: rgba(34,197,94,.14);
+
+    color: var(--success);
+}
+
+
+.history-status.pending {
+    background: rgba(248,113,113,.12);
+
+    color: var(--danger);
+}
+
+
+.history-status.reserved {
+    background: rgba(251,191,36,.12);
+
+    color: #fbbf24;
+}
+
+
+/* =========================================================
+   RESERVA
+========================================================= */
+
+.reserve-tag {
+    background: rgba(251,191,36,.14);
+
+    color: #fbbf24;
+}
+
+
+/* =========================================================
+   VACÍO
+========================================================= */
+
+.history-empty {
+    padding: 55px 20px !important;
+
+    text-align: center;
+}
+
+
+.history-empty i {
+    display: block;
+
+    margin-bottom: 12px;
+
+    color: var(--muted);
+
+    font-size: 25px;
+}
+
+
+.history-empty strong {
+    display: block;
+
+    margin-bottom: 5px;
+
+    color: white;
+
+    font-size: 14px;
+}
+
+
+.history-empty span {
+    color: var(--muted);
+
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   PAGINACIÓN
+========================================================= */
+
+.history-pagination {
+    margin-top: 20px;
+}
+
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 1100px) {
+
+    .history-filters-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+
+    .history-summary-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 600px) {
+
+    .history-filter-card {
+        padding: 15px;
+    }
+
+
+    .history-search-row {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+
+    .history-search {
+        width: 100%;
+    }
+
+
+    .history-search-row .primary-action-button,
+    .history-search-row .secondary-button {
+        width: 100%;
+
+        justify-content: center;
+    }
+
+
+    .history-filters-grid {
+        grid-template-columns: 1fr;
+    }
+
+
+    .history-summary-grid {
+        grid-template-columns: 1fr 1fr;
+
+        gap: 10px;
+    }
+
+
+    .history-summary-card {
+        padding: 14px;
+    }
+
+
+    .history-summary-card strong {
+        font-size: 16px;
+    }
+
+
+    .history-results-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+}
+
+
+@media (max-width: 420px) {
+
+    .history-summary-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+@media (max-width: 600px) {
+
+    .history-results-actions {
+        width: 100%;
+
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+
+    .history-active-filters {
+        width: 100%;
+    }
+
+
+    .history-export-button {
+        width: 100%;
+
+        justify-content: center;
+    }
+
+}
+
+.history-export-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    padding: 6px 10px;
+
+    background: rgba(255, 255, 255, .08);
+
+    border: 1px solid var(--border);
+    border-radius: 8px;
+
+    color: var(--muted);
+
+    font-size: 10px;
+    font-weight: 600;
+
+    text-decoration: none;
+
+    transition: .15s;
+}
+
+
+.history-export-button i {
+    color: var(--success);
+    font-size: 11px;
+}
+
+
+.history-export-button:hover {
+    background: rgba(255, 255, 255, .12);
+
+    border-color: rgba(255, 255, 255, .18);
+
+    color: white;
+}
+
+
+.history-export-button:hover i {
+    color: var(--success);
+}

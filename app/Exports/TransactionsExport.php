@@ -225,8 +225,7 @@ class TransactionsExport implements FromCollection, WithHeadings, ShouldAutoSize
                 in_array(
                     $transaction->type,
                     [
-                        'income',
-                        'transfer_in'
+                        'income'
                     ]
                 )
             ) {
@@ -252,8 +251,7 @@ class TransactionsExport implements FromCollection, WithHeadings, ShouldAutoSize
                 in_array(
                     $transaction->type,
                     [
-                        'income',
-                        'transfer_in'
+                        'income'
                     ]
                 )
                     ? 'Ingreso'

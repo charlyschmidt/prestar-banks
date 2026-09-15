@@ -75,7 +75,10 @@
 
             </a>
 
-
+            <a href="{{ route('history.index') }}" class="{{ request()->routeIs('history.*') ? 'active' : '' }}">
+                <i class="bi bi-clock-history"></i>
+                Historial
+            </a>
 
 
 
@@ -219,6 +222,13 @@
 
 
         </a>
+
+        @if (auth()->user()->is_admin)
+            <a href="{{ route('history.index') }}" class="{{ request()->routeIs('history.*') ? 'active' : '' }}">
+                <i class="bi bi-clock-history"></i>
+                Historial
+            </a>
+        @endif
 
 
 

@@ -394,7 +394,7 @@
 
 
 
-                                    @if (in_array($movement->type, ['income', 'transfer_in']))
+                                    @if (in_array($movement->type, ['income']))
                                         <span class="tag income-tag">
 
                                             <i class="bi bi-arrow-up"></i>
@@ -434,7 +434,7 @@
 
 
 
-                                    @if (in_array($movement->type, ['income', 'transfer_in']))
+                                    @if (in_array($movement->type, ['income']))
                                         <span class="amount-income">
 
                                             +

@@ -225,7 +225,7 @@
                                 {{-- TIPO --}}
                                 <td>
 
-                                    @if (in_array($transaction->type, ['income', 'transfer_in']))
+                                    @if (in_array($transaction->type, ['income']))
                                         <span class="movement-income">
 
                                             <i class="bi bi-arrow-up"></i>
@@ -265,7 +265,7 @@
                                 {{-- MONTO --}}
                                 <td class="text-end">
 
-                                    @if (in_array($transaction->type, ['income', 'transfer_in']))
+                                    @if (in_array($transaction->type, ['income']))
                                         <span class="amount-income">
 
                                             + ${{ number_format($transaction->amount, 2, ',', '.') }}

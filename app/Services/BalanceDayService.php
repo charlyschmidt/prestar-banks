@@ -234,8 +234,7 @@ class BalanceDayService
                 $dayId
             )
             ->whereIn('type', [
-                'income',
-                'transfer_in'
+                'income'
             ])
             ->sum('amount');
     }
@@ -361,8 +360,7 @@ class BalanceDayService
                 in_array(
                     $movement->type,
                     [
-                        'income',
-                        'transfer_in'
+                        'income'
                     ]
                 )
             ) {
@@ -404,8 +402,7 @@ class BalanceDayService
             $day->id
         )
             ->whereIn('type', [
-                'income',
-                'transfer_in'
+                'income'
             ])
             ->sum('amount');
     }

@@ -6,6 +6,7 @@ use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\FinancialDayController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\HistoryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,6 +31,17 @@ Route::get('/', function () {
 */
 
 Route::middleware('auth')->group(function () {
+
+    Route::get(
+        '/historial',
+        [HistoryController::class, 'index']
+    )->name('history.index');
+
+    Route::get(
+        '/historial/exportar',
+        [HistoryController::class, 'export']
+    )->name('history.export');
+
     Route::get('/configuracion', function () {
 
         return view('settings.index');
@@ -59,7 +71,7 @@ Route::middleware('auth')->group(function () {
         'accounts',
         AccountController::class
     );
-    
+
     Route::get(
         '/accounts/{account}/export',
         [

@@ -56,8 +56,7 @@ class BalanceService
         $income = Transaction::whereIn(
             'type',
             [
-                'income',
-                'transfer_in'
+                'income'
             ]
         )
             ->sum('amount');
@@ -95,8 +94,7 @@ class BalanceService
 
                 $income = $account->transactions
                     ->whereIn('type', [
-                        'income',
-                        'transfer_in'
+                        'income'
                     ])
                     ->sum('amount');
 
@@ -130,8 +128,7 @@ class BalanceService
 
                     'income' => $account->transactions
                         ->whereIn('type', [
-                            'income',
-                            'transfer_in'
+                            'income'
                         ])
                         ->count(),
 
@@ -165,8 +162,7 @@ class BalanceService
         return Transaction::whereIn(
             'type',
             [
-                'income',
-                'transfer_in'
+                'income'
             ]
         )
             ->whereMonth(
@@ -244,8 +240,7 @@ class BalanceService
         return Transaction::whereIn(
             'type',
             [
-                'income',
-                'transfer_in'
+                'income'
             ]
         )
             ->whereDate(

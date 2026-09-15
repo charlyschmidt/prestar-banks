@@ -45,6 +45,7 @@ import '../css/login.css';
 
 import '../css/settings.css';
 
+import '../css/history.css';
 
 /*
 |--------------------------------------------------------------------------

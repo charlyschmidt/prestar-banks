@@ -247,8 +247,7 @@ class TransactionController extends Controller
                 in_array(
                     $transaction->type,
                     [
-                        'income',
-                        'transfer_in'
+                        'income'
                     ]
                 )
             ) {
@@ -519,8 +518,7 @@ class TransactionController extends Controller
                     in_array(
                         $transaction->type,
                         [
-                            'income',
-                            'transfer_in'
+                            'income'
                         ]
                     )
                 ) {
@@ -627,8 +625,7 @@ class TransactionController extends Controller
                     in_array(
                         $data['type'],
                         [
-                            'income',
-                            'transfer_in'
+                            'income'
                         ]
                     )
                 ) {
@@ -753,8 +750,7 @@ class TransactionController extends Controller
                     in_array(
                         $transaction->type,
                         [
-                            'income',
-                            'transfer_in'
+                            'income'
                         ]
                     )
                 ) {

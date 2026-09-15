@@ -30,8 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const isIncome =
                 [
-                    'income',
-                    'transfer_in'
+                    'income'
                 ].includes(transaction.type);
 
 

@@ -171,6 +171,13 @@
                         Movimientos
                     </a>
 
+                    @if (auth()->user()->is_admin)
+                        <a href="{{ route('history.index') }}" class="user-dropdown-link">
+                            <i class="bi bi-clock-history"></i>
+                            Historial
+                        </a>
+                    @endif
+
 
                     <div class="user-dropdown-divider"></div>
 

@@ -374,8 +374,7 @@ function addMovementToTable(
     */
 
     const isIncome = [
-        'income',
-        'transfer_in'
+        'income'
     ].includes(
         movement.type
     );

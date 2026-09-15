@@ -32,8 +32,30 @@ class UserController extends Controller
 
     public function store(Request $request)
     {
-        $data = $request->validate([
+        /*
+    |--------------------------------------------------------------------------
+    | Validación
+    |--------------------------------------------------------------------------
+    */
 
+        $allowedRoles = [
+            'operator',
+            'administration'
+        ];
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Solo un Super Admin puede crear otro Super Admin
+    |--------------------------------------------------------------------------
+    */
+
+        if (auth()->user()->is_admin) {
+            $allowedRoles[] = 'super_admin';
+        }
+
+
+        $data = $request->validate([
             'username' => [
                 'required',
                 'string',
@@ -49,28 +71,50 @@ class UserController extends Controller
 
             'role' => [
                 'required',
-                'in:operator,administration'
+                'in:' . implode(',', $allowedRoles)
             ]
-
         ]);
 
 
-        User::create([
+        /*
+    |--------------------------------------------------------------------------
+    | Determinar permisos
+    |--------------------------------------------------------------------------
+    */
 
+        $isSuperAdmin =
+            $data['role'] === 'super_admin';
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Crear usuario
+    |--------------------------------------------------------------------------
+    */
+
+        User::create([
             'name' => $data['username'],
 
             'username' => $data['username'],
 
-            'email' => $data['username'] . '@local',
+            'email' =>
+            $data['username'] . '@local',
 
-            'password' => Hash::make(
-                $data['password']
-            ),
+            'password' =>
+            Hash::make($data['password']),
 
-            'role' => $data['role'],
+            /*
+        | Super Admin NO es realmente un role.
+        | El permiso real sigue siendo is_admin.
+        */
 
-            'is_admin' => false
+            'role' =>
+            $isSuperAdmin
+                ? 'operator'
+                : $data['role'],
 
+            'is_admin' =>
+            $isSuperAdmin
         ]);
 
 
@@ -93,37 +137,47 @@ class UserController extends Controller
 
     public function update(Request $request, User $usuario)
     {
-        $rules = [
-
-            'password' => [
-                'nullable',
-                'string',
-                'min:8'
-            ]
-
-        ];
+        $currentUser = auth()->user();
 
 
         /*
-        |--------------------------------------------------------------------------
-        | Solo usuarios normales pueden cambiar de rol
-        |--------------------------------------------------------------------------
-        |
-        | El Super Admin nunca modifica su role desde este formulario.
-        |
-        */
+    |--------------------------------------------------------------------------
+    | Roles permitidos
+    |--------------------------------------------------------------------------
+    |
+    | Solo un Super Admin puede asignar el nivel Super Admin.
+    |
+    */
 
-        if (!$usuario->is_admin) {
+        $allowedRoles = [
+            'operator',
+            'administration'
+        ];
 
-            $rules['role'] = [
-                'required',
-                'in:operator,administration'
-            ];
+        if ($currentUser->is_admin) {
+            $allowedRoles[] = 'super_admin';
         }
 
 
+        /*
+    |--------------------------------------------------------------------------
+    | Validación
+    |--------------------------------------------------------------------------
+    */
+
         $data = $request->validate(
-            $rules,
+            [
+                'password' => [
+                    'nullable',
+                    'string',
+                    'min:8'
+                ],
+
+                'role' => [
+                    'required',
+                    'in:' . implode(',', $allowedRoles)
+                ]
+            ],
             [
                 'password.min' =>
                 'La contraseña debe tener al menos 8 caracteres.',
@@ -137,14 +191,64 @@ class UserController extends Controller
         );
 
 
+        /*
+    |--------------------------------------------------------------------------
+    | Nuevo nivel
+    |--------------------------------------------------------------------------
+    */
+
+        $willBeSuperAdmin =
+            $data['role'] === 'super_admin';
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Protección del último Super Admin
+    |--------------------------------------------------------------------------
+    |
+    | Si el usuario actualmente es Super Admin y se intenta bajarlo
+    | a otro rol, verificamos que exista otro Super Admin activo.
+    |
+    */
+
+        if (
+            $usuario->is_admin &&
+            !$willBeSuperAdmin
+        ) {
+
+            $superAdmins = User::where(
+                'is_admin',
+                true
+            )->count();
+
+
+            if ($superAdmins <= 1) {
+
+                return redirect()
+                    ->back()
+                    ->withInput()
+                    ->with(
+                        'error',
+                        'No podés quitar el rol al último Super Admin del sistema.'
+                    );
+            }
+        }
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Datos a actualizar
+    |--------------------------------------------------------------------------
+    */
+
         $updateData = [];
 
 
         /*
-        |--------------------------------------------------------------------------
-        | Contraseña
-        |--------------------------------------------------------------------------
-        */
+    |--------------------------------------------------------------------------
+    | Contraseña
+    |--------------------------------------------------------------------------
+    */
 
         if (!empty($data['password'])) {
 
@@ -155,23 +259,36 @@ class UserController extends Controller
 
 
         /*
-        |--------------------------------------------------------------------------
-        | Rol
-        |--------------------------------------------------------------------------
+    |--------------------------------------------------------------------------
+    | Super Admin
+    |--------------------------------------------------------------------------
+    */
+
+        if ($willBeSuperAdmin) {
+
+            /*
+        | Super Admin se controla mediante is_admin.
+        | Dejamos operator como role interno.
         */
 
-        if (!$usuario->is_admin) {
+            $updateData['is_admin'] = true;
+            $updateData['role'] = 'operator';
+        } else {
 
+            $updateData['is_admin'] = false;
             $updateData['role'] = $data['role'];
         }
 
 
-        if (!empty($updateData)) {
+        /*
+    |--------------------------------------------------------------------------
+    | Actualizar
+    |--------------------------------------------------------------------------
+    */
 
-            $usuario->update(
-                $updateData
-            );
-        }
+        $usuario->update(
+            $updateData
+        );
 
 
         return redirect()
@@ -185,16 +302,61 @@ class UserController extends Controller
 
     public function destroy(User $usuario)
     {
-        if ($usuario->is_admin) {
+        $currentUser = auth()->user();
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | No permitir eliminarse a sí mismo
+    |--------------------------------------------------------------------------
+    */
+
+        if ($usuario->id === $currentUser->id) {
 
             return redirect()
                 ->route('usuarios.index')
                 ->with(
                     'error',
-                    'El Super Admin no puede eliminarse.'
+                    'No podés eliminar tu propio usuario.'
                 );
         }
 
+
+        /*
+    |--------------------------------------------------------------------------
+    | Protección de Super Admin
+    |--------------------------------------------------------------------------
+    |
+    | Se puede eliminar un Super Admin solamente si existe
+    | al menos otro Super Admin activo.
+    |
+    */
+
+        if ($usuario->is_admin) {
+
+            $superAdmins = User::where(
+                'is_admin',
+                true
+            )->count();
+
+
+            if ($superAdmins <= 1) {
+
+                return redirect()
+                    ->route('usuarios.index')
+                    ->with(
+                        'error',
+                        'No se puede eliminar el último Super Admin del sistema.'
+                    );
+            }
+        }
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Eliminación lógica
+    |--------------------------------------------------------------------------
+    */
 
         $usuario->delete();
 

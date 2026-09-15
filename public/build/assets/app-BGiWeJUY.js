@@ -20,7 +20,7 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
                     ${M(e.transaction.description||``)}
                     ·
                     ${M(e.account.name)}
-                `}re(e),k()})}});function re(e,t=!0){let n=document.querySelector(`#movements-body`);if(!n)return;let r=e.transaction;if(!r||n.querySelector(`tr[data-movement-id="${r.id}"]`))return;let i=new Date(r.date),a=String(i.getDate()).padStart(2,`0`),o=String(i.getMonth()+1).padStart(2,`0`),s=String(i.getHours()).padStart(2,`0`),c=String(i.getMinutes()).padStart(2,`0`),l=`${a}/${o}`,u=`${s}:${c}`,d=[`income`,`transfer_in`].includes(r.type),f=r.type===`reserve`,p;p=d?`
+                `}re(e),k()})}});function re(e,t=!0){let n=document.querySelector(`#movements-body`);if(!n)return;let r=e.transaction;if(!r||n.querySelector(`tr[data-movement-id="${r.id}"]`))return;let i=new Date(r.date),a=String(i.getDate()).padStart(2,`0`),o=String(i.getMonth()+1).padStart(2,`0`),s=String(i.getHours()).padStart(2,`0`),c=String(i.getMinutes()).padStart(2,`0`),l=`${a}/${o}`,u=`${s}:${c}`,d=[`income`].includes(r.type),f=r.type===`reserve`,p;p=d?`
         <span class="tag income-tag">
             <i class="bi bi-arrow-up"></i>
             Ingreso
@@ -134,7 +134,7 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
                 `);let o=t.querySelector(`[data-movements]`);o&&(o.innerHTML=`
                     <i class="bi bi-arrow-left-right"></i>
                     ${e.movements}
-                `)});let a=document.querySelector(`#movements-body`);a&&(a.innerHTML=``,[...t.movements].reverse().forEach(e=>{re({transaction:{id:e.id,type:e.type,amount:e.amount,description:e.description,date:e.date,balance_after:e.balance_after,user:e.user},account:e.account,initialBalance:e.initial_balance},!1)})),console.log(`Dashboard sincronizado correctamente`)}catch(e){console.error(`Error sincronizando dashboard:`,e)}}}function j(e){let t=Number(e);return Number.isNaN(t)?`0,00`:t.toLocaleString(`es-AR`,{minimumFractionDigits:2,maximumFractionDigits:2})}function M(e){let t=document.createElement(`div`);return t.textContent=e,t.innerHTML}document.addEventListener(`DOMContentLoaded`,()=>{document.getElementById(`transactions-body`)&&Echo.channel(`dashboard`).listen(`.transaction.created`,e=>{console.log(`Nuevo movimiento:`,e);let t=e.transaction,n=e.account,r=document.getElementById(`transactions-body`),i=[`income`,`transfer_in`].includes(t.type),a=`
+                `)});let a=document.querySelector(`#movements-body`);a&&(a.innerHTML=``,[...t.movements].reverse().forEach(e=>{re({transaction:{id:e.id,type:e.type,amount:e.amount,description:e.description,date:e.date,balance_after:e.balance_after,user:e.user},account:e.account,initialBalance:e.initial_balance},!1)})),console.log(`Dashboard sincronizado correctamente`)}catch(e){console.error(`Error sincronizando dashboard:`,e)}}}function j(e){let t=Number(e);return Number.isNaN(t)?`0,00`:t.toLocaleString(`es-AR`,{minimumFractionDigits:2,maximumFractionDigits:2})}function M(e){let t=document.createElement(`div`);return t.textContent=e,t.innerHTML}document.addEventListener(`DOMContentLoaded`,()=>{document.getElementById(`transactions-body`)&&Echo.channel(`dashboard`).listen(`.transaction.created`,e=>{console.log(`Nuevo movimiento:`,e);let t=e.transaction,n=e.account,r=document.getElementById(`transactions-body`),i=[`income`].includes(t.type),a=`
 
 <tr>
 

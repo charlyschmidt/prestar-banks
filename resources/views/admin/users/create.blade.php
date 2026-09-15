@@ -85,6 +85,7 @@
                     </label>
 
                     <select name="role" class="login-input" required>
+
                         <option value="">
                             Seleccionar rol
                         </option>
@@ -96,6 +97,12 @@
                         <option value="administration" {{ old('role') === 'administration' ? 'selected' : '' }}>
                             Administración
                         </option>
+
+                        @if (auth()->user()->is_admin)
+                            <option value="super_admin" {{ old('role') === 'super_admin' ? 'selected' : '' }}>
+                                Super Admin
+                            </option>
+                        @endif
 
                     </select>
 

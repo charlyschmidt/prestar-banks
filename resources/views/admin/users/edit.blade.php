@@ -2,71 +2,61 @@
 
 
 @section('content')
+    <div class="page-container">
 
-<div class="page-container">
 
+        <div class="page-header d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
 
-    <div class="page-header d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div>
 
-        <div>
+                <h1>
+                    Editar usuario
+                </h1>
 
-            <h1>
-                Editar usuario
-            </h1>
+                <p class="mt-2">
+                    Modificar acceso de {{ $user->username }}
+                </p>
 
-            <p class="mt-2">
-                Modificar acceso de {{ $user->username }}
-            </p>
+            </div>
 
         </div>
 
-    </div>
+
+
+        <div class="form-card">
+
+
+            @if ($errors->any())
+                <div class="alert-error mb-4">
+
+                    <i class="bi bi-exclamation-triangle"></i>
+
+                    {{ $errors->first() }}
+
+                </div>
+            @endif
 
 
 
-    <div class="form-card">
+            <form method="POST" action="{{ route('usuarios.update', $user->id) }}">
 
+                @csrf
 
-        @if ($errors->any())
-
-            <div class="alert-error mb-4">
-
-                <i class="bi bi-exclamation-triangle"></i>
-
-                {{ $errors->first() }}
-
-            </div>
-
-        @endif
+                @method('PUT')
 
 
 
-        <form method="POST"
-              action="{{ route('usuarios.update', $user->id) }}">
+                <div class="form-group mb-4">
 
-            @csrf
+                    <label class="login-label">
+                        Usuario
+                    </label>
 
-            @method('PUT')
+                    <input type="text" class="login-input" value="{{ $user->username }}" readonly>
 
-
-
-            <div class="form-group mb-4">
-
-                <label class="login-label">
-                    Usuario
-                </label>
-
-                <input
-                    type="text"
-                    class="login-input"
-                    value="{{ $user->username }}"
-                    readonly>
-
-            </div>
+                </div>
 
 
-
-            @if (!$user->is_admin)
 
                 <div class="form-group mb-4">
 
@@ -74,107 +64,79 @@
                         Rol
                     </label>
 
-                    <select
-                        name="role"
-                        class="login-input"
-                        required
-                    >
+                    <select name="role" class="login-input" required>
 
-                        <option
-                            value="operator"
-                            {{ old('role', $user->role) === 'operator' ? 'selected' : '' }}
-                        >
+                        <option value="operator"
+                            {{ old('role', $user->is_admin ? 'super_admin' : $user->role) === 'operator' ? 'selected' : '' }}>
                             Operador
                         </option>
 
-                        <option
-                            value="administration"
-                            {{ old('role', $user->role) === 'administration' ? 'selected' : '' }}
-                        >
+
+                        <option value="administration"
+                            {{ old('role', $user->is_admin ? 'super_admin' : $user->role) === 'administration' ? 'selected' : '' }}>
                             Administración
                         </option>
 
+
+                        @if (auth()->user()->is_admin)
+                            <option value="super_admin"
+                                {{ old('role', $user->is_admin ? 'super_admin' : $user->role) === 'super_admin' ? 'selected' : '' }}>
+                                Super Admin
+                            </option>
+                        @endif
+
                     </select>
 
-                    @error('role')
 
+                    @error('role')
                         <div class="alert-error mt-2">
                             {{ $message }}
                         </div>
-
                     @enderror
 
                 </div>
 
-            @else
+
 
                 <div class="form-group mb-4">
 
                     <label class="login-label">
-                        Tipo de usuario
+                        Nueva contraseña
                     </label>
 
-                    <input
-                        type="text"
-                        class="login-input"
-                        value="Super Admin"
-                        readonly>
+                    <input type="password" name="password" class="login-input" autocomplete="new-password">
+
+                    <small class="form-text text-white-50">
+                        Dejá este campo vacío si no querés cambiar la contraseña.
+                    </small>
+
+                    @error('password')
+                        <div class="alert-error mt-2">
+                            {{ $message }}
+                        </div>
+                    @enderror
 
                 </div>
 
-            @endif
 
 
+                <div class="d-flex flex-column flex-md-row justify-content-end">
 
-            <div class="form-group mb-4">
+                    <button type="submit" class="primary-action-button">
 
-                <label class="login-label">
-                    Nueva contraseña
-                </label>
+                        <i class="bi bi-check-lg"></i>
 
-                <input
-                    type="password"
-                    name="password"
-                    class="login-input"
-                    autocomplete="new-password">
+                        Guardar cambios
 
-                <small class="form-text text-white-50">
-                    Dejá este campo vacío si no querés cambiar la contraseña.
-                </small>
+                    </button>
 
-                @error('password')
-
-                    <div class="alert-error mt-2">
-                        {{ $message }}
-                    </div>
-
-                @enderror
-
-            </div>
+                </div>
 
 
+            </form>
 
-            <div class="d-flex flex-column flex-md-row justify-content-end">
+        </div>
 
-                <button
-                    type="submit"
-                    class="primary-action-button"
-                >
-
-                    <i class="bi bi-check-lg"></i>
-
-                    Guardar cambios
-
-                </button>
-
-            </div>
-
-
-        </form>
 
     </div>
-
-
-</div>
-
 @endsection

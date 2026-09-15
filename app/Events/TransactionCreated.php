@@ -62,8 +62,8 @@ class TransactionCreated implements ShouldBroadcastNow
 
         $income = (clone $transactions)
             ->whereIn('type', [
-                'income',
-                'transfer_in'
+                'income'
+               
             ])
             ->sum('amount');
 
@@ -148,8 +148,7 @@ class TransactionCreated implements ShouldBroadcastNow
 
         $dayIncome = (clone $dayTransactions)
             ->whereIn('type', [
-                'income',
-                'transfer_in'
+                'income'
             ])
             ->sum('amount');
 
