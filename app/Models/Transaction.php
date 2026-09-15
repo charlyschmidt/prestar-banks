@@ -19,7 +19,10 @@ class Transaction extends Model
         'description',
         'transfer_id',
         'date',
-        'balance_after'
+        'balance_after',
+        'destination_bank',
+        'executed_at',
+        'executed_by',
 
     ];
 
@@ -28,6 +31,8 @@ class Transaction extends Model
         'amount' => 'decimal:2',
 
         'date' => 'datetime',
+
+        'executed_at' => 'datetime',
 
     ];
 
@@ -46,6 +51,15 @@ class Transaction extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class)
+            ->withTrashed();
+    }
+
+    public function executedBy()
+    {
+        return $this->belongsTo(
+            User::class,
+            'executed_by'
+        )->withTrashed();
     }
 }

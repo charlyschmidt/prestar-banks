@@ -176,6 +176,9 @@ class TransactionCreated implements ShouldBroadcastNow
                 'description' =>
                 $this->transaction->description,
 
+                'destination_bank' =>
+                $this->transaction->destination_bank,
+
                 'date' =>
                 $this->transaction->date,
 
@@ -183,9 +186,17 @@ class TransactionCreated implements ShouldBroadcastNow
                 $balance
                     ? $balance->current_balance
                     : 0,
+
+                'executed_at' =>
+                $this->transaction->executed_at,
+
                 'user' => [
-                    'id' => $this->transaction->user?->id,
-                    'name' => $this->transaction->user?->name ?? 'Sin registro',
+                    'id' =>
+                    $this->transaction->user?->id,
+
+                    'name' =>
+                    $this->transaction->user?->name
+                        ?? 'Sin registro',
                 ],
 
             ],

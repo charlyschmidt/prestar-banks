@@ -11,7 +11,7 @@ use App\Models\AccountDailyBalance;
 use Illuminate\Support\Facades\DB;
 use App\Exports\TransactionsExport;
 use Maatwebsite\Excel\Facades\Excel;
-
+use App\Support\ArgentineBanks;
 
 class TransactionController extends Controller
 {
@@ -68,10 +68,10 @@ class TransactionController extends Controller
         ])->get();
 
 
-        return view(
-            'transactions.create',
-            compact('accounts')
-        );
+        return view('transactions.create', [
+            'accounts' => $accounts,
+            'banks' => ArgentineBanks::all(),
+        ]);
     }
 
 
@@ -80,10 +80,8 @@ class TransactionController extends Controller
 
 
 
-    public function store(
-        Request $request,
-        FinancialDayService $financialDayService
-    ) {
+    public function store(Request $request, FinancialDayService $financialDayService)
+    {
 
         $data = $request->validate([
 
@@ -111,7 +109,13 @@ class TransactionController extends Controller
             'date' => [
                 'required',
                 'date'
-            ]
+            ],
+            'destination_bank' => [
+                'required_if:type,expense',
+                'nullable',
+                'string',
+                'max:150',
+            ],
 
         ]);
 
@@ -195,7 +199,7 @@ class TransactionController extends Controller
                     'Saldo insuficiente. Disponible: $' .
                         number_format(
                             $balance->current_balance,
-                            0,
+                            2,
                             ',',
                             '.'
                         )
@@ -219,6 +223,9 @@ class TransactionController extends Controller
     | Crear movimiento y actualizar saldo
     |--------------------------------------------------------------------------
     */
+        if ($data['type'] !== 'expense') {
+            $data['destination_bank'] = null;
+        }
 
         DB::transaction(function () use (
             $data,
@@ -295,12 +302,6 @@ class TransactionController extends Controller
                 'Movimiento creado correctamente.'
             );
     }
-
-
-
-
-
-
 
 
 
@@ -762,4 +763,113 @@ class TransactionController extends Controller
 
         );
     }
+
+    public function execute(Transaction $transaction)
+{
+    $user = auth()->user();
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Solo usuarios del área Administración
+    |--------------------------------------------------------------------------
+    |
+    | El Super Admin sigue siendo un concepto separado y no ejecuta
+    | transferencias desde esta función.
+    |
+    */
+
+    if (
+        $user->is_admin ||
+        $user->role !== 'administration'
+    ) {
+
+        return response()->json([
+            'success' => false,
+            'message' => 'No tenés permisos para ejecutar movimientos.'
+        ], 403);
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Solo egresos
+    |--------------------------------------------------------------------------
+    */
+
+    if ($transaction->type !== 'expense') {
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Solo se pueden ejecutar movimientos de egreso.'
+        ], 422);
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Debe tener banco destino
+    |--------------------------------------------------------------------------
+    */
+
+    if (!$transaction->destination_bank) {
+
+        return response()->json([
+            'success' => false,
+            'message' => 'El movimiento no tiene un banco destino.'
+        ], 422);
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Evitar ejecutar dos veces
+    |--------------------------------------------------------------------------
+    */
+
+    if ($transaction->executed_at) {
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Este movimiento ya fue ejecutado.'
+        ], 422);
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Marcar como ejecutado
+    |--------------------------------------------------------------------------
+    */
+
+    $transaction->update([
+
+        'executed_at' => now(),
+
+        'executed_by' => $user->id,
+
+    ]);
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Respuesta AJAX
+    |--------------------------------------------------------------------------
+    */
+
+    return response()->json([
+
+        'success' => true,
+
+        'message' => 'Transferencia ejecutada correctamente.',
+
+        'transaction_id' => $transaction->id,
+
+        'executed_at' => $transaction->executed_at
+            ->format('d/m/Y H:i'),
+
+        'executed_by' => $user->name,
+
+    ]);
+}
 }

@@ -40,148 +40,215 @@ document.addEventListener('DOMContentLoaded', () => {
 
 <tr>
 
-
-<td>
-
-Hoy
-
-</td>
+    <!-- FECHA -->
+    <td>
+        Hoy
+    </td>
 
 
+    <!-- CUENTA -->
+    <td>
 
-<td>
+        <div class="account-cell">
 
-<div class="account-cell">
-
-    ${account.logo
-                    ?
-                    `<img src="/storage/${account.logo}">`
-                    :
-                    `<div class="mini-logo">
-            <i class="bi bi-bank"></i>
-        </div>`
+            ${account.logo
+                    ? `<img src="/storage/${account.logo}" alt="${account.name}">`
+                    : `
+                        <div class="mini-logo">
+                            <i class="bi bi-bank"></i>
+                        </div>
+                    `
                 }
 
+            <span>
+                ${account.name}
+            </span>
 
-    <span>
+        </div>
 
-        ${account.name}
-
-    </span>
-
-</div>
-
-</td>
+    </td>
 
 
+    <!-- BANCO DESTINO -->
+    <td>
 
+        ${transaction.type === 'expense' &&
+                    transaction.destination_bank
 
+                    ? `
+                    <div class="destination-bank">
 
-<td>
+                        <i class="bi bi-bank"></i>
 
-${isIncome
+                        <span>
+                            ${transaction.destination_bank}
+                        </span>
 
-                    ?
-                    `
-    <span class="movement-income">
+                    </div>
 
-        <i class="bi bi-arrow-up"></i>
+                    <div
+                        class="execution-badge"
+                        data-execution-badge="${transaction.id}"
+                        style="display: none;"
+                    >
 
-        Ingreso
+                        <i class="bi bi-check-circle-fill"></i>
 
-    </span>
-    `
+                        <span>
+                            Ejecutada
+                        </span>
 
-                    :
+                    </div>
+                `
 
-                    `
-    <span class="movement-expense">
-
-        <i class="bi bi-arrow-down"></i>
-
-        Egreso
-
-    </span>
-    `
-
+                    : `
+                    <span class="text-muted">
+                        —
+                    </span>
+                `
                 }
 
-</td>
+    </td>
 
 
+    <!-- USUARIO -->
+    <td>
+
+        <div class="movement-user">
+
+            <i class="bi bi-person-circle"></i>
+
+            <span>
+                ${transaction.user?.name ?? 'Sin registro'}
+            </span>
+
+        </div>
+
+    </td>
 
 
+    <!-- TIPO -->
+    <td>
 
-<td>
+        ${isIncome
 
-${transaction.description ?? 'Sin descripción'}
+                    ? `
+                    <span class="movement-income">
 
-</td>
+                        <i class="bi bi-arrow-up"></i>
 
+                        Ingreso
 
+                    </span>
+                `
 
+                    : `
+                    <span class="movement-expense">
 
+                        <i class="bi bi-arrow-down"></i>
 
-<td class="text-end">
+                        Egreso
 
-
-${isIncome
-
-                    ?
-
-                    `
-    <span class="amount-income">
-
-        +
-        $${Number(transaction.amount)
-                        .toLocaleString('es-AR')}
-
-    </span>
-    `
-
-                    :
-
-                    `
-    <span class="amount-expense">
-
-        -
-        $${Number(transaction.amount)
-                        .toLocaleString('es-AR')}
-
-    </span>
-    `
-
+                    </span>
+                `
                 }
 
-
-</td>
-
+    </td>
 
 
+    <!-- DESCRIPCIÓN -->
+    <td>
+
+        ${transaction.description ?? 'Sin descripción'}
+
+    </td>
 
 
-<td>
+    <!-- MONTO -->
+    <td class="text-end">
 
-$${Number(event.initialBalance)
-                    .toLocaleString('es-AR')}
+        ${isIncome
 
-</td>
+                    ? `
+                    <span class="amount-income">
+
+                        +
+                        $${Number(transaction.amount).toLocaleString(
+                        'es-AR',
+                        {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                        }
+                    )}
+
+                    </span>
+                `
+
+                    : `
+                    <span class="amount-expense">
+
+                        -
+                        $${Number(transaction.amount).toLocaleString(
+                        'es-AR',
+                        {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                        }
+                    )}
+
+                    </span>
+                `
+                }
+
+    </td>
 
 
+    <!-- ACCIONES -->
+    <td>
 
+        <div class="table-actions">
 
+            ${transaction.can_execute
 
-<td>
+                    ? `
+                        <button
+                            type="button"
+                            class="icon-button execute-transaction-button"
+                            data-transaction-id="${transaction.id}"
+                            data-execute-url="/transactions/${transaction.id}/execute"
+                            title="Ejecutar transferencia"
+                        >
 
-$${Number(event.balance)
-                    .toLocaleString('es-AR')}
+                            <i class="bi bi-send-check"></i>
 
-</td>
+                        </button>
+                    `
 
+                    : ''
+                }
 
+            ${transaction.can_manage
+
+                    ? `
+                        <a
+                            href="/transactions/${transaction.id}/edit"
+                            class="icon-button"
+                            title="Editar movimiento"
+                        >
+
+                            <i class="bi bi-pencil"></i>
+
+                        </a>
+                    `
+
+                    : ''
+                }
+
+        </div>
+
+    </td>
 
 </tr>
-
 
 `;
 
@@ -195,5 +262,130 @@ $${Number(event.balance)
 
         });
 
+
+});
+
+/*
+|--------------------------------------------------------------------------
+| Ejecutar transferencia
+|--------------------------------------------------------------------------
+*/
+
+document.addEventListener('click', async (event) => {
+
+    const button = event.target.closest(
+        '.execute-transaction-button'
+    );
+
+
+    if (!button) {
+        return;
+    }
+
+
+    const confirmed = confirm(
+        '¿Confirmás que esta transferencia fue realizada?'
+    );
+
+
+    if (!confirmed) {
+        return;
+    }
+
+
+    const transactionId =
+        button.dataset.transactionId;
+
+    const executeUrl =
+        button.dataset.executeUrl;
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Bloquear botón mientras procesa
+    |--------------------------------------------------------------------------
+    */
+
+    button.disabled = true;
+
+
+    try {
+
+        const csrfToken = document.querySelector(
+            'meta[name="csrf-token"]'
+        );
+
+
+        if (!csrfToken) {
+            throw new Error(
+                'No se encontró el token CSRF.'
+            );
+        }
+
+
+        const response = await fetch(
+            executeUrl,
+            {
+                method: 'PATCH',
+
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': csrfToken.content
+                }
+            }
+        );
+
+
+        const data = await response.json();
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.message ??
+                'No se pudo ejecutar la transferencia.'
+            );
+
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Mostrar badge "Ejecutada"
+        |--------------------------------------------------------------------------
+        */
+
+        const badge = document.querySelector(
+            `[data-execution-badge="${transactionId}"]`
+        );
+
+
+        if (badge) {
+
+            badge.style.display =
+                'inline-flex';
+
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Quitar botón Ejecutar
+        |--------------------------------------------------------------------------
+        */
+
+        button.remove();
+
+
+    } catch (error) {
+
+        button.disabled = false;
+
+        alert(
+            error.message
+        );
+
+    }
 
 });

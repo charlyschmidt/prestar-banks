@@ -1,7 +1,80 @@
 /* =====================
  MOVEMENTS
 ===================== */
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 22px;
+    align-items: start;
+}
 
+.form-grid .form-group {
+    min-width: 0;
+}
+
+.form-grid .full-width {
+    grid-column: 1 / -1;
+}
+
+@media (max-width: 768px) {
+
+    .form-grid {
+        grid-template-columns: 1fr;
+        gap: 18px;
+    }
+
+    .form-grid .full-width {
+        grid-column: auto;
+    }
+
+}
+
+.destination-bank {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 13px;
+    color: var(--text);
+    white-space: nowrap;
+}
+
+.destination-bank i {
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.text-muted {
+    color: #ffffff !important
+}
+
+.execution-badge {
+    width: fit-content;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+
+    margin-top: 6px;
+    padding: 4px 7px;
+
+    border-radius: 7px;
+
+    background: rgba(34, 197, 94, 0.14);
+
+    color: var(--success);
+
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.execution-badge i {
+    font-size: 10px;
+}
+
+.execution-badge span {
+    color: inherit;
+}
 
 .movements-card,
 .movements {

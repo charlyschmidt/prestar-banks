@@ -13,7 +13,7 @@
 
         <strong data-header-balance>
 
-            ${{ number_format($header['balance'], 0, ',', '.') }}
+            ${{ number_format($header['balance'], 2, ',', '.') }}
 
         </strong>
 
@@ -41,20 +41,12 @@
 
             <strong class="green" data-header-income>
 
-
-                + ${{ number_format($header['income'], 0, ',', '.') }}
-
+                + ${{ number_format($header['income'], 2, ',', '.') }}
 
             </strong>
 
 
         </div>
-
-
-
-
-
-
 
         <div class="header-item">
 
@@ -67,7 +59,7 @@
             <strong class="red" data-header-expense>
 
 
-                - ${{ number_format($header['expense'], 0, ',', '.') }}
+                - ${{ number_format($header['expense'], 2, ',', '.') }}
 
 
             </strong>
@@ -82,8 +74,7 @@
 
 
 
-        <a href="{{ route('transactions.create') }}"
-           class="new-movement-button">
+        <a href="{{ route('transactions.create') }}" class="new-movement-button">
 
 
             <i class="bi bi-plus-lg"></i>
@@ -106,13 +97,19 @@
         <div class="user-profile-badge">
 
 
-            <span class="role-badge {{ auth()->user()->is_admin ? 'admin' : 'user' }}">
-
-
-                {{ auth()->user()->is_admin ? 'ADMIN' : 'USUARIO' }}
-
-
-            </span>
+            @if (auth()->user()->is_admin)
+                <span class="role-badge admin">
+                    SUPER ADMIN
+                </span>
+            @elseif (auth()->user()->role === 'administration')
+                <span class="role-badge administration">
+                    ADMINISTRACIÓN
+                </span>
+            @else
+                <span class="role-badge user">
+                    OPERADOR
+                </span>
+            @endif
 
 
 

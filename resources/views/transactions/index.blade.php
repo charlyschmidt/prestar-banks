@@ -104,6 +104,10 @@
                             </th>
 
                             <th>
+                                Banco destino
+                            </th>
+
+                            <th>
                                 Usuario
                             </th>
 
@@ -165,6 +169,39 @@
                                         </span>
 
                                     </div>
+
+                                </td>
+
+                                {{-- BANCO DESTINO --}}
+                                <td>
+
+                                    @if ($transaction->type === 'expense' && $transaction->destination_bank)
+                                        <div class="destination-bank">
+
+                                            <i class="bi bi-bank"></i>
+
+                                            <span>
+                                                {{ $transaction->destination_bank }}
+                                            </span>
+
+                                        </div>
+
+
+                                        <div class="execution-badge" data-execution-badge="{{ $transaction->id }}"
+                                            @if (!$transaction->executed_at) style="display: none;" @endif>
+
+                                            <i class="bi bi-check-circle-fill"></i>
+
+                                            <span>
+                                                Ejecutada
+                                            </span>
+
+                                        </div>
+                                    @else
+                                        <span class="text-muted">
+                                            —
+                                        </span>
+                                    @endif
 
                                 </td>
 
@@ -242,6 +279,26 @@
 
                                     <div class="table-actions">
 
+
+                                        {{-- EJECUTAR TRANSFERENCIA --}}
+                                        @if (
+                                            !auth()->user()->is_admin &&
+                                                auth()->user()->role === 'administration' &&
+                                                $transaction->type === 'expense' &&
+                                                !$transaction->executed_at)
+                                            <button type="button" class="icon-button execute-transaction-button"
+                                                data-transaction-id="{{ $transaction->id }}"
+                                                data-execute-url="{{ route('transactions.execute', $transaction) }}"
+                                                title="Ejecutar transferencia">
+
+                                                <i class="bi bi-send-check"></i>
+
+                                            </button>
+                                        @endif
+
+
+
+                                        {{-- EDITAR / ELIMINAR --}}
                                         @if (auth()->user()->is_admin || $transaction->user_id === auth()->id())
                                             <a href="{{ route('transactions.edit', $transaction) }}" class="icon-button"
                                                 title="Editar movimiento">
@@ -257,6 +314,7 @@
                                                 @csrf
                                                 @method('DELETE')
 
+
                                                 <button type="submit" class="icon-button danger"
                                                     title="Eliminar movimiento">
 
@@ -265,7 +323,16 @@
                                                 </button>
 
                                             </form>
-                                        @else
+                                        @endif
+
+
+                                        @if (
+                                            !(
+                                                !auth()->user()->is_admin &&
+                                                auth()->user()->role === 'administration' &&
+                                                $transaction->type === 'expense' &&
+                                                !$transaction->executed_at
+                                            ) && !(auth()->user()->is_admin || $transaction->user_id === auth()->id()))
                                             <span class="text-muted">
                                                 —
                                             </span>
@@ -281,7 +348,7 @@
 
                             <tr>
 
-                                <td colspan="7" class="text-center">
+                                <td colspan="8" class="text-center">
 
                                     Sin movimientos en esta jornada
 

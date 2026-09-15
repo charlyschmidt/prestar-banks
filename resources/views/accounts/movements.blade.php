@@ -124,7 +124,7 @@
 
                         <h3>
 
-                            ${{ number_format($balance->initial_balance ?? 0, 0, ',', '.') }}
+                            ${{ number_format($balance->initial_balance ?? 0, 2, ',', '.') }}
 
                         </h3>
 
@@ -159,7 +159,7 @@
                         <h3 class="green">
 
 
-                            ${{ number_format($balance->current_balance ?? 0, 0, ',', '.') }}
+                            ${{ number_format($balance->current_balance ?? 0, 2, ',', '.') }}
 
 
                         </h3>
@@ -222,6 +222,10 @@
                             </th>
 
                             <th>
+                                Banco destino
+                            </th>
+
+                            <th>
                                 Usuario
                             </th>
 
@@ -266,6 +270,39 @@
 
                                 <td>
                                     {{ $movement->description }}
+                                </td>
+
+                                {{-- BANCO DESTINO --}}
+                                <td>
+
+                                    @if ($movement->type === 'expense' && $movement->destination_bank)
+                                        <div class="destination-bank">
+
+                                            <i class="bi bi-bank"></i>
+
+                                            <span>
+                                                {{ $movement->destination_bank }}
+                                            </span>
+
+                                        </div>
+
+
+                                        <div class="execution-badge" data-execution-badge="{{ $movement->id }}"
+                                            @if (!$movement->executed_at) style="display: none;" @endif>
+
+                                            <i class="bi bi-check-circle-fill"></i>
+
+                                            <span>
+                                                Ejecutada
+                                            </span>
+
+                                        </div>
+                                    @else
+                                        <span class="text-muted">
+                                            —
+                                        </span>
+                                    @endif
+
                                 </td>
 
 
@@ -325,14 +362,36 @@
 
                                 </td>
 
+                                {{-- ACCIONES --}}
                                 <td>
 
                                     <div class="table-actions">
 
+
+                                        {{-- EJECUTAR TRANSFERENCIA --}}
+                                        @if (
+                                            !auth()->user()->is_admin &&
+                                                auth()->user()->role === 'administration' &&
+                                                $movement->type === 'expense' &&
+                                                !$movement->executed_at)
+                                            <button type="button" class="icon-button execute-transaction-button"
+                                                data-transaction-id="{{ $movement->id }}"
+                                                data-execute-url="{{ route('transactions.execute', $movement) }}"
+                                                title="Ejecutar transferencia">
+
+                                                <i class="bi bi-send-check"></i>
+
+                                            </button>
+                                        @endif
+
+
+                                        {{-- EDITAR / ELIMINAR --}}
                                         @if (auth()->user()->is_admin || $movement->user_id === auth()->id())
                                             <a href="{{ route('transactions.edit', $movement) }}" class="icon-button"
                                                 title="Editar movimiento">
+
                                                 <i class="bi bi-pencil"></i>
+
                                             </a>
 
 
@@ -342,12 +401,28 @@
                                                 @csrf
                                                 @method('DELETE')
 
+
                                                 <button type="submit" class="icon-button danger"
                                                     title="Eliminar movimiento">
+
                                                     <i class="bi bi-trash"></i>
+
                                                 </button>
 
                                             </form>
+                                        @endif
+
+
+                                        @if (
+                                            !(
+                                                !auth()->user()->is_admin &&
+                                                auth()->user()->role === 'administration' &&
+                                                $movement->type === 'expense' &&
+                                                !$movement->executed_at
+                                            ) && !(auth()->user()->is_admin || $movement->user_id === auth()->id()))
+                                            <span class="text-muted">
+                                                —
+                                            </span>
                                         @endif
 
                                     </div>
@@ -360,7 +435,7 @@
 
                             <tr>
 
-                                <td colspan="6">
+                                <td colspan="7">
                                     Sin movimientos en esta jornada
                                 </td>
 

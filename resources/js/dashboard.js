@@ -819,14 +819,19 @@ Formatear dinero
 */
 function formatMoney(value) {
 
-    return Number(value || 0).toLocaleString(
+    const number = Number(value);
+
+    if (Number.isNaN(number)) {
+        return '0,00';
+    }
+
+    return number.toLocaleString(
         'es-AR',
         {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2
         }
     );
-
 }
 /*
 Escapar HTML

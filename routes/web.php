@@ -59,6 +59,7 @@ Route::middleware('auth')->group(function () {
         'accounts',
         AccountController::class
     );
+    
     Route::get(
         '/accounts/{account}/export',
         [
@@ -77,6 +78,11 @@ Route::middleware('auth')->group(function () {
         'transactions/export',
         [TransactionController::class, 'export']
     )->name('transactions.export');
+
+    Route::patch(
+        '/transactions/{transaction}/execute',
+        [TransactionController::class, 'execute']
+    )->name('transactions.execute');
 
     Route::resource('transactions', TransactionController::class);
 

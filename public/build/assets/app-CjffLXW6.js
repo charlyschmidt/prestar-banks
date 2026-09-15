@@ -127,123 +127,177 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
                 `);let a=t.querySelector(`[data-movements]`);a&&(a.innerHTML=`
                     <i class="bi bi-arrow-left-right"></i>
                     ${e.movements}
-                `)});let a=document.querySelector(`#movements-body`);a&&(a.innerHTML=``,[...t.movements].reverse().forEach(e=>{re({transaction:{id:e.id,type:e.type,amount:e.amount,description:e.description,date:e.date,balance_after:e.balance_after,user:e.user},account:e.account,initialBalance:e.initial_balance},!1)})),console.log(`Dashboard sincronizado correctamente`)}catch(e){console.error(`Error sincronizando dashboard:`,e)}}}function j(e){return Number(e||0).toLocaleString(`es-AR`,{minimumFractionDigits:2,maximumFractionDigits:2})}function M(e){let t=document.createElement(`div`);return t.textContent=e,t.innerHTML}document.addEventListener(`DOMContentLoaded`,()=>{document.getElementById(`transactions-body`)&&Echo.channel(`dashboard`).listen(`.transaction.created`,e=>{console.log(`Nuevo movimiento:`,e);let t=e.transaction,n=e.account,r=document.getElementById(`transactions-body`),i=[`income`,`transfer_in`].includes(t.type),a=`
+                `)});let a=document.querySelector(`#movements-body`);a&&(a.innerHTML=``,[...t.movements].reverse().forEach(e=>{re({transaction:{id:e.id,type:e.type,amount:e.amount,description:e.description,date:e.date,balance_after:e.balance_after,user:e.user},account:e.account,initialBalance:e.initial_balance},!1)})),console.log(`Dashboard sincronizado correctamente`)}catch(e){console.error(`Error sincronizando dashboard:`,e)}}}function j(e){let t=Number(e);return Number.isNaN(t)?`0,00`:t.toLocaleString(`es-AR`,{minimumFractionDigits:2,maximumFractionDigits:2})}function M(e){let t=document.createElement(`div`);return t.textContent=e,t.innerHTML}document.addEventListener(`DOMContentLoaded`,()=>{document.getElementById(`transactions-body`)&&Echo.channel(`dashboard`).listen(`.transaction.created`,e=>{console.log(`Nuevo movimiento:`,e);let t=e.transaction,n=e.account,r=document.getElementById(`transactions-body`),i=[`income`,`transfer_in`].includes(t.type),a=`
 
 <tr>
 
-
-<td>
-
-Hoy
-
-</td>
+    <!-- FECHA -->
+    <td>
+        Hoy
+    </td>
 
 
+    <!-- CUENTA -->
+    <td>
 
-<td>
+        <div class="account-cell">
 
-<div class="account-cell">
+            ${n.logo?`<img src="/storage/${n.logo}" alt="${n.name}">`:`
+                        <div class="mini-logo">
+                            <i class="bi bi-bank"></i>
+                        </div>
+                    `}
 
-    ${n.logo?`<img src="/storage/${n.logo}">`:`<div class="mini-logo">
-            <i class="bi bi-bank"></i>
-        </div>`}
+            <span>
+                ${n.name}
+            </span>
 
+        </div>
 
-    <span>
-
-        ${n.name}
-
-    </span>
-
-</div>
-
-</td>
-
+    </td>
 
 
+    <!-- BANCO DESTINO -->
+    <td>
+
+        ${t.type===`expense`&&t.destination_bank?`
+                    <div class="destination-bank">
+
+                        <i class="bi bi-bank"></i>
+
+                        <span>
+                            ${t.destination_bank}
+                        </span>
+
+                    </div>
+
+                    <div
+                        class="execution-badge"
+                        data-execution-badge="${t.id}"
+                        style="display: none;"
+                    >
+
+                        <i class="bi bi-check-circle-fill"></i>
+
+                        <span>
+                            Ejecutada
+                        </span>
+
+                    </div>
+                `:`
+                    <span class="text-muted">
+                        —
+                    </span>
+                `}
+
+    </td>
 
 
-<td>
+    <!-- USUARIO -->
+    <td>
 
-${i?`
-    <span class="movement-income">
+        <div class="movement-user">
 
-        <i class="bi bi-arrow-up"></i>
+            <i class="bi bi-person-circle"></i>
 
-        Ingreso
+            <span>
+                ${t.user?.name??`Sin registro`}
+            </span>
 
-    </span>
-    `:`
-    <span class="movement-expense">
+        </div>
 
-        <i class="bi bi-arrow-down"></i>
-
-        Egreso
-
-    </span>
-    `}
-
-</td>
+    </td>
 
 
+    <!-- TIPO -->
+    <td>
+
+        ${i?`
+                    <span class="movement-income">
+
+                        <i class="bi bi-arrow-up"></i>
+
+                        Ingreso
+
+                    </span>
+                `:`
+                    <span class="movement-expense">
+
+                        <i class="bi bi-arrow-down"></i>
+
+                        Egreso
+
+                    </span>
+                `}
+
+    </td>
 
 
+    <!-- DESCRIPCIÓN -->
+    <td>
 
-<td>
+        ${t.description??`Sin descripción`}
 
-${t.description??`Sin descripción`}
-
-</td>
-
-
+    </td>
 
 
+    <!-- MONTO -->
+    <td class="text-end">
 
-<td class="text-end">
+        ${i?`
+                    <span class="amount-income">
 
+                        +
+                        $${Number(t.amount).toLocaleString(`es-AR`,{minimumFractionDigits:2,maximumFractionDigits:2})}
 
-${i?`
-    <span class="amount-income">
+                    </span>
+                `:`
+                    <span class="amount-expense">
 
-        +
-        $${Number(t.amount).toLocaleString(`es-AR`)}
+                        -
+                        $${Number(t.amount).toLocaleString(`es-AR`,{minimumFractionDigits:2,maximumFractionDigits:2})}
 
-    </span>
-    `:`
-    <span class="amount-expense">
+                    </span>
+                `}
 
-        -
-        $${Number(t.amount).toLocaleString(`es-AR`)}
-
-    </span>
-    `}
-
-
-</td>
+    </td>
 
 
+    <!-- ACCIONES -->
+    <td>
 
+        <div class="table-actions">
 
+            ${t.can_execute?`
+                        <button
+                            type="button"
+                            class="icon-button execute-transaction-button"
+                            data-transaction-id="${t.id}"
+                            data-execute-url="/transactions/${t.id}/execute"
+                            title="Ejecutar transferencia"
+                        >
 
-<td>
+                            <i class="bi bi-send-check"></i>
 
-$${Number(e.initialBalance).toLocaleString(`es-AR`)}
+                        </button>
+                    `:``}
 
-</td>
+            ${t.can_manage?`
+                        <a
+                            href="/transactions/${t.id}/edit"
+                            class="icon-button"
+                            title="Editar movimiento"
+                        >
 
+                            <i class="bi bi-pencil"></i>
 
+                        </a>
+                    `:``}
 
+        </div>
 
-
-<td>
-
-$${Number(e.balance).toLocaleString(`es-AR`)}
-
-</td>
-
-
+    </td>
 
 </tr>
 
-
-`;r.insertAdjacentHTML(`afterbegin`,a)})}),document.addEventListener(`DOMContentLoaded`,()=>{document.querySelectorAll(`.money-input`).forEach(e=>{e.value&&=ie(e.value),e.addEventListener(`input`,function(){let e=this.value;e=e.replace(/\./g,``),e=e.replace(/[^\d,]/g,``);let t=e.indexOf(`,`);t!==-1&&(e=e.substring(0,t+1)+e.substring(t+1).replace(/,/g,``));let n=e.split(`,`),r=n[0]||``,i=n[1]===void 0?null:n[1].substring(0,2);r=r.replace(/^0+(?=\d)/,``),r===``&&(r=`0`),r=Number(r).toLocaleString(`es-AR`),this.value=i===null?r:`${r},${i}`}),e.addEventListener(`blur`,function(){this.value&&=N(this.value)})}),document.querySelectorAll(`form`).forEach(e=>{e.addEventListener(`submit`,()=>{e.querySelectorAll(`.money-input`).forEach(e=>{e.value&&=P(e.value)})})})});function ie(e){if(e==null||e===``)return``;let t=String(e).trim();if(t.includes(`,`))return N(t);let n=Number(t);return Number.isNaN(n)?``:n.toLocaleString(`es-AR`,{minimumFractionDigits:2,maximumFractionDigits:2})}function N(e){if(!e)return``;let t=String(e).replace(/\./g,``).replace(`,`,`.`),n=Number(t);return Number.isNaN(n)?``:n.toLocaleString(`es-AR`,{minimumFractionDigits:2,maximumFractionDigits:2})}function P(e){return String(e).replace(/\./g,``).replace(`,`,`.`)}document.addEventListener(`DOMContentLoaded`,()=>{let e=document.getElementById(`realtimeSound`),t=document.getElementById(`testRealtimeSound`);e&&(e.checked=ne(),e.addEventListener(`change`,()=>{O(e.checked),e.checked&&k()})),t&&t.addEventListener(`click`,()=>{k()})});
+`;r.insertAdjacentHTML(`afterbegin`,a)})}),document.addEventListener(`click`,async e=>{let t=e.target.closest(`.execute-transaction-button`);if(!t||!confirm(`¿Confirmás que esta transferencia fue realizada?`))return;let n=t.dataset.transactionId,r=t.dataset.executeUrl;t.disabled=!0;try{let e=document.querySelector(`meta[name="csrf-token"]`);if(!e)throw Error(`No se encontró el token CSRF.`);let i=await fetch(r,{method:`PATCH`,headers:{Accept:`application/json`,"X-Requested-With":`XMLHttpRequest`,"X-CSRF-TOKEN":e.content}}),a=await i.json();if(!i.ok)throw Error(a.message??`No se pudo ejecutar la transferencia.`);let o=document.querySelector(`[data-execution-badge="${n}"]`);o&&(o.style.display=`inline-flex`),t.remove()}catch(e){t.disabled=!1,alert(e.message)}}),document.addEventListener(`DOMContentLoaded`,()=>{document.querySelectorAll(`.money-input`).forEach(e=>{e.value&&=ie(e.value),e.addEventListener(`input`,function(){let e=this.value;e=e.replace(/\./g,``),e=e.replace(/[^\d,]/g,``);let t=e.indexOf(`,`);t!==-1&&(e=e.substring(0,t+1)+e.substring(t+1).replace(/,/g,``));let n=e.split(`,`),r=n[0]||``,i=n[1]===void 0?null:n[1].substring(0,2);r=r.replace(/^0+(?=\d)/,``),r===``&&(r=`0`),r=Number(r).toLocaleString(`es-AR`),this.value=i===null?r:`${r},${i}`}),e.addEventListener(`blur`,function(){this.value&&=N(this.value)})}),document.querySelectorAll(`form`).forEach(e=>{e.addEventListener(`submit`,()=>{e.querySelectorAll(`.money-input`).forEach(e=>{e.value&&=P(e.value)})})})});function ie(e){if(e==null||e===``)return``;let t=String(e).trim();if(t.includes(`,`))return N(t);let n=Number(t);return Number.isNaN(n)?``:n.toLocaleString(`es-AR`,{minimumFractionDigits:2,maximumFractionDigits:2})}function N(e){if(!e)return``;let t=String(e).replace(/\./g,``).replace(`,`,`.`),n=Number(t);return Number.isNaN(n)?``:n.toLocaleString(`es-AR`,{minimumFractionDigits:2,maximumFractionDigits:2})}function P(e){return String(e).replace(/\./g,``).replace(`,`,`.`)}document.addEventListener(`DOMContentLoaded`,()=>{let e=document.getElementById(`realtimeSound`),t=document.getElementById(`testRealtimeSound`);e&&(e.checked=ne(),e.addEventListener(`change`,()=>{O(e.checked),e.checked&&k()})),t&&t.addEventListener(`click`,()=>{k()})});
