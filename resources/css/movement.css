@@ -745,10 +745,10 @@
 ========================================================= */
 
 .modal-backdrop {
-    background: rgba(0, 0, 0, .82);
+    background: rgba(0, 0, 0, .92);
 
-    backdrop-filter: blur(7px);
-    -webkit-backdrop-filter: blur(7px);
+    backdrop-filter: blur(9px);
+    -webkit-backdrop-filter: blur(9px);
 }
 
 .modal-backdrop.show {
