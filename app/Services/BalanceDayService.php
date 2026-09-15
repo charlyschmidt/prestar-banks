@@ -21,7 +21,6 @@ class BalanceDayService
     }
 
 
-
     public function getDashboardSummary(): array
     {
 
@@ -54,32 +53,44 @@ class BalanceDayService
         }
 
 
-
         return [
 
             'has_day' => true,
 
             'day' => $day,
 
-            'balance_total' => $this->getTotalBalance($day),
+            'balance_total' =>
+                $this->getTotalBalance($day),
 
-            'ingresos_jornada' => $this->getDayIncome($day),
+            'ingresos_jornada' =>
+                $this->getDayIncome($day),
 
-            'egresos_jornada' => $this->getDayExpenses($day),
+            /*
+             * Incluye egresos + reservas
+             * porque ambos descuentan saldo.
+             */
+            'egresos_jornada' =>
+                $this->getDayExpenses($day),
 
-            'accounts' => $this->getAccountsBalance($day),
+            'accounts' =>
+                $this->getAccountsBalance($day),
 
-            'movements' => $this->getLatestMovements($day),
+            'movements' =>
+                $this->getLatestMovements($day),
 
-            'movimiento_ultimo' => $this->getLastMovement($day),
+            'movimiento_ultimo' =>
+                $this->getLastMovement($day),
 
-            'movimientos_total' => $this->getMovementsCount($day)
+            'movimientos_total' =>
+                $this->getMovementsCount($day)
 
         ];
     }
 
-    public function getMovementsCount(FinancialDay $day)
-    {
+
+    public function getMovementsCount(
+        FinancialDay $day
+    ) {
 
         return Transaction::where(
             'financial_day_id',
@@ -87,8 +98,11 @@ class BalanceDayService
         )
             ->count();
     }
-    public function getTotalBalance(FinancialDay $day)
-    {
+
+
+    public function getTotalBalance(
+        FinancialDay $day
+    ) {
 
         return AccountDailyBalance::where(
             'financial_day_id',
@@ -97,8 +111,10 @@ class BalanceDayService
             ->sum('current_balance');
     }
 
-    public function getAccountsBalance(FinancialDay $day)
-    {
+
+    public function getAccountsBalance(
+        FinancialDay $day
+    ) {
 
         return AccountDailyBalance::with('account')
             ->where(
@@ -108,62 +124,115 @@ class BalanceDayService
             ->get()
             ->map(function ($balance) {
 
-
                 return [
 
-                    'id' => $balance->account->id,
+                    'id' =>
+                        $balance->account->id,
 
-                    'name' => $balance->account->name,
+                    'name' =>
+                        $balance->account->name,
 
-                    'type' => $balance->account->type,
+                    'type' =>
+                        $balance->account->type,
 
-                    'logo' => $balance->account->logo
-                        ? Storage::url($balance->account->logo)
-                        : null,
+                    'logo' =>
+                        $balance->account->logo
+                            ? Storage::url(
+                                $balance->account->logo
+                            )
+                            : null,
 
 
                     'initial_balance' =>
-                    $balance->initial_balance,
+                        $balance->initial_balance,
 
 
                     'balance' =>
-                    $balance->current_balance,
+                        $balance->current_balance,
 
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Ingresos
+                    |--------------------------------------------------------------------------
+                    */
 
                     'income' =>
-                    $this->countIncome(
-                        $balance->account_id,
-                        $balance->financial_day_id
-                    ),
+                        $this->countIncome(
+                            $balance->account_id,
+                            $balance->financial_day_id
+                        ),
 
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Egresos
+                    |--------------------------------------------------------------------------
+                    |
+                    | NO incluye reservas.
+                    */
 
                     'expense' =>
-                    $this->countExpense(
-                        $balance->account_id,
-                        $balance->financial_day_id
-                    ),
+                        $this->countExpense(
+                            $balance->account_id,
+                            $balance->financial_day_id
+                        ),
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Reservas
+                    |--------------------------------------------------------------------------
+                    */
+
+                    'reserve' =>
+                        $this->countReserve(
+                            $balance->account_id,
+                            $balance->financial_day_id
+                        ),
+
 
                     'movements' =>
-                    $this->countMovements(
-                        $balance->account_id,
-                        $balance->financial_day_id
-                    ),
+                        $this->countMovements(
+                            $balance->account_id,
+                            $balance->financial_day_id
+                        ),
 
                 ];
             });
     }
 
-    private function countMovements($accountId, $dayId)
-    {
-        return Transaction::where('account_id', $accountId)
-            ->where('financial_day_id', $dayId)
+
+    private function countMovements(
+        $accountId,
+        $dayId
+    ) {
+
+        return Transaction::where(
+            'account_id',
+            $accountId
+        )
+            ->where(
+                'financial_day_id',
+                $dayId
+            )
             ->count();
     }
 
-    private function countIncome($accountId, $dayId)
-    {
-        return Transaction::where('account_id', $accountId)
-            ->where('financial_day_id', $dayId)
+
+    private function countIncome(
+        $accountId,
+        $dayId
+    ) {
+
+        return Transaction::where(
+            'account_id',
+            $accountId
+        )
+            ->where(
+                'financial_day_id',
+                $dayId
+            )
             ->whereIn('type', [
                 'income',
                 'transfer_in'
@@ -172,10 +241,19 @@ class BalanceDayService
     }
 
 
-    private function countExpense($accountId, $dayId)
-    {
-        return Transaction::where('account_id', $accountId)
-            ->where('financial_day_id', $dayId)
+    private function countExpense(
+        $accountId,
+        $dayId
+    ) {
+
+        return Transaction::where(
+            'account_id',
+            $accountId
+        )
+            ->where(
+                'financial_day_id',
+                $dayId
+            )
             ->whereIn('type', [
                 'expense',
                 'transfer_out'
@@ -184,11 +262,30 @@ class BalanceDayService
     }
 
 
+    private function countReserve(
+        $accountId,
+        $dayId
+    ) {
+
+        return Transaction::where(
+            'account_id',
+            $accountId
+        )
+            ->where(
+                'financial_day_id',
+                $dayId
+            )
+            ->where(
+                'type',
+                'reserve'
+            )
+            ->sum('amount');
+    }
 
 
-
-    public function getLastMovement(FinancialDay $day)
-    {
+    public function getLastMovement(
+        FinancialDay $day
+    ) {
 
         return Transaction::with([
             'account',
@@ -203,16 +300,27 @@ class BalanceDayService
             ->first();
     }
 
-    public function getLatestMovements(FinancialDay $day)
-    {
+
+    public function getLatestMovements(
+        FinancialDay $day
+    ) {
 
         $movements = Transaction::with([
             'account',
             'user'
         ])
-            ->where('financial_day_id', $day->id)
-            ->orderBy('date', 'asc')
-            ->orderBy('id', 'asc')
+            ->where(
+                'financial_day_id',
+                $day->id
+            )
+            ->orderBy(
+                'date',
+                'asc'
+            )
+            ->orderBy(
+                'id',
+                'asc'
+            )
             ->get();
 
 
@@ -228,43 +336,68 @@ class BalanceDayService
 
         foreach ($movements as $movement) {
 
-
-            if (!isset($balances[$movement->account_id])) {
+            if (
+                !isset(
+                    $balances[$movement->account_id]
+                )
+            ) {
                 continue;
             }
 
 
-            // guardamos saldo inicial de la cuenta
+            /*
+             * Saldo antes del movimiento
+             */
             $movement->initial_balance =
                 $balances[$movement->account_id];
 
 
-            if (in_array($movement->type, [
-                'income',
-                'transfer_in'
-            ])) {
+            /*
+             * Ingreso suma.
+             *
+             * Egreso y Reserva restan.
+             */
+            if (
+                in_array(
+                    $movement->type,
+                    [
+                        'income',
+                        'transfer_in'
+                    ]
+                )
+            ) {
 
-                $balances[$movement->account_id] += $movement->amount;
+                $balances[$movement->account_id] +=
+                    $movement->amount;
+
             } else {
 
-                $balances[$movement->account_id] -= $movement->amount;
+                $balances[$movement->account_id] -=
+                    $movement->amount;
             }
 
 
-            // saldo luego del movimiento
+            /*
+             * Saldo después del movimiento
+             */
             $movement->balance_after =
                 $balances[$movement->account_id];
         }
 
 
-        return $movements->sortByDesc(function ($movement) {
+        return $movements
+            ->sortByDesc(function ($movement) {
 
-            return $movement->date;
-        })->values();
+                return $movement->date;
+
+            })
+            ->values();
     }
 
-    public function getDayIncome(FinancialDay $day)
-    {
+
+    public function getDayIncome(
+        FinancialDay $day
+    ) {
 
         return Transaction::where(
             'financial_day_id',
@@ -278,9 +411,18 @@ class BalanceDayService
     }
 
 
+    /*
+    |--------------------------------------------------------------------------
+    | Egresos totales de la jornada
+    |--------------------------------------------------------------------------
+    |
+    | Acá SÍ incluimos Reserva porque el header
+    | debe mostrar todo lo que descontó saldo.
+    */
 
-    public function getDayExpenses(FinancialDay $day)
-    {
+    public function getDayExpenses(
+        FinancialDay $day
+    ) {
 
         return Transaction::where(
             'financial_day_id',
@@ -288,6 +430,7 @@ class BalanceDayService
         )
             ->whereIn('type', [
                 'expense',
+                'reserve',
                 'transfer_out'
             ])
             ->sum('amount');

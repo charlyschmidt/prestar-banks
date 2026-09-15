@@ -97,163 +97,122 @@
 
         <div class="row g-3">
 
-
-
             @foreach ($summary['accounts'] as $account)
                 <div class="col-12 col-sm-6 col-xl-3">
 
-
                     <a href="{{ route('accounts.movements', $account['id']) }}" class="text-decoration-none">
-
-
 
                         <div class="bank-card h-100" data-account-id="{{ $account['id'] }}">
 
 
-
-
-
+                            {{-- HEADER --}}
 
                             <div class="bank-header">
-
-
 
                                 @if ($account['logo'])
                                     <img src="{{ $account['logo'] }}" alt="{{ $account['name'] }}">
                                 @endif
 
 
-
-
-
                                 <div>
-
 
                                     <h4>
                                         {{ $account['name'] }}
                                     </h4>
 
-
                                     <small>
                                         Cuenta bancaria
                                     </small>
 
-
                                 </div>
-
-
 
                             </div>
 
 
 
-
-
-
-
+                            {{-- SALDO ACTUAL --}}
 
                             <div class="bank-balance" data-balance>
 
-
                                 ${{ number_format($account['balance'], 2, ',', '.') }}
-
 
                             </div>
 
 
 
-
-
-
-
+                            {{-- SALDO INICIAL --}}
 
                             <div class="bank-initial">
-
 
                                 Inicial:
 
                                 ${{ number_format($account['initial_balance'], 2, ',', '.') }}
 
-
                             </div>
 
 
 
-
-
-
-
+                            {{-- DATOS DE LA JORNADA --}}
 
                             <div class="bank-footer mt-2">
 
 
+                                {{-- INGRESOS --}}
 
-                                <span class="income" data-income>
-
+                                <span class="income" data-income title="Ingresos de la jornada">
 
                                     <i class="bi bi-arrow-up"></i>
 
-
                                     ${{ number_format($account['income'], 2, ',', '.') }}
-
-
 
                                 </span>
 
 
 
+                                {{-- EGRESOS --}}
 
-
-
-                                <span class="expense" data-expense>
-
+                                <span class="expense" data-expense title="Egresos de la jornada">
 
                                     <i class="bi bi-arrow-down"></i>
 
-
                                     ${{ number_format($account['expense'], 2, ',', '.') }}
-
-
 
                                 </span>
 
 
 
+                                {{-- RESERVAS --}}
+
+                                <span class="reserve" data-reserve title="Reservas de la jornada">
+
+                                    <i class="bi bi-lock"></i>
+
+                                    ${{ number_format($account['reserve'] ?? 0, 2, ',', '.') }}
+
+                                </span>
 
 
+
+                                {{-- MOVIMIENTOS --}}
 
                                 <span class="bank-movements" data-movements title="Movimientos de la jornada">
 
-
                                     <i class="bi bi-arrow-left-right"></i>
-
 
                                     {{ $account['movements'] ?? 0 }}
 
-
-
                                 </span>
-
 
 
                             </div>
 
 
-
-
                         </div>
-
-
-
 
                     </a>
 
-
-
                 </div>
             @endforeach
-
-
 
         </div>
 
@@ -438,23 +397,25 @@
                                     @if (in_array($movement->type, ['income', 'transfer_in']))
                                         <span class="tag income-tag">
 
-
                                             <i class="bi bi-arrow-up"></i>
-
 
                                             Ingreso
 
+                                        </span>
+                                    @elseif ($movement->type === 'reserve')
+                                        <span class="tag reserve-tag">
+
+                                            <i class="bi bi-lock"></i>
+
+                                            Reserva
 
                                         </span>
                                     @else
                                         <span class="tag expense-tag">
 
-
                                             <i class="bi bi-arrow-down"></i>
 
-
                                             Egreso
-
 
                                         </span>
                                     @endif

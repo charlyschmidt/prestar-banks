@@ -132,6 +132,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 }
 
+                const reserveElement = card.querySelector(
+                    '[data-reserve]'
+                );
+
+                if (reserveElement) {
+
+                    reserveElement.innerHTML = `
+                        <i class="bi bi-lock"></i>
+                        $${formatMoney(event.reserve)}
+                    `;
+
+                }
+
 
                 const movementsElement = card.querySelector(
                     '[data-movements]'
@@ -367,24 +380,41 @@ function addMovementToTable(
         movement.type
     );
 
+    const isReserve =
+        movement.type === 'reserve';
 
-    const typeHtml = isIncome
-        ? `
+
+    let typeHtml;
+
+
+    if (isIncome) {
+
+        typeHtml = `
         <span class="tag income-tag">
-
             <i class="bi bi-arrow-up"></i>
             Ingreso
-
-        </span>
-    `
-        : `
-        <span class="tag expense-tag">
-
-            <i class="bi bi-arrow-down"></i>
-            Egreso
-
         </span>
     `;
+
+    } else if (isReserve) {
+
+        typeHtml = `
+        <span class="tag reserve-tag">
+            <i class="bi bi-lock"></i>
+            Reserva
+        </span>
+    `;
+
+    } else {
+
+        typeHtml = `
+        <span class="tag expense-tag">
+            <i class="bi bi-arrow-down"></i>
+            Egreso
+        </span>
+    `;
+
+    }
 
 
     /*
@@ -716,8 +746,22 @@ async function syncDashboard() {
                     $${formatMoney(account.expense)}
                 `;
 
+
             }
 
+            const reserveElement =
+                card.querySelector(
+                    '[data-reserve]'
+                );
+
+            if (reserveElement) {
+
+                reserveElement.innerHTML = `
+                    <i class="bi bi-lock"></i>
+                    $${formatMoney(account.reserve)}
+                `;
+
+            }
 
             const movementsElement =
                 card.querySelector(

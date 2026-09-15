@@ -5,7 +5,10 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
                 `);let i=n.querySelector(`[data-expense]`);i&&(i.innerHTML=`
                     <i class="bi bi-arrow-down"></i>
                     $${j(e.expense)}
-                `);let a=n.querySelector(`[data-movements]`);a&&(a.innerHTML=`
+                `);let a=n.querySelector(`[data-reserve]`);a&&(a.innerHTML=`
+                        <i class="bi bi-lock"></i>
+                        $${j(e.reserve)}
+                    `);let o=n.querySelector(`[data-movements]`);o&&(o.innerHTML=`
                     <i class="bi bi-arrow-left-right"></i>
                     ${e.movements}
                 `),n.classList.add(`balance-updated`),setTimeout(()=>{n.classList.remove(`balance-updated`)},700)}let r=document.querySelector(`[data-header-balance]`);r&&(r.textContent=`$`+j(e.balanceTotal));let i=document.querySelector(`[data-header-income]`);i&&(i.textContent=`+ $`+j(e.dayIncome));let a=document.querySelector(`[data-header-expense]`);a&&(a.textContent=`- $`+j(e.dayExpense));let o=document.querySelector(`#last-update`);if(o&&e.transaction){let t=new Date(e.transaction.date),n=String(t.getHours()).padStart(2,`0`),r=String(t.getMinutes()).padStart(2,`0`),i=new Date(e.dayDate);o.innerHTML=`
@@ -17,21 +20,22 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
                     ${M(e.transaction.description||``)}
                     ·
                     ${M(e.account.name)}
-                `}re(e),k()})}});function re(e,t=!0){let n=document.querySelector(`#movements-body`);if(!n)return;let r=e.transaction;if(!r||n.querySelector(`tr[data-movement-id="${r.id}"]`))return;let i=new Date(r.date),a=String(i.getDate()).padStart(2,`0`),o=String(i.getMonth()+1).padStart(2,`0`),s=String(i.getHours()).padStart(2,`0`),c=String(i.getMinutes()).padStart(2,`0`),l=`${a}/${o}`,u=`${s}:${c}`,d=[`income`,`transfer_in`].includes(r.type),f=d?`
+                `}re(e),k()})}});function re(e,t=!0){let n=document.querySelector(`#movements-body`);if(!n)return;let r=e.transaction;if(!r||n.querySelector(`tr[data-movement-id="${r.id}"]`))return;let i=new Date(r.date),a=String(i.getDate()).padStart(2,`0`),o=String(i.getMonth()+1).padStart(2,`0`),s=String(i.getHours()).padStart(2,`0`),c=String(i.getMinutes()).padStart(2,`0`),l=`${a}/${o}`,u=`${s}:${c}`,d=[`income`,`transfer_in`].includes(r.type),f=r.type===`reserve`,p;p=d?`
         <span class="tag income-tag">
-
             <i class="bi bi-arrow-up"></i>
             Ingreso
-
+        </span>
+    `:f?`
+        <span class="tag reserve-tag">
+            <i class="bi bi-lock"></i>
+            Reserva
         </span>
     `:`
         <span class="tag expense-tag">
-
             <i class="bi bi-arrow-down"></i>
             Egreso
-
         </span>
-    `,p=document.createElement(`tr`);p.dataset.movementId=r.id,p.innerHTML=`
+    `;let m=document.createElement(`tr`);m.dataset.movementId=r.id,m.innerHTML=`
 
     <td>
 
@@ -83,7 +87,7 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
 
     <td>
 
-        ${f}
+        ${p}
 
     </td>
 
@@ -118,13 +122,16 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
 
     </td>
 
-`,n.prepend(p),t&&(p.classList.add(`movement-new`),setTimeout(()=>{p.classList.remove(`movement-new`)},1e3))}async function A(){if(document.querySelector(`.dashboard`)){console.log(`Sincronizando dashboard...`);try{let e=await fetch(`/dashboard/sync`,{method:`GET`,headers:{Accept:`application/json`,"X-Requested-With":`XMLHttpRequest`},cache:`no-store`});if(!e.ok)throw Error(`Error HTTP ${e.status}`);let t=await e.json();if(!t.has_day){window.location.reload();return}let n=document.querySelector(`[data-header-balance]`);n&&(n.textContent=`$`+j(t.balance_total));let r=document.querySelector(`[data-header-income]`);r&&(r.textContent=`+ $`+j(t.day_income));let i=document.querySelector(`[data-header-expense]`);i&&(i.textContent=`- $`+j(t.day_expense)),t.accounts.forEach(e=>{let t=document.querySelector(`.bank-card[data-account-id="${e.id}"]`);if(!t)return;let n=t.querySelector(`[data-balance]`);n&&(n.textContent=`$`+j(e.balance));let r=t.querySelector(`[data-income]`);r&&(r.innerHTML=`
+`,n.prepend(m),t&&(m.classList.add(`movement-new`),setTimeout(()=>{m.classList.remove(`movement-new`)},1e3))}async function A(){if(document.querySelector(`.dashboard`)){console.log(`Sincronizando dashboard...`);try{let e=await fetch(`/dashboard/sync`,{method:`GET`,headers:{Accept:`application/json`,"X-Requested-With":`XMLHttpRequest`},cache:`no-store`});if(!e.ok)throw Error(`Error HTTP ${e.status}`);let t=await e.json();if(!t.has_day){window.location.reload();return}let n=document.querySelector(`[data-header-balance]`);n&&(n.textContent=`$`+j(t.balance_total));let r=document.querySelector(`[data-header-income]`);r&&(r.textContent=`+ $`+j(t.day_income));let i=document.querySelector(`[data-header-expense]`);i&&(i.textContent=`- $`+j(t.day_expense)),t.accounts.forEach(e=>{let t=document.querySelector(`.bank-card[data-account-id="${e.id}"]`);if(!t)return;let n=t.querySelector(`[data-balance]`);n&&(n.textContent=`$`+j(e.balance));let r=t.querySelector(`[data-income]`);r&&(r.innerHTML=`
                     <i class="bi bi-arrow-up"></i>
                     $${j(e.income)}
                 `);let i=t.querySelector(`[data-expense]`);i&&(i.innerHTML=`
                     <i class="bi bi-arrow-down"></i>
                     $${j(e.expense)}
-                `);let a=t.querySelector(`[data-movements]`);a&&(a.innerHTML=`
+                `);let a=t.querySelector(`[data-reserve]`);a&&(a.innerHTML=`
+                    <i class="bi bi-lock"></i>
+                    $${j(e.reserve)}
+                `);let o=t.querySelector(`[data-movements]`);o&&(o.innerHTML=`
                     <i class="bi bi-arrow-left-right"></i>
                     ${e.movements}
                 `)});let a=document.querySelector(`#movements-body`);a&&(a.innerHTML=``,[...t.movements].reverse().forEach(e=>{re({transaction:{id:e.id,type:e.type,amount:e.amount,description:e.description,date:e.date,balance_after:e.balance_after,user:e.user},account:e.account,initialBalance:e.initial_balance},!1)})),console.log(`Dashboard sincronizado correctamente`)}catch(e){console.error(`Error sincronizando dashboard:`,e)}}}function j(e){let t=Number(e);return Number.isNaN(t)?`0,00`:t.toLocaleString(`es-AR`,{minimumFractionDigits:2,maximumFractionDigits:2})}function M(e){let t=document.createElement(`div`);return t.textContent=e,t.innerHTML}document.addEventListener(`DOMContentLoaded`,()=>{document.getElementById(`transactions-body`)&&Echo.channel(`dashboard`).listen(`.transaction.created`,e=>{console.log(`Nuevo movimiento:`,e);let t=e.transaction,n=e.account,r=document.getElementById(`transactions-body`),i=[`income`,`transfer_in`].includes(t.type),a=`

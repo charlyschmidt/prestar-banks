@@ -331,6 +331,14 @@
                                             Ingreso
 
                                         </span>
+                                    @elseif ($movement->type === 'reserve')
+                                        <span class="tag reserve-tag">
+
+                                            <i class="bi bi-lock"></i>
+
+                                            Reserva
+
+                                        </span>
                                     @else
                                         <span class="tag expense-tag">
 
@@ -370,8 +378,7 @@
 
                                         {{-- EJECUTAR TRANSFERENCIA --}}
                                         @if (
-                                            !auth()->user()->is_admin &&
-                                                auth()->user()->role === 'administration' &&
+                                            (auth()->user()->is_admin || auth()->user()->role === 'administration') &&
                                                 $movement->type === 'expense' &&
                                                 !$movement->executed_at)
                                             <button type="button" class="icon-button execute-transaction-button"
@@ -413,10 +420,10 @@
                                         @endif
 
 
+                                        {{-- SIN ACCIONES --}}
                                         @if (
                                             !(
-                                                !auth()->user()->is_admin &&
-                                                auth()->user()->role === 'administration' &&
+                                                (auth()->user()->is_admin || auth()->user()->role === 'administration') &&
                                                 $movement->type === 'expense' &&
                                                 !$movement->executed_at
                                             ) && !(auth()->user()->is_admin || $movement->user_id === auth()->id()))

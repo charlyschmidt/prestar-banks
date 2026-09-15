@@ -233,6 +233,14 @@
                                             Ingreso
 
                                         </span>
+                                    @elseif ($transaction->type === 'reserve')
+                                        <span class="movement-reserve">
+
+                                            <i class="bi bi-lock"></i>
+
+                                            Reserva
+
+                                        </span>
                                     @else
                                         <span class="movement-expense">
 
@@ -282,8 +290,7 @@
 
                                         {{-- EJECUTAR TRANSFERENCIA --}}
                                         @if (
-                                            !auth()->user()->is_admin &&
-                                                auth()->user()->role === 'administration' &&
+                                            (auth()->user()->is_admin || auth()->user()->role === 'administration') &&
                                                 $transaction->type === 'expense' &&
                                                 !$transaction->executed_at)
                                             <button type="button" class="icon-button execute-transaction-button"
@@ -328,8 +335,7 @@
 
                                         @if (
                                             !(
-                                                !auth()->user()->is_admin &&
-                                                auth()->user()->role === 'administration' &&
+                                                (auth()->user()->is_admin || auth()->user()->role === 'administration') &&
                                                 $transaction->type === 'expense' &&
                                                 !$transaction->executed_at
                                             ) && !(auth()->user()->is_admin || $transaction->user_id === auth()->id()))

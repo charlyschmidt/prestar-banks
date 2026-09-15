@@ -12,12 +12,11 @@ class DashboardController extends Controller
         BalanceDayService $balanceDayService
     ) {
 
-        $summary = $balanceDayService->getDashboardSummary();
-
+        $summary =
+            $balanceDayService->getDashboardSummary();
 
 
         if (!$summary['has_day']) {
-
 
             return view(
                 'dashboard.no-day',
@@ -28,8 +27,6 @@ class DashboardController extends Controller
         }
 
 
-
-
         return view(
             'dashboard.index',
             [
@@ -38,10 +35,13 @@ class DashboardController extends Controller
         );
     }
 
+
     public function sync(
-        \App\Services\BalanceDayService $balanceDayService
+        BalanceDayService $balanceDayService
     ) {
-        $summary = $balanceDayService->getDashboardSummary();
+
+        $summary =
+            $balanceDayService->getDashboardSummary();
 
 
         if (!$summary['has_day']) {
@@ -56,60 +56,111 @@ class DashboardController extends Controller
 
             'has_day' => true,
 
-            'balance_total' => $summary['balance_total'],
+            'balance_total' =>
+                $summary['balance_total'],
 
-            'day_income' => $summary['ingresos_jornada'],
+            'day_income' =>
+                $summary['ingresos_jornada'],
 
-            'day_expense' => $summary['egresos_jornada'],
+            'day_expense' =>
+                $summary['egresos_jornada'],
 
-            'movements_total' => $summary['movimientos_total'],
+            'movements_total' =>
+                $summary['movimientos_total'],
 
-            'accounts' => collect($summary['accounts'])
-                ->map(function ($account) {
 
-                    return [
-                        'id' => $account['id'],
-                        'balance' => $account['balance'],
-                        'income' => $account['income'],
-                        'expense' => $account['expense'],
-                        'movements' => $account['movements'],
-                    ];
-                })
-                ->values(),
+            /*
+            |--------------------------------------------------------------------------
+            | Cuentas
+            |--------------------------------------------------------------------------
+            */
 
-            'movements' => collect($summary['movements'])
-                ->map(function ($movement) {
+            'accounts' =>
+                collect($summary['accounts'])
+                    ->map(function ($account) {
 
-                    return [
+                        return [
 
-                        'id' => $movement->id,
+                            'id' =>
+                                $account['id'],
 
-                        'type' => $movement->type,
+                            'balance' =>
+                                $account['balance'],
 
-                        'amount' => $movement->amount,
+                            'income' =>
+                                $account['income'],
 
-                        'description' => $movement->description,
+                            'expense' =>
+                                $account['expense'],
 
-                        'date' => $movement->date,
+                            'reserve' =>
+                                $account['reserve'],
 
-                        'initial_balance' => $movement->initial_balance,
+                            'movements' =>
+                                $account['movements'],
 
-                        'balance_after' => $movement->balance_after,
+                        ];
+                    })
+                    ->values(),
 
-                        'account' => [
-                            'id' => $movement->account->id,
-                            'name' => $movement->account->name,
-                        ],
 
-                        'user' => [
-                            'id' => $movement->user?->id,
-                            'name' => $movement->user?->name
-                                ?? 'Sin registro',
-                        ],
+            /*
+            |--------------------------------------------------------------------------
+            | Movimientos
+            |--------------------------------------------------------------------------
+            */
 
-                    ];
-                })
-                ->values(),
+            'movements' =>
+                collect($summary['movements'])
+                    ->map(function ($movement) {
+
+                        return [
+
+                            'id' =>
+                                $movement->id,
+
+                            'type' =>
+                                $movement->type,
+
+                            'amount' =>
+                                $movement->amount,
+
+                            'description' =>
+                                $movement->description,
+
+                            'date' =>
+                                $movement->date,
+
+                            'initial_balance' =>
+                                $movement->initial_balance,
+
+                            'balance_after' =>
+                                $movement->balance_after,
+
+                            'account' => [
+
+                                'id' =>
+                                    $movement->account->id,
+
+                                'name' =>
+                                    $movement->account->name,
+
+                            ],
+
+                            'user' => [
+
+                                'id' =>
+                                    $movement->user?->id,
+
+                                'name' =>
+                                    $movement->user?->name
+                                    ?? 'Sin registro',
+
+                            ],
+
+                        ];
+                    })
+                    ->values(),
 
         ]);
     }

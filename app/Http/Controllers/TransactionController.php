@@ -92,7 +92,7 @@ class TransactionController extends Controller
 
             'type' => [
                 'required',
-                'in:income,expense,transfer_in,transfer_out'
+                'in:income,expense,reserve,transfer_in,transfer_out'
             ],
 
             'amount' => [
@@ -182,6 +182,7 @@ class TransactionController extends Controller
             $data['type'],
             [
                 'expense',
+                'reserve',
                 'transfer_out'
             ]
         );
@@ -286,13 +287,17 @@ class TransactionController extends Controller
     |--------------------------------------------------------------------------
     */
 
-        $transaction->load('account');
+        $transaction->refresh();
 
+        $transaction->load([
+            'account',
+            'user',
+            'financialDay'
+        ]);
 
         event(
             new TransactionCreated($transaction)
         );
-
 
 
         return redirect()
@@ -327,7 +332,9 @@ class TransactionController extends Controller
         }
 
 
-        $day = app(\App\Services\FinancialDayService::class)->current();
+        $day = app(
+            \App\Services\FinancialDayService::class
+        )->current();
 
 
         if (!$day) {
@@ -343,6 +350,7 @@ class TransactionController extends Controller
 
         $accounts = Account::with([
             'dailyBalances' => function ($q) use ($day) {
+
                 $q->where(
                     'financial_day_id',
                     $day->id
@@ -351,20 +359,15 @@ class TransactionController extends Controller
         ])->get();
 
 
-
         return view(
             'transactions.edit',
-            compact(
-                'transaction',
-                'accounts'
-            )
+            [
+                'transaction' => $transaction,
+                'accounts' => $accounts,
+                'banks' => ArgentineBanks::all(),
+            ]
         );
     }
-
-
-
-
-
 
 
 
@@ -394,21 +397,66 @@ class TransactionController extends Controller
         }
 
 
+        /*
+    |--------------------------------------------------------------------------
+    | Validación
+    |--------------------------------------------------------------------------
+    */
 
         $data = $request->validate([
 
-            'account_id' => 'required|exists:accounts,id',
+            'account_id' => [
+                'required',
+                'exists:accounts,id'
+            ],
 
-            'type' => 'required|in:income,expense,transfer_in,transfer_out',
+            'type' => [
+                'required',
+                'in:income,expense,reserve,transfer_in,transfer_out'
+            ],
 
-            'amount' => 'required|numeric|min:0.01',
+            'amount' => [
+                'required',
+                'numeric',
+                'min:0.01'
+            ],
 
-            'description' => 'nullable|string',
+            'destination_bank' => [
+                'required_if:type,expense',
+                'nullable',
+                'string',
+                'max:150'
+            ],
 
-            'date' => 'required|date'
+            'description' => [
+                'nullable',
+                'string'
+            ],
+
+            'date' => [
+                'required',
+                'date'
+            ]
 
         ]);
 
+
+        /*
+    |--------------------------------------------------------------------------
+    | Banco destino
+    |--------------------------------------------------------------------------
+    |
+    | Solamente los egresos tienen banco destino.
+    |
+    | Reserva -> null
+    | Ingreso -> null
+    |
+    */
+
+        if ($data['type'] !== 'expense') {
+
+            $data['destination_bank'] = null;
+        }
 
 
         $day = $financialDayService->current();
@@ -423,7 +471,6 @@ class TransactionController extends Controller
                     'No hay una jornada abierta actualmente.'
                 );
         }
-
 
 
         try {
@@ -452,7 +499,6 @@ class TransactionController extends Controller
                     ->first();
 
 
-
                 if (!$oldBalance) {
 
                     throw new \Exception(
@@ -461,6 +507,13 @@ class TransactionController extends Controller
                 }
 
 
+                /*
+             * Si el movimiento anterior era ingreso,
+             * lo revertimos restándolo.
+             *
+             * Si era egreso o reserva,
+             * lo revertimos sumándolo.
+             */
 
                 if (
                     in_array(
@@ -485,7 +538,6 @@ class TransactionController extends Controller
                 }
 
 
-
                 /*
             |--------------------------------------------------------------------------
             | 2. Buscar saldo de la nueva cuenta
@@ -504,7 +556,6 @@ class TransactionController extends Controller
                     ->first();
 
 
-
                 if (!$newBalance) {
 
                     throw new \Exception(
@@ -513,10 +564,29 @@ class TransactionController extends Controller
                 }
 
 
+                /*
+            |--------------------------------------------------------------------------
+            | IMPORTANTE
+            |--------------------------------------------------------------------------
+            |
+            | Si estamos editando un movimiento de la MISMA cuenta,
+            | $oldBalance y $newBalance representan el mismo registro.
+            |
+            | Como arriba usamos increment/decrement directo en DB,
+            | refrescamos para tener el saldo actualizado después
+            | de haber revertido el movimiento anterior.
+            |
+            */
+
+                $newBalance->refresh();
+
 
                 /*
             |--------------------------------------------------------------------------
             | 3. Validar saldo disponible
+            |--------------------------------------------------------------------------
+            |
+            | Tanto Egreso como Reserva descuentan saldo.
             |--------------------------------------------------------------------------
             */
 
@@ -524,6 +594,7 @@ class TransactionController extends Controller
                     $data['type'],
                     [
                         'expense',
+                        'reserve',
                         'transfer_out'
                     ]
                 );
@@ -538,13 +609,12 @@ class TransactionController extends Controller
                         'Saldo insuficiente. Disponible: $' .
                             number_format(
                                 $newBalance->current_balance,
-                                0,
+                                2,
                                 ',',
                                 '.'
                             )
                     );
                 }
-
 
 
                 /*
@@ -569,12 +639,25 @@ class TransactionController extends Controller
                     );
                 } else {
 
+                    /*
+                 * expense
+                 * reserve
+                 * transfer_out
+                 */
+
                     $newBalance->decrement(
                         'current_balance',
                         $data['amount']
                     );
                 }
 
+
+                /*
+             * Volvemos a refrescar para guardar
+             * el saldo final correcto.
+             */
+
+                $newBalance->refresh();
 
 
                 /*
@@ -583,9 +666,11 @@ class TransactionController extends Controller
             |--------------------------------------------------------------------------
             */
 
-                $data['financial_day_id'] = $day->id;
+                $data['financial_day_id'] =
+                    $day->id;
 
-                $data['balance_after'] = $newBalance->current_balance;
+                $data['balance_after'] =
+                    $newBalance->current_balance;
 
 
                 $transaction->update($data);
@@ -599,7 +684,6 @@ class TransactionController extends Controller
                     $e->getMessage()
                 );
         }
-
 
 
         return redirect()
@@ -765,11 +849,11 @@ class TransactionController extends Controller
     }
 
     public function execute(Transaction $transaction)
-{
-    $user = auth()->user();
+    {
+        $user = auth()->user();
 
 
-    /*
+        /*
     |--------------------------------------------------------------------------
     | Solo usuarios del área Administración
     |--------------------------------------------------------------------------
@@ -779,97 +863,97 @@ class TransactionController extends Controller
     |
     */
 
-    if (
-        $user->is_admin ||
-        $user->role !== 'administration'
-    ) {
+        if (
+            $user->is_admin ||
+            $user->role !== 'administration'
+        ) {
 
-        return response()->json([
-            'success' => false,
-            'message' => 'No tenés permisos para ejecutar movimientos.'
-        ], 403);
-    }
+            return response()->json([
+                'success' => false,
+                'message' => 'No tenés permisos para ejecutar movimientos.'
+            ], 403);
+        }
 
 
-    /*
+        /*
     |--------------------------------------------------------------------------
     | Solo egresos
     |--------------------------------------------------------------------------
     */
 
-    if ($transaction->type !== 'expense') {
+        if ($transaction->type !== 'expense') {
 
-        return response()->json([
-            'success' => false,
-            'message' => 'Solo se pueden ejecutar movimientos de egreso.'
-        ], 422);
-    }
+            return response()->json([
+                'success' => false,
+                'message' => 'Solo se pueden ejecutar movimientos de egreso.'
+            ], 422);
+        }
 
 
-    /*
+        /*
     |--------------------------------------------------------------------------
     | Debe tener banco destino
     |--------------------------------------------------------------------------
     */
 
-    if (!$transaction->destination_bank) {
+        if (!$transaction->destination_bank) {
 
-        return response()->json([
-            'success' => false,
-            'message' => 'El movimiento no tiene un banco destino.'
-        ], 422);
-    }
+            return response()->json([
+                'success' => false,
+                'message' => 'El movimiento no tiene un banco destino.'
+            ], 422);
+        }
 
 
-    /*
+        /*
     |--------------------------------------------------------------------------
     | Evitar ejecutar dos veces
     |--------------------------------------------------------------------------
     */
 
-    if ($transaction->executed_at) {
+        if ($transaction->executed_at) {
 
-        return response()->json([
-            'success' => false,
-            'message' => 'Este movimiento ya fue ejecutado.'
-        ], 422);
-    }
+            return response()->json([
+                'success' => false,
+                'message' => 'Este movimiento ya fue ejecutado.'
+            ], 422);
+        }
 
 
-    /*
+        /*
     |--------------------------------------------------------------------------
     | Marcar como ejecutado
     |--------------------------------------------------------------------------
     */
 
-    $transaction->update([
+        $transaction->update([
 
-        'executed_at' => now(),
+            'executed_at' => now(),
 
-        'executed_by' => $user->id,
+            'executed_by' => $user->id,
 
-    ]);
+        ]);
 
 
-    /*
+        /*
     |--------------------------------------------------------------------------
     | Respuesta AJAX
     |--------------------------------------------------------------------------
     */
 
-    return response()->json([
+        return response()->json([
 
-        'success' => true,
+            'success' => true,
 
-        'message' => 'Transferencia ejecutada correctamente.',
+            'message' => 'Transferencia ejecutada correctamente.',
 
-        'transaction_id' => $transaction->id,
+            'transaction_id' => $transaction->id,
 
-        'executed_at' => $transaction->executed_at
-            ->format('d/m/Y H:i'),
+            'executed_at' => $transaction->executed_at
+                ->format('d/m/Y H:i'),
 
-        'executed_by' => $user->name,
+            'executed_by' => $user->name,
 
-    ]);
-}
+        ]);
+    }
 }

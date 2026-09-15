@@ -229,6 +229,26 @@
 
 
 
+.reserve {
+    color: #fbbf24;
+}
+
+.reserve-tag {
+    background: rgba(251, 191, 36, 0.14);
+    color: #fbbf24;
+}
+
+.movement-reserve {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #fbbf24;
+    font-weight: 600;
+}
+
+.movement-reserve i {
+    color: #fbbf24;
+}
 
 .table-actions {
 

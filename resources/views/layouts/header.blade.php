@@ -114,11 +114,87 @@
 
 
 
-            <div class="user-avatar">
+            <div class="dropdown user-menu">
+
+                <button type="button" class="user-avatar user-avatar-button" data-bs-toggle="dropdown"
+                    aria-expanded="false" title="Menú de usuario">
+                    {{ strtoupper(substr(auth()->user()->name ?? auth()->user()->username, 0, 1)) }}
+                </button>
 
 
-                {{ strtoupper(substr(auth()->user()->name ?? auth()->user()->username, 0, 1)) }}
+                <div class="dropdown-menu dropdown-menu-end user-dropdown">
 
+                    <div class="user-dropdown-header">
+
+                        <div class="user-dropdown-avatar">
+                            {{ strtoupper(substr(auth()->user()->name ?? auth()->user()->username, 0, 1)) }}
+                        </div>
+
+                        <div>
+
+                            <strong>
+                                {{ auth()->user()->name ?? auth()->user()->username }}
+                            </strong>
+
+                            @if (auth()->user()->is_admin)
+                                <span>
+                                    Super Admin
+                                </span>
+                            @elseif (auth()->user()->role === 'administration')
+                                <span>
+                                    Administración
+                                </span>
+                            @else
+                                <span>
+                                    Operador
+                                </span>
+                            @endif
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="user-dropdown-divider"></div>
+
+
+                    <a href="{{ route('dashboard') }}" class="user-dropdown-link">
+                        <i class="bi bi-grid"></i>
+
+                        Dashboard
+                    </a>
+
+
+                    <a href="{{ route('transactions.index') }}" class="user-dropdown-link">
+                        <i class="bi bi-arrow-left-right"></i>
+
+                        Movimientos
+                    </a>
+
+
+                    <div class="user-dropdown-divider"></div>
+
+
+                    <a href="{{ route('settings.index') }}" class="user-dropdown-link">
+                        <i class="bi bi-gear"></i>
+
+                        Configuración
+                    </a>
+
+
+                    <form method="POST" action="{{ route('logout') }}">
+
+                        @csrf
+
+                        <button type="submit" class="user-dropdown-link user-dropdown-button">
+                            <i class="bi bi-box-arrow-right"></i>
+
+                            Salir
+                        </button>
+
+                    </form>
+
+                </div>
 
             </div>
 
