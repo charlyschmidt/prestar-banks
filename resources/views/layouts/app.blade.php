@@ -21,7 +21,9 @@
 
 
 
-<body>
+<body
+    data-create-transaction-url="{{ route('transactions.create') }}"
+>
 
 
     <div class="app-layout">

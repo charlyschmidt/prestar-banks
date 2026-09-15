@@ -59,3 +59,5 @@ import './transactions';
 import './money-input';
 
 import './settings';
+
+import './shortcuts';
