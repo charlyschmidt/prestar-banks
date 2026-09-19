@@ -113,6 +113,7 @@ body {
     gap: 20px;
 }
 
+
 .form-group {
     display: flex;
     flex-direction: column;
@@ -120,16 +121,99 @@ body {
     gap: 8px;
 }
 
-.form-group label {
-    color: #b8b8b8;
 
-    font-size: 13px;
+.form-group label {
+    color: #9a9a9a;
+
+    font-size: 12px;
     font-weight: 500;
+
+    letter-spacing: .01em;
+}
+
+
+/* ==========================
+   INPUTS
+========================== */
+
+.form-group input {
+    width: 100%;
+    height: 50px;
+
+    padding: 0 15px;
+
+    background: rgba(255, 255, 255, .035);
+
+    border: 1px solid rgba(255, 255, 255, .10);
+    border-radius: 10px;
+
+    outline: none;
+
+    color: #fff;
+
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 400;
+
+    caret-color: #fff;
+
+    transition:
+        background .18s ease,
+        border-color .18s ease,
+        box-shadow .18s ease;
 }
 
 
 .form-group input::placeholder {
     color: #555;
+
+    opacity: 1;
+}
+
+
+/* Autofill Chrome */
+
+.form-group input:-webkit-autofill,
+.form-group input:-webkit-autofill:hover,
+.form-group input:-webkit-autofill:focus {
+    -webkit-text-fill-color: #fff;
+
+    -webkit-box-shadow:
+        0 0 0 1000px #090909 inset;
+
+    transition:
+        background-color 9999s ease-in-out 0s;
+}
+
+
+/* ==========================
+   FOCUS
+========================== */
+
+.form-group input:focus {
+    background: rgba(255, 255, 255, .055);
+
+    border-color: rgba(255, 255, 255, .30);
+
+    box-shadow:
+        0 0 0 3px rgba(255, 255, 255, .035);
+}
+
+
+/* ==========================
+   VALID / INVALID
+========================== */
+
+.form-group input:user-invalid {
+    border-color: rgba(248, 113, 113, .45);
+}
+
+
+.form-group input:user-invalid:focus {
+    border-color: rgba(248, 113, 113, .65);
+
+    box-shadow:
+        0 0 0 3px rgba(248, 113, 113, .07);
 }
 
 
@@ -144,24 +228,27 @@ body {
 
     margin-top: 8px;
 
-    border: 0;
+    border: 1px solid rgba(255, 255, 255, .9);
     border-radius: 10px;
 
-    background: #fff;
-    color: #000;
+    background: rgba(255, 255, 255, .94);
+    color: #080808;
 
-    font-size: 14px;
+    font-family: inherit;
+    font-size: 15px;
     font-weight: 600;
 
     cursor: pointer;
 
     transition:
-        background .2s ease,
-        transform .2s ease;
+        background .18s ease,
+        border-color .18s ease,
+        transform .18s ease;
 }
 
+
 .register-button:active {
-    transform: scale(.98);
+    transform: scale(.985);
 }
 
 
@@ -286,9 +373,9 @@ body {
 ========================== */
 
 @media (hover: hover) {
-
     .register-button:hover {
-        background: #e8e8e8;
+        background: #fff;
+        border-color: #fff;
     }
 
     .register-footer a:hover {

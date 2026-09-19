@@ -111,20 +111,14 @@ body {
 ========================== */
 
 .welcome-badge {
-    margin-bottom: 24px;
-
+margin-bottom: 35px;
     padding: 8px 13px;
-
     border: 1px solid #242424;
     border-radius: 999px;
-
     background: rgba(255, 255, 255, .025);
-
     color: #888;
-
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 500;
-
     letter-spacing: .5px;
 }
 
@@ -261,12 +255,10 @@ body {
 
     transform: translateX(-50%);
 
-    background: linear-gradient(
-        90deg,
-        transparent,
-        #222,
-        transparent
-    );
+    background: linear-gradient(90deg,
+            transparent,
+            #222,
+            transparent);
 }
 
 
@@ -289,11 +281,9 @@ body {
     border-radius: 20px;
 
     background:
-        linear-gradient(
-            145deg,
-            rgba(255,255,255,.045),
-            rgba(255,255,255,.012)
-        );
+        linear-gradient(145deg,
+            rgba(255, 255, 255, .045),
+            rgba(255, 255, 255, .012));
 
     box-shadow:
         0 30px 80px rgba(0, 0, 0, .45);
@@ -385,7 +375,7 @@ body {
 
     color: #888;
 
-    font-size: 13px;
+    font-size: 16px;
 
     line-height: 1.65;
 }
@@ -433,7 +423,7 @@ body {
     background: #fff;
     color: #000;
 
-    font-size: 13px;
+    font-size: 17px;
     font-weight: 600;
 
     text-decoration: none;
@@ -543,7 +533,7 @@ body {
 
     color: #ddd;
 
-    font-size: 13px;
+    font-size: 15px;
     font-weight: 500;
 }
 
@@ -551,7 +541,7 @@ body {
 .feature-item p {
     color: #666;
 
-    font-size: 12px;
+    font-size: 14px;
 
     line-height: 1.5;
 }
@@ -563,14 +553,10 @@ body {
 
 .welcome-footer {
     position: relative;
-
     padding: 0 20px 32px;
-
     text-align: center;
-
-    color: #444;
-
-    font-size: 11px;
+    color: #606060;
+    font-size: 14px;
 }
 
 .welcome-footer span {
@@ -594,7 +580,7 @@ body {
 
     text-decoration: none;
 
-     animation: arrowBounce 1.4s ease-in-out infinite;
+    animation: arrowBounce 1.4s ease-in-out infinite;
     will-change: transform, opacity;
 }
 
@@ -680,7 +666,7 @@ body {
 
 
     .welcome-logo {
-        font-size: 76px;
+        font-size: 100px;
         letter-spacing: -4px;
     }
 
@@ -713,9 +699,7 @@ body {
 
     .welcome-plan {
         padding:
-            20px
-            40px
-            110px;
+            20px 40px 110px;
     }
 
 
@@ -758,8 +742,7 @@ body {
 
     .plan-card {
         grid-template-columns:
-            .82fr
-            1.18fr;
+            .82fr 1.18fr;
     }
 
 
