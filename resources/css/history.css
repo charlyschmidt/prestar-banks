@@ -1,5 +1,5 @@
 /* =========================================================
-   HISTORIAL
+   HISTORIAL — MOBILE FIRST
 ========================================================= */
 
 .history-page {
@@ -13,19 +13,25 @@
 
 .history-filter-card {
     width: 100%;
-    padding: 20px;
+
+    padding: 15px;
     margin-bottom: 20px;
 
-    background: var(--card);
+    background: var(--company-card);
 
-    border: 1px solid var(--border);
+    border: 1px solid var(--company-border);
     border-radius: 18px;
 }
 
 
+/* =========================================================
+   BUSCADOR
+========================================================= */
+
 .history-search-row {
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    align-items: stretch;
 
     gap: 10px;
 
@@ -36,7 +42,7 @@
 .history-search {
     position: relative;
 
-    flex: 1;
+    width: 100%;
 }
 
 
@@ -48,7 +54,7 @@
 
     transform: translateY(-50%);
 
-    color: var(--muted);
+    color: var(--company-muted);
 
     pointer-events: none;
 }
@@ -60,34 +66,49 @@
 
     padding: 0 15px 0 42px;
 
-    background: rgba(255,255,255,.05);
+    background: var(--company-hover);
 
-    border: 1px solid var(--border);
+    border: 1px solid var(--company-border);
     border-radius: 11px;
 
     outline: none;
 
-    color: white;
+    color: var(--company-text);
 
     font-size: 13px;
+
+    transition:
+        border-color .15s ease,
+        background .15s ease;
 }
 
 
 .history-search input::placeholder {
-    color: var(--muted);
+    color: var(--company-muted);
 }
 
 
 .history-search input:focus {
-    border-color: rgba(255,255,255,.30);
+    border-color: var(--company-muted);
 }
 
+
+.history-search-row .primary-action-button,
+.history-search-row .secondary-button {
+    width: 100%;
+
+    justify-content: center;
+}
+
+
+/* =========================================================
+   FILTROS GRID
+========================================================= */
 
 .history-filters-grid {
     display: grid;
 
-    grid-template-columns:
-        repeat(3, minmax(0, 1fr));
+    grid-template-columns: 1fr;
 
     gap: 15px;
 }
@@ -103,7 +124,7 @@
 
     margin-bottom: 7px;
 
-    color: var(--muted);
+    color: var(--company-muted);
 
     font-size: 11px;
     font-weight: 600;
@@ -117,10 +138,9 @@
 .history-summary-grid {
     display: grid;
 
-    grid-template-columns:
-        repeat(4, minmax(0, 1fr));
+    grid-template-columns: 1fr;
 
-    gap: 15px;
+    gap: 10px;
 
     margin-bottom: 30px;
 }
@@ -129,11 +149,11 @@
 .history-summary-card {
     min-width: 0;
 
-    padding: 17px 18px;
+    padding: 14px;
 
-    background: var(--card);
+    background: var(--company-card);
 
-    border: 1px solid var(--border);
+    border: 1px solid var(--company-border);
     border-radius: 15px;
 }
 
@@ -143,7 +163,7 @@
 
     margin-bottom: 8px;
 
-    color: var(--muted);
+    color: var(--company-muted);
 
     font-size: 11px;
 }
@@ -152,12 +172,12 @@
 .history-summary-card strong {
     display: block;
 
-    color: white;
-
-    font-size: 20px;
-    font-weight: 700;
-
     overflow: hidden;
+
+    color: var(--company-text);
+
+    font-size: 16px;
+    font-weight: 700;
 
     text-overflow: ellipsis;
 }
@@ -168,7 +188,7 @@
 
     margin-top: 6px;
 
-    color: var(--muted);
+    color: var(--company-muted);
 
     font-size: 10px;
 }
@@ -185,9 +205,8 @@
 
 .history-results-header {
     display: flex;
-
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column;
+    align-items: flex-start;
 
     gap: 15px;
 
@@ -198,7 +217,7 @@
 .history-results-header h3 {
     margin: 0;
 
-    color: white;
+    color: var(--company-text);
 
     font-size: 17px;
     font-weight: 700;
@@ -210,58 +229,69 @@
 
     margin-top: 4px;
 
-    color: var(--muted);
+    color: var(--company-muted);
 
     font-size: 11px;
 }
 
+
 /* =========================================================
-   FILTROS ACTIVOS
+   FILTROS ACTIVOS / ACCIONES
 ========================================================= */
 
 .history-results-actions {
+    width: 100%;
+
     display: flex;
-    align-items: center;
-    justify-content: space-between;
+    flex-direction: column;
+    align-items: flex-start;
+
     gap: 15px;
 }
 
 
 .history-active-filters {
+    width: 100%;
+    min-width: 0;
+
     display: flex;
     align-items: center;
     flex-wrap: wrap;
-    gap: 7px;
 
-    min-width: 0;
+    gap: 7px;
 }
 
 
 .history-filter-chip {
     display: inline-flex;
     align-items: center;
+
     gap: 6px;
 
     padding: 6px 7px 9px 10px;
 
-    background: rgba(255, 255, 255, .08);
+    background: var(--company-hover);
 
-    border: 1px solid var(--border);
+    border: 1px solid var(--company-border);
     border-radius: 20px;
 
-    color: var(--muted);
+    color: var(--company-muted);
 
     font-size: 10px;
     font-weight: 500;
 
     text-decoration: none;
 
-    transition: .15s;
+    transition:
+        background .15s ease,
+        border-color .15s ease,
+        color .15s ease;
 }
 
 
 .history-filter-chip strong {
-    color: white;
+    color: var(--company-text);
+
     font-weight: 600;
 }
 
@@ -274,49 +304,73 @@
     align-items: center;
     justify-content: center;
 
+    background: var(--company-hover);
+
     border-radius: 50%;
 
-    background: rgba(255, 255, 255, .10);
-
-    color: var(--muted);
+    color: var(--company-muted);
 
     font-size: 13px;
     line-height: 1;
 
-    transition: .15s;
-}
-
-
-.history-filter-chip:hover {
-    background: rgba(255, 255, 255, .11);
-
-    border-color: rgba(255, 255, 255, .18);
-
-    color: white;
-}
-
-
-.history-filter-chip:hover i {
-    background: rgba(248, 113, 113, .15);
-
-    color: var(--danger);
+    transition:
+        background .15s ease,
+        color .15s ease;
 }
 
 
 .history-clear-filters {
     padding: 6px 4px;
 
-    color: var(--muted);
+    color: var(--company-muted);
 
     font-size: 10px;
     font-weight: 600;
 
     text-decoration: none;
+
+    transition: color .15s ease;
 }
 
 
-.history-clear-filters:hover {
-    color: white;
+/* =========================================================
+   EXPORTAR
+========================================================= */
+
+.history-export-button {
+    width: 100%;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 6px;
+
+    padding: 8px 10px;
+
+    background: var(--company-hover);
+
+    border: 1px solid var(--company-border);
+    border-radius: 8px;
+
+    color: var(--company-muted);
+
+    font-size: 10px;
+    font-weight: 600;
+
+    text-decoration: none;
+
+    transition:
+        background .15s ease,
+        border-color .15s ease,
+        color .15s ease;
+}
+
+
+.history-export-button i {
+    color: var(--success);
+
+    font-size: 11px;
 }
 
 
@@ -327,15 +381,17 @@
 .history-table-card {
     overflow: hidden;
 
-    background: var(--card);
+    background: var(--company-card);
 
-    border: 1px solid var(--border);
+    border: 1px solid var(--company-border);
     border-radius: 16px;
 }
 
 
 .history-table {
     margin-bottom: 0;
+
+    color: var(--company-text);
 }
 
 
@@ -366,7 +422,6 @@
 
 .history-status {
     display: inline-flex;
-
     align-items: center;
 
     gap: 5px;
@@ -383,21 +438,21 @@
 
 
 .history-status.executed {
-    background: rgba(34,197,94,.14);
+    background: rgba(34, 197, 94, .14);
 
     color: var(--success);
 }
 
 
 .history-status.pending {
-    background: rgba(248,113,113,.12);
+    background: rgba(248, 113, 113, .12);
 
     color: var(--danger);
 }
 
 
 .history-status.reserved {
-    background: rgba(251,191,36,.12);
+    background: rgba(251, 191, 36, .12);
 
     color: #fbbf24;
 }
@@ -408,7 +463,7 @@
 ========================================================= */
 
 .reserve-tag {
-    background: rgba(251,191,36,.14);
+    background: rgba(251, 191, 36, .14);
 
     color: #fbbf24;
 }
@@ -430,7 +485,7 @@
 
     margin-bottom: 12px;
 
-    color: var(--muted);
+    color: var(--company-muted);
 
     font-size: 25px;
 }
@@ -441,14 +496,14 @@
 
     margin-bottom: 5px;
 
-    color: white;
+    color: var(--company-text);
 
     font-size: 14px;
 }
 
 
 .history-empty span {
-    color: var(--muted);
+    color: var(--company-muted);
 
     font-size: 12px;
 }
@@ -460,6 +515,8 @@
 
 .history-pagination {
     margin-top: 20px;
+
+    color: var(--company-text);
 }
 
 
@@ -467,7 +524,39 @@
    TABLET
 ========================================================= */
 
-@media (max-width: 1100px) {
+@media (min-width: 421px) {
+
+    .history-summary-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+}
+
+
+@media (min-width: 601px) {
+
+    .history-filter-card {
+        padding: 20px;
+    }
+
+
+    .history-search-row {
+        flex-direction: row;
+        align-items: center;
+    }
+
+
+    .history-search {
+        flex: 1;
+    }
+
+
+    .history-search-row .primary-action-button,
+    .history-search-row .secondary-button {
+        width: auto;
+    }
+
 
     .history-filters-grid {
         grid-template-columns:
@@ -475,143 +564,196 @@
     }
 
 
-    .history-summary-grid {
-        grid-template-columns:
-            repeat(2, minmax(0, 1fr));
+    .history-summary-card {
+        padding: 17px 18px;
+    }
+
+
+    .history-summary-card strong {
+        font-size: 20px;
+    }
+
+
+    .history-results-header {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+
+    .history-results-actions {
+        width: auto;
+
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+
+    .history-active-filters {
+        width: auto;
+    }
+
+
+    .history-export-button {
+        width: auto;
     }
 
 }
 
 
 /* =========================================================
-   MOBILE
+   DESKTOP
 ========================================================= */
 
-@media (max-width: 600px) {
-
-    .history-filter-card {
-        padding: 15px;
-    }
-
-
-    .history-search-row {
-        align-items: stretch;
-        flex-direction: column;
-    }
-
-
-    .history-search {
-        width: 100%;
-    }
-
-
-    .history-search-row .primary-action-button,
-    .history-search-row .secondary-button {
-        width: 100%;
-
-        justify-content: center;
-    }
-
+@media (min-width: 1101px) {
 
     .history-filters-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns:
+            repeat(3, minmax(0, 1fr));
     }
 
 
     .history-summary-grid {
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns:
+            repeat(4, minmax(0, 1fr));
 
-        gap: 10px;
-    }
-
-
-    .history-summary-card {
-        padding: 14px;
-    }
-
-
-    .history-summary-card strong {
-        font-size: 16px;
-    }
-
-
-    .history-results-header {
-        align-items: flex-start;
-        flex-direction: column;
+        gap: 15px;
     }
 
 }
 
 
-@media (max-width: 420px) {
+/* =========================================================
+   HOVER
+========================================================= */
 
-    .history-summary-grid {
-        grid-template-columns: 1fr;
+@media (hover: hover) {
+
+    .history-filter-chip:hover {
+        background: var(--company-hover);
+
+        border-color: var(--company-muted);
+
+        color: var(--company-text);
+    }
+
+
+    .history-filter-chip:hover i {
+        background: rgba(248, 113, 113, .15);
+
+        color: var(--danger);
+    }
+
+
+    .history-clear-filters:hover {
+        color: var(--company-text);
+    }
+
+
+    .history-export-button:hover {
+        background: var(--company-hover);
+
+        border-color: var(--company-muted);
+
+        color: var(--company-text);
+    }
+
+
+    .history-export-button:hover i {
+        color: var(--success);
     }
 
 }
 
-@media (max-width: 600px) {
+/* =========================================================
+   MULTIMONEDA
+========================================================= */
 
-    .history-results-actions {
-        width: 100%;
+.history-currency-values {
+    display: flex;
+    flex-direction: column;
 
-        align-items: flex-start;
-        flex-direction: column;
-    }
-
-
-    .history-active-filters {
-        width: 100%;
-    }
-
-
-    .history-export-button {
-        width: 100%;
-
-        justify-content: center;
-    }
-
-}
-
-.history-export-button {
-    display: inline-flex;
-    align-items: center;
     gap: 6px;
 
-    padding: 6px 10px;
+    min-width: 0;
+}
 
-    background: rgba(255, 255, 255, .08);
 
-    border: 1px solid var(--border);
-    border-radius: 8px;
+.history-currency-value {
+    display: flex;
+    align-items: baseline;
 
-    color: var(--muted);
+    gap: 8px;
+
+    min-width: 0;
+}
+
+
+.history-currency-code {
+    min-width: 32px;
+
+    margin: 0 !important;
+
+    color: var(--company-muted);
 
     font-size: 10px;
-    font-weight: 600;
-
-    text-decoration: none;
-
-    transition: .15s;
+    font-weight: 700;
+    line-height: 1;
 }
 
 
-.history-export-button i {
-    color: var(--success);
-    font-size: 11px;
+.history-currency-amount {
+    min-width: 0;
+
+    margin: 0 !important;
+
+    overflow: hidden;
+
+    font-size: 16px !important;
+    font-weight: 700;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 
-.history-export-button:hover {
-    background: rgba(255, 255, 255, .12);
+.history-currency-empty {
+    margin: 0 !important;
 
-    border-color: rgba(255, 255, 255, .18);
-
-    color: white;
+    font-size: 16px !important;
 }
 
 
-.history-export-button:hover i {
-    color: var(--success);
+.history-currency-badge {
+    min-width: 42px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 5px 8px;
+
+    background: var(--company-hover);
+
+    border: 1px solid var(--company-border);
+    border-radius: 7px;
+
+    color: var(--company-text);
+
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1;
+
+    white-space: nowrap;
+}
+
+
+@media (min-width: 601px) {
+
+    .history-currency-amount,
+    .history-currency-empty {
+        font-size: 20px !important;
+    }
+
 }

@@ -1,125 +1,390 @@
-/* =====================
-   SETTINGS
-===================== */
+/* ==========================
+   SETTINGS — MOBILE FIRST
+========================== */
 
-.setting-row {
-
-    display:flex;
-
-    justify-content:space-between;
-
-    align-items:center;
-
-    gap:30px;
-
+.settings-card {
+    margin-bottom: 18px;
 }
 
 
+/* ==========================
+   SECTION HEADER
+========================== */
+
+.settings-section-header,
 .setting-info {
+    display: flex;
+    align-items: flex-start;
 
-    display:flex;
-
-    align-items:flex-start;
-
-    gap:16px;
-
+    gap: 14px;
 }
 
+.settings-section-header {
+    padding-bottom: 22px;
+    margin-bottom: 22px;
+
+    border-bottom: 1px solid var(--company-border);
+}
 
 .setting-icon {
+    width: 44px;
+    height: 44px;
 
-    width:48px;
+    min-width: 44px;
 
-    height:48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-    min-width:48px;
+    background: var(--company-hover);
 
-    display:flex;
+    border: 1px solid var(--company-border);
+    border-radius: 12px;
 
-    align-items:center;
+    color: var(--company-text);
 
-    justify-content:center;
-
-    border-radius:14px;
-
-    background:rgba(255,255,255,.08);
-
-    color:white;
-
-    font-size:20px;
-
+    font-size: 18px;
 }
 
-
+.settings-section-header h3,
 .setting-info h3 {
+    margin: 0 0 6px;
 
-    color:white;
+    color: var(--company-text);
 
-    margin:0 0 6px;
-
-    font-size:16px;
-
-    font-weight:700;
-
+    font-size: 15px;
+    font-weight: 700;
 }
 
-
+.settings-section-header p,
 .setting-info p {
+    margin: 0;
 
-    color:var(--muted);
+    max-width: 500px;
 
-    margin:0;
+    color: var(--company-muted);
 
-    font-size:13px;
-
-    line-height:1.5;
-
-    max-width:500px;
-
+    font-size: 12px;
+    line-height: 1.5;
 }
 
+
+/* ==========================
+   BRANDING
+========================== */
+
+.branding-form {
+    width: 100%;
+}
+
+.branding-field {
+    display: flex;
+    flex-direction: column;
+
+    gap: 18px;
+
+    padding: 22px 0;
+
+    border-bottom: 1px solid var(--company-border);
+}
+
+.branding-field:first-child {
+    padding-top: 0;
+}
+
+.branding-field-info label {
+    display: block;
+
+    margin-bottom: 6px;
+
+    color: var(--company-text);
+
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.branding-field-info p {
+    margin: 0;
+
+    max-width: 500px;
+
+    color: var(--company-muted);
+
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+
+/* ==========================
+   COLOR
+========================== */
+
+.color-control {
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+}
+
+.color-picker {
+    width: 52px;
+    height: 42px;
+
+    padding: 3px;
+
+    background: transparent;
+
+    border: 1px solid var(--company-border);
+    border-radius: 9px;
+
+    cursor: pointer;
+}
+
+.color-picker::-webkit-color-swatch-wrapper {
+    padding: 2px;
+}
+
+.color-picker::-webkit-color-swatch {
+    border: 0;
+    border-radius: 6px;
+}
+
+.color-value {
+    color: var(--company-muted);
+
+    font-size: 12px;
+    font-weight: 600;
+
+    letter-spacing: .5px;
+}
+
+
+/* ==========================
+   LOGO
+========================== */
+
+.logo-control {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+
+    gap: 14px;
+}
+
+.logo-preview {
+    width: 58px;
+    height: 58px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    overflow: hidden;
+
+    /*
+     * Fondo blanco intencional.
+     * El logo necesita una superficie neutra
+     * independientemente del color de empresa.
+     */
+
+    background: #ffffff;
+
+    border: 1px solid var(--company-border);
+    border-radius: 12px;
+}
+
+.logo-preview img {
+    width: 100%;
+    height: 100%;
+
+    display: block;
+
+    padding: 5px;
+
+    object-fit: contain;
+}
+
+.logo-placeholder {
+    color: #111111;
+
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.logo-file-input {
+    display: none;
+}
+
+.logo-upload-button {
+    min-height: 40px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 8px;
+
+    padding: 0 14px;
+
+    background: transparent;
+
+    border: 1px solid var(--company-border);
+    border-radius: 10px;
+
+    color: var(--company-text);
+
+    font-size: 12px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background .15s ease,
+        border-color .15s ease,
+        color .15s ease;
+}
+
+
+/* ==========================
+   ACTIONS
+========================== */
+
+.branding-actions {
+    padding-top: 22px;
+}
+
+
+/* ==========================
+   SOUND
+========================== */
+
+.setting-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+
+    gap: 20px;
+}
 
 .setting-test {
+    margin-top: 25px;
+    padding-top: 20px;
 
-    margin-top:25px;
-
-    padding-top:20px;
-
-    border-top:1px solid var(--border);
-
+    border-top: 1px solid var(--company-border);
 }
 
+
+/* ==========================
+   SWITCH
+========================== */
 
 .form-switch .form-check-input {
+    width: 48px;
+    height: 24px;
 
-    width:48px;
+    cursor: pointer;
 
-    height:24px;
+    background-color: var(--company-hover);
 
-    cursor:pointer;
+    border-color: var(--company-border);
 
-    background-color:rgba(255,255,255,.15);
-
-    border-color:rgba(255,255,255,.20);
-
+    box-shadow: none;
 }
 
+.form-switch .form-check-input:focus {
+    border-color: var(--company-muted);
+
+    box-shadow: none;
+}
 
 .form-switch .form-check-input:checked {
+    background-color: #22c55e;
 
-    background-color:#22c55e;
+    border-color: #22c55e;
+}
 
-    border-color:#22c55e;
+.settings-input {
+    width: 100%;
+
+    padding: 11px 13px;
+
+    background: var(--company-card);
+    color: var(--company-text);
+
+    border: 1px solid var(--company-border);
+    border-radius: 10px;
+
+    font-size: 14px;
+
+    outline: none;
+
+    transition:
+        border-color .15s ease,
+        background .15s ease;
+}
+
+.settings-input:focus {
+    border-color: var(--company-text);
+}
+
+.settings-input::placeholder {
+    color: var(--company-muted);
+}
+
+
+/* ==========================
+   ERROR
+========================== */
+
+.settings-error {
+    margin-top: 12px;
+
+    color: #f87171;
+
+    font-size: 12px;
+}
+
+
+/* ==========================
+   DESKTOP
+========================== */
+
+@media (min-width: 768px) {
+
+    .branding-field {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+
+        gap: 40px;
+    }
+
+    .branding-field-info {
+        flex: 1;
+    }
+
+    .color-control,
+    .logo-control {
+        flex-shrink: 0;
+    }
 
 }
 
 
-@media(max-width:600px) {
+/* ==========================
+   HOVER DEVICES
+========================== */
 
-    .setting-row {
+@media (hover: hover) {
 
-        align-items:flex-start;
+    .logo-upload-button:hover {
+        background: var(--company-hover);
 
+        border-color: var(--company-muted);
+
+        color: var(--company-text);
     }
 
 }

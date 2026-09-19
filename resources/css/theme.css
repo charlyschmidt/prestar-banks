@@ -1,17 +1,30 @@
+/* ==========================
+   SEMANTIC COLORS
+========================== */
+
 :root {
 
-    --bg: #104072;
+    --green: #73b18a;
 
-    --card: #02284f;
+    --red: #a44949;
 
-    --text: #ffffff;
+    --success: #73b18a;
 
-    --muted: #b8c7d9;
+    --danger: #a44949;
 
-    --border: rgba(255,255,255,.10);
+    /* Financial values */
+    --income: #22c55e;
+    --expense: #ef4444;
+}
 
-    --green: #22c55e;
 
-    --red: #ef4444;
+/* ==========================
+   GLOBAL DASHBOARD BASE
+========================== */
 
+html,
+body {
+    background: var(--company-bg);
+
+    color: var(--company-text);
 }

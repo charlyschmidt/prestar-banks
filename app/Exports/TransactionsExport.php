@@ -10,7 +10,11 @@ use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 
-class TransactionsExport implements FromCollection, WithHeadings, ShouldAutoSize
+
+class TransactionsExport implements
+    FromCollection,
+    WithHeadings,
+    ShouldAutoSize
 {
     protected int $financialDayId;
 
@@ -37,6 +41,40 @@ class TransactionsExport implements FromCollection, WithHeadings, ShouldAutoSize
 
         /*
         |--------------------------------------------------------------------------
+        | Saldos diarios
+        |--------------------------------------------------------------------------
+        |
+        | Cada registro corresponde a una moneda concreta de una cuenta.
+        |
+        */
+
+        $dailyBalances = AccountDailyBalance::with([
+            'account',
+            'accountBalance',
+        ])
+            ->where(
+                'financial_day_id',
+                $this->financialDayId
+            )
+            ->get()
+            ->sortBy([
+                fn($a, $b) =>
+                strcmp(
+                    $a->account?->name ?? '',
+                    $b->account?->name ?? ''
+                ),
+
+                fn($a, $b) =>
+                strcmp(
+                    $a->accountBalance?->currency ?? '',
+                    $b->accountBalance?->currency ?? ''
+                ),
+            ])
+            ->values();
+
+
+        /*
+        |--------------------------------------------------------------------------
         | Encabezado del reporte
         |--------------------------------------------------------------------------
         */
@@ -48,40 +86,46 @@ class TransactionsExport implements FromCollection, WithHeadings, ShouldAutoSize
             '',
             '',
             '',
-            ''
+            '',
         ]);
 
 
         $rows->push([
             'Fecha jornada',
-            $this->day->date,
+            Carbon::parse($this->day->date)
+                ->format('d/m/Y'),
             '',
             '',
             '',
             '',
-            ''
+            '',
         ]);
 
 
         $rows->push([
             'Inicio jornada',
-            $this->day->opened_at,
+
+            $this->day->opened_at
+                ? Carbon::parse($this->day->opened_at)
+                    ->format('d/m/Y H:i')
+                : '',
+
             '',
             '',
             '',
             '',
-            ''
+            '',
         ]);
 
 
         $rows->push([
             'Exportado por',
-            $this->user->username,
+            $this->user->name,
             '',
             '',
             '',
             '',
-            ''
+            '',
         ]);
 
 
@@ -92,7 +136,7 @@ class TransactionsExport implements FromCollection, WithHeadings, ShouldAutoSize
             '',
             '',
             '',
-            ''
+            '',
         ]);
 
 
@@ -103,58 +147,75 @@ class TransactionsExport implements FromCollection, WithHeadings, ShouldAutoSize
             '',
             '',
             '',
-            ''
+            '',
         ]);
 
 
         /*
         |--------------------------------------------------------------------------
-        | Saldos iniciales
+        | Saldos de la jornada
         |--------------------------------------------------------------------------
         */
 
         $rows->push([
-            'SALDOS INICIALES',
+            'SALDOS DE LA JORNADA',
             '',
             '',
             '',
             '',
             '',
-            ''
+            '',
         ]);
 
 
         $rows->push([
             'Banco',
+            'Moneda',
             'Saldo inicial',
+            'Saldo actual',
             '',
             '',
             '',
-            '',
-            ''
         ]);
 
 
-        $balances = AccountDailyBalance::with('account')
-            ->where(
-                'financial_day_id',
-                $this->financialDayId
-            )
-            ->get();
-
-
-        foreach ($balances as $balance) {
+        foreach ($dailyBalances as $dailyBalance) {
 
             $rows->push([
-                $balance->account->name,
-                $balance->initial_balance,
+
+                $dailyBalance->account?->name
+                    ?? 'Cuenta eliminada',
+
+                $dailyBalance->accountBalance?->currency
+                    ?? '---',
+
+                (float) $dailyBalance->initial_balance,
+
+                (float) $dailyBalance->current_balance,
+
                 '',
                 '',
                 '',
-                '',
-                ''
+
             ]);
         }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Separador
+        |--------------------------------------------------------------------------
+        */
+
+        $rows->push([
+            '',
+            '',
+            '',
+            '',
+            '',
+            '',
+            '',
+        ]);
 
 
         /*
@@ -164,24 +225,13 @@ class TransactionsExport implements FromCollection, WithHeadings, ShouldAutoSize
         */
 
         $rows->push([
-            '',
-            '',
-            '',
-            '',
-            '',
-            '',
-            ''
-        ]);
-
-
-        $rows->push([
             'MOVIMIENTOS',
             '',
             '',
             '',
             '',
             '',
-            ''
+            '',
         ]);
 
 
@@ -190,15 +240,23 @@ class TransactionsExport implements FromCollection, WithHeadings, ShouldAutoSize
             'Concepto',
             'Banco',
             'Usuario',
+            'Moneda',
             'Tipo',
             'Monto',
-            'Saldo después'
+            'Saldo después',
         ]);
 
 
+        /*
+        |--------------------------------------------------------------------------
+        | Transacciones
+        |--------------------------------------------------------------------------
+        */
+
         $transactions = Transaction::with([
             'account',
-            'user'
+            'accountBalance',
+            'user',
         ])
             ->where(
                 'financial_day_id',
@@ -209,31 +267,110 @@ class TransactionsExport implements FromCollection, WithHeadings, ShouldAutoSize
             ->get();
 
 
-        $balances = AccountDailyBalance::where(
-            'financial_day_id',
-            $this->financialDayId
-        )
-            ->pluck(
-                'initial_balance',
-                'account_id'
-            );
+        /*
+        |--------------------------------------------------------------------------
+        | Saldos corrientes por AccountBalance
+        |--------------------------------------------------------------------------
+        |
+        | Ejemplo:
+        |
+        | [
+        |     1 => 1000000, // Provincia ARS
+        |     2 => 2000,    // Provincia USD
+        |     3 => 500000,  // Santander ARS
+        | ]
+        |
+        | De esta manera nunca mezclamos monedas.
+        |
+        */
 
+        $runningBalances = $dailyBalances
+            ->mapWithKeys(
+                function ($dailyBalance) {
+
+                    return [
+
+                        $dailyBalance->account_balance_id =>
+                        (float) $dailyBalance->initial_balance,
+
+                    ];
+                }
+            )
+            ->toArray();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Construir movimientos
+        |--------------------------------------------------------------------------
+        */
 
         foreach ($transactions as $transaction) {
 
+            $accountBalanceId =
+                $transaction->account_balance_id;
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Protección ante registros antiguos
+            |--------------------------------------------------------------------------
+            */
+
             if (
-                in_array(
-                    $transaction->type,
-                    [
-                        'income'
-                    ]
+                !array_key_exists(
+                    $accountBalanceId,
+                    $runningBalances
                 )
             ) {
-                $balances[$transaction->account_id] += $transaction->amount;
-            } else {
-                $balances[$transaction->account_id] -= $transaction->amount;
+
+                $runningBalances[$accountBalanceId] = 0;
             }
 
+
+            /*
+            |--------------------------------------------------------------------------
+            | Actualizar saldo de ESA moneda
+            |--------------------------------------------------------------------------
+            */
+
+            if ($transaction->type === 'income') {
+
+                $runningBalances[$accountBalanceId] +=
+                    (float) $transaction->amount;
+
+            } else {
+
+                $runningBalances[$accountBalanceId] -=
+                    (float) $transaction->amount;
+            }
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Tipo
+            |--------------------------------------------------------------------------
+            */
+
+            $type = match ($transaction->type) {
+
+                'income' =>
+                'Ingreso',
+
+                'reserve' =>
+                'Reserva',
+
+                default =>
+                'Egreso',
+
+            };
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Fila
+            |--------------------------------------------------------------------------
+            */
 
             $rows->push([
 
@@ -243,23 +380,20 @@ class TransactionsExport implements FromCollection, WithHeadings, ShouldAutoSize
                 $transaction->description
                     ?? 'Sin descripción',
 
-                $transaction->account->name,
+                $transaction->account?->name
+                    ?? 'Cuenta eliminada',
 
                 $transaction->user?->name
                     ?? 'Sin registro',
 
-                in_array(
-                    $transaction->type,
-                    [
-                        'income'
-                    ]
-                )
-                    ? 'Ingreso'
-                    : 'Egreso',
+                $transaction->accountBalance?->currency
+                    ?? '---',
 
-                $transaction->amount,
+                $type,
 
-                $balances[$transaction->account_id],
+                (float) $transaction->amount,
+
+                $runningBalances[$accountBalanceId],
 
             ]);
         }
@@ -268,6 +402,16 @@ class TransactionsExport implements FromCollection, WithHeadings, ShouldAutoSize
         return $rows;
     }
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | Headings
+    |--------------------------------------------------------------------------
+    |
+    | El reporte ya construye manualmente todos sus encabezados dentro
+    | de collection(), por eso no agregamos una fila adicional.
+    |
+    */
 
     public function headings(): array
     {

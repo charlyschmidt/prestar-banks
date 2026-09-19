@@ -8,17 +8,15 @@
 @import "./dashboard.css";
 @import "./account.css";
 @import "./movement.css";
-@import "./login.css";
 @import "./history.css";
+@import "./settings.css";
 
 body {
-
     margin: 0;
 
-    background: var(--bg);
+    background: var(--company-bg);
 
-    color: var(--text);
+    color: var(--company-text);
 
     font-family: Inter, system-ui, sans-serif;
-
 }

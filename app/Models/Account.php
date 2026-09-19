@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Concerns\BelongsToCompany;
 
 class Account extends Model
 {
+    use BelongsToCompany;
 
     protected $fillable = [
         'name',
@@ -24,5 +26,12 @@ class Account extends Model
     public function dailyBalances()
     {
         return $this->hasMany(AccountDailyBalance::class);
+    }
+
+    public function balances()
+    {
+        return $this->hasMany(
+            AccountBalance::class
+        );
     }
 }

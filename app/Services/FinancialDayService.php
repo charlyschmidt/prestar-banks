@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\AccountBalance;
 use App\Models\FinancialDay;
 use App\Models\AccountDailyBalance;
 use Illuminate\Support\Facades\DB;
@@ -9,6 +10,11 @@ use Illuminate\Support\Facades\DB;
 class FinancialDayService
 {
 
+    /*
+    |--------------------------------------------------------------------------
+    | Jornada actual
+    |--------------------------------------------------------------------------
+    */
 
     public function current()
     {
@@ -24,8 +30,11 @@ class FinancialDayService
     }
 
 
-
-
+    /*
+    |--------------------------------------------------------------------------
+    | Buscar jornada por fecha
+    |--------------------------------------------------------------------------
+    */
 
     public function findByDate($date)
     {
@@ -37,90 +46,163 @@ class FinancialDayService
     }
 
 
-
-
+    /*
+    |--------------------------------------------------------------------------
+    | Abrir jornada
+    |--------------------------------------------------------------------------
+    */
 
     public function open(array $balances)
     {
-
         $existing = FinancialDay::whereDate(
             'date',
             today()
         )
-            ->where('status', 'open')
+            ->where(
+                'status',
+                'open'
+            )
             ->first();
 
 
-
         if ($existing) {
-
             return $existing;
         }
 
 
+        return DB::transaction(
+            function () use ($balances) {
 
-        return DB::transaction(function () use ($balances) {
+                $day = FinancialDay::create([
+
+                    'date' =>
+                        today(),
+
+                    'status' =>
+                        'open',
+
+                    'opened_by' =>
+                        auth()->id(),
+
+                    'opened_at' =>
+                        now(),
+
+                ]);
 
 
-            $day = FinancialDay::create([
+                /*
+                |--------------------------------------------------------------------------
+                | Saldos iniciales
+                |--------------------------------------------------------------------------
+                |
+                | $balances ahora tiene esta estructura:
+                |
+                | [
+                |     account_balance_id => amount,
+                |     account_balance_id => amount,
+                | ]
+                |
+                | Ejemplo:
+                |
+                | [
+                |     1 => 1500000, // Santander ARS
+                |     2 => 12000,   // Santander USD
+                |     3 => 3500,    // Santander EUR
+                | ]
+                |
+                */
 
-                'date' => today(),
+                foreach (
+                    $balances as $accountBalanceId => $amount
+                ) {
 
-                'status' => 'open',
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Validar saldo / moneda
+                    |--------------------------------------------------------------------------
+                    |
+                    | AccountBalance utiliza BelongsToCompany.
+                    | Por lo tanto solamente podremos encontrar
+                    | saldos pertenecientes a la empresa activa.
+                    |
+                    */
 
-                'opened_by' => auth()->id(),
-
-                'opened_at' => now()
-
-            ]);
-
-
-
-            foreach ($balances as $accountId => $amount) {
+                    $accountBalance =
+                        AccountBalance::with('account')
+                            ->findOrFail(
+                                $accountBalanceId
+                            );
 
 
-                AccountDailyBalance::updateOrCreate(
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Crear saldo diario
+                    |--------------------------------------------------------------------------
+                    */
 
-                    [
-                        'financial_day_id' => $day->id,
+                    AccountDailyBalance::updateOrCreate(
 
-                        'account_id' => $accountId
-                    ],
+                        [
+                            'financial_day_id' =>
+                                $day->id,
 
-                    [
-                        'initial_balance' => $amount,
+                            'account_balance_id' =>
+                                $accountBalance->id,
+                        ],
 
-                        'current_balance' => $amount
-                    ]
+                        [
+                            /*
+                             * Conservamos account_id por
+                             * compatibilidad con el sistema
+                             * actual.
+                             */
 
-                );
+                            'account_id' =>
+                                $accountBalance->account_id,
+
+                            'initial_balance' =>
+                                $amount,
+
+                            'current_balance' =>
+                                $amount,
+                        ]
+
+                    );
+                }
+
+
+                return $day;
             }
-
-
-
-            return $day;
-        });
+        );
     }
 
 
+    /*
+    |--------------------------------------------------------------------------
+    | Cerrar jornada
+    |--------------------------------------------------------------------------
+    */
 
+    public function close(
+        FinancialDay $day
+    ) {
 
-
-    public function close(FinancialDay $day)
-    {
-
-        if ($day->status === 'closed') {
-
+        if (
+            $day->status === 'closed'
+        ) {
             return $day;
         }
 
 
-
         $day->update([
-            'status' => 'closed',
-            'closed_at' => now()
-        ]);
 
+            'status' =>
+                'closed',
+
+            'closed_at' =>
+                now(),
+
+        ]);
 
 
         return $day;

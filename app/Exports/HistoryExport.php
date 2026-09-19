@@ -3,10 +3,10 @@
 namespace App\Exports;
 
 use App\Models\Transaction;
+use Illuminate\Database\Eloquent\Builder;
 use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
-use Illuminate\Database\Eloquent\Builder;
 
 
 class HistoryExport implements
@@ -23,13 +23,20 @@ class HistoryExport implements
     }
 
 
+    /*
+    |--------------------------------------------------------------------------
+    | Query
+    |--------------------------------------------------------------------------
+    */
+
     public function query(): Builder
     {
         $query = Transaction::query()
             ->with([
                 'account',
+                'accountBalance',
                 'user',
-                'executedBy'
+                'executedBy',
             ]);
 
 
@@ -70,6 +77,32 @@ class HistoryExport implements
             $query->where(
                 'account_id',
                 $this->filters['account_id']
+            );
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Moneda
+        |--------------------------------------------------------------------------
+        */
+
+        if (!empty($this->filters['currency'])) {
+
+            $currency = strtoupper(
+                trim($this->filters['currency'])
+            );
+
+
+            $query->whereHas(
+                'accountBalance',
+                function ($q) use ($currency) {
+
+                    $q->where(
+                        'currency',
+                        $currency
+                    );
+                }
             );
         }
 
@@ -121,7 +154,7 @@ class HistoryExport implements
 
         /*
         |--------------------------------------------------------------------------
-        | Estado ejecución
+        | Estado de ejecución
         |--------------------------------------------------------------------------
         */
 
@@ -135,6 +168,7 @@ class HistoryExport implements
                 $query->whereNotNull(
                     'executed_at'
                 );
+
             } elseif (
                 $this->filters['execution']
                 === 'pending'
@@ -149,13 +183,14 @@ class HistoryExport implements
 
         /*
         |--------------------------------------------------------------------------
-        | Monto
+        | Monto mínimo
         |--------------------------------------------------------------------------
         */
 
         if (
-            $this->filters['amount_min']
-            ?? null
+            isset($this->filters['amount_min'])
+            &&
+            $this->filters['amount_min'] !== ''
         ) {
 
             $query->where(
@@ -166,9 +201,16 @@ class HistoryExport implements
         }
 
 
+        /*
+        |--------------------------------------------------------------------------
+        | Monto máximo
+        |--------------------------------------------------------------------------
+        */
+
         if (
-            $this->filters['amount_max']
-            ?? null
+            isset($this->filters['amount_max'])
+            &&
+            $this->filters['amount_max'] !== ''
         ) {
 
             $query->where(
@@ -209,6 +251,12 @@ class HistoryExport implements
                     );
 
 
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Cuenta
+                    |--------------------------------------------------------------------------
+                    */
+
                     $q->orWhereHas(
                         'account',
                         function ($account) use ($search) {
@@ -222,27 +270,62 @@ class HistoryExport implements
                     );
 
 
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Moneda
+                    |--------------------------------------------------------------------------
+                    */
+
+                    $q->orWhereHas(
+                        'accountBalance',
+                        function ($balance) use ($search) {
+
+                            $balance->where(
+                                'currency',
+                                'like',
+                                '%' . $search . '%'
+                            );
+                        }
+                    );
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Usuario
+                    |--------------------------------------------------------------------------
+                    */
+
                     $q->orWhereHas(
                         'user',
                         function ($user) use ($search) {
 
-                            $user
-                                ->where(
-                                    'name',
-                                    'like',
-                                    '%' . $search . '%'
-                                )
-                                ->orWhere(
-                                    'username',
-                                    'like',
-                                    '%' . $search . '%'
-                                );
+                            $user->where(
+                                function ($q) use ($search) {
+
+                                    $q->where(
+                                        'name',
+                                        'like',
+                                        '%' . $search . '%'
+                                    )
+                                        ->orWhere(
+                                            'email',
+                                            'like',
+                                            '%' . $search . '%'
+                                        );
+                                }
+                            );
                         }
                     );
                 }
             );
         }
 
+
+        /*
+        |--------------------------------------------------------------------------
+        | Orden
+        |--------------------------------------------------------------------------
+        */
 
         return $query
             ->orderByDesc('date')
@@ -262,6 +345,7 @@ class HistoryExport implements
             'Fecha',
             'Hora',
             'Cuenta',
+            'Moneda',
             'Usuario',
             'Tipo',
             'Descripción',
@@ -282,13 +366,34 @@ class HistoryExport implements
 
     public function map($transaction): array
     {
+        /*
+        |--------------------------------------------------------------------------
+        | Tipo
+        |--------------------------------------------------------------------------
+        */
+
         $type = match ($transaction->type) {
-            'income' => 'Ingreso',
-            'expense' => 'Egreso',
-            'reserve' => 'Reserva',
-            default => $transaction->type,
+
+            'income' =>
+            'Ingreso',
+
+            'expense' =>
+            'Egreso',
+
+            'reserve' =>
+            'Reserva',
+
+            default =>
+            $transaction->type,
+
         };
 
+
+        /*
+        |--------------------------------------------------------------------------
+        | Estado
+        |--------------------------------------------------------------------------
+        */
 
         $status = match (true) {
 
@@ -304,22 +409,49 @@ class HistoryExport implements
 
             default
             => '',
+
         };
 
 
+        /*
+        |--------------------------------------------------------------------------
+        | Monto
+        |--------------------------------------------------------------------------
+        |
+        | El monto continúa siendo numérico.
+        |
+        | La moneda se exporta en su propia columna para que Excel
+        | pueda seguir trabajando con el valor como número.
+        |
+        */
+
         $amount =
             $transaction->type === 'income'
-            ? $transaction->amount
-            : -$transaction->amount;
+            ? (float) $transaction->amount
+            : -(float) $transaction->amount;
 
+
+        /*
+        |--------------------------------------------------------------------------
+        | Fila
+        |--------------------------------------------------------------------------
+        */
 
         return [
-            $transaction->date?->format('d/m/Y'),
 
-            $transaction->date?->format('H:i'),
+            $transaction->date?->format(
+                'd/m/Y'
+            ),
+
+            $transaction->date?->format(
+                'H:i'
+            ),
 
             $transaction->account?->name
                 ?? 'Cuenta eliminada',
+
+            $transaction->accountBalance?->currency
+                ?? '---',
 
             $transaction->user?->name
                 ?? 'Sin registro',
@@ -341,8 +473,9 @@ class HistoryExport implements
 
             $transaction->executed_at
                 ? $transaction->executed_at
-                ->format('d/m/Y H:i')
+                    ->format('d/m/Y H:i')
                 : '',
+
         ];
     }
 }

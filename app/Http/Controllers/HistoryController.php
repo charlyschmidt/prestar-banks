@@ -12,6 +12,11 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class HistoryController extends Controller
 {
+    /*
+    |--------------------------------------------------------------------------
+    | Historial
+    |--------------------------------------------------------------------------
+    */
 
     public function index(Request $request)
     {
@@ -19,14 +24,12 @@ class HistoryController extends Controller
         |--------------------------------------------------------------------------
         | Seguridad
         |--------------------------------------------------------------------------
-        |
-        | Historial es exclusivo del Super Admin.
-        |
         */
 
-        if (!auth()->user()->is_admin) {
+        if (!auth()->user()->isSuperAdmin()) {
             abort(403);
         }
+
 
         /*
         |--------------------------------------------------------------------------
@@ -36,9 +39,10 @@ class HistoryController extends Controller
 
         $query = Transaction::with([
             'account',
+            'accountBalance',
             'user',
             'financialDay',
-            'executedBy'
+            'executedBy',
         ]);
 
 
@@ -85,6 +89,32 @@ class HistoryController extends Controller
             $query->where(
                 'account_id',
                 $request->account_id
+            );
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Moneda
+        |--------------------------------------------------------------------------
+        */
+
+        if ($request->filled('currency')) {
+
+            $currency = strtoupper(
+                trim($request->currency)
+            );
+
+
+            $query->whereHas(
+                'accountBalance',
+                function ($q) use ($currency) {
+
+                    $q->where(
+                        'currency',
+                        $currency
+                    );
+                }
             );
         }
 
@@ -147,6 +177,7 @@ class HistoryController extends Controller
                 $query->whereNotNull(
                     'executed_at'
                 );
+
             } elseif (
                 $request->execution === 'pending'
             ) {
@@ -160,21 +191,16 @@ class HistoryController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | Búsqueda
-        |--------------------------------------------------------------------------
-        */
-
-        /*
-        |--------------------------------------------------------------------------
         | Búsqueda global
         |--------------------------------------------------------------------------
         |
-        | Busca simultáneamente por:
+        | Busca por:
         |
         | - Descripción
-        | - Cuenta / banco origen
+        | - Cuenta
         | - Usuario
         | - Banco destino
+        | - Moneda
         |
         */
 
@@ -184,77 +210,103 @@ class HistoryController extends Controller
                 $request->search
             );
 
-            $query->where(function ($q) use ($search) {
 
-                /*
-        |--------------------------------------------------------------
-        | Descripción
-        |--------------------------------------------------------------
-        */
+            $query->where(
+                function ($q) use ($search) {
 
-                $q->where(
-                    'description',
-                    'like',
-                    '%' . $search . '%'
-                );
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Descripción
+                    |--------------------------------------------------------------------------
+                    */
 
-
-                /*
-        |--------------------------------------------------------------
-        | Banco destino
-        |--------------------------------------------------------------
-        */
-
-                $q->orWhere(
-                    'destination_bank',
-                    'like',
-                    '%' . $search . '%'
-                );
+                    $q->where(
+                        'description',
+                        'like',
+                        '%' . $search . '%'
+                    );
 
 
-                /*
-        |--------------------------------------------------------------
-        | Cuenta / Banco origen
-        |--------------------------------------------------------------
-        */
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Banco destino
+                    |--------------------------------------------------------------------------
+                    */
 
-                $q->orWhereHas(
-                    'account',
-                    function ($accountQuery) use ($search) {
-
-                        $accountQuery->where(
-                            'name',
-                            'like',
-                            '%' . $search . '%'
-                        );
-                    }
-                );
+                    $q->orWhere(
+                        'destination_bank',
+                        'like',
+                        '%' . $search . '%'
+                    );
 
 
-                /*
-        |--------------------------------------------------------------
-        | Usuario
-        |--------------------------------------------------------------
-        */
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Cuenta
+                    |--------------------------------------------------------------------------
+                    */
 
-                $q->orWhereHas(
-                    'user',
-                    function ($userQuery) use ($search) {
+                    $q->orWhereHas(
+                        'account',
+                        function ($accountQuery) use ($search) {
 
-                        $userQuery
-                            ->where(
+                            $accountQuery->where(
                                 'name',
                                 'like',
                                 '%' . $search . '%'
-                            )
-                            ->orWhere(
-                                'username',
+                            );
+                        }
+                    );
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Moneda
+                    |--------------------------------------------------------------------------
+                    */
+
+                    $q->orWhereHas(
+                        'accountBalance',
+                        function ($balanceQuery) use ($search) {
+
+                            $balanceQuery->where(
+                                'currency',
                                 'like',
                                 '%' . $search . '%'
                             );
-                    }
-                );
-            });
+                        }
+                    );
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Usuario
+                    |--------------------------------------------------------------------------
+                    */
+
+                    $q->orWhereHas(
+                        'user',
+                        function ($userQuery) use ($search) {
+
+                            $userQuery->where(
+                                function ($q) use ($search) {
+
+                                    $q->where(
+                                        'name',
+                                        'like',
+                                        '%' . $search . '%'
+                                    )
+                                        ->orWhere(
+                                            'email',
+                                            'like',
+                                            '%' . $search . '%'
+                                        );
+                                }
+                            );
+                        }
+                    );
+                }
+            );
         }
 
 
@@ -292,29 +344,49 @@ class HistoryController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | Totales reales de la consulta filtrada
+        | Total de resultados
+        |--------------------------------------------------------------------------
+        */
+
+        $totalResults =
+            (clone $query)->count();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Totales agrupados por moneda
         |--------------------------------------------------------------------------
         |
-        | Clonamos la consulta ANTES de paginar.
+        | Nunca sumamos monedas diferentes.
+        |
+        | Resultado:
+        |
+        | [
+        |     'ARS' => 1500000,
+        |     'USD' => 2500,
+        | ]
         |
         */
 
-        $totalResults = (clone $query)->count();
+        $totalIncome = $this->totalsByCurrency(
+            clone $query,
+            ['income']
+        );
 
 
-        $totalIncome = (clone $query)
-            ->where('type', 'income')
-            ->sum('amount');
+        $totalExpense = $this->totalsByCurrency(
+            clone $query,
+            [
+                'expense',
+                'transfer_out',
+            ]
+        );
 
 
-        $totalExpense = (clone $query)
-            ->where('type', 'expense')
-            ->sum('amount');
-
-
-        $totalReserve = (clone $query)
-            ->where('type', 'reserve')
-            ->sum('amount');
+        $totalReserve = $this->totalsByCurrency(
+            clone $query,
+            ['reserve']
+        );
 
 
         /*
@@ -341,10 +413,54 @@ class HistoryController extends Controller
         )->get();
 
 
+        /*
+        |--------------------------------------------------------------------------
+        | Monedas disponibles
+        |--------------------------------------------------------------------------
+        |
+        | Las obtenemos de AccountBalance a través de las cuentas disponibles
+        | para esta empresa.
+        |
+        */
+
+        $currencies = $accounts
+            ->load('balances')
+            ->flatMap(
+                fn($account) =>
+                $account->balances->pluck('currency')
+            )
+            ->filter()
+            ->unique()
+            ->sort()
+            ->values();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Usuarios
+        |--------------------------------------------------------------------------
+        */
+
         $users = User::withTrashed()
+            ->whereHas(
+                'companies',
+                function ($query) {
+
+                    $query->where(
+                        'companies.id',
+                        session('company_id')
+                    );
+                }
+            )
             ->orderBy('name')
             ->get();
 
+
+        /*
+        |--------------------------------------------------------------------------
+        | Bancos destino
+        |--------------------------------------------------------------------------
+        */
 
         $destinationBanks = Transaction::whereNotNull(
             'destination_bank'
@@ -374,6 +490,7 @@ class HistoryController extends Controller
             compact(
                 'transactions',
                 'accounts',
+                'currencies',
                 'users',
                 'destinationBanks',
                 'totalResults',
@@ -384,29 +501,37 @@ class HistoryController extends Controller
         );
     }
 
-    public function export(Request $request)
-    {
-        /*
+
+    /*
     |--------------------------------------------------------------------------
-    | Seguridad
+    | Exportar
     |--------------------------------------------------------------------------
     */
 
-        if (!auth()->user()->is_admin) {
+    public function export(Request $request)
+    {
+        /*
+        |--------------------------------------------------------------------------
+        | Seguridad
+        |--------------------------------------------------------------------------
+        */
+
+        if (!auth()->user()->isSuperAdmin()) {
             abort(403);
         }
 
 
         /*
-    |--------------------------------------------------------------------------
-    | Filtros
-    |--------------------------------------------------------------------------
-    */
+        |--------------------------------------------------------------------------
+        | Filtros
+        |--------------------------------------------------------------------------
+        */
 
         $filters = $request->only([
             'date_from',
             'date_to',
             'account_id',
+            'currency',
             'user_id',
             'type',
             'destination_bank',
@@ -433,5 +558,69 @@ class HistoryController extends Controller
             new HistoryExport($filters),
             $fileName
         );
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Totales por moneda
+    |--------------------------------------------------------------------------
+    |
+    | Recibe la misma consulta filtrada del historial y solamente suma
+    | las monedas de forma independiente.
+    |
+    */
+
+    private function totalsByCurrency(
+        $query,
+        array $types
+    ): array {
+
+        $transactions = $query
+            ->whereIn(
+                'type',
+                $types
+            )
+            ->with('accountBalance')
+            ->get();
+
+
+        $totals = [];
+
+
+        foreach ($transactions as $transaction) {
+
+            $currency =
+                $transaction->accountBalance?->currency;
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Movimiento sin AccountBalance
+            |--------------------------------------------------------------------------
+            |
+            | No lo mezclamos arbitrariamente con ARS.
+            |
+            */
+
+            if (!$currency) {
+                continue;
+            }
+
+
+            if (!isset($totals[$currency])) {
+                $totals[$currency] = 0;
+            }
+
+
+            $totals[$currency] +=
+                (float) $transaction->amount;
+        }
+
+
+        ksort($totals);
+
+
+        return $totals;
     }
 }

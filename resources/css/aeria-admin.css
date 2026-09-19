@@ -1,0 +1,1403 @@
+/* =========================================================
+   AERIA FINANCE
+   PLATFORM ADMIN
+   Mobile First
+========================================================= */
+
+
+/* ==========================
+   BASE
+========================== */
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+
+    background: #080808;
+    color: #ffffff;
+
+    font-family:
+        Inter,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+}
+
+
+/* ==========================
+   HEADER
+========================== */
+
+.admin-header {
+    min-height: 70px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 16px;
+
+    padding: 15px 16px;
+
+    border-bottom: 1px solid rgba(255, 255, 255, .08);
+}
+
+.admin-brand {
+    display: flex;
+    flex-direction: column;
+
+    color: #ffffff;
+
+    font-size: 17px;
+    font-weight: 700;
+
+    letter-spacing: -.5px;
+    line-height: 1;
+}
+
+.admin-brand span {
+    margin-top: 6px;
+
+    color: rgba(255, 255, 255, .42);
+
+    font-size: 12px;
+    font-weight: 500;
+
+    letter-spacing: 1.3px;
+
+    text-transform: uppercase;
+}
+
+
+/* ==========================
+   ADMIN USER / LOGOUT
+========================== */
+
+.admin-user {
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+}
+
+.admin-user-name {
+    display: none;
+
+    color: rgba(255, 255, 255, .55);
+
+    font-size: 12px;
+}
+
+.admin-logout-form {
+    margin: 0;
+}
+
+.admin-logout-button {
+    height: 36px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 7px;
+
+    padding: 0 11px;
+
+    background: rgba(255, 255, 255, .05);
+
+    border: 1px solid rgba(255, 255, 255, .09);
+    border-radius: 9px;
+
+    color: rgba(255, 255, 255, .65);
+
+    font-size: 12px;
+    font-weight: 500;
+
+    cursor: pointer;
+
+    transition:
+        background .15s ease,
+        color .15s ease;
+}
+
+.admin-logout-button:hover {
+    background: rgba(255, 255, 255, .09);
+
+    color: #ffffff;
+}
+
+.admin-logout-button i {
+    font-size: 14px;
+}
+
+
+/* ==========================
+   CONTENT
+========================== */
+
+.admin-container {
+    width: 100%;
+    max-width: 1400px;
+
+    margin: 0 auto;
+
+    padding: 26px 16px 50px;
+}
+
+.page-header {
+    margin-bottom: 24px;
+}
+
+.page-header h1 {
+    margin: 0;
+
+    font-size: 26px;
+    font-weight: 600;
+
+    letter-spacing: -.8px;
+}
+
+.page-header p {
+    margin: 7px 0 0;
+
+    color: rgba(255, 255, 255, .42);
+
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   PLATFORM DASHBOARD
+========================================================= */
+
+
+/* ==========================
+   MAIN STATS
+========================== */
+
+.platform-stats {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 10px;
+
+    margin-bottom: 10px;
+}
+
+.platform-stat-card {
+    min-width: 0;
+
+    padding: 16px;
+
+    background: rgba(255, 255, 255, .035);
+
+    border: 1px solid rgba(255, 255, 255, .08);
+    border-radius: 14px;
+}
+
+.platform-stat-primary {
+    grid-column: 1 / -1;
+
+    background: rgba(255, 255, 255, .055);
+}
+
+.platform-stat-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 10px;
+
+    margin-bottom: 12px;
+}
+
+.platform-stat-header span {
+    color: rgba(255, 255, 255, .43);
+
+    font-size: 12px;
+    font-weight: 500;
+
+    letter-spacing: .55px;
+
+    text-transform: uppercase;
+}
+
+.platform-stat-header i {
+    color: rgba(255, 255, 255, .28);
+
+    font-size: 14px;
+}
+
+.platform-stat-card strong {
+    display: block;
+
+    overflow: hidden;
+
+    color: #ffffff;
+
+    font-size: 18px;
+    font-weight: 600;
+
+    letter-spacing: -.5px;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.platform-stat-primary strong {
+    font-size: 25px;
+}
+
+.platform-stat-card small {
+    display: block;
+
+    margin-top: 7px;
+
+    color: rgba(255, 255, 255, .3);
+
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+
+/* ==========================
+   FINANCIAL FLOW
+========================== */
+
+.platform-flow {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 10px;
+
+    margin-bottom: 28px;
+}
+
+.platform-flow-item {
+    min-width: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 10px;
+
+    padding: 14px 16px;
+
+    background: rgba(255, 255, 255, .02);
+
+    border: 1px solid rgba(255, 255, 255, .065);
+    border-radius: 12px;
+}
+
+.platform-flow-item > div {
+    min-width: 0;
+}
+
+.platform-flow-item span {
+    display: block;
+
+    margin-bottom: 5px;
+
+    color: rgba(255, 255, 255, .35);
+
+    font-size: 12px;
+    font-weight: 500;
+
+    letter-spacing: .5px;
+
+    text-transform: uppercase;
+}
+
+.platform-flow-item strong {
+    display: block;
+
+    overflow: hidden;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.platform-flow-item > i {
+    flex-shrink: 0;
+
+    font-size: 15px;
+}
+
+.platform-flow-income strong,
+.platform-flow-income > i {
+    color: #22c55e;
+}
+
+.platform-flow-expense strong,
+.platform-flow-expense > i {
+    color: #ef4444;
+}
+
+
+/* =========================================================
+   COMPANIES
+========================================================= */
+
+.companies-card {
+    overflow: hidden;
+
+    background: rgba(255, 255, 255, .025);
+
+    border: 1px solid rgba(255, 255, 255, .08);
+    border-radius: 16px;
+}
+
+
+/* ==========================
+   COMPANIES HEADER
+========================== */
+
+.companies-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 16px;
+
+    padding: 17px 18px;
+
+    border-bottom: 1px solid rgba(255, 255, 255, .07);
+}
+
+.companies-header h2 {
+    margin: 0;
+
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.companies-header p {
+    margin: 5px 0 0;
+
+    color: rgba(255, 255, 255, .35);
+
+    font-size: 12px;
+}
+
+.companies-total {
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: baseline;
+
+    gap: 5px;
+
+    color: #ffffff;
+
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.companies-total span {
+    color: rgba(255, 255, 255, .32);
+
+    font-size: 12px;
+    font-weight: 400;
+
+    text-transform: uppercase;
+}
+
+
+/* ==========================
+   COMPANY STATUS SUMMARY
+========================== */
+
+.company-status-summary {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    border-bottom: 1px solid rgba(255, 255, 255, .06);
+}
+
+.company-status-summary > div {
+    min-width: 0;
+
+    display: flex;
+    align-items: center;
+
+    gap: 6px;
+
+    padding: 12px 10px;
+
+    border-right: 1px solid rgba(255, 255, 255, .05);
+}
+
+.company-status-summary > div:last-child {
+    border-right: 0;
+}
+
+.company-status-summary strong {
+    color: #ffffff;
+
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.company-status-summary small {
+    overflow: hidden;
+
+    color: rgba(255, 255, 255, .36);
+
+    font-size: 12px;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.company-status-dot {
+    width: 6px;
+    height: 6px;
+
+    flex-shrink: 0;
+
+    border-radius: 50%;
+}
+
+.status-dot-active {
+    background: #22c55e;
+}
+
+.status-dot-pending {
+    background: #eab308;
+}
+
+.status-dot-suspended {
+    background: #ef4444;
+}
+
+
+/* ==========================
+   COMPANY ROW
+========================== */
+
+.company-row {
+    padding: 17px 18px;
+
+    border-bottom: 1px solid rgba(255, 255, 255, .06);
+}
+
+.company-row:last-child {
+    border-bottom: 0;
+}
+
+.company-main {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+
+    gap: 12px;
+
+    margin-bottom: 15px;
+}
+
+.company-name {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.company-name-link {
+    display: inline-flex;
+    align-items: center;
+
+    gap: 6px;
+
+    color: #ffffff;
+
+    text-decoration: none;
+
+    transition: opacity .15s ease;
+}
+
+.company-name-link:hover {
+    color: #ffffff;
+
+    opacity: .7;
+}
+
+.company-name-link i {
+    color: rgba(255, 255, 255, .4);
+
+    font-size: 12px;
+}
+
+.company-meta {
+    margin-top: 5px;
+
+    color: rgba(255, 255, 255, .4);
+
+    font-size: 12px;
+}
+
+
+/* ==========================
+   COMPANY DATA
+========================== */
+
+.company-detail {
+    min-width: 0;
+
+    margin-top: 11px;
+}
+
+.company-detail span {
+    display: block;
+
+    margin-bottom: 4px;
+
+    color: rgba(255, 255, 255, .32);
+
+    font-size: 12px;
+    font-weight: 500;
+
+    letter-spacing: .5px;
+
+    text-transform: uppercase;
+}
+
+.company-detail strong {
+    display: block;
+
+    overflow: hidden;
+
+    color: rgba(255, 255, 255, .72);
+
+    font-size: 12px;
+    font-weight: 400;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+/* ==========================
+   STATUS BADGES
+========================== */
+
+.status {
+    display: inline-flex;
+    align-items: center;
+
+    padding: 5px 8px;
+
+    border-radius: 20px;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    letter-spacing: .4px;
+
+    text-transform: uppercase;
+}
+
+.status-pending {
+    background: rgba(234, 179, 8, .12);
+
+    color: #eab308;
+}
+
+.status-active {
+    background: rgba(34, 197, 94, .12);
+
+    color: #22c55e;
+}
+
+.status-suspended {
+    background: rgba(239, 68, 68, .12);
+
+    color: #ef4444;
+}
+
+
+/* ==========================
+   COMPANY ACTIONS
+========================== */
+
+.company-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+
+    gap: 7px;
+
+    margin-top: 15px;
+}
+
+.company-actions form {
+    margin: 0;
+}
+
+.admin-button {
+    min-height: 34px;
+
+    padding: 7px 12px;
+
+    border: 0;
+    border-radius: 8px;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background .15s ease,
+        opacity .15s ease;
+}
+
+.admin-button-approve {
+    background: #ffffff;
+
+    color: #080808;
+}
+
+.admin-button-approve:hover {
+    background: #e8e8e8;
+}
+
+.admin-button-suspend {
+    background: rgba(239, 68, 68, .10);
+
+    border: 1px solid rgba(239, 68, 68, .20);
+
+    color: #ef4444;
+}
+
+.admin-button-suspend:hover {
+    background: rgba(239, 68, 68, .18);
+}
+
+
+/* ==========================
+   EMPTY STATE
+========================== */
+
+.empty-state {
+    padding: 50px 20px;
+
+    color: rgba(255, 255, 255, .4);
+
+    font-size: 12px;
+
+    text-align: center;
+}
+
+
+/* =========================================================
+   COMPANY DETAIL PAGE
+========================================================= */
+
+
+/* ==========================
+   BACK
+========================== */
+
+.admin-back {
+    margin-bottom: 22px;
+}
+
+.admin-back a {
+    display: inline-flex;
+    align-items: center;
+
+    gap: 7px;
+
+    color: rgba(255, 255, 255, .48);
+
+    font-size: 12px;
+    font-weight: 500;
+
+    text-decoration: none;
+
+    transition: color .15s ease;
+}
+
+.admin-back a:hover {
+    color: #ffffff;
+}
+
+
+/* ==========================
+   COMPANY DETAIL HEADER
+========================== */
+
+.company-detail-header {
+    margin-bottom: 24px;
+}
+
+.company-detail-title {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+
+    gap: 10px;
+}
+
+.company-detail-title h1 {
+    margin: 0;
+
+    font-size: 26px;
+    font-weight: 600;
+
+    letter-spacing: -.8px;
+}
+
+.company-detail-info {
+    display: flex;
+    flex-direction: column;
+
+    gap: 5px;
+
+    margin-top: 10px;
+
+    color: rgba(255, 255, 255, .42);
+
+    font-size: 12px;
+}
+
+
+/* ==========================
+   COMPANY SUMMARY
+========================== */
+
+.company-summary-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 10px;
+
+    margin-bottom: 28px;
+}
+
+.company-summary-card {
+    min-width: 0;
+
+    padding: 16px;
+
+    background: rgba(255, 255, 255, .035);
+
+    border: 1px solid rgba(255, 255, 255, .08);
+    border-radius: 14px;
+}
+
+.company-summary-card span {
+    display: block;
+
+    margin-bottom: 8px;
+
+    color: rgba(255, 255, 255, .42);
+
+    font-size: 12px;
+
+    letter-spacing: .4px;
+
+    text-transform: uppercase;
+}
+
+.company-summary-card strong {
+    display: block;
+
+    overflow: hidden;
+
+    color: #ffffff;
+
+    font-size: 16px;
+    font-weight: 600;
+
+    letter-spacing: -.4px;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.company-summary-income strong {
+    color: #22c55e;
+}
+
+.company-summary-expense strong {
+    color: #ef4444;
+}
+
+
+/* ==========================
+   ACTIVITY CARD
+========================== */
+
+.company-activity-card {
+    overflow: hidden;
+
+    background: rgba(255, 255, 255, .025);
+
+    border: 1px solid rgba(255, 255, 255, .08);
+    border-radius: 16px;
+}
+
+.company-activity-header {
+    padding: 17px 18px;
+
+    border-bottom: 1px solid rgba(255, 255, 255, .07);
+}
+
+.company-activity-header h2 {
+    margin: 0;
+
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.company-activity-header p {
+    margin: 5px 0 0;
+
+    color: rgba(255, 255, 255, .38);
+
+    font-size: 12px;
+}
+
+
+/* ==========================
+   MOBILE ACTIVITY
+========================== */
+
+.activity-mobile {
+    display: block;
+}
+
+.activity-desktop {
+    display: none;
+}
+
+.activity-day {
+    padding: 18px;
+
+    border-bottom: 1px solid rgba(255, 255, 255, .06);
+}
+
+.activity-day:last-child {
+    border-bottom: 0;
+}
+
+.activity-day-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+
+    gap: 12px;
+
+    margin-bottom: 18px;
+}
+
+.activity-day-header > div {
+    display: flex;
+    flex-direction: column;
+
+    gap: 4px;
+}
+
+.activity-day-header strong {
+    color: #ffffff;
+
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.activity-day-header > div > span {
+    color: rgba(255, 255, 255, .38);
+
+    font-size: 12px;
+}
+
+
+/* ==========================
+   DAY STATUS
+========================== */
+
+.day-status {
+    display: inline-flex;
+    align-items: center;
+
+    padding: 4px 7px;
+
+    border-radius: 20px;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    letter-spacing: .4px;
+
+    text-transform: uppercase;
+}
+
+.day-status-open {
+    background: rgba(34, 197, 94, .10);
+
+    color: #22c55e;
+}
+
+.day-status-closed {
+    background: rgba(255, 255, 255, .06);
+
+    color: rgba(255, 255, 255, .5);
+}
+
+
+/* ==========================
+   DAY BALANCES
+========================== */
+
+.activity-day-balances {
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1fr)
+        auto
+        minmax(0, 1fr);
+
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 14px;
+
+    background: rgba(255, 255, 255, .025);
+
+    border: 1px solid rgba(255, 255, 255, .06);
+    border-radius: 11px;
+}
+
+.activity-day-balances > div {
+    min-width: 0;
+}
+
+.activity-day-balances > div:last-child {
+    text-align: right;
+}
+
+.activity-day-balances span {
+    display: block;
+
+    margin-bottom: 5px;
+
+    color: rgba(255, 255, 255, .35);
+
+    font-size: 12px;
+
+    text-transform: uppercase;
+}
+
+.activity-day-balances strong {
+    display: block;
+
+    overflow: hidden;
+
+    color: #ffffff;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.activity-day-balances > i {
+    color: rgba(255, 255, 255, .2);
+
+    font-size: 12px;
+}
+
+
+/* ==========================
+   DAY MOVEMENTS
+========================== */
+
+.activity-day-movements {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 10px;
+
+    margin-top: 10px;
+}
+
+.activity-day-movements > div {
+    min-width: 0;
+
+    padding: 12px 14px;
+
+    background: rgba(255, 255, 255, .02);
+
+    border: 1px solid rgba(255, 255, 255, .05);
+    border-radius: 10px;
+}
+
+.activity-day-movements span {
+    display: block;
+
+    margin-bottom: 5px;
+
+    color: rgba(255, 255, 255, .35);
+
+    font-size: 12px;
+
+    text-transform: uppercase;
+}
+
+.activity-day-movements strong {
+    display: block;
+
+    overflow: hidden;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.activity-income {
+    color: #22c55e;
+}
+
+.activity-expense {
+    color: #ef4444;
+}
+
+
+/* =========================================================
+   TABLET / DESKTOP
+========================================================= */
+
+@media (min-width: 768px) {
+
+    /* ==========================
+       HEADER
+    ========================== */
+
+    .admin-header {
+        padding: 16px 24px;
+    }
+
+    .admin-user-name {
+        display: inline;
+    }
+
+
+    /* ==========================
+       CONTENT
+    ========================== */
+
+    .admin-container {
+        padding: 40px 32px 70px;
+    }
+
+    .page-header {
+        margin-bottom: 30px;
+    }
+
+    .page-header h1 {
+        font-size: 30px;
+    }
+
+
+    /* ==========================
+       PLATFORM STATS
+    ========================== */
+
+    .platform-stats {
+        grid-template-columns:
+            repeat(4, minmax(0, 1fr));
+
+        gap: 14px;
+
+        margin-bottom: 14px;
+    }
+
+    .platform-stat-primary {
+        grid-column: auto;
+    }
+
+    .platform-stat-card {
+        padding: 20px;
+    }
+
+    .platform-stat-card strong,
+    .platform-stat-primary strong {
+        font-size: 21px;
+    }
+
+    .platform-stat-card small {
+        font-size: 12px;
+    }
+
+
+    /* ==========================
+       FLOW
+    ========================== */
+
+    .platform-flow {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+        gap: 14px;
+
+        margin-bottom: 34px;
+    }
+
+    .platform-flow-item {
+        padding: 17px 20px;
+    }
+
+    .platform-flow-item strong {
+        font-size: 15px;
+    }
+
+
+    /* ==========================
+       COMPANIES
+    ========================== */
+
+    .companies-header {
+        padding: 19px 20px;
+    }
+
+    .company-status-summary {
+        display: flex;
+
+        padding: 0 20px;
+    }
+
+    .company-status-summary > div {
+        padding: 11px 22px 11px 0;
+
+        margin-right: 22px;
+
+        border-right: 0;
+    }
+
+    .company-row {
+        display: grid;
+
+        grid-template-columns:
+            minmax(190px, 1.35fr)
+            80px
+            minmax(190px, 1.25fr)
+            130px
+            minmax(100px, .7fr);
+
+        align-items: center;
+
+        gap: 20px;
+
+        padding: 17px 20px;
+    }
+
+    .company-main {
+        display: block;
+
+        margin: 0;
+    }
+
+    .company-main .status {
+        margin-top: 7px;
+    }
+
+    .company-detail {
+        margin-top: 0;
+    }
+
+    .company-actions {
+        justify-content: flex-end;
+
+        margin-top: 0;
+    }
+
+
+    /* ==========================
+       DETAIL HEADER
+    ========================== */
+
+    .company-detail-header {
+        margin-bottom: 30px;
+    }
+
+    .company-detail-title h1 {
+        font-size: 30px;
+    }
+
+    .company-detail-info {
+        flex-direction: row;
+        align-items: center;
+
+        gap: 16px;
+    }
+
+    .company-detail-info span + span::before {
+        content: "·";
+
+        margin-right: 16px;
+
+        color: rgba(255, 255, 255, .2);
+    }
+
+
+    /* ==========================
+       COMPANY SUMMARY
+    ========================== */
+
+    .company-summary-grid {
+        grid-template-columns:
+            repeat(3, minmax(0, 1fr));
+
+        gap: 14px;
+
+        margin-bottom: 32px;
+    }
+
+    .company-summary-card {
+        padding: 20px;
+    }
+
+    .company-summary-card strong {
+        font-size: 20px;
+    }
+
+
+    /* ==========================
+       ACTIVITY DESKTOP
+    ========================== */
+
+    .activity-mobile {
+        display: none;
+    }
+
+    .activity-desktop {
+        display: block;
+
+        overflow-x: auto;
+    }
+
+    .activity-table {
+        min-width: 850px;
+    }
+
+    .activity-table-row {
+        display: grid;
+
+        grid-template-columns:
+            130px
+            minmax(140px, 1fr)
+            minmax(140px, 1fr)
+            minmax(140px, 1fr)
+            minmax(140px, 1fr)
+            110px;
+
+        align-items: center;
+
+        gap: 18px;
+
+        min-height: 58px;
+
+        padding: 10px 18px;
+
+        border-bottom: 1px solid rgba(255, 255, 255, .055);
+
+        color: rgba(255, 255, 255, .72);
+
+        font-size: 12px;
+    }
+
+    .activity-table-row:last-child {
+        border-bottom: 0;
+    }
+
+    .activity-table-head {
+        min-height: 42px;
+
+        background: rgba(255, 255, 255, .018);
+
+        color: rgba(255, 255, 255, .32);
+
+        font-size: 12px;
+        font-weight: 500;
+
+        letter-spacing: .4px;
+
+        text-transform: uppercase;
+    }
+
+    .activity-date {
+        display: flex;
+        flex-direction: column;
+
+        gap: 3px;
+    }
+
+    .activity-date strong {
+        color: #ffffff;
+
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .activity-date span {
+        color: rgba(255, 255, 255, .3);
+
+        font-size: 12px;
+
+        text-transform: uppercase;
+    }
+
+    .activity-table-total {
+        min-height: 64px;
+
+        background: rgba(255, 255, 255, .025);
+
+        color: #ffffff;
+
+        font-weight: 600;
+    }
+}
+
+
+/* =========================================================
+   LARGE DESKTOP
+========================================================= */
+
+@media (min-width: 1100px) {
+
+    .platform-stat-card {
+        padding: 22px;
+    }
+
+    .platform-stat-card strong,
+    .platform-stat-primary strong {
+        font-size: 24px;
+    }
+
+    .platform-flow-item strong {
+        font-size: 17px;
+    }
+
+}

@@ -2,33 +2,31 @@
 
 
 @section('content')
-    <div class="page-container">
+    <div class="page-container transactions-page">
 
 
+        {{-- =========================================================
+    HEADER
+========================================================== --}}
 
-        <div class="page-header">
+        <div class="transactions-header">
 
-
-            <div class="d-flex align-items-center gap-3 movement-title">
+            <div class="transactions-header-main">
 
                 <a href="{{ route('dashboard') }}" class="secondary-button back-button">
-
                     <i class="bi bi-arrow-left"></i>
 
                     <span>
                         Volver
                     </span>
-
                 </a>
 
 
-
-                <div>
+                <div class="transactions-title">
 
                     <h1>
                         Movimientos
                     </h1>
-
 
                     <p>
                         Jornada actual
@@ -36,60 +34,43 @@
 
                 </div>
 
-
             </div>
 
 
-
-
-
-            <div class="d-flex gap-2 movement-actions">
-
+            <div class="transactions-header-actions">
 
                 <a href="{{ route('transactions.create') }}" class="primary-action-button">
-
-
                     <i class="bi bi-plus"></i>
 
                     <span>
                         Nuevo
                     </span>
-
-
                 </a>
 
 
-
                 <a href="{{ route('transactions.export') }}" class="primary-action-button">
-
-
                     <i class="bi bi-file-earmark-arrow-down"></i>
 
                     <span>
                         Exportar Excel
                     </span>
-
-
                 </a>
 
-
             </div>
-
-
 
         </div>
 
 
 
+        {{-- =========================================================
+        MOVIMIENTOS
+    ========================================================== --}}
 
-
-
-
-        <div class="movements-card">
+        <div class="movements-card transactions-table-card">
 
             <div class="table-responsive">
 
-                <table class="modern-table">
+                <table class="modern-table transactions-table">
 
                     <thead>
 
@@ -109,6 +90,10 @@
 
                             <th>
                                 Usuario
+                            </th>
+
+                            <th>
+                                Moneda
                             </th>
 
                             <th>
@@ -135,22 +120,48 @@
                     <tbody id="transactions-body">
 
                         @forelse ($transactions as $transaction)
-                            <tr>
+                            @php
+
+                                $currency = $transaction->accountBalance?->currency ?? '---';
+
+                                $canExecute = auth()->user()->canExecuteTransactions();
+
+                                $canManage = auth()->user()->isSuperAdmin() || $transaction->user_id === auth()->id();
+
+                            @endphp
+
+
+                            <tr data-transaction-id="{{ $transaction->id }}"
+                                data-account-balance-id="{{ $transaction->account_balance_id }}">
+
 
                                 {{-- FECHA --}}
+
                                 <td>
 
-                                    {{ \Carbon\Carbon::parse($transaction->date)->format('d/m/Y H:i') }}
+                                    <div class="movement-date">
+
+                                        <strong>
+                                            {{ \Carbon\Carbon::parse($transaction->date)->format('d/m') }}
+                                        </strong>
+
+                                        <small>
+                                            {{ \Carbon\Carbon::parse($transaction->date)->format('H:i') }}
+                                        </small>
+
+                                    </div>
 
                                 </td>
 
 
+
                                 {{-- CUENTA --}}
+
                                 <td>
 
                                     <div class="account-cell">
 
-                                        @if ($transaction->account->logo)
+                                        @if ($transaction->account?->logo)
                                             <img src="{{ Storage::url($transaction->account->logo) }}"
                                                 alt="{{ $transaction->account->name }}">
                                         @else
@@ -163,16 +174,17 @@
 
 
                                         <span>
-
-                                            {{ $transaction->account->name }}
-
+                                            {{ $transaction->account?->name ?? 'Cuenta eliminada' }}
                                         </span>
 
                                     </div>
 
                                 </td>
 
+
+
                                 {{-- BANCO DESTINO --}}
+
                                 <td>
 
                                     @if ($transaction->type === 'expense' && $transaction->destination_bank)
@@ -206,7 +218,9 @@
                                 </td>
 
 
+
                                 {{-- USUARIO --}}
+
                                 <td>
 
                                     <div class="movement-user">
@@ -222,10 +236,24 @@
                                 </td>
 
 
-                                {{-- TIPO --}}
+
+                                {{-- MONEDA --}}
+
                                 <td>
 
-                                    @if (in_array($transaction->type, ['income']))
+                                    <span class="movement-currency">
+                                        {{ $currency }}
+                                    </span>
+
+                                </td>
+
+
+
+                                {{-- TIPO --}}
+
+                                <td>
+
+                                    @if ($transaction->type === 'income')
                                         <span class="movement-income">
 
                                             <i class="bi bi-arrow-up"></i>
@@ -254,27 +282,39 @@
                                 </td>
 
 
+
                                 {{-- DESCRIPCIÓN --}}
+
                                 <td>
 
-                                    {{ $transaction->description ?? 'Sin descripción' }}
+                                    <span class="transaction-description">
+
+                                        {{ $transaction->description ?? 'Sin descripción' }}
+
+                                    </span>
 
                                 </td>
 
 
-                                {{-- MONTO --}}
-                                <td class="text-end">
 
-                                    @if (in_array($transaction->type, ['income']))
+                                {{-- MONTO --}}
+
+                                <td class="text-end amount">
+
+                                    @if ($transaction->type === 'income')
                                         <span class="amount-income">
 
-                                            + ${{ number_format($transaction->amount, 2, ',', '.') }}
+                                            +
+
+                                            {{ number_format($transaction->amount, 2, ',', '.') }}
 
                                         </span>
                                     @else
                                         <span class="amount-expense">
 
-                                            - ${{ number_format($transaction->amount, 2, ',', '.') }}
+                                            -
+
+                                            {{ number_format($transaction->amount, 2, ',', '.') }}
 
                                         </span>
                                     @endif
@@ -282,17 +322,17 @@
                                 </td>
 
 
+
                                 {{-- ACCIONES --}}
+
                                 <td>
 
                                     <div class="table-actions">
 
 
                                         {{-- EJECUTAR TRANSFERENCIA --}}
-                                        @if (
-                                            (auth()->user()->is_admin || auth()->user()->role === 'administration') &&
-                                                $transaction->type === 'expense' &&
-                                                !$transaction->executed_at)
+
+                                        @if ($canExecute && $transaction->type === 'expense' && !$transaction->executed_at)
                                             <button type="button" class="icon-button execute-transaction-button"
                                                 data-transaction-id="{{ $transaction->id }}"
                                                 data-execute-url="{{ route('transactions.execute', $transaction) }}"
@@ -303,17 +343,25 @@
                                             </button>
                                         @endif
 
-                                        {{-- VER DETALLE DE TRANSFERENCIA EJECUTADA --}}
+
+
+                                        {{-- VER TRANSFERENCIA EJECUTADA --}}
+
                                         @if ($transaction->type === 'expense' && $transaction->executed_at)
                                             <button type="button" class="icon-button" data-bs-toggle="modal"
                                                 data-bs-target="#transactionDetailModal{{ $transaction->id }}"
                                                 title="Ver detalle de transferencia">
+
                                                 <i class="bi bi-eye"></i>
+
                                             </button>
                                         @endif
 
+
+
                                         {{-- EDITAR / ELIMINAR --}}
-                                        @if (auth()->user()->is_admin || $transaction->user_id === auth()->id())
+
+                                        @if ($canManage)
                                             <a href="{{ route('transactions.edit', $transaction) }}" class="icon-button"
                                                 title="Editar movimiento">
 
@@ -340,12 +388,13 @@
                                         @endif
 
 
+
+                                        {{-- SIN ACCIONES --}}
+
                                         @if (
-                                            !(
-                                                (auth()->user()->is_admin || auth()->user()->role === 'administration') &&
-                                                $transaction->type === 'expense' &&
-                                                !$transaction->executed_at
-                                            ) && !(auth()->user()->is_admin || $transaction->user_id === auth()->id()))
+                                            !($canExecute && $transaction->type === 'expense' && !$transaction->executed_at) &&
+                                                !($transaction->type === 'expense' && $transaction->executed_at) &&
+                                                !$canManage)
                                             <span class="text-muted">
                                                 —
                                             </span>
@@ -361,10 +410,8 @@
 
                             <tr>
 
-                                <td colspan="8" class="text-center">
-
+                                <td colspan="9" class="text-center">
                                     Sin movimientos en esta jornada
-
                                 </td>
 
                             </tr>
@@ -381,11 +428,18 @@
 
 
         {{-- =========================================================
-    MODALES DE TRANSFERENCIAS EJECUTADAS
-========================================================= --}}
+        MODALES DE TRANSFERENCIAS EJECUTADAS
+    ========================================================== --}}
 
         @foreach ($transactions as $transaction)
             @if ($transaction->type === 'expense' && $transaction->executed_at)
+                @php
+
+                    $currency = $transaction->accountBalance?->currency ?? '---';
+
+                @endphp
+
+
                 <div class="modal fade transaction-detail-modal" id="transactionDetailModal{{ $transaction->id }}"
                     tabindex="-1" aria-hidden="true">
 
@@ -394,17 +448,18 @@
                         <div class="modal-content transaction-detail-content">
 
 
-                            {{-- =====================================================
-                        HEADER
-                    ====================================================== --}}
+                            {{-- HEADER --}}
 
                             <div class="transaction-detail-header">
 
                                 <div class="transaction-detail-title">
 
                                     <div class="transaction-detail-icon">
+
                                         <i class="bi bi-check2-circle"></i>
+
                                     </div>
+
 
                                     <div>
 
@@ -413,7 +468,11 @@
                                         </span>
 
                                         <h3>
-                                            ${{ number_format($transaction->amount, 2, ',', '.') }}
+
+                                            {{ $currency }}
+
+                                            {{ number_format($transaction->amount, 2, ',', '.') }}
+
                                         </h3>
 
                                     </div>
@@ -423,19 +482,21 @@
 
                                 <button type="button" class="transaction-modal-close" data-bs-dismiss="modal"
                                     aria-label="Cerrar">
+
                                     <i class="bi bi-x-lg"></i>
+
                                 </button>
 
                             </div>
 
 
-                            {{-- =====================================================
-                        ESTADO
-                    ====================================================== --}}
+
+                            {{-- ESTADO --}}
 
                             <div class="transaction-detail-status">
 
                                 <i class="bi bi-check-circle-fill"></i>
+
 
                                 <div>
 
@@ -444,8 +505,11 @@
                                     </strong>
 
                                     <span>
+
                                         Ejecutada el
+
                                         {{ $transaction->executed_at->format('d/m/Y H:i') }}
+
                                     </span>
 
                                 </div>
@@ -453,9 +517,8 @@
                             </div>
 
 
-                            {{-- =====================================================
-                        ORIGEN / DESTINO
-                    ====================================================== --}}
+
+                            {{-- TRANSFERENCIA --}}
 
                             <div class="transaction-detail-section">
 
@@ -475,6 +538,7 @@
                                             ORIGEN
                                         </span>
 
+
                                         <div class="transaction-bank-info">
 
                                             @if ($transaction->account?->logo)
@@ -482,7 +546,9 @@
                                                     alt="{{ $transaction->account->name }}">
                                             @else
                                                 <div class="transaction-bank-placeholder">
+
                                                     <i class="bi bi-bank"></i>
+
                                                 </div>
                                             @endif
 
@@ -494,7 +560,7 @@
                                                 </strong>
 
                                                 <span>
-                                                    Cuenta de origen
+                                                    Cuenta de origen · {{ $currency }}
                                                 </span>
 
                                             </div>
@@ -502,6 +568,7 @@
                                         </div>
 
                                     </div>
+
 
 
                                     {{-- FLECHA --}}
@@ -513,6 +580,7 @@
                                     </div>
 
 
+
                                     {{-- DESTINO --}}
 
                                     <div class="transaction-bank">
@@ -521,11 +589,15 @@
                                             DESTINO
                                         </span>
 
+
                                         <div class="transaction-bank-info">
 
                                             <div class="transaction-bank-placeholder">
+
                                                 <i class="bi bi-bank"></i>
+
                                             </div>
+
 
                                             <div>
 
@@ -543,15 +615,13 @@
 
                                     </div>
 
-
                                 </div>
 
                             </div>
 
 
-                            {{-- =====================================================
-                        DETALLE DEL MOVIMIENTO
-                    ====================================================== --}}
+
+                            {{-- DETALLE --}}
 
                             <div class="transaction-detail-section">
 
@@ -562,8 +632,6 @@
 
                                 <div class="transaction-detail-grid transaction-detail-grid-compact">
 
-
-                                    {{-- FECHA Y HORA --}}
 
                                     <div class="transaction-detail-item">
 
@@ -578,7 +646,18 @@
                                     </div>
 
 
-                                    {{-- TIPO --}}
+                                    <div class="transaction-detail-item">
+
+                                        <span>
+                                            Moneda
+                                        </span>
+
+                                        <strong>
+                                            {{ $currency }}
+                                        </strong>
+
+                                    </div>
+
 
                                     <div class="transaction-detail-item">
 
@@ -593,8 +672,6 @@
                                     </div>
 
 
-                                    {{-- CONCEPTO --}}
-
                                     <div class="transaction-detail-item transaction-detail-concept">
 
                                         <span>
@@ -607,15 +684,13 @@
 
                                     </div>
 
-
                                 </div>
 
                             </div>
 
 
-                            {{-- =====================================================
-                        EJECUCIÓN
-                    ====================================================== --}}
+
+                            {{-- EJECUCIÓN --}}
 
                             <div class="transaction-detail-section transaction-execution-section">
 
@@ -627,6 +702,7 @@
                                 <div class="transaction-execution-info">
 
                                     <i class="bi bi-check-circle-fill"></i>
+
 
                                     <div>
 
@@ -645,9 +721,8 @@
                             </div>
 
 
-                            {{-- =====================================================
-                        FOOTER
-                    ====================================================== --}}
+
+                            {{-- FOOTER --}}
 
                             <div class="transaction-detail-footer">
 
@@ -665,5 +740,7 @@
                 </div>
             @endif
         @endforeach
+
+
     </div>
 @endsection

@@ -1,19 +1,55 @@
-import { playRealtimeSound } from './realtime-sound';
-
 document.addEventListener('DOMContentLoaded', () => {
 
-    // Solo ejecutar en el dashboard
-    if (!document.querySelector('.dashboard')) {
+    /*
+    |--------------------------------------------------------------------------
+    | Dashboard
+    |--------------------------------------------------------------------------
+    */
+
+    const dashboard =
+        document.querySelector('.dashboard');
+
+
+    /*
+     * Solo ejecutar en el dashboard.
+     */
+
+    if (!dashboard) {
         return;
     }
 
-    console.log('Dashboard JS cargado');
 
     /*
-   |--------------------------------------------------------------------------
-   | Resincronización al volver a la pestaña
-   |--------------------------------------------------------------------------
-   */
+    |--------------------------------------------------------------------------
+    | Empresa activa
+    |--------------------------------------------------------------------------
+    */
+
+    const companyId =
+        document.body.dataset.companyId;
+
+
+    if (!companyId) {
+
+        console.error(
+            'No se encontró la empresa activa en el dashboard'
+        );
+
+        return;
+    }
+
+
+    console.log(
+        'Dashboard JS cargado para empresa:',
+        companyId
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Resincronización al volver a la pestaña
+    |--------------------------------------------------------------------------
+    */
 
     document.addEventListener(
         'visibilitychange',
@@ -50,264 +86,597 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     );
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | Laravel Echo
+    |--------------------------------------------------------------------------
+    */
+
     if (!window.Echo) {
-        console.error('Laravel Echo no está disponible');
+
+        console.error(
+            'Laravel Echo no está disponible'
+        );
+
         return;
     }
 
-    console.log('Laravel Echo disponible');
-    console.log('Conectando al canal dashboard...');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Canal por empresa
+    |--------------------------------------------------------------------------
+    */
+
+    const channelName =
+        `dashboard.${companyId}`;
+
+
+    console.log(
+        'Laravel Echo disponible'
+    );
+
+    console.log(
+        'Conectando al canal:',
+        channelName
+    );
 
 
     window.Echo
-        .channel('dashboard')
-        .listen('.transaction.created', (event) => {
+        .private(channelName)
+        .listen(
+            '.transaction.created',
+            (event) => {
 
-            console.log('NUEVO MOVIMIENTO RECIBIDO:', event);
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | Datos
-            |--------------------------------------------------------------------------
-            */
-
-            const accountId = event.account?.id;
-
-            if (!accountId) {
-                console.error('El evento no contiene account.id');
-                return;
-            }
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | CARD DEL BANCO
-            |--------------------------------------------------------------------------
-            */
-
-            const card = document.querySelector(
-                `.bank-card[data-account-id="${accountId}"]`
-            );
-
-
-            if (card) {
-
-                const balanceElement = card.querySelector(
-                    '[data-balance]'
+                console.log(
+                    'NUEVO MOVIMIENTO RECIBIDO:',
+                    event
                 );
 
-                if (balanceElement) {
 
-                    balanceElement.textContent =
-                        '$' + formatMoney(event.balance);
+                /*
+                |--------------------------------------------------------------------------
+                | Seguridad adicional
+                |--------------------------------------------------------------------------
+                */
 
+                if (
+                    String(event.companyId)
+                    !==
+                    String(companyId)
+                ) {
+
+                    console.error(
+                        'Evento descartado: pertenece a otra empresa'
+                    );
+
+                    return;
                 }
 
 
-                const incomeElement = card.querySelector(
-                    '[data-income]'
-                );
+                /*
+                |--------------------------------------------------------------------------
+                | Identificar cuenta / moneda
+                |--------------------------------------------------------------------------
+                */
 
-                if (incomeElement) {
+                const accountId =
+                    event.account?.id;
 
-                    incomeElement.innerHTML = `
-                    <i class="bi bi-arrow-up"></i>
-                    $${formatMoney(event.income)}
-                `;
 
+                const accountBalanceId =
+                    event.accountBalance?.id
+                    ??
+                    event.account_balance_id
+                    ??
+                    event.transaction?.account_balance_id;
+
+
+                const currency =
+                    event.accountBalance?.currency
+                    ??
+                    event.currency
+                    ??
+                    event.transaction?.currency
+                    ??
+                    '';
+
+
+                if (!accountId) {
+
+                    console.error(
+                        'El evento no contiene account.id'
+                    );
+
+                    return;
                 }
 
 
-                const expenseElement = card.querySelector(
-                    '[data-expense]'
-                );
+                /*
+                |--------------------------------------------------------------------------
+                | Card del banco
+                |--------------------------------------------------------------------------
+                */
 
-                if (expenseElement) {
-
-                    expenseElement.innerHTML = `
-                    <i class="bi bi-arrow-down"></i>
-                    $${formatMoney(event.expense)}
-                `;
-
-                }
-
-                const reserveElement = card.querySelector(
-                    '[data-reserve]'
-                );
-
-                if (reserveElement) {
-
-                    reserveElement.innerHTML = `
-                        <i class="bi bi-lock"></i>
-                        $${formatMoney(event.reserve)}
-                    `;
-
-                }
+                const card =
+                    document.querySelector(
+                        `.bank-card[data-account-id="${accountId}"]`
+                    );
 
 
-                const movementsElement = card.querySelector(
-                    '[data-movements]'
-                );
+                if (card && accountBalanceId) {
 
-                if (movementsElement) {
+                    /*
+                     * Buscamos específicamente el bloque
+                     * correspondiente a la moneda afectada.
+                     */
 
-                    movementsElement.innerHTML = `
-                    <i class="bi bi-arrow-left-right"></i>
-                    ${event.movements}
-                `;
+                    const currencyBlock =
+                        card.querySelector(
+                            `[data-account-balance-id="${accountBalanceId}"]`
+                        );
+
+
+                    if (currencyBlock) {
+
+
+                        /*
+                        |--------------------------------------------------------------------------
+                        | Saldo actual
+                        |--------------------------------------------------------------------------
+                        */
+
+                        const balanceElement =
+                            currencyBlock.querySelector(
+                                '[data-balance]'
+                            );
+
+
+                        if (
+                            balanceElement
+                            &&
+                            event.balance !== undefined
+                        ) {
+
+                            balanceElement.textContent =
+                                formatCurrencyAmount(
+                                    currency,
+                                    event.balance
+                                );
+
+                        }
+
+
+                        /*
+                        |--------------------------------------------------------------------------
+                        | Ingresos
+                        |--------------------------------------------------------------------------
+                        */
+
+                        const incomeElement =
+                            currencyBlock.querySelector(
+                                '[data-income]'
+                            );
+
+
+                        if (
+                            incomeElement
+                            &&
+                            event.income !== undefined
+                        ) {
+
+                            incomeElement.innerHTML = `
+                                <i class="bi bi-arrow-up"></i>
+                                ${formatMoney(event.income)}
+                            `;
+
+                        }
+
+
+                        /*
+                        |--------------------------------------------------------------------------
+                        | Egresos
+                        |--------------------------------------------------------------------------
+                        */
+
+                        const expenseElement =
+                            currencyBlock.querySelector(
+                                '[data-expense]'
+                            );
+
+
+                        if (
+                            expenseElement
+                            &&
+                            event.expense !== undefined
+                        ) {
+
+                            expenseElement.innerHTML = `
+                                <i class="bi bi-arrow-down"></i>
+                                ${formatMoney(event.expense)}
+                            `;
+
+                        }
+
+
+                        /*
+                        |--------------------------------------------------------------------------
+                        | Reservas
+                        |--------------------------------------------------------------------------
+                        */
+
+                        const reserveElement =
+                            currencyBlock.querySelector(
+                                '[data-reserve]'
+                            );
+
+
+                        if (
+                            reserveElement
+                            &&
+                            event.reserve !== undefined
+                        ) {
+
+                            reserveElement.innerHTML = `
+                                <i class="bi bi-lock"></i>
+                                ${formatMoney(event.reserve)}
+                            `;
+
+                        }
+
+
+                        /*
+                        |--------------------------------------------------------------------------
+                        | Cantidad de movimientos
+                        |--------------------------------------------------------------------------
+                        */
+
+                        const movementsElement =
+                            currencyBlock.querySelector(
+                                '[data-movements]'
+                            );
+
+
+                        if (
+                            movementsElement
+                            &&
+                            event.movements !== undefined
+                        ) {
+
+                            movementsElement.innerHTML = `
+                                <i class="bi bi-arrow-left-right"></i>
+                                ${event.movements}
+                            `;
+
+                        }
+
+
+                        /*
+                        |--------------------------------------------------------------------------
+                        | Animación
+                        |--------------------------------------------------------------------------
+                        */
+
+                        currencyBlock.classList.add(
+                            'balance-updated'
+                        );
+
+
+                        setTimeout(() => {
+
+                            currencyBlock.classList.remove(
+                                'balance-updated'
+                            );
+
+                        }, 700);
+
+                    }
 
                 }
 
 
                 /*
                 |--------------------------------------------------------------------------
-                | Animación
+                | Header
+                |--------------------------------------------------------------------------
+                |
+                | Si el evento ya trae los totales agrupados
+                | por moneda los mostramos.
+                |
+                | Si todavía el evento viejo manda números,
+                | no rompemos la interfaz: syncDashboard()
+                | recuperará el estado real desde la BD.
                 |--------------------------------------------------------------------------
                 */
 
-                card.classList.add('balance-updated');
+                if (
+                    event.balanceTotal
+                    &&
+                    typeof event.balanceTotal === 'object'
+                ) {
 
-                setTimeout(() => {
-
-                    card.classList.remove(
-                        'balance-updated'
+                    updateCurrencyTotal(
+                        '[data-header-balance]',
+                        event.balanceTotal
                     );
 
-                }, 700);
-
-            }
+                }
 
 
-            /*
-            |--------------------------------------------------------------------------
-            | HEADER
-            |--------------------------------------------------------------------------
-            */
+                if (
+                    event.dayIncome
+                    &&
+                    typeof event.dayIncome === 'object'
+                ) {
 
-            const headerBalance = document.querySelector(
-                '[data-header-balance]'
-            );
+                    updateCurrencyTotal(
+                        '[data-header-income]',
+                        event.dayIncome,
+                        '+ '
+                    );
 
-            if (headerBalance) {
-
-                headerBalance.textContent =
-                    '$' + formatMoney(event.balanceTotal);
-
-            }
+                }
 
 
-            const headerIncome = document.querySelector(
-                '[data-header-income]'
-            );
+                if (
+                    event.dayExpense
+                    &&
+                    typeof event.dayExpense === 'object'
+                ) {
 
-            if (headerIncome) {
+                    updateCurrencyTotal(
+                        '[data-header-expense]',
+                        event.dayExpense,
+                        '- '
+                    );
 
-                headerIncome.textContent =
-                    '+ $' + formatMoney(event.dayIncome);
-
-            }
+                }
 
 
-            const headerExpense = document.querySelector(
-                '[data-header-expense]'
-            );
+                /*
+                |--------------------------------------------------------------------------
+                | Último movimiento
+                |--------------------------------------------------------------------------
+                */
 
-            if (headerExpense) {
+                const lastUpdate =
+                    document.querySelector(
+                        '#last-update'
+                    );
 
-                headerExpense.textContent =
-                    '- $' + formatMoney(event.dayExpense);
 
-            }
+                if (
+                    lastUpdate
+                    &&
+                    event.transaction
+                ) {
 
-            /*
-            |--------------------------------------------------------------------------
-            | Último movimiento
-            |--------------------------------------------------------------------------
-            */
+                    const date =
+                        new Date(
+                            event.transaction.date
+                        );
 
-            const lastUpdate = document.querySelector(
-                '#last-update'
-            );
 
-            if (lastUpdate && event.transaction) {
+                    const hours =
+                        String(
+                            date.getHours()
+                        ).padStart(
+                            2,
+                            '0'
+                        );
 
-                const date = new Date(
-                    event.transaction.date
+
+                    const minutes =
+                        String(
+                            date.getMinutes()
+                        ).padStart(
+                            2,
+                            '0'
+                        );
+
+
+                    let dayText = '';
+
+
+                    if (event.dayDate) {
+
+                        const dayDate =
+                            new Date(
+                                event.dayDate
+                            );
+
+
+                        const day =
+                            String(
+                                dayDate.getDate()
+                            ).padStart(
+                                2,
+                                '0'
+                            );
+
+
+                        const month =
+                            String(
+                                dayDate.getMonth() + 1
+                            ).padStart(
+                                2,
+                                '0'
+                            );
+
+
+                        const year =
+                            dayDate.getFullYear();
+
+
+                        dayText =
+                            `${day}/${month}/${year}`;
+
+                    }
+
+
+                    lastUpdate.innerHTML = `
+                        ${dayText
+                            ? `Jornada abierta: ${dayText} · `
+                            : ''
+                        }
+                        Último movimiento:
+                        ${hours}:${minutes}
+                        ·
+                        ${escapeHtml(
+                            event.transaction.description || ''
+                        )}
+                        ·
+                        ${escapeHtml(
+                            event.account?.name || ''
+                        )}
+                        ${currency
+                            ? ` · ${escapeHtml(currency)}`
+                            : ''
+                        }
+                    `;
+
+                }
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | Tabla de movimientos
+                |--------------------------------------------------------------------------
+                */
+
+                addMovementToTable(
+                    normalizeRealtimeEvent(
+                        event
+                    )
                 );
 
-                const hours = String(
-                    date.getHours()
-                ).padStart(2, '0');
 
-                const minutes = String(
-                    date.getMinutes()
-                ).padStart(2, '0');
+                playRealtimeSound();
 
-                const dayDate = new Date(
-                    event.dayDate
-                );
 
-                const day = String(
-                    dayDate.getDate()
-                ).padStart(2, '0');
+                /*
+                |--------------------------------------------------------------------------
+                | Resincronización
+                |--------------------------------------------------------------------------
+                |
+                | El evento puede todavía estar usando el payload
+                | anterior. La BD es la fuente definitiva.
+                |
+                | Sincronizamos después del evento para actualizar
+                | cards y totales con la estructura multimoneda.
+                |--------------------------------------------------------------------------
+                */
 
-                const month = String(
-                    dayDate.getMonth() + 1
-                ).padStart(2, '0');
-
-                const year =
-                    dayDate.getFullYear();
-
-                lastUpdate.innerHTML = `
-                    Jornada abierta:
-                    ${day}/${month}/${year}
-                    · Último movimiento:
-                    ${hours}:${minutes}
-                    ·
-                    ${escapeHtml(event.transaction.description || '')}
-                    ·
-                    ${escapeHtml(event.account.name)}
-                `;
+                syncDashboard();
 
             }
-
-            /*
-            |--------------------------------------------------------------------------
-            | TABLA DE MOVIMIENTOS
-            |--------------------------------------------------------------------------
-            */
-
-            addMovementToTable(event);
-            playRealtimeSound();
-
-        });
-
-
-
+        );
 
 });
 
+
 /*
-Agregar movimiento a la tabla
---------------------------------------------------------------------------
+|--------------------------------------------------------------------------
+| Normalizar evento realtime
+|--------------------------------------------------------------------------
 */
 
-function addMovementToTable(
-    event,
-    animate = true
-) {
+function normalizeRealtimeEvent(event) {
 
-    const tbody = document.querySelector(
-        '#movements-body'
-    );
+    const currency =
+        event.accountBalance?.currency
+        ??
+        event.currency
+        ??
+        event.transaction?.currency
+        ??
+        '';
+
+
+    const accountBalanceId =
+        event.accountBalance?.id
+        ??
+        event.account_balance_id
+        ??
+        event.transaction?.account_balance_id
+        ??
+        null;
+
+
+    return {
+
+        transaction: {
+
+            ...event.transaction,
+
+            account_balance_id:
+                accountBalanceId,
+
+            currency:
+                currency,
+
+            user:
+                event.transaction?.user
+                ??
+                event.user
+                ??
+                null,
+
+        },
+
+        account:
+            event.account
+            ??
+            null,
+
+        account_balance: {
+
+            id:
+                accountBalanceId,
+
+            currency:
+                currency,
+
+        },
+
+        currency:
+            currency,
+
+        initialBalance:
+            event.initialBalance
+            ??
+            event.transaction?.initial_balance
+            ??
+            0,
+
+    };
+
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Agregar movimiento a la tabla
+|--------------------------------------------------------------------------
+*/
+
+function addMovementToTable(event, animate = true)
+{
+
+    const tbody =
+        document.querySelector(
+            '#movements-body'
+        );
+
 
     if (!tbody) {
         return;
     }
 
 
-    const movement = event.transaction;
+    const movement =
+        event.transaction;
 
 
     if (!movement) {
@@ -323,11 +692,56 @@ function addMovementToTable(
 
     if (
         tbody.querySelector(
-            `tr[data-movement-id="${movement.id}"]`
+            `tr[data-transaction-id="${movement.id}"]`
         )
     ) {
+
         return;
+
     }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Eliminar fila "Sin movimientos"
+    |--------------------------------------------------------------------------
+    */
+
+    const emptyRow =
+        tbody.querySelector(
+            'tr[data-empty-row]'
+        );
+
+
+    if (emptyRow) {
+
+        emptyRow.remove();
+
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Moneda
+    |--------------------------------------------------------------------------
+    */
+
+    const currency =
+        movement.currency
+        ??
+        event.account_balance?.currency
+        ??
+        event.currency
+        ??
+        '---';
+
+
+    const accountBalanceId =
+        movement.account_balance_id
+        ??
+        event.account_balance?.id
+        ??
+        '';
 
 
     /*
@@ -336,27 +750,46 @@ function addMovementToTable(
     |--------------------------------------------------------------------------
     */
 
-    const date = new Date(movement.date);
+    const date =
+        new Date(
+            movement.date
+        );
 
 
-    const day = String(
-        date.getDate()
-    ).padStart(2, '0');
+    const day =
+        String(
+            date.getDate()
+        ).padStart(
+            2,
+            '0'
+        );
 
 
-    const month = String(
-        date.getMonth() + 1
-    ).padStart(2, '0');
+    const month =
+        String(
+            date.getMonth() + 1
+        ).padStart(
+            2,
+            '0'
+        );
 
 
-    const hours = String(
-        date.getHours()
-    ).padStart(2, '0');
+    const hours =
+        String(
+            date.getHours()
+        ).padStart(
+            2,
+            '0'
+        );
 
 
-    const minutes = String(
-        date.getMinutes()
-    ).padStart(2, '0');
+    const minutes =
+        String(
+            date.getMinutes()
+        ).padStart(
+            2,
+            '0'
+        );
 
 
     const dateText =
@@ -373,11 +806,9 @@ function addMovementToTable(
     |--------------------------------------------------------------------------
     */
 
-    const isIncome = [
-        'income'
-    ].includes(
-        movement.type
-    );
+    const isIncome =
+        movement.type === 'income';
+
 
     const isReserve =
         movement.type === 'reserve';
@@ -389,29 +820,29 @@ function addMovementToTable(
     if (isIncome) {
 
         typeHtml = `
-        <span class="tag income-tag">
-            <i class="bi bi-arrow-up"></i>
-            Ingreso
-        </span>
-    `;
+            <span class="tag income-tag">
+                <i class="bi bi-arrow-up"></i>
+                Ingreso
+            </span>
+        `;
 
     } else if (isReserve) {
 
         typeHtml = `
-        <span class="tag reserve-tag">
-            <i class="bi bi-lock"></i>
-            Reserva
-        </span>
-    `;
+            <span class="tag reserve-tag">
+                <i class="bi bi-lock"></i>
+                Reserva
+            </span>
+        `;
 
     } else {
 
         typeHtml = `
-        <span class="tag expense-tag">
-            <i class="bi bi-arrow-down"></i>
-            Egreso
-        </span>
-    `;
+            <span class="tag expense-tag">
+                <i class="bi bi-arrow-down"></i>
+                Egreso
+            </span>
+        `;
 
     }
 
@@ -422,121 +853,151 @@ function addMovementToTable(
     |--------------------------------------------------------------------------
     */
 
-    const row = document.createElement('tr');
+    const row =
+        document.createElement(
+            'tr'
+        );
 
 
-    row.dataset.movementId =
+    row.dataset.transactionId =
         movement.id;
+
+
+    if (accountBalanceId) {
+
+        row.dataset.accountBalanceId =
+            accountBalanceId;
+
+    }
 
 
     row.innerHTML = `
 
-    <td>
+        <td>
 
-        <div class="movement-date">
+            <div class="movement-date">
+
+                <strong>
+                    ${dateText}
+                </strong>
+
+                <small>
+                    ${timeText}
+                </small>
+
+            </div>
+
+        </td>
+
+
+        <td>
+
+            <div class="movement-user">
+
+                <i class="bi bi-person-circle"></i>
+
+                <span>
+                    ${escapeHtml(
+                        movement.user?.name
+                        ||
+                        'Sin registro'
+                    )}
+                </span>
+
+            </div>
+
+        </td>
+
+
+        <td>
 
             <strong>
-                ${dateText}
+                ${escapeHtml(
+                    movement.description
+                    ||
+                    'Sin descripción'
+                )}
             </strong>
 
-            <small>
-                ${timeText}
-            </small>
-
-        </div>
-
-    </td>
+        </td>
 
 
-    <td>
+        <td>
 
-        <div class="movement-user">
+            ${escapeHtml(
+                event.account?.name
+                ||
+                ''
+            )}
 
-            <i class="bi bi-person-circle"></i>
+        </td>
 
-            <span>
-                ${escapeHtml(
-        movement.user?.name || 'Sin registro'
-    )}
+
+        <td>
+
+            <span class="movement-currency">
+                ${escapeHtml(currency)}
             </span>
 
-        </div>
-
-    </td>
+        </td>
 
 
-    <td>
+        <td>
 
-        <strong>
-            ${escapeHtml(
-        movement.description || 'Sin descripción'
-    )}
-        </strong>
+            ${typeHtml}
 
-    </td>
+        </td>
 
 
-    <td>
+        <td class="amount">
 
-        ${escapeHtml(
-        event.account.name
-    )}
+            ${
+                isIncome
+                    ? `
+                        <span class="amount-income">
+                            +
+                            ${formatMoney(
+                                movement.amount
+                            )}
+                        </span>
+                    `
+                    : `
+                        <span class="amount-expense">
+                            -
+                            ${formatMoney(
+                                movement.amount
+                            )}
+                        </span>
+                    `
+            }
 
-    </td>
-
-
-    <td>
-
-        ${typeHtml}
-
-    </td>
-
-
-   <td class="amount">
-
-    ${isIncome
-            ? `
-                <span class="amount-income">
-                    +
-                    $${formatMoney(
-                movement.amount
-            )}
-                </span>
-            `
-            : `
-                <span class="amount-expense">
-                    -
-                    $${formatMoney(
-                movement.amount
-            )}
-                </span>
-            `
-        }
-
-</td>
+        </td>
 
 
-    <td>
+        <td>
 
-        ${formatMoney(event.initialBalance) === '0,00'
-            ? ''
-            : '$' + formatMoney(
+            ${formatMoney(
                 event.initialBalance
-            )
-        }
+                ??
+                movement.initial_balance
+                ??
+                0
+            )}
 
-    </td>
+        </td>
 
 
-    <td>
+        <td>
 
-        $${formatMoney(
-            movement.balance_after
-        )}
+            ${formatMoney(
+                movement.balance_after
+                ??
+                0
+            )}
 
-    </td>
+        </td>
 
-`;
+    `;
 
 
     /*
@@ -545,7 +1006,9 @@ function addMovementToTable(
     |--------------------------------------------------------------------------
     */
 
-    tbody.prepend(row);
+    tbody.prepend(
+        row
+    );
 
 
     /*
@@ -582,29 +1045,47 @@ function addMovementToTable(
 
 async function syncDashboard() {
 
-    if (!document.querySelector('.dashboard')) {
+    if (
+        !document.querySelector(
+            '.dashboard'
+        )
+    ) {
+
         return;
+
     }
 
 
-    console.log('Sincronizando dashboard...');
+    console.log(
+        'Sincronizando dashboard...'
+    );
 
 
     try {
 
-        const response = await fetch(
-            '/dashboard/sync',
-            {
-                method: 'GET',
+        const response =
+            await fetch(
+                '/dashboard/sync',
+                {
+                    method: 'GET',
 
-                headers: {
-                    'Accept': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
+                    headers: {
 
-                cache: 'no-store'
-            }
-        );
+                        'Accept':
+                            'application/json',
+
+                        'X-Requested-With':
+                            'XMLHttpRequest'
+
+                    },
+
+                    cache:
+                        'no-store',
+
+                    credentials:
+                        'same-origin'
+                }
+            );
 
 
         if (!response.ok) {
@@ -616,7 +1097,8 @@ async function syncDashboard() {
         }
 
 
-        const data = await response.json();
+        const data =
+            await response.json();
 
 
         /*
@@ -630,158 +1112,251 @@ async function syncDashboard() {
             window.location.reload();
 
             return;
-        }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | HEADER
-        |--------------------------------------------------------------------------
-        */
-
-        const headerBalance =
-            document.querySelector(
-                '[data-header-balance]'
-            );
-
-        if (headerBalance) {
-
-            headerBalance.textContent =
-                '$' + formatMoney(
-                    data.balance_total
-                );
-
-        }
-
-
-        const headerIncome =
-            document.querySelector(
-                '[data-header-income]'
-            );
-
-        if (headerIncome) {
-
-            headerIncome.textContent =
-                '+ $' + formatMoney(
-                    data.day_income
-                );
-
-        }
-
-
-        const headerExpense =
-            document.querySelector(
-                '[data-header-expense]'
-            );
-
-        if (headerExpense) {
-
-            headerExpense.textContent =
-                '- $' + formatMoney(
-                    data.day_expense
-                );
 
         }
 
 
         /*
         |--------------------------------------------------------------------------
-        | CARDS
+        | Header
         |--------------------------------------------------------------------------
         */
 
-        data.accounts.forEach(account => {
-
-            const card =
-                document.querySelector(
-                    `.bank-card[data-account-id="${account.id}"]`
-                );
+        updateCurrencyTotal(
+            '[data-header-balance]',
+            data.balance_total
+        );
 
 
-            if (!card) {
-                return;
-            }
+        updateCurrencyTotal(
+            '[data-header-income]',
+            data.day_income,
+            '+ '
+        );
 
 
-            const balanceElement =
-                card.querySelector(
-                    '[data-balance]'
-                );
+        updateCurrencyTotal(
+            '[data-header-expense]',
+            data.day_expense,
+            '- '
+        );
 
-            if (balanceElement) {
 
-                balanceElement.textContent =
-                    '$' + formatMoney(
-                        account.balance
+        /*
+        |--------------------------------------------------------------------------
+        | Cards
+        |--------------------------------------------------------------------------
+        */
+
+        if (
+            Array.isArray(
+                data.accounts
+            )
+        ) {
+
+            data.accounts.forEach(
+                account => {
+
+                    const card =
+                        document.querySelector(
+                            `.bank-card[data-account-id="${account.id}"]`
+                        );
+
+
+                    if (!card) {
+
+                        return;
+
+                    }
+
+
+                    if (
+                        !Array.isArray(
+                            account.balances
+                        )
+                    ) {
+
+                        return;
+
+                    }
+
+
+                    account.balances.forEach(
+                        balance => {
+
+                            /*
+                             * Buscamos exactamente el saldo
+                             * correspondiente a esa moneda.
+                             */
+
+                            const currencyBlock =
+                                card.querySelector(
+                                    `[data-account-balance-id="${balance.account_balance_id}"]`
+                                );
+
+
+                            if (!currencyBlock) {
+
+                                return;
+
+                            }
+
+
+                            /*
+                            |--------------------------------------------------------------------------
+                            | Saldo
+                            |--------------------------------------------------------------------------
+                            */
+
+                            const balanceElement =
+                                currencyBlock.querySelector(
+                                    '[data-balance]'
+                                );
+
+
+                            if (balanceElement) {
+
+                                balanceElement.textContent =
+                                    formatCurrencyAmount(
+                                        balance.currency,
+                                        balance.balance
+                                    );
+
+                            }
+
+
+                            /*
+                            |--------------------------------------------------------------------------
+                            | Saldo inicial
+                            |--------------------------------------------------------------------------
+                            */
+
+                            const initialBalanceElement =
+                                currencyBlock.querySelector(
+                                    '[data-initial-balance]'
+                                );
+
+
+                            if (
+                                initialBalanceElement
+                            ) {
+
+                                initialBalanceElement.textContent =
+                                    formatCurrencyAmount(
+                                        balance.currency,
+                                        balance.initial_balance
+                                    );
+
+                            }
+
+
+                            /*
+                            |--------------------------------------------------------------------------
+                            | Ingresos
+                            |--------------------------------------------------------------------------
+                            */
+
+                            const incomeElement =
+                                currencyBlock.querySelector(
+                                    '[data-income]'
+                                );
+
+
+                            if (incomeElement) {
+
+                                incomeElement.innerHTML = `
+                                    <i class="bi bi-arrow-up"></i>
+                                    ${formatMoney(
+                                        balance.income
+                                    )}
+                                `;
+
+                            }
+
+
+                            /*
+                            |--------------------------------------------------------------------------
+                            | Egresos
+                            |--------------------------------------------------------------------------
+                            */
+
+                            const expenseElement =
+                                currencyBlock.querySelector(
+                                    '[data-expense]'
+                                );
+
+
+                            if (expenseElement) {
+
+                                expenseElement.innerHTML = `
+                                    <i class="bi bi-arrow-down"></i>
+                                    ${formatMoney(
+                                        balance.expense
+                                    )}
+                                `;
+
+                            }
+
+
+                            /*
+                            |--------------------------------------------------------------------------
+                            | Reservas
+                            |--------------------------------------------------------------------------
+                            */
+
+                            const reserveElement =
+                                currencyBlock.querySelector(
+                                    '[data-reserve]'
+                                );
+
+
+                            if (reserveElement) {
+
+                                reserveElement.innerHTML = `
+                                    <i class="bi bi-lock"></i>
+                                    ${formatMoney(
+                                        balance.reserve
+                                    )}
+                                `;
+
+                            }
+
+
+                            /*
+                            |--------------------------------------------------------------------------
+                            | Movimientos
+                            |--------------------------------------------------------------------------
+                            */
+
+                            const movementsElement =
+                                currencyBlock.querySelector(
+                                    '[data-movements]'
+                                );
+
+
+                            if (
+                                movementsElement
+                            ) {
+
+                                movementsElement.innerHTML = `
+                                    <i class="bi bi-arrow-left-right"></i>
+                                    ${balance.movements ?? 0}
+                                `;
+
+                            }
+
+                        }
                     );
 
-            }
+                }
+            );
 
-
-            const incomeElement =
-                card.querySelector(
-                    '[data-income]'
-                );
-
-            if (incomeElement) {
-
-                incomeElement.innerHTML = `
-                    <i class="bi bi-arrow-up"></i>
-                    $${formatMoney(account.income)}
-                `;
-
-            }
-
-
-            const expenseElement =
-                card.querySelector(
-                    '[data-expense]'
-                );
-
-            if (expenseElement) {
-
-                expenseElement.innerHTML = `
-                    <i class="bi bi-arrow-down"></i>
-                    $${formatMoney(account.expense)}
-                `;
-
-
-            }
-
-            const reserveElement =
-                card.querySelector(
-                    '[data-reserve]'
-                );
-
-            if (reserveElement) {
-
-                reserveElement.innerHTML = `
-                    <i class="bi bi-lock"></i>
-                    $${formatMoney(account.reserve)}
-                `;
-
-            }
-
-            const movementsElement =
-                card.querySelector(
-                    '[data-movements]'
-                );
-
-            if (movementsElement) {
-
-                movementsElement.innerHTML = `
-                    <i class="bi bi-arrow-left-right"></i>
-                    ${account.movements}
-                `;
-
-            }
-
-        });
+        }
 
 
         /*
         |--------------------------------------------------------------------------
-        | TABLA
+        | Tabla
         |--------------------------------------------------------------------------
         */
 
@@ -794,49 +1369,127 @@ async function syncDashboard() {
         if (tbody) {
 
             /*
-             * Limpiamos la tabla porque ahora
-             * la verdad viene nuevamente de la BD.
+             * La verdad viene nuevamente de la BD.
              */
 
             tbody.innerHTML = '';
 
 
-            /*
-             * addMovementToTable usa prepend().
-             *
-             * Recorremos al revés para que finalmente
-             * el movimiento más nuevo quede arriba.
-             */
+            if (
+                Array.isArray(
+                    data.movements
+                )
+                &&
+                data.movements.length
+            ) {
 
-            [...data.movements]
-                .reverse()
-                .forEach(movement => {
+                /*
+                 * addMovementToTable usa prepend().
+                 *
+                 * Recorremos al revés para que el
+                 * movimiento más nuevo quede arriba.
+                 */
 
-                    addMovementToTable(
-                        {
-                            transaction: {
-                                id: movement.id,
-                                type: movement.type,
-                                amount: movement.amount,
-                                description: movement.description,
-                                date: movement.date,
-                                balance_after:
-                                    movement.balance_after,
+                [...data.movements]
+                    .reverse()
+                    .forEach(
+                        movement => {
 
-                                user: movement.user
-                            },
+                            addMovementToTable(
+                                {
 
-                            account:
-                                movement.account,
+                                    transaction: {
 
-                            initialBalance:
-                                movement.initial_balance
+                                        id:
+                                            movement.id,
 
-                        },
-                        false
+                                        account_balance_id:
+                                            movement.account_balance_id,
+
+                                        currency:
+                                            movement.currency
+                                            ??
+                                            movement.account_balance?.currency
+                                            ??
+                                            '',
+
+                                        type:
+                                            movement.type,
+
+                                        amount:
+                                            movement.amount,
+
+                                        description:
+                                            movement.description,
+
+                                        date:
+                                            movement.date,
+
+                                        initial_balance:
+                                            movement.initial_balance,
+
+                                        balance_after:
+                                            movement.balance_after,
+
+                                        user:
+                                            movement.user
+
+                                    },
+
+                                    account:
+                                        movement.account,
+
+                                    account_balance:
+                                        movement.account_balance,
+
+                                    currency:
+                                        movement.currency
+                                        ??
+                                        movement.account_balance?.currency
+                                        ??
+                                        '',
+
+                                    initialBalance:
+                                        movement.initial_balance
+
+                                },
+                                false
+                            );
+
+                        }
                     );
 
-                });
+            } else {
+
+                /*
+                 * No hay movimientos.
+                 */
+
+                const row =
+                    document.createElement(
+                        'tr'
+                    );
+
+
+                row.dataset.emptyRow =
+                    'true';
+
+
+                row.innerHTML = `
+                    <td
+                        colspan="9"
+                        class="text-center"
+                    >
+                        Sin movimientos todavía.
+                    </td>
+                `;
+
+
+                tbody.appendChild(
+                    row
+                );
+
+            }
 
         }
 
@@ -844,6 +1497,7 @@ async function syncDashboard() {
         console.log(
             'Dashboard sincronizado correctamente'
         );
+
 
     } catch (error) {
 
@@ -856,17 +1510,143 @@ async function syncDashboard() {
 
 }
 
+
 /*
-Formatear dinero
---------------------------------------------------------------------------
+|--------------------------------------------------------------------------
+| Actualizar total agrupado por moneda
+|--------------------------------------------------------------------------
 */
+
+function updateCurrencyTotal(
+    selector,
+    totals,
+    prefix = ''
+) {
+
+    const element =
+        document.querySelector(selector);
+
+
+    if (!element) {
+        return;
+    }
+
+
+    if (
+        !totals ||
+        typeof totals !== 'object' ||
+        Array.isArray(totals)
+    ) {
+
+        element.innerHTML = `
+            <span class="header-currency-value">
+                ${prefix}0,00
+            </span>
+        `;
+
+        return;
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Mostrar únicamente monedas con importe distinto de cero
+    |--------------------------------------------------------------------------
+    */
+
+    const entries =
+        Object.entries(totals)
+            .filter(
+                ([currency, amount]) =>
+                    Number(amount) !== 0
+            );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Todo está en cero
+    |--------------------------------------------------------------------------
+    |
+    | No asumimos ninguna moneda.
+    |--------------------------------------------------------------------------
+    */
+
+    if (!entries.length) {
+
+        element.innerHTML = `
+            <span class="header-currency-value">
+                ${prefix}0,00
+            </span>
+        `;
+
+        return;
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Valores por moneda
+    |--------------------------------------------------------------------------
+    */
+
+    element.innerHTML =
+        entries
+            .map(
+                ([currency, amount]) => `
+                    <span class="header-currency-value">
+                        ${escapeHtml(prefix)}
+                        ${escapeHtml(currency)}
+                        ${formatMoney(amount)}
+                    </span>
+                `
+            )
+            .join('');
+
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Formatear moneda + importe
+|--------------------------------------------------------------------------
+*/
+
+function formatCurrencyAmount(
+    currency,
+    value
+) {
+
+    const code =
+        currency
+        ||
+        '';
+
+
+    return `${code} ${formatMoney(value)}`.trim();
+
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Formatear dinero
+|--------------------------------------------------------------------------
+*/
+
 function formatMoney(value) {
 
-    const number = Number(value);
+    const number =
+        Number(value);
 
-    if (Number.isNaN(number)) {
+
+    if (
+        Number.isNaN(number)
+    ) {
+
         return '0,00';
+
     }
+
 
     return number.toLocaleString(
         'es-AR',
@@ -875,20 +1655,74 @@ function formatMoney(value) {
             maximumFractionDigits: 2
         }
     );
+
 }
+
+
 /*
-Escapar HTML
---------------------------------------------------------------------------
+|--------------------------------------------------------------------------
+| Escapar HTML
+|--------------------------------------------------------------------------
 */
 
 function escapeHtml(value) {
 
     const div =
-        document.createElement('div');
+        document.createElement(
+            'div'
+        );
+
 
     div.textContent =
-        value;
+        value ?? '';
+
 
     return div.innerHTML;
+
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Sonido realtime
+|--------------------------------------------------------------------------
+|
+| Conservamos compatibilidad con la función utilizada
+| anteriormente por el dashboard.
+|--------------------------------------------------------------------------
+*/
+
+function playRealtimeSound() {
+
+    try {
+
+        const audio =
+            document.querySelector(
+                '#realtime-sound'
+            );
+
+
+        if (
+            audio
+            &&
+            typeof audio.play === 'function'
+        ) {
+
+            audio.currentTime = 0;
+
+            audio
+                .play()
+                .catch(() => {});
+
+        }
+
+    } catch (error) {
+
+        /*
+         * El sonido nunca debe romper
+         * la actualización del dashboard.
+         */
+
+    }
 
 }

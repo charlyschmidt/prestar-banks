@@ -10,7 +10,7 @@
             HEADER
         ========================================================== --}}
 
-        <div class="page-header d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+        <div class="page-header">
 
             <div>
 
@@ -42,12 +42,13 @@
 
                 <div class="history-search-row">
 
+
                     <div class="history-search">
 
                         <i class="bi bi-search"></i>
 
                         <input type="text" name="search" value="{{ request('search') }}"
-                            placeholder="Buscar descripción, cuenta, usuario o banco destino..." autocomplete="off">
+                            placeholder="Buscar descripción, cuenta, usuario, moneda o banco destino..." autocomplete="off">
 
                     </div>
 
@@ -68,6 +69,7 @@
                         Limpiar
 
                     </a>
+
 
                 </div>
 
@@ -133,6 +135,33 @@
 
 
 
+                    {{-- MONEDA --}}
+
+                    <div class="form-group">
+
+                        <label>
+                            Moneda
+                        </label>
+
+                        <select name="currency" class="dark-input">
+
+                            <option value="">
+                                Todas
+                            </option>
+
+                            @foreach ($currencies as $currency)
+                                <option value="{{ $currency }}"
+                                    {{ request('currency') === $currency ? 'selected' : '' }}>
+                                    {{ $currency }}
+                                </option>
+                            @endforeach
+
+                        </select>
+
+                    </div>
+
+
+
                     {{-- USUARIO --}}
 
                     <div class="form-group">
@@ -150,11 +179,13 @@
                             @foreach ($users as $user)
                                 <option value="{{ $user->id }}"
                                     {{ (string) request('user_id') === (string) $user->id ? 'selected' : '' }}>
+
                                     {{ $user->name ?? $user->username }}
 
                                     @if ($user->trashed())
                                         (eliminado)
                                     @endif
+
                                 </option>
                             @endforeach
 
@@ -293,9 +324,6 @@
             RESUMEN DEL RESULTADO
         ========================================================== --}}
 
-
-
-
         <div class="history-summary-grid">
 
 
@@ -327,9 +355,31 @@
                     Ingresos
                 </span>
 
-                <strong class="green">
-                    ${{ number_format($totalIncome, 2, ',', '.') }}
-                </strong>
+
+                <div class="history-currency-values">
+
+                    @forelse ($totalIncome as $currency => $amount)
+                        <div class="history-currency-value">
+
+                            <span class="history-currency-code">
+                                {{ $currency }}
+                            </span>
+
+                            <strong class="history-currency-amount green">
+                                {{ number_format($amount, 2, ',', '.') }}
+                            </strong>
+
+                        </div>
+
+                    @empty
+
+                        <strong class="history-currency-empty green">
+                            0,00
+                        </strong>
+                    @endforelse
+
+                </div>
+
 
                 <small>
                     total según filtros
@@ -347,9 +397,31 @@
                     Egresos
                 </span>
 
-                <strong class="red">
-                    ${{ number_format($totalExpense, 2, ',', '.') }}
-                </strong>
+
+                <div class="history-currency-values">
+
+                    @forelse ($totalExpense as $currency => $amount)
+                        <div class="history-currency-value">
+
+                            <span class="history-currency-code">
+                                {{ $currency }}
+                            </span>
+
+                            <strong class="history-currency-amount red">
+                                {{ number_format($amount, 2, ',', '.') }}
+                            </strong>
+
+                        </div>
+
+                    @empty
+
+                        <strong class="history-currency-empty red">
+                            0,00
+                        </strong>
+                    @endforelse
+
+                </div>
+
 
                 <small>
                     sin incluir reservas
@@ -367,9 +439,31 @@
                     Reservas
                 </span>
 
-                <strong class="history-reserve-color">
-                    ${{ number_format($totalReserve, 2, ',', '.') }}
-                </strong>
+
+                <div class="history-currency-values">
+
+                    @forelse ($totalReserve as $currency => $amount)
+                        <div class="history-currency-value">
+
+                            <span class="history-currency-code">
+                                {{ $currency }}
+                            </span>
+
+                            <strong class="history-currency-amount history-reserve-color">
+                                {{ number_format($amount, 2, ',', '.') }}
+                            </strong>
+
+                        </div>
+
+                    @empty
+
+                        <strong class="history-currency-empty history-reserve-color">
+                            0,00
+                        </strong>
+                    @endforelse
+
+                </div>
+
 
                 <small>
                     total según filtros
@@ -383,10 +477,11 @@
 
 
         {{-- =========================================================
-            CABECERA TABLA
+            CABECERA DE RESULTADOS
         ========================================================== --}}
 
         <div class="history-results-header" id="history-results">
+
 
             <div>
 
@@ -413,14 +508,21 @@
             </div>
 
 
+
             <div class="history-results-actions">
+
+
+                {{-- FILTROS ACTIVOS --}}
 
                 <div class="history-active-filters">
 
+
                     {{-- DESDE --}}
+
                     @if (request('date_from'))
                         <a href="{{ route('history.index', request()->except(['date_from', 'page'])) }}"
                             class="history-filter-chip" title="Quitar filtro">
+
                             <span>
                                 Desde:
                                 <strong>
@@ -429,14 +531,18 @@
                             </span>
 
                             <i class="bi bi-x"></i>
+
                         </a>
                     @endif
 
 
+
                     {{-- HASTA --}}
+
                     @if (request('date_to'))
                         <a href="{{ route('history.index', request()->except(['date_to', 'page'])) }}"
                             class="history-filter-chip" title="Quitar filtro">
+
                             <span>
                                 Hasta:
                                 <strong>
@@ -445,11 +551,14 @@
                             </span>
 
                             <i class="bi bi-x"></i>
+
                         </a>
                     @endif
 
 
+
                     {{-- CUENTA --}}
+
                     @if (request('account_id'))
                         @php
                             $activeAccount = $accounts->firstWhere('id', request('account_id'));
@@ -457,6 +566,7 @@
 
                         <a href="{{ route('history.index', request()->except(['account_id', 'page'])) }}"
                             class="history-filter-chip" title="Quitar filtro">
+
                             <span>
                                 Cuenta:
                                 <strong>
@@ -465,11 +575,34 @@
                             </span>
 
                             <i class="bi bi-x"></i>
+
                         </a>
                     @endif
 
 
+
+                    {{-- MONEDA --}}
+
+                    @if (request('currency'))
+                        <a href="{{ route('history.index', request()->except(['currency', 'page'])) }}"
+                            class="history-filter-chip" title="Quitar filtro">
+
+                            <span>
+                                Moneda:
+                                <strong>
+                                    {{ request('currency') }}
+                                </strong>
+                            </span>
+
+                            <i class="bi bi-x"></i>
+
+                        </a>
+                    @endif
+
+
+
                     {{-- USUARIO --}}
+
                     @if (request('user_id'))
                         @php
                             $activeUser = $users->firstWhere('id', request('user_id'));
@@ -477,6 +610,7 @@
 
                         <a href="{{ route('history.index', request()->except(['user_id', 'page'])) }}"
                             class="history-filter-chip" title="Quitar filtro">
+
                             <span>
                                 Usuario:
                                 <strong>
@@ -485,11 +619,14 @@
                             </span>
 
                             <i class="bi bi-x"></i>
+
                         </a>
                     @endif
 
 
+
                     {{-- TIPO --}}
+
                     @if (request('type'))
                         @php
                             $typeLabels = [
@@ -501,6 +638,7 @@
 
                         <a href="{{ route('history.index', request()->except(['type', 'page'])) }}"
                             class="history-filter-chip" title="Quitar filtro">
+
                             <span>
                                 Tipo:
                                 <strong>
@@ -509,14 +647,18 @@
                             </span>
 
                             <i class="bi bi-x"></i>
+
                         </a>
                     @endif
 
 
+
                     {{-- BANCO DESTINO --}}
+
                     @if (request('destination_bank'))
                         <a href="{{ route('history.index', request()->except(['destination_bank', 'page'])) }}"
                             class="history-filter-chip" title="Quitar filtro">
+
                             <span>
                                 Destino:
                                 <strong>
@@ -525,14 +667,18 @@
                             </span>
 
                             <i class="bi bi-x"></i>
+
                         </a>
                     @endif
 
 
+
                     {{-- ESTADO --}}
+
                     @if (request('execution'))
                         <a href="{{ route('history.index', request()->except(['execution', 'page'])) }}"
                             class="history-filter-chip" title="Quitar filtro">
+
                             <span>
                                 Estado:
                                 <strong>
@@ -541,46 +687,58 @@
                             </span>
 
                             <i class="bi bi-x"></i>
+
                         </a>
                     @endif
 
 
+
                     {{-- MONTO MÍNIMO --}}
+
                     @if (request('amount_min'))
                         <a href="{{ route('history.index', request()->except(['amount_min', 'page'])) }}"
                             class="history-filter-chip" title="Quitar filtro">
+
                             <span>
-                                Desde $
+                                Mínimo:
                                 <strong>
                                     {{ number_format((float) request('amount_min'), 2, ',', '.') }}
                                 </strong>
                             </span>
 
                             <i class="bi bi-x"></i>
+
                         </a>
                     @endif
 
 
+
                     {{-- MONTO MÁXIMO --}}
+
                     @if (request('amount_max'))
                         <a href="{{ route('history.index', request()->except(['amount_max', 'page'])) }}"
                             class="history-filter-chip" title="Quitar filtro">
+
                             <span>
-                                Hasta $
+                                Máximo:
                                 <strong>
                                     {{ number_format((float) request('amount_max'), 2, ',', '.') }}
                                 </strong>
                             </span>
 
                             <i class="bi bi-x"></i>
+
                         </a>
                     @endif
 
 
+
                     {{-- BÚSQUEDA --}}
+
                     @if (request('search'))
                         <a href="{{ route('history.index', request()->except(['search', 'page'])) }}"
                             class="history-filter-chip" title="Quitar filtro">
+
                             <span>
                                 Búsqueda:
                                 <strong>
@@ -589,15 +747,19 @@
                             </span>
 
                             <i class="bi bi-x"></i>
+
                         </a>
                     @endif
 
 
+
                     {{-- LIMPIAR TODOS --}}
+
                     @if (request()->hasAny([
                             'date_from',
                             'date_to',
                             'account_id',
+                            'currency',
                             'user_id',
                             'type',
                             'destination_bank',
@@ -611,18 +773,23 @@
                         </a>
                     @endif
 
+
                 </div>
+
 
 
                 {{-- EXPORTAR --}}
 
                 @if ($transactions->total() > 0)
-                    <a href="{{ route('history.export', request()->query()) }}"
-                        class="history-export-button">
+                    <a href="{{ route('history.export', request()->query()) }}" class="history-export-button">
+
                         <i class="bi bi-file-earmark-arrow-down"></i>
+
                         Exportar Excel
+
                     </a>
                 @endif
+
 
             </div>
 
@@ -652,19 +819,7 @@
                             </th>
 
                             <th>
-                                Cuenta
-                            </th>
-
-                            <th>
-                                Usuario
-                            </th>
-
-                            <th>
-                                Tipo
-                            </th>
-
-                            <th>
-                                Descripción
+                                Cuenta origen
                             </th>
 
                             <th>
@@ -672,11 +827,27 @@
                             </th>
 
                             <th>
-                                Estado
+                                Usuario
+                            </th>
+
+                            <th>
+                                Descripción
+                            </th>
+
+                            <th>
+                                Tipo
+                            </th>
+
+                            <th>
+                                Moneda
                             </th>
 
                             <th class="text-end">
                                 Monto
+                            </th>
+
+                            <th>
+                                Estado
                             </th>
 
                         </tr>
@@ -712,7 +883,7 @@
 
 
 
-                                {{-- CUENTA --}}
+                                {{-- CUENTA ORIGEN --}}
 
                                 <td>
 
@@ -731,12 +902,34 @@
 
 
                                         <span>
-
                                             {{ $transaction->account?->name ?? 'Cuenta eliminada' }}
-
                                         </span>
 
                                     </div>
+
+                                </td>
+
+
+
+                                {{-- BANCO DESTINO --}}
+
+                                <td>
+
+                                    @if ($transaction->type === 'expense' && $transaction->destination_bank)
+                                        <div class="destination-bank">
+
+                                            <i class="bi bi-bank"></i>
+
+                                            <span>
+                                                {{ $transaction->destination_bank }}
+                                            </span>
+
+                                        </div>
+                                    @else
+                                        <span class="text-muted">
+                                            —
+                                        </span>
+                                    @endif
 
                                 </td>
 
@@ -760,68 +953,99 @@
 
 
 
-                                {{-- TIPO --}}
-
-                                <td>
-
-
-                                    @if ($transaction->type === 'income')
-                                        <span class="tag income-tag">
-                                            <i class="bi bi-arrow-up"></i>
-                                            Ingreso
-                                        </span>
-                                    @elseif ($transaction->type === 'reserve')
-                                        <span class="tag reserve-tag">
-                                            <i class="bi bi-lock"></i>
-                                            Reserva
-                                        </span>
-                                    @else
-                                        <span class="tag expense-tag">
-                                            <i class="bi bi-arrow-down"></i>
-                                            Egreso
-                                        </span>
-                                    @endif
-
-
-                                </td>
-
-
-
                                 {{-- DESCRIPCIÓN --}}
 
                                 <td>
 
                                     <div class="history-description">
-
                                         {{ $transaction->description ?? 'Sin descripción' }}
-
                                     </div>
 
                                 </td>
 
 
 
-                                {{-- BANCO DESTINO --}}
+                                {{-- TIPO --}}
 
                                 <td>
 
+                                    @if ($transaction->type === 'income')
+                                        <span class="tag income-tag">
 
-                                    @if ($transaction->type === 'expense' && $transaction->destination_bank)
-                                        <div class="destination-bank">
+                                            <i class="bi bi-arrow-up"></i>
 
-                                            <i class="bi bi-bank"></i>
+                                            Ingreso
 
-                                            <span>
-                                                {{ $transaction->destination_bank }}
-                                            </span>
+                                        </span>
+                                    @elseif ($transaction->type === 'reserve')
+                                        <span class="tag reserve-tag">
 
-                                        </div>
+                                            <i class="bi bi-lock"></i>
+
+                                            Reserva
+
+                                        </span>
+                                    @else
+                                        <span class="tag expense-tag">
+
+                                            <i class="bi bi-arrow-down"></i>
+
+                                            Egreso
+
+                                        </span>
+                                    @endif
+
+                                </td>
+
+
+
+                                {{-- MONEDA --}}
+
+                                <td>
+
+                                    @if ($transaction->accountBalance?->currency)
+                                        <span class="history-currency-badge">
+                                            {{ $transaction->accountBalance->currency }}
+                                        </span>
                                     @else
                                         <span class="text-muted">
                                             —
                                         </span>
                                     @endif
 
+                                </td>
+
+
+
+                                {{-- MONTO --}}
+
+                                <td class="text-end">
+
+                                    @if ($transaction->type === 'income')
+                                        <span class="amount-income">
+
+                                            +
+
+                                            {{ number_format($transaction->amount, 2, ',', '.') }}
+
+                                        </span>
+                                    @elseif ($transaction->type === 'reserve')
+                                        <span class="history-reserve-amount">
+
+                                            -
+
+                                            {{ number_format($transaction->amount, 2, ',', '.') }}
+
+                                        </span>
+                                    @else
+                                        <span class="amount-expense">
+
+                                            -
+
+                                            {{ number_format($transaction->amount, 2, ',', '.') }}
+
+                                        </span>
+                                    @endif
 
                                 </td>
 
@@ -830,7 +1054,6 @@
                                 {{-- ESTADO --}}
 
                                 <td>
-
 
                                     @if ($transaction->type === 'expense')
                                         @if ($transaction->executed_at)
@@ -864,34 +1087,6 @@
                                         </span>
                                     @endif
 
-
-                                </td>
-
-
-
-                                {{-- MONTO --}}
-
-                                <td class="text-end">
-
-
-                                    @if ($transaction->type === 'income')
-                                        <span class="amount-income">
-                                            +
-                                            ${{ number_format($transaction->amount, 2, ',', '.') }}
-                                        </span>
-                                    @elseif ($transaction->type === 'reserve')
-                                        <span class="history-reserve-amount">
-                                            -
-                                            ${{ number_format($transaction->amount, 2, ',', '.') }}
-                                        </span>
-                                    @else
-                                        <span class="amount-expense">
-                                            -
-                                            ${{ number_format($transaction->amount, 2, ',', '.') }}
-                                        </span>
-                                    @endif
-
-
                                 </td>
 
 
@@ -903,7 +1098,7 @@
 
                             <tr>
 
-                                <td colspan="8" class="history-empty">
+                                <td colspan="9" class="history-empty">
 
                                     <i class="bi bi-search"></i>
 
@@ -950,21 +1145,25 @@
     </div>
 
 @endsection
-@if (request('results'))
 
+
+
+@if (request('results'))
     <script>
         document.addEventListener(
             'DOMContentLoaded',
-            function () {
+            function() {
 
                 const results =
                     document.getElementById(
                         'history-results'
                     );
 
+
                 if (!results) {
                     return;
                 }
+
 
                 setTimeout(() => {
 
@@ -978,5 +1177,4 @@
             }
         );
     </script>
-
 @endif

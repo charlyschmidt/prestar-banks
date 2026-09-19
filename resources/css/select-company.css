@@ -1,0 +1,409 @@
+/* ==========================
+   PAGE — MOBILE FIRST
+========================== */
+
+.company-selection-page {
+    width: 100%;
+    min-height: 100dvh;
+
+    display: flex;
+    justify-content: center;
+
+    padding: 32px 20px 45px;
+
+    background: #000;
+    color: #fff;
+
+    font-family:
+        Inter,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+
+    -webkit-font-smoothing: antialiased;
+}
+
+
+/* ==========================
+   WRAPPER
+========================== */
+
+.company-selection-wrapper {
+    width: 100%;
+    max-width: 440px;
+}
+
+
+/* ==========================
+   BRAND
+========================== */
+
+.company-selection-brand {
+    display: inline-block;
+
+    color: #fff;
+
+    font-size: 20px;
+    font-weight: 600;
+
+    letter-spacing: -1px;
+
+    text-decoration: none;
+}
+
+.company-selection-brand span {
+    font-weight: 300;
+}
+
+.company-selection-brand:hover {
+    color: #fff;
+}
+
+
+/* ==========================
+   HEADER
+========================== */
+
+.company-selection-header {
+    margin-top: 65px;
+    margin-bottom: 30px;
+
+    text-align: left;
+}
+
+.company-selection-header h1 {
+    margin: 0;
+
+    color: #fff;
+
+    font-size: 30px;
+    font-weight: 600;
+
+    line-height: 1.1;
+    letter-spacing: -1px;
+}
+
+.company-selection-header p {
+    margin: 12px 0 0;
+
+    color: #888;
+
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+
+/* ==========================
+   COMPANY LIST
+========================== */
+
+.company-selection-grid {
+    width: 100%;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 10px;
+}
+
+.company-selection-grid form {
+    width: 100%;
+
+    margin: 0;
+}
+
+
+/* ==========================
+   COMPANY CARD
+========================== */
+
+.company-selection-card {
+    width: 100%;
+    min-height: 72px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 14px;
+
+    padding: 12px 14px;
+
+    background: #0a0a0a;
+    color: #fff;
+
+    border: 1px solid #242424;
+    border-radius: 12px;
+
+    font-family: inherit;
+
+    text-align: left;
+
+    cursor: pointer;
+
+    transition:
+        background .2s ease,
+        border-color .2s ease,
+        transform .2s ease;
+}
+
+.company-selection-card:active {
+    transform: scale(.99);
+}
+
+
+/* ==========================
+   COMPANY AVATAR / LOGO
+========================== */
+
+
+
+/* Logo real de la empresa */
+
+.company-selection-avatar img {
+    width: 100%;
+    height: 100%;
+
+    display: block;
+
+    object-fit: contain;
+
+    padding: 5px;
+
+    background: #fff;
+}
+
+
+/* ==========================
+   INFO
+========================== */
+
+.company-selection-info {
+    min-width: 0;
+
+    flex: 1;
+}
+
+.company-selection-info strong {
+    display: block;
+
+    overflow: hidden;
+
+    color: #fff;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.company-selection-info span {
+    display: block;
+
+    margin-top: 4px;
+
+    color: #666;
+
+    font-size: 11px;
+}
+
+
+/* ==========================
+   ARROW
+========================== */
+
+.company-selection-card > i {
+    flex-shrink: 0;
+
+    color: #555;
+
+    font-size: 13px;
+}
+
+
+/* ==========================
+   FOOTER
+========================== */
+
+.company-selection-footer {
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 15px;
+
+    margin-top: 30px;
+    padding-top: 20px;
+
+    border-top: 1px solid #1c1c1c;
+}
+
+
+/* ==========================
+   USER
+========================== */
+
+.company-selection-user {
+    min-width: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 3px;
+}
+
+.company-selection-user span {
+    color: #555;
+
+    font-size: 10px;
+}
+
+.company-selection-user strong {
+    overflow: hidden;
+
+    color: #999;
+
+    font-size: 11px;
+    font-weight: 500;
+
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+
+/* ==========================
+   LOGOUT
+========================== */
+
+.company-selection-footer form {
+    flex-shrink: 0;
+
+    margin: 0;
+}
+
+.company-selection-logout {
+    height: 38px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 7px;
+
+    padding: 0 12px;
+
+    background: transparent;
+    color: #aaa;
+
+    border: 1px solid #292929;
+    border-radius: 9px;
+
+    font-family: inherit;
+    font-size: 11px;
+
+    cursor: pointer;
+
+    transition:
+        background .2s ease,
+        color .2s ease,
+        border-color .2s ease;
+}
+
+.company-selection-avatar {
+    width: 52px;
+    height: 52px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    overflow: hidden;
+
+    background: #161616;
+
+    border: 1px solid #292929;
+    border-radius: 12px;
+
+    font-size: 18px;
+    font-weight: 600;
+
+    color: #ffffff;
+}
+
+.company-selection-logo {
+    width: 100%;
+    height: 100%;
+
+    display: block;
+
+    object-fit: contain;
+
+    padding: 5px;
+
+    background: #ffffff;
+}
+
+/* ==========================
+   TABLET / DESKTOP
+========================== */
+
+@media (min-width: 768px) {
+
+    .company-selection-page {
+        align-items: center;
+
+        padding: 60px 30px;
+    }
+
+    .company-selection-wrapper {
+        max-width: 500px;
+    }
+
+    .company-selection-header {
+        margin-top: 50px;
+    }
+
+    .company-selection-header h1 {
+        font-size: 34px;
+    }
+
+    .company-selection-card {
+        min-height: 76px;
+
+        padding: 14px 16px;
+    }
+
+    .company-selection-avatar {
+        width: 46px;
+        height: 46px;
+    }
+
+}
+
+
+/* ==========================
+   HOVER DEVICES
+========================== */
+
+@media (hover: hover) {
+
+    .company-selection-card:hover {
+        background: #101010;
+
+        border-color: #444;
+    }
+
+    .company-selection-logout:hover {
+        background: #111;
+
+        border-color: #3a3a3a;
+
+        color: #fff;
+    }
+
+}

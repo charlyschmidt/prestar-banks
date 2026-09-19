@@ -10,7 +10,6 @@ import './bootstrap';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 
-
 /*
 |--------------------------------------------------------------------------
 | Bootstrap UI
@@ -22,10 +21,9 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
 
-
 /*
 |--------------------------------------------------------------------------
-| Estilos propios
+| Dashboard / Empresa
 |--------------------------------------------------------------------------
 */
 
@@ -41,11 +39,30 @@ import '../css/account.css';
 
 import '../css/movement.css';
 
-import '../css/login.css';
+import '../css/history.css';
 
 import '../css/settings.css';
 
-import '../css/history.css';
+
+/*
+|--------------------------------------------------------------------------
+| AERIA — Acceso público
+|--------------------------------------------------------------------------
+*/
+
+import '../css/welcome.css';
+
+import '../css/login.css';
+
+import '../css/register.css';
+
+import '../css/register-pending.css';
+
+import '../css/select-company.css';
+
+import '../css/error.css';
+
+import '../css/aeria-admin.css';
 
 /*
 |--------------------------------------------------------------------------

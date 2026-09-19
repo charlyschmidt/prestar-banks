@@ -1,54 +1,71 @@
-/* =====================
-   ACCOUNTS
-===================== */
+/* ==========================
+   ACCOUNTS — MOBILE FIRST
+========================== */
+
+
+/* ==========================
+   GRID
+========================== */
 
 .accounts-grid {
 
     display: grid;
 
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: 1fr;
 
-    gap: 20px;
+    gap: 16px;
 
 }
+
+
+/* ==========================
+   ACCOUNT CARD
+========================== */
 
 .account-card {
 
-    background: var(--card);
+    background: var(--company-card);
 
-    border: 1px solid var(--border);
+    border: 1px solid var(--company-border);
 
-    border-radius: 20px;
+    border-radius: 16px;
 
-    padding: 22px;
+    padding: 18px;
 
     display: flex;
+
+    flex-direction: column;
+
+    align-items: flex-start;
 
     justify-content: space-between;
 
-    align-items: center;
+    gap: 18px;
 
-    transition: .2s;
-
-}
-
-.account-card:hover {
-
-    transform: translateY(-3px);
-
-    border-color: rgba(255,255,255,.18);
+    transition:
+        transform .2s ease,
+        border-color .2s ease,
+        background .2s ease;
 
 }
+
 
 .account-top {
+
+    width: 100%;
 
     display: flex;
 
     align-items: center;
 
-    gap: 15px;
+    gap: 14px;
 
 }
+
+
+/* ==========================
+   ACCOUNT LOGO
+========================== */
 
 .account-logo {
 
@@ -56,106 +73,2151 @@
 
     height: 48px;
 
-    border-radius: 14px;
+    flex-shrink: 0;
+
+    border-radius: 12px;
 
     object-fit: contain;
 
-    background: #104072;
+    background: var(--company-hover);
+
+    border: 1px solid var(--company-border);
 
     padding: 8px;
 
 }
 
+
 .account-logo.empty {
 
     display: flex;
 
-    justify-content: center;
-
     align-items: center;
 
-    color: white;
+    justify-content: center;
+
+    color: var(--company-text);
 
 }
+
+
+/* ==========================
+   ACCOUNT TEXT
+========================== */
 
 .account-card h3 {
 
     margin: 0;
 
+    color: var(--company-text);
+
     font-size: 16px;
 
-    color: white;
+    font-weight: 600;
 
 }
 
+
 .account-card span {
 
-    color: var(--muted);
+    color: var(--company-muted);
 
     font-size: 13px;
 
 }
 
-.account-actions {
+
+/* ==========================
+   ACCOUNT CARD CONTENT
+========================== */
+
+.account-card-content {
+
+    width: 100%;
 
     display: flex;
 
-    gap: 8px;
+    flex-direction: column;
+
+    gap: 20px;
 
 }
 
-.account-page-title {
+
+.account-info {
+
+    min-width: 0;
+
+}
+
+
+/* ==========================
+   ACCOUNT CURRENCIES
+========================== */
+
+.account-currencies {
+
+    width: 100%;
+
+}
+
+
+.account-currencies-label {
+
+    display: block;
+
+    margin-bottom: 8px;
+
+    color: var(--company-muted);
+
+    font-size: 12px;
+
+}
+
+
+.account-currency-list {
+
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 6px;
+
+}
+
+
+.account-currency-badge {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    min-height: 26px;
+
+    padding: 4px 9px;
+
+    border: 1px solid var(--company-border);
+
+    border-radius: 7px;
+
+    background: var(--company-hover);
+
+    color: var(--company-text);
+
+    font-size: 11px;
+
+    font-weight: 600;
+
+}
+
+
+.account-currency-empty {
+
+    color: var(--company-muted);
+
+    font-size: 12px;
+
+}
+
+
+/* ==========================
+   ACCOUNT CARD FOOTER
+========================== */
+
+.account-card-footer {
+
+    width: 100%;
+
+    margin-top: auto;
+
+    padding-top: 14px;
+
+    border-top: 1px solid var(--company-border);
 
     display: flex;
 
     align-items: center;
 
-    gap: 15px;
+    justify-content: flex-end;
+
+    gap: 8px;
 
 }
 
-.account-page-title .account-logo {
 
-    width: 56px;
+.account-delete-form {
 
-    height: 56px;
+    display: block;
 
-}
+    margin: 0;
 
-/* Apertura de jornada */
-
-.opening-balance-input {
-
-    margin-top: 18px;
+    padding: 0;
 
 }
 
-/* Responsive */
 
-@media (max-width: 991px) {
+/* ==========================
+   ACCOUNT CARD ACTION
+========================== */
 
-    .accounts-grid {
+.account-card-action {
+
+    appearance: none;
+
+    width: 36px;
+
+    height: 36px;
+
+    min-width: 36px;
+
+    min-height: 36px;
+
+    margin: 0;
+
+    padding: 0;
+
+    border: 1px solid var(--company-border);
+
+    border-radius: 9px;
+
+    background: var(--company-hover);
+
+    color: var(--company-text);
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    text-decoration: none;
+
+    font-family: inherit;
+
+    font-size: 14px;
+
+    line-height: 1;
+
+    cursor: pointer;
+
+    box-sizing: border-box;
+
+}
+
+
+.account-card-action i {
+
+    display: block;
+
+    margin: 0;
+
+    padding: 0;
+
+    font-size: 14px;
+
+    line-height: 1;
+
+}
+
+
+.account-card-action.danger {
+
+    color: var(--danger);
+
+}
+
+
+
+
+
+/* ==========================================================
+   ACCOUNT EDIT FORM
+   MOBILE FIRST
+========================================================== */
+
+
+/* ==========================
+   FORM CARD
+========================== */
+
+.account-form-card {
+
+    width: 100%;
+
+    max-width: none;
+
+}
+
+
+/* ==========================
+   TWO MAIN COLUMNS
+========================== */
+
+.account-edit-grid {
+
+    display: grid;
+
+    grid-template-columns: 1fr;
+
+    gap: 30px;
+
+}
+
+
+/* ==========================
+   LEFT COLUMN
+========================== */
+
+.account-edit-main {
+
+    min-width: 0;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 20px;
+
+}
+
+
+/* ==========================
+   LOGO EDITOR
+========================== */
+
+.account-logo-editor {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+}
+
+
+.account-logo-preview {
+
+    width: 64px;
+
+    height: 64px;
+
+    flex: 0 0 64px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 8px;
+
+    background: #ffffff;
+
+    border-radius: 12px;
+
+    overflow: hidden;
+
+}
+
+
+.account-logo-preview img {
+
+    width: 100%;
+
+    height: 100%;
+
+    object-fit: contain;
+
+}
+
+
+.account-logo-preview.account-logo-empty {
+
+    background: var(--company-hover);
+
+    border: 1px solid var(--company-border);
+
+    color: var(--company-muted);
+
+    font-size: 22px;
+
+}
+
+
+.account-logo-upload {
+
+    flex: 1;
+
+    min-width: 0;
+
+}
+
+
+.account-logo-upload .dark-input {
+
+    width: 100%;
+
+}
+
+
+.account-logo-upload small {
+
+    display: block;
+
+    margin-top: 6px;
+
+    color: var(--company-muted);
+
+    font-size: 12px;
+
+}
+
+
+/* ==========================
+   RIGHT COLUMN
+   CURRENCIES
+========================== */
+
+.account-edit-currencies {
+
+    min-width: 0;
+
+}
+
+
+.account-currencies-header {
+
+    margin-bottom: 16px;
+
+}
+
+
+.account-currencies-header label {
+
+    display: block;
+
+    margin-bottom: 5px;
+
+}
+
+
+.account-currencies-header small {
+
+    display: block;
+
+    color: var(--company-muted);
+
+    font-size: 13px;
+
+    line-height: 1.4;
+
+}
+
+
+/* ==========================
+   CURRENCY GRID
+========================== */
+
+.currency-selector {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 10px;
+
+}
+
+
+/* ==========================
+   CURRENCY OPTION
+========================== */
+
+.currency-option {
+
+    position: relative;
+
+    display: block;
+
+    margin: 0;
+
+    cursor: pointer;
+
+    user-select: none;
+
+}
+
+
+.currency-option>input {
+
+    position: absolute;
+
+    width: 1px;
+
+    height: 1px;
+
+    opacity: 0;
+
+    pointer-events: none;
+
+}
+
+
+/* ==========================
+   CURRENCY CARD
+========================== */
+
+.currency-option-content {
+
+    width: 100%;
+
+    min-height: 64px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 10px;
+
+    padding: 12px 14px;
+
+    background: var(--company-hover);
+
+    border: 1px solid var(--company-border);
+
+    border-radius: 12px;
+
+    transition:
+        background .18s ease,
+        border-color .18s ease;
+
+}
+
+
+/* ==========================
+   CURRENCY TEXT
+========================== */
+
+.currency-option-info {
+
+    min-width: 0;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 3px;
+
+}
+
+
+.currency-option-code {
+
+    color: var(--company-text);
+
+    font-size: 15px;
+
+    font-weight: 700;
+
+    line-height: 1.2;
+
+}
+
+
+.currency-option-name {
+
+    color: var(--company-muted);
+
+    font-size: 12px;
+
+    line-height: 1.3;
+
+}
+
+
+/* ==========================
+   CURRENCY CHECK
+========================== */
+
+.currency-option-check {
+
+    width: 26px;
+
+    height: 26px;
+
+    flex: 0 0 26px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border: 1px solid var(--company-border);
+
+    border-radius: 7px;
+
+    color: transparent;
+
+    font-size: 15px;
+
+    transition:
+        background .18s ease,
+        border-color .18s ease,
+        color .18s ease;
+
+}
+
+
+/* ==========================
+   SELECTED CURRENCY
+========================== */
+
+.currency-option>input:checked+.currency-option-content {
+
+    background: var(--company-card);
+
+    border-color: var(--company-primary);
+
+}
+
+
+.currency-option>input:checked+.currency-option-content .currency-option-check {
+
+    background: var(--company-primary);
+
+    border-color: var(--company-primary);
+
+    color: var(--company-bg);
+
+}
+
+
+/* ==========================
+   KEYBOARD FOCUS
+========================== */
+
+.currency-option>input:focus-visible+.currency-option-content {
+
+    outline: 2px solid var(--company-primary);
+
+    outline-offset: 2px;
+
+}
+
+
+/* ==========================
+   CURRENCY NOTICE
+========================== */
+
+.account-currencies-notice {
+
+    display: flex;
+
+    align-items: flex-start;
+
+    gap: 8px;
+
+    margin-top: 14px;
+
+    color: var(--company-muted);
+
+    font-size: 12px;
+
+    line-height: 1.45;
+
+}
+
+
+.account-currencies-notice i {
+
+    flex-shrink: 0;
+
+    margin-top: 1px;
+
+}
+
+
+/* ==========================================================
+   SMALL MOBILE
+========================================================== */
+
+@media (max-width: 480px) {
+
+    .currency-selector {
 
         grid-template-columns: 1fr;
 
     }
 
-    .account-card {
+
+    .account-logo-editor {
 
         flex-direction: column;
 
         align-items: flex-start;
 
+    }
+
+
+    .account-logo-upload {
+
+        width: 100%;
+
+    }
+
+}
+
+
+/* ==========================================================
+   TABLET
+========================================================== */
+
+@media (min-width: 768px) {
+
+    .account-logo-editor {
+
+        flex-direction: row;
+
+        align-items: center;
+
+    }
+
+}
+
+
+/* ==========================================================
+   DESKTOP
+========================================================== */
+
+@media (min-width: 992px) {
+
+
+    /* ACCOUNT LIST */
+
+    .accounts-grid {
+
+        grid-template-columns:
+            repeat(3, minmax(0, 1fr));
+
         gap: 20px;
 
     }
 
-    .account-actions {
 
-        width: 100%;
+    .account-card {
 
-        justify-content: flex-end;
+        padding: 22px;
 
+        flex-direction: column;
+
+        align-items: stretch;
+
+        gap: 18px;
+
+    }
+
+
+
+    /* ACCOUNT EDIT */
+
+    .account-edit-grid {
+
+        grid-template-columns:
+            minmax(0, 1fr) minmax(0, 1fr);
+
+        gap: 48px;
+
+        align-items: start;
+
+    }
+
+
+    .currency-selector {
+
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+    }
+
+}
+
+
+/* ==========================================================
+   DEVICES WITH HOVER
+========================================================== */
+
+@media (hover: hover) {
+    .account-card-action:hover {
+
+        background: var(--company-card);
+
+        border-color: var(--company-muted);
+
+        color: var(--company-text);
+
+    }
+
+
+    .account-card-action.danger:hover {
+
+        color: var(--danger);
+
+    }
+
+    .account-card:hover {
+
+        transform: translateY(-3px);
+
+        border-color: var(--company-muted);
+
+    }
+
+
+    .currency-option:hover .currency-option-content {
+
+        border-color: var(--company-muted);
+
+    }
+
+}
+/* ==========================================================
+   FINANCIAL DAY — OPENING
+   MOBILE FIRST
+========================================================== */
+
+
+/* ==========================
+   PAGE
+========================== */
+
+.opening-page {
+    width: 100%;
+}
+
+
+.opening-page-header {
+    margin-bottom: 24px;
+}
+
+
+.opening-page-header h1 {
+    margin: 0;
+
+    color: var(--company-text);
+
+    font-size: 24px;
+    font-weight: 700;
+}
+
+
+.opening-page-header p {
+    margin: 7px 0 0;
+
+    color: var(--company-muted);
+
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+
+/* ==========================
+   ERRORS
+========================== */
+
+.opening-errors {
+    margin-bottom: 20px;
+}
+
+
+/* ==========================
+   FORM
+========================== */
+
+.opening-form {
+    width: 100%;
+}
+
+
+/* ==========================
+   GRID
+========================== */
+
+.opening-grid {
+    width: 100%;
+
+    display: grid;
+
+    grid-template-columns: 1fr;
+
+    align-items: start;
+
+    gap: 14px;
+}
+
+
+/* ==========================
+   ACCOUNT CARD
+========================== */
+
+.opening-account-card {
+    width: 100%;
+
+    padding: 18px;
+
+    background: var(--company-card);
+
+    border: 1px solid var(--company-border);
+    border-radius: 16px;
+
+    color: var(--company-text);
+}
+
+
+/* ==========================
+   ACCOUNT HEADER
+========================== */
+
+.opening-account-header {
+    width: 100%;
+
+    padding-bottom: 16px;
+
+    border-bottom: 1px solid var(--company-border);
+}
+
+
+.opening-account-identity {
+    min-width: 0;
+
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+}
+
+
+/* ==========================
+   ACCOUNT LOGO
+========================== */
+
+.opening-account-logo {
+    width: 46px;
+    height: 46px;
+
+    flex: 0 0 46px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 6px;
+
+    background: #ffffff;
+
+    border-radius: 11px;
+
+    object-fit: contain;
+}
+
+
+.opening-account-logo-empty {
+    background: var(--company-hover);
+
+    border: 1px solid var(--company-border);
+
+    color: var(--company-muted);
+
+    font-size: 18px;
+}
+
+
+/* ==========================
+   ACCOUNT NAME
+========================== */
+
+.opening-account-name {
+    min-width: 0;
+
+    flex: 1;
+}
+
+
+.opening-account-name h3 {
+    margin: 0 0 3px;
+
+    overflow: hidden;
+
+    color: var(--company-text);
+
+    font-size: 15px;
+    font-weight: 700;
+
+    line-height: 1.3;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+.opening-account-name span {
+    display: block;
+
+    color: var(--company-muted);
+
+    font-size: 12px;
+    line-height: 1.3;
+}
+
+
+/* ==========================
+   BALANCES
+========================== */
+
+.opening-balances {
+    width: 100%;
+}
+
+
+/* ==========================
+   BALANCE ROW
+========================== */
+
+.opening-balance-row {
+    width: 100%;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 10px;
+
+    padding: 16px 0;
+}
+
+
+.opening-balance-row:last-child {
+    padding-bottom: 0;
+}
+
+
+.opening-balance-row + .opening-balance-row {
+    border-top: 1px solid var(--company-border);
+}
+
+
+/* ==========================
+   CURRENCY INFO
+========================== */
+
+.opening-balance-currency {
+    min-width: 0;
+
+    display: flex;
+    align-items: baseline;
+
+    gap: 7px;
+}
+
+
+.opening-balance-currency strong {
+    color: var(--company-text);
+
+    font-size: 14px;
+    font-weight: 700;
+
+    line-height: 1;
+}
+
+
+.opening-balance-currency span {
+    color: var(--company-muted);
+
+    font-size: 12px;
+    line-height: 1;
+}
+
+
+/* ==========================
+   MONEY FIELD
+========================== */
+
+.opening-balance-field {
+    position: relative;
+
+    width: 100%;
+}
+
+
+/* ==========================
+   CURRENCY INSIDE INPUT
+========================== */
+
+.opening-input-currency {
+    position: absolute;
+
+    top: 50%;
+    left: 14px;
+
+    z-index: 2;
+
+    transform: translateY(-50%);
+
+    color: var(--company-muted);
+
+    font-size: 12px;
+    font-weight: 700;
+
+    pointer-events: none;
+}
+
+
+/* ==========================
+   INPUT
+========================== */
+
+.opening-money-input {
+    appearance: none;
+
+    width: 100%;
+    height: 44px;
+
+    padding: 0 14px 0 52px;
+
+    background: var(--company-hover);
+
+    border: 1px solid var(--company-border);
+    border-radius: 10px;
+
+    outline: none;
+
+    color: var(--company-text);
+
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+
+    transition:
+        border-color .18s ease,
+        background .18s ease,
+        box-shadow .18s ease;
+}
+
+
+.opening-money-input::placeholder {
+    color: var(--company-muted);
+
+    opacity: .65;
+}
+
+
+.opening-money-input:focus {
+    background: var(--company-card);
+
+    border-color: var(--company-primary);
+
+    box-shadow:
+        0 0 0 3px
+        color-mix(
+            in srgb,
+            var(--company-primary) 12%,
+            transparent
+        );
+}
+
+
+/* ==========================
+   NO CURRENCIES
+========================== */
+
+.opening-no-currencies {
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+
+    padding: 16px 0 0;
+
+    color: var(--company-muted);
+
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+
+.opening-no-currencies i {
+    flex-shrink: 0;
+}
+
+
+/* ==========================
+   ACTIONS
+========================== */
+
+.opening-actions {
+    width: 100%;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: stretch;
+
+    gap: 14px;
+
+    margin-top: 22px;
+
+    padding-top: 20px;
+
+    border-top: 1px solid var(--company-border);
+}
+
+
+/* ==========================
+   ACTION INFO
+========================== */
+
+.opening-actions-info {
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+
+    color: var(--company-muted);
+
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+
+.opening-actions-info i {
+    flex-shrink: 0;
+
+    color: var(--company-muted);
+
+    font-size: 14px;
+}
+
+
+/* ==========================
+   SUBMIT
+========================== */
+
+.opening-submit {
+    width: 100%;
+
+    justify-content: center;
+}
+
+
+/* ==========================
+   NO ACCOUNTS
+========================== */
+
+.opening-no-accounts {
+    width: 100%;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    gap: 7px;
+
+    padding: 40px 20px;
+
+    background: var(--company-card);
+
+    border: 1px solid var(--company-border);
+    border-radius: 16px;
+
+    color: var(--company-muted);
+
+    text-align: center;
+}
+
+
+.opening-no-accounts-icon {
+    width: 48px;
+    height: 48px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin-bottom: 5px;
+
+    background: var(--company-hover);
+
+    border: 1px solid var(--company-border);
+    border-radius: 12px;
+
+    color: var(--company-text);
+
+    font-size: 20px;
+}
+
+
+.opening-no-accounts strong {
+    color: var(--company-text);
+
+    font-size: 15px;
+}
+
+
+.opening-no-accounts span {
+    color: var(--company-muted);
+
+    font-size: 12px;
+}
+
+
+/* ==========================================================
+   TABLET
+========================================================== */
+
+@media (min-width: 601px) {
+
+    .opening-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+        gap: 16px;
+    }
+
+
+    .opening-account-card {
+        padding: 18px;
+    }
+
+
+    /*
+     * En tablet ya ponemos moneda e input
+     * en la misma línea.
+     */
+
+    .opening-balance-row {
+        display: grid;
+
+        grid-template-columns:
+            minmax(90px, .65fr)
+            minmax(140px, 1.35fr);
+
+        align-items: center;
+
+        gap: 14px;
+
+        padding: 15px 0;
+    }
+
+
+    .opening-balance-currency {
+        flex-direction: column;
+        align-items: flex-start;
+
+        gap: 4px;
+    }
+
+
+    .opening-actions {
+        flex-direction: row;
+
+        align-items: center;
+        justify-content: space-between;
+
+        gap: 20px;
+    }
+
+
+    .opening-submit {
+        width: auto;
+
+        flex-shrink: 0;
+    }
+
+}
+
+
+/* ==========================================================
+   DESKTOP
+========================================================== */
+
+@media (min-width: 1101px) {
+
+    .opening-page-header {
+        margin-bottom: 28px;
+    }
+
+
+    .opening-page-header h1 {
+        font-size: 26px;
+    }
+
+
+    /*
+     * Tres bancos por fila.
+     *
+     * No usamos h-100.
+     * Cada card mide únicamente lo que necesita.
+     */
+
+    .opening-grid {
+        grid-template-columns:
+            repeat(3, minmax(0, 1fr));
+
+        align-items: start;
+
+        gap: 18px;
+    }
+
+
+    .opening-account-card {
+        height: auto;
+
+        padding: 20px;
+    }
+
+
+    .opening-account-header {
+        padding-bottom: 17px;
+    }
+
+
+    .opening-account-logo {
+        width: 48px;
+        height: 48px;
+
+        flex-basis: 48px;
+    }
+
+
+    .opening-balance-row {
+        grid-template-columns:
+            minmax(90px, .65fr)
+            minmax(150px, 1.35fr);
+
+        gap: 16px;
+
+        padding: 16px 0;
+    }
+
+
+    .opening-money-input {
+        height: 42px;
+    }
+
+
+    .opening-actions {
+        margin-top: 28px;
+
+        padding-top: 22px;
+    }
+
+}
+
+
+/* ==========================================================
+   LARGE DESKTOP
+========================================================== */
+
+@media (min-width: 1500px) {
+
+    .opening-grid {
+        gap: 20px;
+    }
+
+
+    .opening-account-card {
+        padding: 22px;
+    }
+
+}
+
+
+/* ==========================================================
+   HOVER
+========================================================== */
+
+@media (hover: hover) {
+
+    .opening-account-card {
+        transition:
+            border-color .18s ease,
+            transform .18s ease;
+    }
+
+
+    .opening-account-card:hover {
+        border-color: var(--company-muted);
+
+        transform: translateY(-2px);
+    }
+
+}
+/* ==========================================================
+   ACCOUNT MOVEMENTS
+   MOBILE FIRST
+========================================================== */
+
+
+/* ==========================
+   PAGE
+========================== */
+
+.account-movements-page {
+    width: 100%;
+}
+
+
+/* ==========================
+   HEADER
+========================== */
+
+.account-movements-header {
+    width: 100%;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 18px;
+
+    margin-bottom: 24px;
+}
+
+
+.account-movements-heading {
+    min-width: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: flex-start;
+
+    gap: 16px;
+}
+
+
+.account-movements-account {
+    min-width: 0;
+
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+}
+
+
+.account-movements-logo {
+    width: 48px;
+    height: 48px;
+
+    flex: 0 0 48px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 6px;
+
+    background: #ffffff;
+
+    border-radius: 11px;
+
+    object-fit: contain;
+}
+
+
+.account-movements-logo-empty {
+    background: var(--company-hover);
+
+    border: 1px solid var(--company-border);
+
+    color: var(--company-muted);
+
+    font-size: 18px;
+}
+
+
+.account-movements-title {
+    min-width: 0;
+}
+
+
+.account-movements-title h1 {
+    margin: 0 0 4px;
+
+    overflow: hidden;
+
+    color: var(--company-text);
+
+    font-size: 22px;
+    font-weight: 700;
+
+    line-height: 1.2;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+.account-movements-title p {
+    margin: 0;
+
+    color: var(--company-muted);
+
+    font-size: 13px;
+
+    line-height: 1.4;
+}
+
+
+.account-movements-header-actions {
+    width: 100%;
+}
+
+
+.account-movements-header-actions .primary-action-button {
+    width: 100%;
+
+    justify-content: center;
+}
+
+
+/* ==========================
+   BALANCE SUMMARY
+========================== */
+
+.account-balance-summary {
+    width: 100%;
+
+    display: grid;
+
+    grid-template-columns: 1fr;
+
+    gap: 12px;
+
+    margin-bottom: 26px;
+}
+
+
+/* ==========================
+   BALANCE CARD
+========================== */
+
+.account-balance-card {
+    min-width: 0;
+
+    padding: 17px;
+
+    background: var(--company-card);
+
+    border: 1px solid var(--company-border);
+    border-radius: 14px;
+}
+
+
+/* ==========================
+   BALANCE CARD HEADER
+========================== */
+
+.account-balance-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 12px;
+
+    padding-bottom: 13px;
+
+    border-bottom: 1px solid var(--company-border);
+}
+
+
+.account-balance-currency {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 26px;
+
+    padding: 4px 9px;
+
+    background: var(--company-hover);
+
+    border: 1px solid var(--company-border);
+    border-radius: 7px;
+
+    color: var(--company-text);
+
+    font-size: 11px;
+    font-weight: 700;
+
+    line-height: 1;
+}
+
+
+.account-balance-label {
+    color: var(--company-muted);
+
+    font-size: 11px;
+
+    text-align: right;
+}
+
+
+/* ==========================
+   BALANCE VALUES
+========================== */
+
+.account-balance-values {
+    display: grid;
+
+    grid-template-columns: 1fr;
+
+    gap: 14px;
+
+    padding-top: 15px;
+}
+
+
+.account-balance-value {
+    min-width: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 5px;
+}
+
+
+.account-balance-value span {
+    color: var(--company-muted);
+
+    font-size: 11px;
+
+    line-height: 1.2;
+}
+
+
+.account-balance-value strong {
+    overflow: hidden;
+
+    color: var(--company-text);
+
+    font-size: 18px;
+    font-weight: 700;
+
+    line-height: 1.2;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+.account-balance-current strong {
+    color: var(--success);
+}
+
+
+.account-balance-divider {
+    width: 100%;
+    height: 1px;
+
+    background: var(--company-border);
+}
+
+
+/* ==========================
+   EMPTY BALANCE
+========================== */
+
+.account-balance-empty {
+    display: flex;
+    align-items: center;
+
+    gap: 9px;
+
+    padding: 18px;
+
+    background: var(--company-card);
+
+    border: 1px solid var(--company-border);
+    border-radius: 14px;
+
+    color: var(--company-muted);
+
+    font-size: 12px;
+
+    line-height: 1.4;
+}
+
+
+.account-balance-empty i {
+    flex-shrink: 0;
+
+    font-size: 16px;
+}
+
+
+/* ==========================
+   MOVEMENTS SECTION
+========================== */
+
+.account-movements-table-section {
+    width: 100%;
+
+    margin-top: 0;
+}
+
+
+.account-movements-table-section .section-title {
+    margin-bottom: 14px;
+}
+
+
+.account-movements-table-section .section-title h3 {
+    margin: 0;
+
+    color: var(--company-text);
+
+    font-size: 16px;
+    font-weight: 700;
+}
+
+
+.account-movements-count {
+    display: block;
+
+    margin-top: 4px;
+
+    color: var(--company-muted);
+
+    font-size: 11px;
+
+    line-height: 1.2;
+}
+
+
+/* ==========================
+   TABLE
+========================== */
+
+.account-movements-table {
+    width: 100%;
+}
+
+
+.account-movements-table th,
+.account-movements-table td {
+    vertical-align: middle;
+}
+
+
+.account-movements-table .movement-description {
+    display: block;
+
+    min-width: 140px;
+
+    color: var(--company-text);
+
+    font-size: 13px;
+    font-weight: 600;
+
+    line-height: 1.35;
+}
+
+
+/* ==========================
+   CURRENCY
+========================== */
+
+.account-movements-table .movement-currency {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 42px;
+
+    padding: 4px 7px;
+
+    background: var(--company-hover);
+
+    border: 1px solid var(--company-border);
+    border-radius: 6px;
+
+    color: var(--company-text);
+
+    font-size: 10px;
+    font-weight: 700;
+
+    line-height: 1;
+}
+
+
+/* ==========================
+   AMOUNT
+========================== */
+
+.account-movements-table .amount {
+    white-space: nowrap;
+
+    font-weight: 700;
+}
+
+
+/* ==========================
+   DESTINATION BANK
+========================== */
+
+.account-movements-table .destination-bank {
+    display: flex;
+    align-items: center;
+
+    gap: 6px;
+
+    min-width: 120px;
+}
+
+
+.account-movements-table .destination-bank i {
+    flex-shrink: 0;
+
+    color: var(--company-muted);
+
+    font-size: 12px;
+}
+
+
+.account-movements-table .destination-bank span {
+    color: var(--company-text);
+
+    font-size: 12px;
+}
+
+
+/* ==========================
+   EXECUTION BADGE
+========================== */
+
+.account-movements-table .execution-badge {
+    display: inline-flex;
+    align-items: center;
+
+    gap: 5px;
+
+    margin-top: 6px;
+
+    color: var(--success);
+
+    font-size: 10px;
+    font-weight: 600;
+}
+
+
+.account-movements-table .execution-badge[hidden] {
+    display: none;
+}
+
+
+/* ==========================
+   USER
+========================== */
+
+.account-movements-table .movement-user {
+    display: flex;
+    align-items: center;
+
+    gap: 6px;
+
+    white-space: nowrap;
+}
+
+
+.account-movements-table .movement-user i {
+    flex-shrink: 0;
+
+    color: var(--company-muted);
+
+    font-size: 13px;
+}
+
+
+.account-movements-table .movement-user span {
+    color: var(--company-text);
+
+    font-size: 12px;
+}
+
+
+/* ==========================
+   ACTIONS
+========================== */
+
+.account-movements-table .table-actions {
+    display: flex;
+    align-items: center;
+
+    gap: 6px;
+
+    white-space: nowrap;
+}
+
+
+.account-movements-table .table-actions form {
+    margin: 0;
+}
+
+
+/* ==========================================================
+   TABLET
+========================================================== */
+
+@media (min-width: 601px) {
+
+    .account-movements-header {
+        gap: 20px;
+    }
+
+
+    .account-movements-heading {
+        flex-direction: row;
+        align-items: center;
+
+        gap: 18px;
+    }
+
+
+    .account-balance-summary {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+        gap: 14px;
+    }
+
+
+    .account-balance-values {
+        grid-template-columns:
+            minmax(0, 1fr)
+            1px
+            minmax(0, 1fr);
+
+        align-items: center;
+
+        gap: 16px;
+    }
+
+
+    .account-balance-divider {
+        width: 1px;
+        height: 38px;
+    }
+
+
+    .account-movements-header-actions {
+        width: auto;
+    }
+
+
+    .account-movements-header-actions .primary-action-button {
+        width: auto;
+    }
+
+}
+
+
+/* ==========================================================
+   DESKTOP
+========================================================== */
+
+@media (min-width: 992px) {
+
+    .account-movements-header {
+        flex-direction: row;
+
+        align-items: center;
+        justify-content: space-between;
+
+        gap: 30px;
+
+        margin-bottom: 28px;
+    }
+
+
+    .account-movements-title h1 {
+        font-size: 25px;
+    }
+
+
+    .account-movements-logo {
+        width: 52px;
+        height: 52px;
+
+        flex-basis: 52px;
+    }
+
+
+    .account-balance-summary {
+        grid-template-columns:
+            repeat(
+                auto-fit,
+                minmax(280px, 1fr)
+            );
+
+        gap: 16px;
+
+        margin-bottom: 30px;
+    }
+
+
+    .account-balance-card {
+        padding: 18px;
+    }
+
+
+    .account-balance-value strong {
+        font-size: 20px;
+    }
+
+}
+
+
+/* ==========================================================
+   LARGE DESKTOP
+========================================================== */
+
+@media (min-width: 1400px) {
+
+    .account-balance-summary {
+        grid-template-columns:
+            repeat(
+                auto-fit,
+                minmax(300px, 1fr)
+            );
+    }
+
+}
+
+
+/* ==========================================================
+   HOVER
+========================================================== */
+
+@media (hover: hover) {
+
+    .account-balance-card {
+        transition:
+            border-color .18s ease,
+            transform .18s ease;
+    }
+
+
+    .account-balance-card:hover {
+        border-color: var(--company-muted);
+
+        transform: translateY(-2px);
     }
 
 }

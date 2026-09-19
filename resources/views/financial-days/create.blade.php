@@ -2,10 +2,15 @@
 
 
 @section('content')
-    <div class="page-container">
+
+    <div class="page-container opening-page">
 
 
-        <div class="page-header">
+        {{-- =========================================================
+        HEADER
+    ========================================================== --}}
+
+        <div class="page-header opening-page-header">
 
             <div>
 
@@ -14,7 +19,7 @@
                 </h1>
 
                 <p>
-                    Cargá los saldos iniciales de tus cuentas para comenzar el día.
+                    Ingresá el saldo disponible de cada cuenta al comenzar el día.
                 </p>
 
             </div>
@@ -23,40 +28,106 @@
 
 
 
-        <form method="POST" action="{{ route('financial-days.store') }}">
+        {{-- =========================================================
+        ERRORES
+    ========================================================== --}}
+
+        @if ($errors->any())
+            <div class="alert alert-danger opening-errors">
+
+                @foreach ($errors->all() as $error)
+                    <div>
+                        {{ $error }}
+                    </div>
+                @endforeach
+
+            </div>
+        @endif
+
+
+
+        {{-- =========================================================
+        FORMULARIO
+    ========================================================== --}}
+
+        <form method="POST" action="{{ route('financial-days.store') }}" class="opening-form">
 
             @csrf
 
 
-            <div class="row g-3">
 
-                @foreach ($accounts as $account)
-                    <div class="col-12 col-sm-6 col-xl-3">
-
-                        <div class="account-card h-100">
+            <div class="opening-grid">
 
 
-                            <div class="w-100">
-
-                                <div class="account-top">
-
-                                    @if ($account->logo)
-                                        <img class="account-logo" src="{{ Storage::url($account->logo) }}"
-                                            alt="{{ $account->name }}">
-                                    @else
-                                        <div class="account-logo empty">
-
-                                            <i class="bi bi-bank"></i>
-
-                                        </div>
-                                    @endif
+                @forelse ($accounts as $account)
+                    <div class="opening-account-card">
 
 
-                                    <div>
+                        {{-- =================================================
+                        BANCO
+                    ================================================== --}}
 
-                                        <h3>
-                                            {{ $account->name }}
-                                        </h3>
+                        <div class="opening-account-header">
+
+
+                            <div class="opening-account-identity">
+
+
+                                @if ($account->logo)
+                                    <img class="opening-account-logo" src="{{ Storage::url($account->logo) }}"
+                                        alt="{{ $account->name }}">
+                                @else
+                                    <div class="opening-account-logo opening-account-logo-empty">
+
+                                        <i class="bi bi-bank"></i>
+
+                                    </div>
+                                @endif
+
+
+
+                                <div class="opening-account-name">
+
+                                    <h3>
+                                        {{ $account->name }}
+                                    </h3>
+
+                                    <span>
+
+                                        {{ $account->balances->count() }}
+
+                                        {{ $account->balances->count() === 1 ? 'moneda configurada' : 'monedas configuradas' }}
+
+                                    </span>
+
+                                </div>
+
+
+                            </div>
+
+
+                        </div>
+
+
+
+                        {{-- =================================================
+                        MONEDAS
+                    ================================================== --}}
+
+                        <div class="opening-balances">
+
+
+                            @forelse ($account->balances as $balance)
+                                <div class="opening-balance-row">
+
+
+                                    {{-- MONEDA --}}
+
+                                    <div class="opening-balance-currency">
+
+                                        <strong>
+                                            {{ $balance->currency }}
+                                        </strong>
 
                                         <span>
                                             Saldo inicial
@@ -64,44 +135,116 @@
 
                                     </div>
 
+
+
+                                    {{-- INPUT --}}
+
+                                    <div class="opening-balance-field">
+
+
+                                        <span class="opening-input-currency">
+                                            {{ $balance->currency }}
+                                        </span>
+
+
+                                        <input type="text" class="opening-money-input money-input"
+                                            name="balances[{{ $balance->id }}]"
+                                            placeholder="0,00" 
+                                            value="{{ old('balances.' . $balance->id) }}" inputmode="decimal"
+                                            autocomplete="off"
+                                            aria-label="Saldo inicial {{ $balance->currency }} de {{ $account->name }}"
+                                            required>
+
+
+                                    </div>
+
+
                                 </div>
 
 
-                                <div class="mt-4">
+                            @empty
 
-                                    <input type="text" class="dark-input w-100 money-input"
-                                        name="balances[{{ $account->id }}]" placeholder="0" inputmode="decimal"
-                                        autocomplete="off" required>
+
+                                <div class="opening-no-currencies">
+
+                                    <i class="bi bi-exclamation-circle"></i>
+
+                                    <span>
+                                        Esta cuenta no tiene monedas configuradas.
+                                    </span>
 
                                 </div>
-
-                            </div>
+                            @endforelse
 
 
                         </div>
 
+
                     </div>
-                @endforeach
+
+
+                @empty
+
+
+                    <div class="opening-no-accounts">
+
+                        <div class="opening-no-accounts-icon">
+
+                            <i class="bi bi-bank"></i>
+
+                        </div>
+
+                        <strong>
+                            No hay cuentas disponibles
+                        </strong>
+
+                        <span>
+                            Primero tenés que crear una cuenta para poder abrir la jornada.
+                        </span>
+
+                    </div>
+                @endforelse
+
 
             </div>
 
 
 
-            <div class="opening-day-actions mt-4 d-flex justify-content-center">
+            {{-- =========================================================
+            ACTIONS
+        ========================================================== --}}
 
-                <button type="submit" class="primary-action-button">
+            @if ($accounts->isNotEmpty() && $accounts->sum(fn($account) => $account->balances->count()) > 0)
+                <div class="opening-actions">
 
-                    <i class="bi bi-play-circle"></i>
 
-                    Abrir jornada
+                    <div class="opening-actions-info">
 
-                </button>
+                        <i class="bi bi-info-circle"></i>
 
-            </div>
+                        <span>
+                            Verificá los saldos antes de iniciar la jornada.
+                        </span>
+
+                    </div>
+
+
+                    <button type="submit" class="primary-action-button opening-submit">
+
+                        <i class="bi bi-play-circle"></i>
+
+                        Abrir jornada
+
+                    </button>
+
+
+                </div>
+            @endif
 
 
         </form>
 
 
     </div>
+
 @endsection

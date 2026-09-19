@@ -4,16 +4,54 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\CompanyContextService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
+    /*
+    |--------------------------------------------------------------------------
+    | Usuarios de la empresa activa
+    |--------------------------------------------------------------------------
+    */
 
     public function index()
     {
-        $users = User::orderBy('username')
+        $currentUser = auth()->user();
+
+        $this->ensureCanManageUsers(
+            $currentUser
+        );
+
+        $companyId = app(
+            CompanyContextService::class
+        )->id();
+
+
+        $users = User::query()
+            ->whereHas(
+                'companies',
+                function ($query) use ($companyId) {
+                    $query->where(
+                        'companies.id',
+                        $companyId
+                    );
+                }
+            )
+            ->with([
+                'companies' => function ($query) use ($companyId) {
+                    $query->where(
+                        'companies.id',
+                        $companyId
+                    );
+                }
+            ])
+            ->orderBy('name')
             ->get();
+
 
         return view(
             'admin.users.index',
@@ -22,163 +60,83 @@ class UserController extends Controller
     }
 
 
+    /*
+    |--------------------------------------------------------------------------
+    | Crear
+    |--------------------------------------------------------------------------
+    */
+
     public function create()
     {
+        $this->ensureCanManageUsers(
+            auth()->user()
+        );
+
         return view(
             'admin.users.create'
         );
     }
 
 
+    /*
+    |--------------------------------------------------------------------------
+    | Guardar
+    |--------------------------------------------------------------------------
+    */
+
     public function store(Request $request)
-    {
-        /*
-    |--------------------------------------------------------------------------
-    | Validación
-    |--------------------------------------------------------------------------
-    */
-
-        $allowedRoles = [
-            'operator',
-            'administration'
-        ];
-
-
-        /*
-    |--------------------------------------------------------------------------
-    | Solo un Super Admin puede crear otro Super Admin
-    |--------------------------------------------------------------------------
-    */
-
-        if (auth()->user()->is_admin) {
-            $allowedRoles[] = 'super_admin';
-        }
-
-
-        $data = $request->validate([
-            'username' => [
-                'required',
-                'string',
-                'max:50',
-                'unique:users'
-            ],
-
-            'password' => [
-                'required',
-                'string',
-                'min:6'
-            ],
-
-            'role' => [
-                'required',
-                'in:' . implode(',', $allowedRoles)
-            ]
-        ]);
-
-
-        /*
-    |--------------------------------------------------------------------------
-    | Determinar permisos
-    |--------------------------------------------------------------------------
-    */
-
-        $isSuperAdmin =
-            $data['role'] === 'super_admin';
-
-
-        /*
-    |--------------------------------------------------------------------------
-    | Crear usuario
-    |--------------------------------------------------------------------------
-    */
-
-        User::create([
-            'name' => $data['username'],
-
-            'username' => $data['username'],
-
-            'email' =>
-            $data['username'] . '@local',
-
-            'password' =>
-            Hash::make($data['password']),
-
-            /*
-        | Super Admin NO es realmente un role.
-        | El permiso real sigue siendo is_admin.
-        */
-
-            'role' =>
-            $isSuperAdmin
-                ? 'operator'
-                : $data['role'],
-
-            'is_admin' =>
-            $isSuperAdmin
-        ]);
-
-
-        return redirect()
-            ->route('usuarios.index')
-            ->with(
-                'success',
-                'Usuario creado correctamente'
-            );
-    }
-
-
-    public function edit(User $usuario)
-    {
-        return view('admin.users.edit', [
-            'user' => $usuario
-        ]);
-    }
-
-
-    public function update(Request $request, User $usuario)
     {
         $currentUser = auth()->user();
 
-
-        /*
-    |--------------------------------------------------------------------------
-    | Roles permitidos
-    |--------------------------------------------------------------------------
-    |
-    | Solo un Super Admin puede asignar el nivel Super Admin.
-    |
-    */
-
-        $allowedRoles = [
-            'operator',
-            'administration'
-        ];
-
-        if ($currentUser->is_admin) {
-            $allowedRoles[] = 'super_admin';
-        }
+        $this->ensureCanManageUsers(
+            $currentUser
+        );
 
 
-        /*
-    |--------------------------------------------------------------------------
-    | Validación
-    |--------------------------------------------------------------------------
-    */
+        $companyId = app(
+            CompanyContextService::class
+        )->id();
+
 
         $data = $request->validate(
             [
+                'name' => [
+                    'required',
+                    'string',
+                    'max:100'
+                ],
+
+                'email' => [
+                    'required',
+                    'email',
+                    'max:255'
+                ],
+
                 'password' => [
-                    'nullable',
+                    'required',
                     'string',
                     'min:8'
                 ],
 
                 'role' => [
                     'required',
-                    'in:' . implode(',', $allowedRoles)
+                    Rule::in([
+                        'operator',
+                        'administration',
+                        'super_admin'
+                    ])
                 ]
             ],
             [
+                'name.required' =>
+                'Ingresá el nombre del usuario.',
+
+                'email.required' =>
+                'Ingresá el email.',
+
+                'email.email' =>
+                'Ingresá un email válido.',
+
                 'password.min' =>
                 'La contraseña debe tener al menos 8 caracteres.',
 
@@ -191,103 +149,153 @@ class UserController extends Controller
         );
 
 
-        /*
-    |--------------------------------------------------------------------------
-    | Nuevo nivel
-    |--------------------------------------------------------------------------
-    */
+        DB::transaction(
+            function () use (
+                $data,
+                $companyId
+            ) {
 
-        $willBeSuperAdmin =
-            $data['role'] === 'super_admin';
+                /*
+                |--------------------------------------------------------------------------
+                | Buscar usuario global por email
+                |--------------------------------------------------------------------------
+                */
 
-
-        /*
-    |--------------------------------------------------------------------------
-    | Protección del último Super Admin
-    |--------------------------------------------------------------------------
-    |
-    | Si el usuario actualmente es Super Admin y se intenta bajarlo
-    | a otro rol, verificamos que exista otro Super Admin activo.
-    |
-    */
-
-        if (
-            $usuario->is_admin &&
-            !$willBeSuperAdmin
-        ) {
-
-            $superAdmins = User::where(
-                'is_admin',
-                true
-            )->count();
+                $user = User::withTrashed()
+                    ->where(
+                        'email',
+                        $data['email']
+                    )
+                    ->first();
 
 
-            if ($superAdmins <= 1) {
+                /*
+                |--------------------------------------------------------------------------
+                | Usuario nuevo
+                |--------------------------------------------------------------------------
+                */
 
-                return redirect()
-                    ->back()
-                    ->withInput()
-                    ->with(
-                        'error',
-                        'No podés quitar el rol al último Super Admin del sistema.'
+                if (!$user) {
+
+                    if (empty($data['password'])) {
+                        abort(
+                            422,
+                            'La contraseña es obligatoria para un usuario nuevo.'
+                        );
+                    }
+
+
+                    $user = User::create([
+                        'name' =>
+                        $data['name'],
+
+                        /*
+                         * Temporal mientras username
+                         * siga existiendo en la tabla.
+                         */
+                        'username' =>
+                        $this->generateUsername(
+                            $data['email']
+                        ),
+
+                        'email' =>
+                        $data['email'],
+
+                        'password' =>
+                        Hash::make(
+                            $data['password']
+                        ),
+                    ]);
+                }
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | Usuario existente
+                |--------------------------------------------------------------------------
+                */ else {
+
+                    /*
+                     * Si estaba eliminado globalmente,
+                     * lo restauramos.
+                     */
+                    if ($user->trashed()) {
+                        $user->restore();
+                    }
+
+
+                    /*
+                     * Actualizamos el nombre.
+                     */
+                    $user->name =
+                        $data['name'];
+
+
+                    /*
+                     * Password opcional para usuario existente.
+                     */
+                    if (!empty($data['password'])) {
+                        $user->password =
+                            Hash::make(
+                                $data['password']
+                            );
+                    }
+
+
+                    $user->save();
+                }
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | Evitar membresía duplicada
+                |--------------------------------------------------------------------------
+                */
+
+                $alreadyBelongs =
+                    $user
+                    ->companies()
+                    ->where(
+                        'companies.id',
+                        $companyId
+                    )
+                    ->exists();
+
+
+                if ($alreadyBelongs) {
+                    abort(
+                        422,
+                        'Ese usuario ya pertenece a esta empresa.'
+                    );
+                }
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | Crear membresía
+                |--------------------------------------------------------------------------
+                */
+
+                $isSuperAdmin =
+                    $data['role']
+                    === 'super_admin';
+
+
+                $user
+                    ->companies()
+                    ->attach(
+                        $companyId,
+                        [
+                            'role' =>
+                            $isSuperAdmin
+                                ? 'operator'
+                                : $data['role'],
+
+                            'is_admin' =>
+                            $isSuperAdmin
+                        ]
                     );
             }
-        }
-
-
-        /*
-    |--------------------------------------------------------------------------
-    | Datos a actualizar
-    |--------------------------------------------------------------------------
-    */
-
-        $updateData = [];
-
-
-        /*
-    |--------------------------------------------------------------------------
-    | Contraseña
-    |--------------------------------------------------------------------------
-    */
-
-        if (!empty($data['password'])) {
-
-            $updateData['password'] = Hash::make(
-                $data['password']
-            );
-        }
-
-
-        /*
-    |--------------------------------------------------------------------------
-    | Super Admin
-    |--------------------------------------------------------------------------
-    */
-
-        if ($willBeSuperAdmin) {
-
-            /*
-        | Super Admin se controla mediante is_admin.
-        | Dejamos operator como role interno.
-        */
-
-            $updateData['is_admin'] = true;
-            $updateData['role'] = 'operator';
-        } else {
-
-            $updateData['is_admin'] = false;
-            $updateData['role'] = $data['role'];
-        }
-
-
-        /*
-    |--------------------------------------------------------------------------
-    | Actualizar
-    |--------------------------------------------------------------------------
-    */
-
-        $usuario->update(
-            $updateData
         );
 
 
@@ -295,77 +303,434 @@ class UserController extends Controller
             ->route('usuarios.index')
             ->with(
                 'success',
-                'Usuario actualizado correctamente'
+                'Usuario agregado correctamente.'
             );
     }
 
 
-    public function destroy(User $usuario)
+    /*
+    |--------------------------------------------------------------------------
+    | Editar
+    |--------------------------------------------------------------------------
+    */
+
+    public function edit(User $usuario)
     {
         $currentUser = auth()->user();
 
+        $this->ensureCanManageUsers(
+            $currentUser
+        );
 
-        /*
+        $membership =
+            $this->membershipForCurrentCompany(
+                $usuario
+            );
+
+
+        return view(
+            'admin.users.edit',
+            [
+                'user' => $usuario,
+                'membership' => $membership
+            ]
+        );
+    }
+
+
+    /*
     |--------------------------------------------------------------------------
-    | No permitir eliminarse a sí mismo
+    | Actualizar
     |--------------------------------------------------------------------------
     */
 
-        if ($usuario->id === $currentUser->id) {
+    public function update(
+        Request $request,
+        User $usuario
+    ) {
+        $currentUser = auth()->user();
 
-            return redirect()
-                ->route('usuarios.index')
-                ->with(
-                    'error',
-                    'No podés eliminar tu propio usuario.'
-                );
-        }
+        $this->ensureCanManageUsers(
+            $currentUser
+        );
+
+
+        $membership =
+            $this->membershipForCurrentCompany(
+                $usuario
+            );
+
+
+        $data = $request->validate(
+            [
+                'name' => [
+                    'required',
+                    'string',
+                    'max:100'
+                ],
+
+                'email' => [
+                    'required',
+                    'email',
+                    'max:255',
+
+                    Rule::unique(
+                        'users',
+                        'email'
+                    )->ignore(
+                        $usuario->id
+                    )
+                ],
+
+                'password' => [
+                    'nullable',
+                    'string',
+                    'min:8'
+                ],
+
+                'role' => [
+                    'required',
+                    Rule::in([
+                        'operator',
+                        'administration',
+                        'super_admin'
+                    ])
+                ]
+            ],
+            [
+                'name.required' =>
+                'Ingresá el nombre del usuario.',
+
+                'email.required' =>
+                'Ingresá el email.',
+
+                'email.email' =>
+                'Ingresá un email válido.',
+
+                'email.unique' =>
+                'Ese email ya está siendo utilizado.',
+
+                'password.min' =>
+                'La contraseña debe tener al menos 8 caracteres.',
+
+                'role.required' =>
+                'Debés seleccionar un rol.',
+
+                'role.in' =>
+                'El rol seleccionado no es válido.',
+            ]
+        );
+
+
+        $willBeSuperAdmin =
+            $data['role']
+            === 'super_admin';
 
 
         /*
-    |--------------------------------------------------------------------------
-    | Protección de Super Admin
-    |--------------------------------------------------------------------------
-    |
-    | Se puede eliminar un Super Admin solamente si existe
-    | al menos otro Super Admin activo.
-    |
-    */
+        |--------------------------------------------------------------------------
+        | Proteger último Super Admin
+        |--------------------------------------------------------------------------
+        */
 
-        if ($usuario->is_admin) {
+        if (
+            (bool) $membership->pivot->is_admin
+            &&
+            !$willBeSuperAdmin
+        ) {
 
-            $superAdmins = User::where(
-                'is_admin',
-                true
-            )->count();
-
-
-            if ($superAdmins <= 1) {
-
-                return redirect()
-                    ->route('usuarios.index')
+            if (
+                $this->superAdminCount()
+                <= 1
+            ) {
+                return back()
+                    ->withInput()
                     ->with(
                         'error',
-                        'No se puede eliminar el último Super Admin del sistema.'
+                        'No podés quitar el rol al último Super Admin de la empresa.'
                     );
             }
         }
 
 
-        /*
-    |--------------------------------------------------------------------------
-    | Eliminación lógica
-    |--------------------------------------------------------------------------
-    */
+        DB::transaction(
+            function () use (
+                $usuario,
+                $data,
+                $willBeSuperAdmin
+            ) {
 
-        $usuario->delete();
+                /*
+                 * Datos globales del usuario.
+                 */
+
+                $usuario->name =
+                    $data['name'];
+
+                $usuario->email =
+                    $data['email'];
+
+
+                if (!empty($data['password'])) {
+                    $usuario->password =
+                        Hash::make(
+                            $data['password']
+                        );
+                }
+
+
+                $usuario->save();
+
+
+                /*
+                 * Datos específicos de la empresa.
+                 */
+
+                $companyId = app(
+                    CompanyContextService::class
+                )->id();
+
+
+                $usuario
+                    ->companies()
+                    ->updateExistingPivot(
+                        $companyId,
+                        [
+                            'role' =>
+                            $willBeSuperAdmin
+                                ? 'operator'
+                                : $data['role'],
+
+                            'is_admin' =>
+                            $willBeSuperAdmin
+                        ]
+                    );
+            }
+        );
 
 
         return redirect()
             ->route('usuarios.index')
             ->with(
                 'success',
-                'Usuario eliminado correctamente'
+                'Usuario actualizado correctamente.'
             );
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Quitar de la empresa
+    |--------------------------------------------------------------------------
+    */
+
+    public function destroy(User $usuario)
+    {
+        $currentUser = auth()->user();
+
+        $this->ensureCanManageUsers(
+            $currentUser
+        );
+
+
+        $membership =
+            $this->membershipForCurrentCompany(
+                $usuario
+            );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | No quitarse a sí mismo
+        |--------------------------------------------------------------------------
+        */
+
+        if (
+            $usuario->id ===
+            $currentUser->id
+        ) {
+            return redirect()
+                ->route('usuarios.index')
+                ->with(
+                    'error',
+                    'No podés quitar tu propio usuario de la empresa.'
+                );
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Proteger último Super Admin
+        |--------------------------------------------------------------------------
+        */
+
+        if (
+            (bool) $membership->pivot->is_admin
+            &&
+            $this->superAdminCount() <= 1
+        ) {
+            return redirect()
+                ->route('usuarios.index')
+                ->with(
+                    'error',
+                    'No se puede quitar al último Super Admin de la empresa.'
+                );
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | IMPORTANTE
+        |--------------------------------------------------------------------------
+        |
+        | No eliminamos User.
+        |
+        | Solamente quitamos la relación con ESTA empresa.
+        |
+        */
+
+        $usuario
+            ->companies()
+            ->detach(
+                app(
+                    CompanyContextService::class
+                )->id()
+            );
+
+
+        return redirect()
+            ->route('usuarios.index')
+            ->with(
+                'success',
+                'Usuario quitado de la empresa correctamente.'
+            );
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Membresía en empresa activa
+    |--------------------------------------------------------------------------
+    */
+
+    private function membershipForCurrentCompany(
+        User $user
+    ) {
+        $companyId = app(
+            CompanyContextService::class
+        )->id();
+
+
+        $membership =
+            $user
+            ->companies()
+            ->where(
+                'companies.id',
+                $companyId
+            )
+            ->first();
+
+
+        if (!$membership) {
+            abort(404);
+        }
+
+
+        return $membership;
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Cantidad de Super Admins
+    |--------------------------------------------------------------------------
+    */
+
+    private function superAdminCount(): int
+    {
+        $companyId = app(
+            CompanyContextService::class
+        )->id();
+
+
+        return DB::table(
+            'company_user'
+        )
+            ->where(
+                'company_id',
+                $companyId
+            )
+            ->where(
+                'is_admin',
+                true
+            )
+            ->count();
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Seguridad
+    |--------------------------------------------------------------------------
+    */
+
+    private function ensureCanManageUsers(
+        User $user
+    ): void {
+
+        if (!$user->isSuperAdmin()) {
+            abort(403);
+        }
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Username temporal
+    |--------------------------------------------------------------------------
+    */
+
+    private function generateUsername(
+        string $email
+    ): string {
+
+        $base = strtolower(
+            explode('@', $email)[0]
+        );
+
+
+        $base = preg_replace(
+            '/[^a-z0-9._-]/',
+            '',
+            $base
+        );
+
+
+        if (!$base) {
+            $base = 'usuario';
+        }
+
+
+        $username = $base;
+        $counter = 1;
+
+
+        while (
+            User::withTrashed()
+            ->where(
+                'username',
+                $username
+            )
+            ->exists()
+        ) {
+            $username =
+                $base
+                . $counter;
+
+            $counter++;
+        }
+
+
+        return $username;
     }
 }

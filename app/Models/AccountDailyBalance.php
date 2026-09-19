@@ -3,15 +3,18 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Concerns\BelongsToCompany;
 
 class AccountDailyBalance extends Model
 {
+    use BelongsToCompany;
 
     protected $fillable = [
         'financial_day_id',
         'account_id',
+        'account_balance_id',
         'initial_balance',
-        'current_balance',
+        'current_balance'
     ];
 
     protected $casts = [
@@ -31,6 +34,17 @@ class AccountDailyBalance extends Model
 
     public function account()
     {
-        return $this->belongsTo(Account::class);
+        return $this->belongsTo(
+            Account::class
+        );
+    }
+
+
+    public function accountBalance()
+    {
+        return $this->belongsTo(
+            AccountBalance::class,
+            'account_balance_id'
+        );
     }
 }

@@ -1,0 +1,839 @@
+/* ==========================
+   BASE — MOBILE FIRST
+========================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html,
+body {
+    width: 100%;
+    min-height: 100%;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    background: #000;
+    color: #fff;
+
+    font-family:
+        Inter,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+
+    -webkit-font-smoothing: antialiased;
+
+    overflow-x: hidden;
+}
+
+
+/* ==========================
+   WELCOME
+========================== */
+
+.welcome {
+    position: relative;
+
+    width: 100%;
+    min-height: 100dvh;
+
+    background: #000;
+
+    overflow: hidden;
+}
+
+
+/* ==========================
+   PARTICLES BACKGROUND
+========================== */
+
+.welcome-particles {
+    position: absolute;
+
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    display: block;
+
+    pointer-events: none;
+
+    z-index: 0;
+}
+
+
+/* ==========================
+   PAGE
+========================== */
+
+.welcome-page {
+    position: relative;
+    z-index: 1;
+
+    width: 100%;
+}
+
+
+/* ==========================
+   HERO
+========================== */
+
+.welcome-content {
+    width: 100%;
+    min-height: 100dvh;
+
+    max-width: 700px;
+
+    margin: 0 auto;
+
+    padding: 60px 20px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+}
+
+
+/* ==========================
+   HERO BADGE
+========================== */
+
+.welcome-badge {
+    margin-bottom: 24px;
+
+    padding: 8px 13px;
+
+    border: 1px solid #242424;
+    border-radius: 999px;
+
+    background: rgba(255, 255, 255, .025);
+
+    color: #888;
+
+    font-size: 11px;
+    font-weight: 500;
+
+    letter-spacing: .5px;
+}
+
+
+/* ==========================
+   BRAND
+========================== */
+
+.welcome-logo {
+    color: #fff;
+
+    font-size: clamp(42px, 13vw, 58px);
+    font-weight: 600;
+
+    line-height: .95;
+    letter-spacing: -2.5px;
+}
+
+.welcome-logo span {
+    font-weight: 300;
+}
+
+
+/* ==========================
+   SUBTITLE
+========================== */
+
+.welcome-subtitle {
+    max-width: 480px;
+
+    margin-top: 20px;
+
+    color: #888;
+
+    font-size: 14px;
+    font-weight: 400;
+
+    line-height: 1.6;
+}
+
+
+/* ==========================
+   ACTIONS
+========================== */
+
+.welcome-actions {
+    width: 100%;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 10px;
+
+    margin-top: 40px;
+}
+
+
+/* ==========================
+   BUTTONS
+========================== */
+
+.welcome-button {
+    width: 100%;
+    min-height: 48px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0 20px;
+
+    border-radius: 10px;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    text-decoration: none;
+
+    transition:
+        background .2s ease,
+        border-color .2s ease,
+        transform .2s ease;
+}
+
+.welcome-button:active {
+    transform: scale(.98);
+}
+
+
+.welcome-button-primary {
+    background: #fff;
+    color: #000;
+
+    border: 1px solid #fff;
+}
+
+
+.welcome-button-secondary {
+    background: rgba(0, 0, 0, .20);
+    color: #fff;
+
+    border: 1px solid #262626;
+
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+
+/* ==========================
+   PLAN SECTION
+========================== */
+
+.welcome-plan {
+    position: relative;
+
+    width: 100%;
+
+    padding: 0 20px 80px;
+}
+
+
+/* línea ambiental superior */
+
+.welcome-plan::before {
+    content: "";
+
+    position: absolute;
+
+    top: 0;
+    left: 50%;
+
+    width: min(700px, 70%);
+    height: 1px;
+
+    transform: translateX(-50%);
+
+    background: linear-gradient(
+        90deg,
+        transparent,
+        #222,
+        transparent
+    );
+}
+
+
+/* ==========================
+   PLAN CARD
+========================== */
+
+.plan-card {
+    width: 100%;
+    max-width: 1100px;
+
+    margin: 0 auto;
+
+    display: grid;
+    grid-template-columns: 1fr;
+
+    overflow: hidden;
+
+    border: 1px solid #1f1f1f;
+    border-radius: 20px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,.045),
+            rgba(255,255,255,.012)
+        );
+
+    box-shadow:
+        0 30px 80px rgba(0, 0, 0, .45);
+
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+}
+
+
+/* ==========================
+   PRICE
+========================== */
+
+.plan-price {
+    padding: 32px 26px;
+
+    border-bottom: 1px solid #1f1f1f;
+}
+
+
+.plan-label {
+    display: block;
+
+    margin-bottom: 25px;
+
+    color: #777;
+
+    font-size: 11px;
+    font-weight: 600;
+
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+}
+
+
+/* ==========================
+   PRICE VALUE
+========================== */
+
+.plan-price-value {
+    display: flex;
+    align-items: flex-end;
+
+    gap: 8px;
+
+    margin-bottom: 22px;
+}
+
+
+.plan-currency {
+    margin-bottom: 9px;
+
+    color: #777;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    letter-spacing: .5px;
+}
+
+
+.plan-price-value strong {
+    color: #fff;
+
+    font-size: 64px;
+    font-weight: 500;
+
+    line-height: .8;
+
+    letter-spacing: -4px;
+}
+
+
+.plan-period {
+    margin-bottom: 7px;
+
+    color: #777;
+
+    font-size: 13px;
+}
+
+
+/* ==========================
+   PRICE DESCRIPTION
+========================== */
+
+.plan-description {
+    max-width: 340px;
+
+    color: #888;
+
+    font-size: 13px;
+
+    line-height: 1.65;
+}
+
+
+/* ==========================
+   UNLIMITED
+========================== */
+
+.plan-unlimited {
+    width: fit-content;
+
+    margin-top: 24px;
+
+    padding: 7px 11px;
+
+    border: 1px solid #292929;
+    border-radius: 7px;
+
+    color: #bbb;
+
+    background: rgba(255, 255, 255, .025);
+
+    font-size: 11px;
+    font-weight: 500;
+}
+
+
+/* ==========================
+   PLAN BUTTON
+========================== */
+
+.plan-button {
+    width: 100%;
+    min-height: 48px;
+
+    margin-top: 30px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 10px;
+
+    background: #fff;
+    color: #000;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    text-decoration: none;
+
+    transition:
+        background .2s ease,
+        transform .2s ease;
+}
+
+.plan-button:active {
+    transform: scale(.98);
+}
+
+
+/* ==========================
+   FEATURES
+========================== */
+
+.plan-features {
+    padding: 32px 26px;
+}
+
+
+.plan-features-header span {
+    display: block;
+
+    margin-bottom: 12px;
+
+    color: #666;
+
+    font-size: 10px;
+    font-weight: 600;
+
+    letter-spacing: 1.5px;
+}
+
+
+.plan-features-header h2 {
+    max-width: 500px;
+
+    color: #fff;
+
+    font-size: 28px;
+    font-weight: 400;
+
+    line-height: 1.1;
+
+    letter-spacing: -1px;
+}
+
+
+/* ==========================
+   FEATURES GRID
+========================== */
+
+.features-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+
+    gap: 0;
+
+    margin-top: 32px;
+}
+
+
+/* ==========================
+   FEATURE ITEM
+========================== */
+
+.feature-item {
+    display: flex;
+    align-items: flex-start;
+
+    gap: 13px;
+
+    padding: 18px 0;
+
+    border-bottom: 1px solid #191919;
+}
+
+
+.feature-check {
+    flex-shrink: 0;
+
+    width: 24px;
+    height: 24px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid #2a2a2a;
+    border-radius: 50%;
+
+    background: rgba(255, 255, 255, .035);
+
+    color: #fff;
+
+    font-size: 10px;
+}
+
+
+.feature-item strong {
+    display: block;
+
+    margin-bottom: 5px;
+
+    color: #ddd;
+
+    font-size: 13px;
+    font-weight: 500;
+}
+
+
+.feature-item p {
+    color: #666;
+
+    font-size: 12px;
+
+    line-height: 1.5;
+}
+
+
+/* ==========================
+   FOOTER
+========================== */
+
+.welcome-footer {
+    position: relative;
+
+    padding: 0 20px 32px;
+
+    text-align: center;
+
+    color: #444;
+
+    font-size: 11px;
+}
+
+.welcome-footer span {
+    margin: 0 7px;
+}
+
+
+/* ==========================
+   SCROLL INDICATOR
+========================== */
+
+.scroll-indicator {
+    width: 30px;
+    height: 38px;
+
+    margin-top: 135px;
+
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+
+    text-decoration: none;
+
+     animation: arrowBounce 1.4s ease-in-out infinite;
+    will-change: transform, opacity;
+}
+
+
+/* PALITO */
+
+.scroll-arrow {
+    position: relative;
+
+    display: block;
+
+    width: 1px;
+    height: 26px;
+
+    background: rgba(255, 255, 255, .65);
+}
+
+
+/* PUNTA */
+
+.scroll-arrow::before,
+.scroll-arrow::after {
+    content: "";
+
+    position: absolute;
+
+    bottom: 0;
+
+    width: 7px;
+    height: 1px;
+
+    background: rgba(255, 255, 255, .65);
+}
+
+
+.scroll-arrow::before {
+    right: 0;
+
+    transform-origin: right center;
+    transform: rotate(45deg);
+}
+
+
+.scroll-arrow::after {
+    left: 0;
+
+    transform-origin: left center;
+    transform: rotate(-45deg);
+}
+
+
+/* ANIMACIÓN */
+
+@keyframes arrowBounce {
+
+    0% {
+        transform: translateY(0);
+        opacity: .35;
+    }
+
+    50% {
+        transform: translateY(12px);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateY(0);
+        opacity: .35;
+    }
+
+}
+
+
+/* ==========================
+   TABLET
+========================== */
+
+@media (min-width: 768px) {
+
+    .welcome-content {
+        padding: 80px 50px;
+    }
+
+
+    .welcome-logo {
+        font-size: 76px;
+        letter-spacing: -4px;
+    }
+
+
+    .welcome-subtitle {
+        margin-top: 22px;
+
+        font-size: 16px;
+    }
+
+
+    .welcome-actions {
+        width: auto;
+
+        flex-direction: row;
+        justify-content: center;
+
+        margin-top: 46px;
+    }
+
+
+    .welcome-button {
+        width: auto;
+
+        min-width: 165px;
+    }
+
+
+    /* PLAN */
+
+    .welcome-plan {
+        padding:
+            20px
+            40px
+            110px;
+    }
+
+
+    .plan-price,
+    .plan-features {
+        padding: 45px;
+    }
+
+
+    .plan-price-value strong {
+        font-size: 76px;
+    }
+
+
+    .plan-features-header h2 {
+        font-size: 36px;
+    }
+
+
+    .features-grid {
+        grid-template-columns:
+            repeat(2, 1fr);
+
+        column-gap: 40px;
+    }
+
+}
+
+
+/* ==========================
+   DESKTOP
+========================== */
+
+@media (min-width: 1000px) {
+
+    .welcome-plan {
+        padding-top: 30px;
+    }
+
+
+    .plan-card {
+        grid-template-columns:
+            .82fr
+            1.18fr;
+    }
+
+
+    .plan-price {
+        padding: 54px;
+
+        border-bottom: 0;
+        border-right: 1px solid #1f1f1f;
+    }
+
+
+    .plan-features {
+        padding: 54px;
+    }
+
+
+    .plan-price-value strong {
+        font-size: 84px;
+    }
+
+
+    .plan-features-header h2 {
+        font-size: 40px;
+    }
+
+}
+
+
+/* ==========================
+   DESKTOP HOVER
+========================== */
+
+@media (hover: hover) {
+
+    .welcome-button-primary:hover,
+    .plan-button:hover {
+        background: #e8e8e8;
+    }
+
+
+    .welcome-button-secondary:hover {
+        background: rgba(255, 255, 255, .06);
+
+        border-color: #333;
+    }
+
+
+    .feature-item {
+        transition: opacity .2s ease;
+    }
+
+
+    .feature-item:hover {
+        opacity: .75;
+    }
+
+}
+
+
+/* ==========================
+   REDUCED MOTION
+========================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+    html {
+        scroll-behavior: auto;
+    }
+
+
+    .welcome-button,
+    .plan-button,
+    .feature-item {
+        transition: none;
+    }
+
+}

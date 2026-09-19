@@ -2,141 +2,254 @@
 
 
 @section('content')
-    <div class="page-container">
+
+<div class="page-container">
 
 
-        <div class="page-header d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+    <div class="page-header d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
 
-            <div>
+        <div>
 
-                <h1>
-                    Editar usuario
-                </h1>
+            <h1>
+                Editar usuario
+            </h1>
 
-                <p class="mt-2">
-                    Modificar acceso de {{ $user->username }}
-                </p>
+            <p class="mt-2">
+                Modificar acceso de {{ $user->name }}
+            </p>
+
+        </div>
+
+    </div>
+
+
+
+    <div class="form-card">
+
+
+        @if (session('error'))
+
+            <div class="alert-error mb-4">
+
+                <i class="bi bi-exclamation-triangle"></i>
+
+                {{ session('error') }}
 
             </div>
 
-        </div>
+        @endif
+
+
+        @if ($errors->any())
+
+            <div class="alert-error mb-4">
+
+                <i class="bi bi-exclamation-triangle"></i>
+
+                {{ $errors->first() }}
+
+            </div>
+
+        @endif
 
 
 
-        <div class="form-card">
+        <form
+            method="POST"
+            action="{{ route('usuarios.update', $user->id) }}"
+        >
 
+            @csrf
 
-            @if ($errors->any())
-                <div class="alert-error mb-4">
-
-                    <i class="bi bi-exclamation-triangle"></i>
-
-                    {{ $errors->first() }}
-
-                </div>
-            @endif
+            @method('PUT')
 
 
 
-            <form method="POST" action="{{ route('usuarios.update', $user->id) }}">
+            {{-- NOMBRE --}}
 
-                @csrf
+            <div class="form-group mb-4">
 
-                @method('PUT')
+                <label class="login-label">
+                    Nombre
+                </label>
+
+                <input
+                    type="text"
+                    name="name"
+                    class="login-input"
+                    value="{{ old('name', $user->name) }}"
+                    required
+                    autocomplete="name"
+                >
+
+                @error('name')
+
+                    <div class="alert-error mt-2">
+                        {{ $message }}
+                    </div>
+
+                @enderror
+
+            </div>
 
 
 
-                <div class="form-group mb-4">
+            {{-- EMAIL --}}
 
-                    <label class="login-label">
-                        Usuario
-                    </label>
+            <div class="form-group mb-4">
 
-                    <input type="text" class="login-input" value="{{ $user->username }}" readonly>
+                <label class="login-label">
+                    Email
+                </label>
 
-                </div>
+                <input
+                    type="email"
+                    name="email"
+                    class="login-input"
+                    value="{{ old('email', $user->email) }}"
+                    required
+                    autocomplete="email"
+                >
+
+                @error('email')
+
+                    <div class="alert-error mt-2">
+                        {{ $message }}
+                    </div>
+
+                @enderror
+
+            </div>
 
 
 
-                <div class="form-group mb-4">
+            {{-- ROL --}}
 
-                    <label class="login-label">
-                        Rol
-                    </label>
+            @php
 
-                    <select name="role" class="login-input" required>
+                $currentRole =
+                    $membership->pivot->is_admin
+                        ? 'super_admin'
+                        : $membership->pivot->role;
 
-                        <option value="operator"
-                            {{ old('role', $user->is_admin ? 'super_admin' : $user->role) === 'operator' ? 'selected' : '' }}>
-                            Operador
+            @endphp
+
+
+            <div class="form-group mb-4">
+
+                <label class="login-label">
+                    Rol
+                </label>
+
+                <select
+                    name="role"
+                    class="login-input"
+                    required
+                >
+
+                    <option
+                        value="operator"
+                        {{ old('role', $currentRole) === 'operator'
+                            ? 'selected'
+                            : '' }}
+                    >
+                        Operador
+                    </option>
+
+
+                    <option
+                        value="administration"
+                        {{ old('role', $currentRole) === 'administration'
+                            ? 'selected'
+                            : '' }}
+                    >
+                        Administración
+                    </option>
+
+
+                    @if (auth()->user()->isSuperAdmin())
+
+                        <option
+                            value="super_admin"
+                            {{ old('role', $currentRole) === 'super_admin'
+                                ? 'selected'
+                                : '' }}
+                        >
+                            Super Admin
                         </option>
 
+                    @endif
 
-                        <option value="administration"
-                            {{ old('role', $user->is_admin ? 'super_admin' : $user->role) === 'administration' ? 'selected' : '' }}>
-                            Administración
-                        </option>
+                </select>
 
 
-                        @if (auth()->user()->is_admin)
-                            <option value="super_admin"
-                                {{ old('role', $user->is_admin ? 'super_admin' : $user->role) === 'super_admin' ? 'selected' : '' }}>
-                                Super Admin
-                            </option>
-                        @endif
+                @error('role')
 
-                    </select>
+                    <div class="alert-error mt-2">
+                        {{ $message }}
+                    </div>
 
+                @enderror
 
-                    @error('role')
-                        <div class="alert-error mt-2">
-                            {{ $message }}
-                        </div>
-                    @enderror
-
-                </div>
+            </div>
 
 
 
-                <div class="form-group mb-4">
+            {{-- PASSWORD --}}
 
-                    <label class="login-label">
-                        Nueva contraseña
-                    </label>
+            <div class="form-group mb-4">
 
-                    <input type="password" name="password" class="login-input" autocomplete="new-password">
+                <label class="login-label">
+                    Nueva contraseña
+                </label>
 
-                    <small class="form-text text-white-50">
-                        Dejá este campo vacío si no querés cambiar la contraseña.
-                    </small>
+                <input
+                    type="password"
+                    name="password"
+                    class="login-input"
+                    autocomplete="new-password"
+                >
 
-                    @error('password')
-                        <div class="alert-error mt-2">
-                            {{ $message }}
-                        </div>
-                    @enderror
-
-                </div>
-
+                <small class="form-text text-white-50">
+                    Dejá este campo vacío si no querés cambiar la contraseña.
+                </small>
 
 
-                <div class="d-flex flex-column flex-md-row justify-content-end">
+                @error('password')
 
-                    <button type="submit" class="primary-action-button">
+                    <div class="alert-error mt-2">
+                        {{ $message }}
+                    </div>
 
-                        <i class="bi bi-check-lg"></i>
+                @enderror
 
-                        Guardar cambios
-
-                    </button>
-
-                </div>
+            </div>
 
 
-            </form>
 
-        </div>
+            {{-- ACCIONES --}}
 
+            <div class="d-flex flex-column flex-md-row justify-content-end">
+
+                <button
+                    type="submit"
+                    class="primary-action-button"
+                >
+
+                    <i class="bi bi-check-lg"></i>
+
+                    Guardar cambios
+
+                </button>
+
+            </div>
+
+
+        </form>
 
     </div>
+
+
+</div>
+
 @endsection

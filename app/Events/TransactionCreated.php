@@ -4,10 +4,11 @@ namespace App\Events;
 
 use App\Models\Transaction;
 use App\Models\AccountDailyBalance;
-use Illuminate\Broadcasting\Channel;
+use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
+
 
 class TransactionCreated implements ShouldBroadcastNow
 {
@@ -19,13 +20,30 @@ class TransactionCreated implements ShouldBroadcastNow
     ) {}
 
 
+    /*
+    |--------------------------------------------------------------------------
+    | Canal
+    |--------------------------------------------------------------------------
+    |
+    | Cada empresa escucha únicamente su propio dashboard.
+    |
+    */
+
     public function broadcastOn(): array
     {
         return [
-            new Channel('dashboard'),
+            new PrivateChannel(
+                'dashboard.' . $this->transaction->company_id
+            ),
         ];
     }
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | Nombre del evento
+    |--------------------------------------------------------------------------
+    */
 
     public function broadcastAs(): string
     {
@@ -33,179 +51,81 @@ class TransactionCreated implements ShouldBroadcastNow
     }
 
 
+    /*
+    |--------------------------------------------------------------------------
+    | Payload
+    |--------------------------------------------------------------------------
+    */
+
     public function broadcastWith(): array
     {
-        $account = $this->transaction->account;
-
-
         /*
         |--------------------------------------------------------------------------
-        | Movimientos de la cuenta en la jornada
+        | Relaciones
         |--------------------------------------------------------------------------
         */
 
-        $transactions = Transaction::where(
-            'account_id',
-            $account->id
-        )
-            ->where(
-                'financial_day_id',
-                $this->transaction->financial_day_id
-            );
+        $this->transaction->loadMissing([
+            'account',
+            'accountBalance',
+            'user',
+            'financialDay',
+        ]);
+
+
+        $account =
+            $this->transaction->account;
+
+
+        $accountBalance =
+            $this->transaction->accountBalance;
 
 
         /*
         |--------------------------------------------------------------------------
-        | Ingresos de la cuenta
-        |--------------------------------------------------------------------------
-        */
-
-        $income = (clone $transactions)
-            ->whereIn('type', [
-                'income'
-               
-            ])
-            ->sum('amount');
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Egresos de la cuenta
+        | Saldo diario de ESTA moneda
         |--------------------------------------------------------------------------
         |
-        | Las reservas NO se incluyen acá porque las mostramos
-        | de manera independiente.
+        | Ya no buscamos solamente por account_id.
+        |
+        | Banco Provincia ARS y Banco Provincia USD son balances
+        | completamente independientes.
         |
         */
 
-        $expense = (clone $transactions)
-            ->whereIn('type', [
-                'expense',
-                'transfer_out'
-            ])
-            ->sum('amount');
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Reservas de la cuenta
-        |--------------------------------------------------------------------------
-        */
-
-        $reserve = (clone $transactions)
-            ->where(
-                'type',
-                'reserve'
-            )
-            ->sum('amount');
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Saldo de la cuenta
-        |--------------------------------------------------------------------------
-        */
-
-        $balance = AccountDailyBalance::where(
-            'account_id',
-            $account->id
+        $dailyBalance = AccountDailyBalance::where(
+            'financial_day_id',
+            $this->transaction->financial_day_id
         )
             ->where(
-                'financial_day_id',
-                $this->transaction->financial_day_id
+                'account_balance_id',
+                $this->transaction->account_balance_id
             )
             ->first();
 
 
         /*
         |--------------------------------------------------------------------------
-        | Saldo inicial de la cuenta
-        |--------------------------------------------------------------------------
-        */
-
-        $initialBalance = $balance
-            ? $balance->initial_balance
-            : 0;
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Todos los movimientos de la jornada
-        |--------------------------------------------------------------------------
-        */
-
-        $dayTransactions = Transaction::where(
-            'financial_day_id',
-            $this->transaction->financial_day_id
-        );
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Ingresos generales de la jornada
-        |--------------------------------------------------------------------------
-        */
-
-        $dayIncome = (clone $dayTransactions)
-            ->whereIn('type', [
-                'income'
-            ])
-            ->sum('amount');
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Egresos generales de la jornada
+        | Payload
         |--------------------------------------------------------------------------
         |
-        | Acá SÍ incluimos las reservas porque también descuentan
-        | dinero del saldo disponible.
+        | El evento solamente informa qué movimiento cambió.
         |
-        */
-
-        $dayExpense = (clone $dayTransactions)
-            ->whereIn('type', [
-                'expense',
-                'reserve',
-                'transfer_out'
-            ])
-            ->sum('amount');
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Reservas generales de la jornada
-        |--------------------------------------------------------------------------
-        */
-
-        $dayReserve = (clone $dayTransactions)
-            ->where(
-                'type',
-                'reserve'
-            )
-            ->sum('amount');
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Balance total de todos los bancos
-        |--------------------------------------------------------------------------
-        */
-
-        $balanceTotal = AccountDailyBalance::where(
-            'financial_day_id',
-            $this->transaction->financial_day_id
-        )
-            ->sum('current_balance');
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Respuesta para Echo / Reverb
-        |--------------------------------------------------------------------------
+        | dashboard.js posteriormente ejecuta syncDashboard(), que obtiene
+        | los totales completos y agrupados correctamente por moneda.
+        |
         */
 
         return [
+
+            /*
+            |--------------------------------------------------------------------------
+            | Empresa
+            |--------------------------------------------------------------------------
+            */
+
+            'companyId' =>
+            $this->transaction->company_id,
 
 
             /*
@@ -215,7 +135,8 @@ class TransactionCreated implements ShouldBroadcastNow
             */
 
             'dayDate' =>
-                $this->transaction->financialDay->date,
+            $this->transaction
+                ->financialDay?->date,
 
 
             /*
@@ -227,38 +148,56 @@ class TransactionCreated implements ShouldBroadcastNow
             'transaction' => [
 
                 'id' =>
-                    $this->transaction->id,
+                $this->transaction->id,
+
+                'account_balance_id' =>
+                $this->transaction->account_balance_id,
+
+                'currency' =>
+                $accountBalance?->currency,
 
                 'amount' =>
-                    $this->transaction->amount,
+                $this->transaction->amount,
 
                 'type' =>
-                    $this->transaction->type,
+                $this->transaction->type,
 
                 'description' =>
-                    $this->transaction->description,
+                $this->transaction->description,
 
                 'destination_bank' =>
-                    $this->transaction->destination_bank,
+                $this->transaction->destination_bank,
 
                 'date' =>
-                    $this->transaction->date,
+                $this->transaction->date,
+
+                'initial_balance' =>
+                $dailyBalance?->initial_balance
+                ?? 0,
 
                 'balance_after' =>
-                    $balance
-                        ? $balance->current_balance
-                        : 0,
+                $dailyBalance?->current_balance
+                ?? 0,
 
                 'executed_at' =>
-                    $this->transaction->executed_at,
+                $this->transaction->executed_at,
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | Usuario
+                |--------------------------------------------------------------------------
+                */
 
                 'user' => [
 
                     'id' =>
-                        $this->transaction->user?->id,
+                    $this->transaction
+                        ->user?->id,
 
                     'name' =>
-                        $this->transaction->user?->name
+                    $this->transaction
+                        ->user?->name
                         ?? 'Sin registro',
 
                 ],
@@ -275,61 +214,53 @@ class TransactionCreated implements ShouldBroadcastNow
             'account' => [
 
                 'id' =>
-                    $account->id,
+                $account?->id,
 
                 'name' =>
-                    $account->name,
+                $account?->name,
 
                 'logo' =>
-                    $account->logo,
+                $account?->logo,
 
             ],
 
 
             /*
             |--------------------------------------------------------------------------
-            | Datos de la cuenta
+            | Moneda / AccountBalance
             |--------------------------------------------------------------------------
             */
 
-            'balance' =>
-                $balance
-                    ? $balance->current_balance
-                    : 0,
+            'account_balance' => [
 
-            'initialBalance' =>
-                $initialBalance,
+                'id' =>
+                $accountBalance?->id,
 
-            'movements' =>
-                (clone $transactions)->count(),
+                'currency' =>
+                $accountBalance?->currency,
 
-            'income' =>
-                $income,
-
-            'expense' =>
-                $expense,
-
-            'reserve' =>
-                $reserve,
+            ],
 
 
             /*
             |--------------------------------------------------------------------------
-            | Datos generales de la jornada / header
+            | Compatibilidad con dashboard.js
             |--------------------------------------------------------------------------
             */
 
-            'balanceTotal' =>
-                $balanceTotal,
+            'accountBalanceId' =>
+            $this->transaction->account_balance_id,
 
-            'dayIncome' =>
-                $dayIncome,
+            'currency' =>
+            $accountBalance?->currency,
 
-            'dayExpense' =>
-                $dayExpense,
+            'balance' =>
+            $dailyBalance?->current_balance
+            ?? 0,
 
-            'dayReserve' =>
-                $dayReserve,
+            'initialBalance' =>
+            $dailyBalance?->initial_balance
+            ?? 0,
 
         ];
     }

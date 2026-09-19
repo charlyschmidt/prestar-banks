@@ -1,543 +1,682 @@
-/* =====================
-   DASHBOARD
-===================== */
-
+/* ==========================
+   DASHBOARD — MOBILE FIRST
+========================== */
 
 .dashboard {
-
-
-    padding: 25px;
-
     min-height: calc(100vh - 75px);
 
+    padding: 15px;
 
+    background: var(--company-bg);
+    color: var(--company-text);
 }
 
 
+/* ==========================
+   HEADER
+========================== */
 
-/* HEADER */
-
-.dashboard-header {
-
-
-    margin-bottom: 30px;
-
-
+.dashboard-page-header {
+    margin-bottom: 24px;
 }
 
 
-
-.dashboard-header h1 {
-
-
-    color: white;
-
-    font-size: 26px;
-
-    font-weight: 700;
-
+.dashboard-page-header h1 {
     margin: 0;
 
+    color: var(--company-text);
 
+    font-size: 24px;
+    font-weight: 700;
 }
 
 
+.dashboard-page-header p {
+    margin: 8px 0 0;
 
-.dashboard-header p {
+    color: var(--company-muted);
 
-
-    color: white;
-
-    font-size: 14px;
-
-    margin-top: 8px;
-
-
+    font-size: 13px;
 }
 
 
-
-/* =====================
-   BANKS
-===================== */
-
+/* ==========================
+   SECTION TITLE
+========================== */
 
 .section-title h1,
 .section-title h3 {
+    margin: 0;
 
-
-    color: white;
+    color: var(--company-text);
 
     font-size: 18px;
-
     font-weight: 700;
-
-
 }
 
 
+.banks-section-title {
+    margin-bottom: 18px;
+}
+
+
+/* ==========================
+   BANKS GRID
+========================== */
 
 .banks-grid {
-
+    width: 100%;
 
     display: grid;
 
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: 1fr;
 
-    gap: 18px;
+    /*
+     * Cada card conserva su altura real.
+     */
 
+    align-items: start;
 
+    gap: 16px;
 }
 
 
+/* ==========================
+   BANK CARD LINK
+========================== */
+
+.bank-card-link {
+    width: 100%;
+
+    display: block;
+
+    align-self: start;
+
+    color: inherit;
+
+    text-decoration: none;
+}
+
+
+.bank-card-link:hover {
+    color: inherit;
+
+    text-decoration: none;
+}
+
+
+/* ==========================
+   BANK CARD
+========================== */
 
 .bank-card {
+    width: 100%;
+    height: auto;
+    min-height: 0;
 
-
-    background: var(--card);
-
-    border: 1px solid var(--border);
-
-    border-radius: 18px;
+    display: block;
 
     padding: 18px;
 
-    color: white;
+    background: var(--company-card);
 
-    transition: .2s;
+    border: 1px solid var(--company-border);
+    border-radius: 18px;
 
+    color: var(--company-text);
 
+    transition:
+        transform .2s ease,
+        border-color .2s ease,
+        background .2s ease;
 }
 
 
-
-.bank-card:hover {
-
-
-    transform: translateY(-3px);
-
-    border-color: rgba(255, 255, 255, .25);
-
-
-}
-
-
+/* ==========================
+   BANK HEADER
+========================== */
 
 .bank-header {
-
-
     display: flex;
-
     align-items: center;
 
     gap: 12px;
 
+    /*
+     * Este es el aire entre logo/nombre
+     * y el primer saldo.
+     */
 
+    margin-bottom: 24px;
 }
 
 
-
 .bank-header img {
-
-
     width: 50px;
-
     height: 50px;
+
+    flex-shrink: 0;
 
     object-fit: contain;
 
-    background: white;
+    background: #ffffff;
 
     border-radius: 12px;
 
     padding: 5px;
-
-
 }
 
+
+.bank-header-content {
+    min-width: 0;
+
+    flex: 1;
+}
 
 
 .bank-header h4 {
+    margin: 0 0 3px;
 
+    overflow: hidden;
 
-    margin: 0;
+    color: var(--company-text);
 
     font-size: 15px;
+    font-weight: 600;
 
-
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
-
 
 
 .bank-header small {
+    display: block;
 
+    overflow: hidden;
 
-    color: var(--muted);
-
-
-}
-
-
-
-.bank-balance {
-
-
-    margin: 22px 0;
-
-    font-size: 24px;
-
-    font-weight: 700;
-
-
-}
-
-
-
-.bank-initial {
-
-
-    color: var(--muted);
+    color: var(--company-muted);
 
     font-size: 13px;
 
-
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 
+/* ==========================
+   CURRENCY CONTAINER
+========================== */
+
+.bank-currency-balances {
+    width: 100%;
+}
+
+
+/* ==========================
+   CURRENCY BLOCK
+========================== */
+
+.bank-currency-balance {
+    width: 100%;
+
+    padding: 0;
+}
+
+
+/*
+ * Segunda moneda en adelante.
+ *
+ * La primera no lleva borde.
+ */
+
+.bank-currency-balance + .bank-currency-balance {
+    margin-top: 22px;
+
+    padding-top: 22px;
+
+    border-top: 1px solid
+        color-mix(
+            in srgb,
+            var(--company-text) 12%,
+            transparent
+        );
+}
+
+
+/* ==========================
+   BALANCE
+========================== */
+
+.bank-balance {
+    margin: 0 0 22px;
+
+    color: var(--company-text);
+
+    font-size: 24px;
+    font-weight: 700;
+
+    line-height: 1.15;
+
+    white-space: nowrap;
+}
+
+
+/* ==========================
+   INITIAL BALANCE
+========================== */
+
+.bank-initial {
+    margin: 0 0 14px;
+
+    color: var(--company-muted);
+
+    font-size: 13px;
+
+    line-height: 1.4;
+}
+
+
+/* ==========================
+   BANK FOOTER
+========================== */
 
 .bank-footer {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+
+    grid-template-columns:
+        minmax(0, 1fr)
+        minmax(0, 1fr);
+
     gap: 10px 14px;
+
+    margin: 0;
 
     font-size: 13px;
 }
 
-.bank-footer>span {
+
+.bank-footer > span {
+    min-width: 0;
+
     display: flex;
     align-items: center;
+
     gap: 5px;
 }
 
-.bank-footer>span:nth-child(even) {
+
+.bank-footer > span:nth-child(even) {
     justify-content: flex-end;
 }
 
 
+/* ==========================
+   INCOME
+========================== */
 
 .income {
-
-
-    color: var(--green);
-
-
+    color: var(--income);
 }
 
 
+/* ==========================
+   EXPENSE
+========================== */
 
 .expense {
-
-
-    color: var(--red);
-
-
+    color: var(--expense);
 }
 
 
+/* ==========================
+   RESERVE
+========================== */
+
+.reserve {
+    color: #ffc107;
+}
+
+
+/* ==========================
+   MOVEMENTS
+========================== */
 
 .bank-movements {
-
-
-    color: var(--muted);
-
-
+    color: var(--company-muted);
 }
 
 
+/* ==========================
+   EMPTY CURRENCY
+========================== */
 
-/* =====================
-   NO DAY
-===================== */
+.bank-currency-empty {
+    padding: 6px 0;
+
+    color: var(--company-muted);
+
+    font-size: 13px;
+}
 
 
-.start-day-card {
+/* ==========================
+   DASHBOARD MOVEMENTS
+========================== */
 
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 25px;
-
-    padding: 35px;
-
-    max-width: 600px;
-
+.dashboard-movements {
     margin-top: 30px;
-
-
 }
 
 
-
-.start-day-icon {
-
-
-    width: 70px;
-
-    height: 70px;
-
-    border-radius: 18px;
-
-    background: #104072;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    color: white;
-
-    font-size: 32px;
-
-
+.dashboard-movements .section-title {
+    margin-bottom: 16px;
 }
 
 
-
-.start-day-content h2 {
-
-
-    color: white;
-
-    margin: 0 0 10px;
-
-}
-
-
-
-.start-day-content p {
-
-
-    color: white;
-
-    font-size: 14px;
-
-}
-
-
-
-/* =====================
-   RESPONSIVE
-===================== */
-
-
-@media(max-width:1100px) {
-
-
-    .banks-grid {
-
-
-        grid-template-columns: repeat(2, 1fr);
-
-
-    }
-
-
-}
-
-
-
-@media(max-width:600px) {
-
-
-    .dashboard {
-
-
-        padding: 15px;
-
-    }
-
-
-
-    .banks-grid {
-
-
-        grid-template-columns: 1fr;
-
-
-    }
-
-
-
-    .start-day-card {
-
-
-        flex-direction: column;
-
-        align-items: flex-start;
-
-        padding: 25px;
-
-
-    }
-
-
-}
-
-/* =====================
-   NO DAY OVERRIDES
-===================== */
+/* ==========================
+   NO DAY
+========================== */
 
 .no-day-header {
-
     display: block;
 
     text-align: left;
-
 }
 
 
-.no-day-header>div {
-
+.no-day-header > div {
     text-align: left;
-
 }
 
 
 .no-day-header h1,
 .no-day-header p {
-
     text-align: left;
-
 }
 
 
-.start-day-card {
+/* ==========================
+   START DAY CARD
+========================== */
 
+.start-day-card {
+    width: 100%;
     max-width: 620px;
 
-    background: var(--card);
-
-    border: 1px solid var(--border);
-
-    border-radius: 20px;
-
-    padding: 30px;
-
     display: flex;
+    flex-direction: column;
+    align-items: flex-start;
 
-    align-items: center;
-
-    gap: 24px;
+    gap: 20px;
 
     margin-top: 20px;
 
-    text-align: left;
+    padding: 22px;
 
+    background: var(--company-card);
+
+    border: 1px solid var(--company-border);
+    border-radius: 18px;
+
+    color: var(--company-text);
+
+    text-align: left;
 }
 
 
+/* ==========================
+   START DAY ICON
+========================== */
+
+.start-day-icon {
+    width: 64px;
+    height: 64px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: var(--company-hover);
+
+    border: 1px solid var(--company-border);
+    border-radius: 16px;
+
+    color: var(--company-text);
+
+    font-size: 28px;
+}
+
+
+/* ==========================
+   START DAY CONTENT
+========================== */
+
 .start-day-content {
+    width: 100%;
 
     flex: 1;
 
     text-align: left;
-
 }
 
 
 .start-day-content h2 {
-
     margin: 0 0 8px;
 
-    color: white;
+    color: var(--company-text);
 
-    font-size: 22px;
-
+    font-size: 21px;
     font-weight: 700;
 
     text-align: left;
-
 }
 
 
 .start-day-content p {
-
     margin: 0 0 20px;
 
-    color: var(--muted);
+    color: var(--company-muted);
 
-    font-size: 14px;
-
+    font-size: 13px;
     line-height: 1.6;
 
     text-align: left;
-
 }
 
 
+/* ==========================
+   START DAY BUTTON
+========================== */
+
 .start-day-button {
+    width: 100%;
+    min-height: 42px;
 
     display: inline-flex;
-
     align-items: center;
-
     justify-content: center;
 
     gap: 8px;
 
-    width: auto;
-
-    min-height: 42px;
-
     padding: 0 18px;
 
     background: #ffffff;
-
-    color: #02284f;
+    color: #111111;
 
     border: 0;
-
     border-radius: 12px;
 
     text-decoration: none;
 
     font-size: 14px;
-
     font-weight: 700;
 
+    cursor: pointer;
+
+    transition:
+        opacity .2s ease,
+        transform .2s ease;
 }
 
 
-.start-day-button:hover {
+/* ==========================
+   TABLET
+========================== */
 
-    background: #e5e7eb;
+@media (min-width: 601px) {
 
-    color: #02284f;
+    .dashboard {
+        padding: 20px;
+    }
 
-}
+
+    .banks-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+        gap: 18px;
+    }
 
 
+    .bank-card {
+        padding: 20px;
+    }
 
-@media(max-width:600px) {
+
+    .bank-balance {
+        font-size: 25px;
+    }
+
 
     .start-day-card {
+        flex-direction: row;
+        align-items: center;
 
-        flex-direction: column;
+        gap: 24px;
 
-        align-items: flex-start;
+        padding: 30px;
+    }
 
-        padding: 22px;
 
+    .start-day-content h2 {
+        font-size: 22px;
+    }
+
+
+    .start-day-content p {
+        font-size: 14px;
     }
 
 
     .start-day-button {
+        width: auto;
+    }
 
-        width: 100%;
+}
 
+
+/* ==========================
+   DESKTOP
+========================== */
+
+@media (min-width: 1101px) {
+
+    .dashboard {
+        padding: 25px;
+    }
+
+
+    .dashboard-page-header {
+        margin-bottom: 30px;
+    }
+
+
+    .dashboard-page-header h1 {
+        font-size: 26px;
+    }
+
+
+    .dashboard-page-header p {
+        font-size: 14px;
+    }
+
+
+    .banks-grid {
+        grid-template-columns:
+            repeat(4, minmax(0, 1fr));
+
+        /*
+         * Fundamental:
+         * ninguna card se estira verticalmente.
+         */
+
+        align-items: start;
+
+        gap: 20px;
+    }
+
+
+    .bank-card {
+        height: auto;
+
+        padding: 22px;
+    }
+
+
+    .bank-header {
+        margin-bottom: 26px;
+    }
+
+
+    .bank-balance {
+        font-size: 25px;
+    }
+
+}
+
+
+/* ==========================
+   LARGE DESKTOP
+========================== */
+
+@media (min-width: 1500px) {
+
+    .banks-grid {
+        gap: 22px;
+    }
+
+
+    .bank-card {
+        padding: 22px 24px;
+    }
+
+
+    .bank-balance {
+        font-size: 26px;
+    }
+
+}
+
+
+/* ==========================
+   HOVER
+========================== */
+
+@media (hover: hover) {
+
+    .bank-card-link:hover .bank-card {
+        transform: translateY(-3px);
+
+        border-color: var(--company-muted);
+    }
+
+
+    .start-day-button:hover {
+        color: #111111;
+
+        opacity: .9;
     }
 
 }

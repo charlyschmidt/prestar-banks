@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Concerns\BelongsToCompany;
 
 class FinancialDay extends Model
 {
+    use BelongsToCompany;
 
     protected $fillable = [
 
@@ -13,8 +15,7 @@ class FinancialDay extends Model
         'status',
         'opened_by',
         'opened_at',
-        'closed_at',
-
+        'closed_at'
     ];
 
 

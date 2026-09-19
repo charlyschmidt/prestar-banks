@@ -25,6 +25,8 @@ class ArgentineBanks
         'Banco de la Nación Argentina',
 
         'Banco de la Provincia de Buenos Aires',
+        
+        'Banco de la Provincia de Neuquén',
 
         'Banco de San Juan',
 
