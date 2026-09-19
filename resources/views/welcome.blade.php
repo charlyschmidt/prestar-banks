@@ -55,9 +55,16 @@
 
                 </div>
 
+                <div class="welcome-trial">
+                    <span class="welcome-trial-dot"></span>
+
+                    Probalo gratis durante 7 días.
+                    <strong>Sin compromiso.</strong>
+                </div>
+
                 <a href="#plan" class="scroll-indicator" aria-label="Ver plan">
-    <span class="scroll-arrow"></span>
-</a>
+                    <span class="scroll-arrow"></span>
+                </a>
 
             </section>
 
@@ -104,8 +111,12 @@
                         </div>
 
                         <a href="{{ route('register') }}" class="plan-button">
-                            Comenzar ahora
+                            Probar gratis 7 días
                         </a>
+
+                        <p class="plan-trial">
+                            7 días de prueba gratuita.
+                        </p>
 
                     </div>
 
