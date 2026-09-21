@@ -14,9 +14,15 @@ class AccountBalance extends Model
         'company_id',
         'account_id',
         'currency',
+        'low_balance_threshold'
     ];
 
-
+    protected function casts(): array
+    {
+        return [
+            'low_balance_threshold' => 'decimal:2',
+        ];
+    }
     /*
     |--------------------------------------------------------------------------
     | Account

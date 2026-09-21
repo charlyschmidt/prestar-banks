@@ -7,7 +7,8 @@ class HeaderService
 {
 
     public function __construct(
-        protected BalanceDayService $balanceDayService
+        protected BalanceDayService $balanceDayService,
+        protected LowBalanceAlertService $lowBalanceAlertService
     ) {
     }
 
@@ -22,18 +23,22 @@ class HeaderService
 
         /*
         |--------------------------------------------------------------------------
+        | Alertas activas
+        |--------------------------------------------------------------------------
+        */
+
+        $alerts =
+            $this->lowBalanceAlertService
+                ->getActiveAlerts();
+
+
+        /*
+        |--------------------------------------------------------------------------
         | Sin jornada abierta
         |--------------------------------------------------------------------------
         |
         | Los valores monetarios SIEMPRE deben mantener
         | el mismo formato multimoneda.
-        |
-        | Nunca devolvemos 0 porque el Blade espera:
-        |
-        | [
-        |     'ARS' => ...,
-        |     'USD' => ...,
-        | ]
         |
         */
 
@@ -54,6 +59,12 @@ class HeaderService
                     [],
 
                 'movements' =>
+                    0,
+
+                'alerts' =>
+                    [],
+
+                'alerts_count' =>
                     0,
 
             ];
@@ -83,6 +94,12 @@ class HeaderService
 
             'movements' =>
                 $summary['movimientos_total'] ?? 0,
+
+            'alerts' =>
+                $alerts,
+
+            'alerts_count' =>
+                $alerts->count(),
 
         ];
 

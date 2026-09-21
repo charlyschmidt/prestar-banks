@@ -64,6 +64,13 @@ import '../css/error.css';
 
 import '../css/aeria-admin.css';
 
+import '../css/movement-control.css';
+
+import '../css/movement-control-results.css';
+
+import '../css/account-alerts.css';
+
+
 /*
 |--------------------------------------------------------------------------
 | Javascript propio
@@ -79,3 +86,7 @@ import './money-input';
 import './settings';
 
 import './shortcuts';
+
+import './movement-control';
+
+

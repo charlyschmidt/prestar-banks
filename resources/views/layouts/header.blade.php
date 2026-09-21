@@ -78,97 +78,221 @@
 
         {{-- USUARIO MOBILE --}}
 
-        <div class="dropdown user-menu mobile-user-menu">
-
-            <button type="button" class="user-avatar user-avatar-button" data-bs-toggle="dropdown"
-                aria-expanded="false" title="Menú de usuario">
-                {{ strtoupper(substr(auth()->user()->name ?? auth()->user()->username, 0, 1)) }}
-            </button>
+        <div class="mobile-header-actions">
 
 
-            <div class="dropdown-menu dropdown-menu-end user-dropdown">
+            {{-- ALERTAS --}}
 
-                <div class="user-dropdown-header">
+            <div class="dropdown header-alerts">
 
-                    <div class="user-dropdown-avatar">
-                        {{ strtoupper(substr(auth()->user()->name ?? auth()->user()->username, 0, 1)) }}
-                    </div>
+                <button type="button" class="header-alert-button" data-bs-toggle="dropdown" aria-expanded="false"
+                    title="Alertas" aria-label="Alertas">
 
-                    <div>
-
-                        <strong>
-                            {{ auth()->user()->name ?? auth()->user()->username }}
-                        </strong>
+                    <i class="bi bi-bell"></i>
 
 
-                        @if (auth()->user()->isSuperAdmin())
+                    @if (($header['alerts_count'] ?? 0) > 0)
+                        <span class="header-alert-count" data-header-alert-count>
+                            {{ $header['alerts_count'] }}
+                        </span>
+                    @endif
+
+                </button>
+
+
+                <div class="dropdown-menu dropdown-menu-end header-alert-dropdown">
+
+
+                    <div class="header-alert-dropdown-header">
+
+                        <div>
+
+                            <strong>
+                                Alertas
+                            </strong>
+
                             <span>
-                                Super Admin
+                                Avisos que requieren tu atención
                             </span>
-                        @elseif (auth()->user()->isAdministration())
-                            <span>
-                                Administración
-                            </span>
-                        @else
-                            <span>
-                                Operador
+
+                        </div>
+
+
+                        @if (($header['alerts_count'] ?? 0) > 0)
+                            <span class="header-alert-total">
+                                {{ $header['alerts_count'] }}
                             </span>
                         @endif
 
                     </div>
 
+
+                    <div class="header-alert-dropdown-divider"></div>
+
+
+                    <div class="header-alert-list">
+
+
+                        @forelse (($header['alerts'] ?? collect()) as $alert)
+                            <a href="{{ route('accounts.alerts', $alert->account_id) }}" class="header-alert-item">
+
+                                <div class="header-alert-item-icon">
+
+                                    <i class="bi bi-exclamation-lg"></i>
+
+                                </div>
+
+
+                                <div class="header-alert-item-content">
+
+                                    <strong>
+                                        {{ $alert->account?->name ?? 'Cuenta' }}
+                                    </strong>
+
+                                    <span>
+                                        Saldo bajo · {{ $alert->accountBalance?->currency }}
+                                    </span>
+
+                                    <small>
+                                        Disponible:
+                                        {{ $alert->accountBalance?->currency }}
+                                        {{ number_format((float) $alert->current_balance, 2, ',', '.') }}
+                                    </small>
+
+                                    <small>
+                                        Límite:
+                                        {{ $alert->accountBalance?->currency }}
+                                        {{ number_format((float) $alert->accountBalance?->low_balance_threshold, 2, ',', '.') }}
+                                    </small>
+
+                                </div>
+
+                            </a>
+
+                        @empty
+
+                            <div class="header-alert-empty">
+
+                                <div class="header-alert-empty-icon">
+                                    <i class="bi bi-check-lg"></i>
+                                </div>
+
+                                <div>
+
+                                    <strong>
+                                        Sin alertas
+                                    </strong>
+
+                                    <span>
+                                        Todos los saldos están dentro de los límites configurados.
+                                    </span>
+
+                                </div>
+
+                            </div>
+                        @endforelse
+
+
+                    </div>
+
                 </div>
 
-
-                <div class="user-dropdown-divider"></div>
-
-
-                <a href="{{ route('dashboard') }}" class="user-dropdown-link">
-                    <i class="bi bi-grid"></i>
-                    Dashboard
-                </a>
+            </div>
 
 
-                <a href="{{ route('transactions.index') }}" class="user-dropdown-link">
-                    <i class="bi bi-arrow-left-right"></i>
-                    Movimientos
-                </a>
+            {{-- USUARIO --}}
+
+            <div class="dropdown user-menu mobile-user-menu">
+
+                <button type="button" class="user-avatar user-avatar-button" data-bs-toggle="dropdown"
+                    aria-expanded="false" title="Menú de usuario">
+                    {{ strtoupper(substr(auth()->user()->name ?? auth()->user()->username, 0, 1)) }}
+                </button>
 
 
-                @if (auth()->user()->isSuperAdmin())
-                    <a href="{{ route('history.index') }}" class="user-dropdown-link">
-                        <i class="bi bi-clock-history"></i>
-                        Historial
+                <div class="dropdown-menu dropdown-menu-end user-dropdown">
+
+                    <div class="user-dropdown-header">
+
+                        <div class="user-dropdown-avatar">
+                            {{ strtoupper(substr(auth()->user()->name ?? auth()->user()->username, 0, 1)) }}
+                        </div>
+
+                        <div>
+
+                            <strong>
+                                {{ auth()->user()->name ?? auth()->user()->username }}
+                            </strong>
+
+
+                            @if (auth()->user()->isSuperAdmin())
+                                <span>
+                                    Super Admin
+                                </span>
+                            @elseif (auth()->user()->isAdministration())
+                                <span>
+                                    Administración
+                                </span>
+                            @else
+                                <span>
+                                    Operador
+                                </span>
+                            @endif
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="user-dropdown-divider"></div>
+
+
+                    <a href="{{ route('dashboard') }}" class="user-dropdown-link">
+                        <i class="bi bi-grid"></i>
+                        Dashboard
                     </a>
 
 
-                    <a href="{{ route('settings.index') }}" class="user-dropdown-link">
-                        <i class="bi bi-gear"></i>
-                        Configuración
+                    <a href="{{ route('transactions.index') }}" class="user-dropdown-link">
+                        <i class="bi bi-arrow-left-right"></i>
+                        Movimientos
                     </a>
-                @endif
 
 
-                <div class="user-dropdown-divider"></div>
+                    @if (auth()->user()->isSuperAdmin())
+                        <a href="{{ route('history.index') }}" class="user-dropdown-link">
+                            <i class="bi bi-clock-history"></i>
+                            Historial
+                        </a>
 
 
-                <form method="POST" action="{{ route('logout') }}">
+                        <a href="{{ route('settings.index') }}" class="user-dropdown-link">
+                            <i class="bi bi-gear"></i>
+                            Configuración
+                        </a>
+                    @endif
 
-                    @csrf
 
-                    <button type="submit" class="user-dropdown-link user-dropdown-button">
-                        <i class="bi bi-box-arrow-right"></i>
-                        Salir
-                    </button>
+                    <div class="user-dropdown-divider"></div>
 
-                </form>
+
+                    <form method="POST" action="{{ route('logout') }}">
+
+                        @csrf
+
+                        <button type="submit" class="user-dropdown-link user-dropdown-button">
+                            <i class="bi bi-box-arrow-right"></i>
+                            Salir
+                        </button>
+
+                    </form>
+
+                </div>
 
             </div>
 
         </div>
-
-    </div>
-
+    </div> {{-- .mobile-header-actions --}}
 
 
     {{-- ==========================
@@ -348,7 +472,146 @@
                 </span>
             @endif
 
+            {{-- ==========================
+     ALERTAS
+========================== --}}
 
+            <div class="dropdown header-alerts">
+
+                <button type="button" class="header-alert-button" data-bs-toggle="dropdown" aria-expanded="false"
+                    title="Alertas" aria-label="Alertas">
+
+                    <i class="bi bi-bell"></i>
+
+
+                    @if (($header['alerts_count'] ?? 0) > 0)
+                        <span class="header-alert-count" data-header-alert-count>
+                            {{ $header['alerts_count'] }}
+                        </span>
+                    @endif
+
+                </button>
+
+
+                <div class="dropdown-menu dropdown-menu-end header-alert-dropdown">
+
+
+                    <div class="header-alert-dropdown-header">
+
+                        <div>
+
+                            <strong>
+                                Alertas
+                            </strong>
+
+                            <span>
+                                Avisos que requieren tu atención
+                            </span>
+
+                        </div>
+
+
+                        @if (($header['alerts_count'] ?? 0) > 0)
+                            <span class="header-alert-total">
+                                {{ $header['alerts_count'] }}
+                            </span>
+                        @endif
+
+                    </div>
+
+
+                    <div class="header-alert-dropdown-divider"></div>
+
+
+                    <div class="header-alert-list">
+
+
+                        @forelse (($header['alerts'] ?? collect()) as $alert)
+                            <a href="{{ route('accounts.alerts', $alert->account_id) }}" class="header-alert-item">
+
+
+                                <div class="header-alert-item-icon">
+
+                                    <i class="bi bi-exclamation-lg"></i>
+
+                                </div>
+
+
+                                <div class="header-alert-item-content">
+
+
+                                    <strong>
+                                        {{ $alert->account?->name ?? 'Cuenta' }}
+                                    </strong>
+
+
+                                    <span>
+                                        Saldo bajo · {{ $alert->accountBalance?->currency }}
+                                    </span>
+
+
+                                    <small>
+
+                                        Disponible:
+
+                                        {{ $alert->accountBalance?->currency }}
+
+                                        {{ number_format((float) $alert->current_balance, 2, ',', '.') }}
+
+                                    </small>
+
+
+                                    <small>
+
+                                        Límite:
+
+                                        {{ $alert->accountBalance?->currency }}
+
+                                        {{ number_format((float) $alert->accountBalance?->low_balance_threshold, 2, ',', '.') }}
+
+                                    </small>
+
+
+                                </div>
+
+
+                            </a>
+
+
+                        @empty
+
+
+                            <div class="header-alert-empty">
+
+                                <div class="header-alert-empty-icon">
+
+                                    <i class="bi bi-check-lg"></i>
+
+                                </div>
+
+
+                                <div>
+
+                                    <strong>
+                                        Sin alertas
+                                    </strong>
+
+                                    <span>
+                                        Todos los saldos están dentro de los límites configurados.
+                                    </span>
+
+                                </div>
+
+                            </div>
+                        @endforelse
+
+
+                    </div>
+
+
+                </div>
+
+            </div>
 
             <div class="dropdown user-menu">
 

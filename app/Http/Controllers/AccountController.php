@@ -12,6 +12,8 @@ use App\Services\FinancialDayService;
 use App\Exports\AccountTransactionsExport;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\FinancialDay;
+use App\Services\MovementControlService;
+
 
 class AccountController extends Controller
 {
@@ -667,6 +669,286 @@ class AccountController extends Controller
 
 
     /*
+|--------------------------------------------------------------------------
+| Control de movimientos
+|--------------------------------------------------------------------------
+*/
+
+    public function movementControl(
+        Account $account,
+        FinancialDayService $financialDayService
+    ) {
+
+        /*
+    |--------------------------------------------------------------------------
+    | Jornada actual
+    |--------------------------------------------------------------------------
+    */
+
+        $day = $financialDayService->current();
+
+
+        if (!$day) {
+
+            return redirect()
+                ->route('dashboard')
+                ->with(
+                    'error',
+                    'No hay jornada abierta.'
+                );
+        }
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Saldos de la cuenta por moneda
+    |--------------------------------------------------------------------------
+    |
+    | El control siempre se realiza sobre un AccountBalance concreto.
+    |
+    | Ejemplo:
+    |
+    | Banco Provincia
+    |   ARS
+    |   USD
+    |
+    | De esta manera nunca mezclamos movimientos de distintas monedas
+    | durante el control del extracto bancario.
+    |
+    */
+
+        $balances = AccountDailyBalance::with(
+            'accountBalance'
+        )
+            ->where(
+                'financial_day_id',
+                $day->id
+            )
+            ->where(
+                'account_id',
+                $account->id
+            )
+            ->get()
+            ->sortBy(
+                fn($balance) =>
+                $balance->accountBalance?->currency
+            )
+            ->values();
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Vista 
+    |--------------------------------------------------------------------------
+    */
+
+        return view(
+            'accounts.movement-control',
+            compact(
+                'account',
+                'day',
+                'balances'
+            )
+        );
+    }
+
+
+    /*
+|--------------------------------------------------------------------------
+| Procesar extracto para control de movimientos
+|--------------------------------------------------------------------------
+*/
+
+    public function processMovementControl(
+        Request $request,
+        Account $account,
+        FinancialDayService $financialDayService,
+        MovementControlService $movementControlService
+    ) {
+
+        /*
+    |--------------------------------------------------------------------------
+    | Jornada actual
+    |--------------------------------------------------------------------------
+    */
+
+        $day = $financialDayService->current();
+
+
+        if (!$day) {
+
+            return redirect()
+                ->route('dashboard')
+                ->with(
+                    'error',
+                    'No hay jornada abierta.'
+                );
+        }
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Validación básica
+    |--------------------------------------------------------------------------
+    */
+
+        $data = $request->validate([
+
+            'account_balance_id' => [
+                'required',
+                'integer',
+            ],
+
+            'statement' => [
+                'required',
+                'file',
+                'mimes:csv,xlsx,xls',
+                'max:10240',
+            ],
+
+        ], [
+
+            'account_balance_id.required' =>
+            'Seleccioná una moneda.',
+
+            'statement.required' =>
+            'Seleccioná un extracto bancario.',
+
+            'statement.file' =>
+            'El extracto seleccionado no es válido.',
+
+            'statement.mimes' =>
+            'El extracto debe ser un archivo CSV, XLSX o XLS.',
+
+            'statement.max' =>
+            'El extracto no puede superar los 10 MB.',
+
+        ]);
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Verificar AccountBalance
+    |--------------------------------------------------------------------------
+    |
+    | No confiamos únicamente en el ID recibido desde el formulario.
+    |
+    | El saldo seleccionado tiene que:
+    |
+    | - pertenecer a esta cuenta
+    | - pertenecer a la empresa actual
+    |
+    | El scope BelongsToCompany del modelo AccountBalance se encarga
+    | del aislamiento por empresa.
+    |
+    */
+
+        $accountBalance = AccountBalance::query()
+            ->where(
+                'id',
+                $data['account_balance_id']
+            )
+            ->where(
+                'account_id',
+                $account->id
+            )
+            ->first();
+
+
+        if (!$accountBalance) {
+
+            return back()
+                ->withInput()
+                ->with(
+                    'error',
+                    'La moneda seleccionada no pertenece a esta cuenta.'
+                );
+        }
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Verificar que participa de la jornada
+    |--------------------------------------------------------------------------
+    */
+
+        $dailyBalance = AccountDailyBalance::query()
+            ->where(
+                'financial_day_id',
+                $day->id
+            )
+            ->where(
+                'account_id',
+                $account->id
+            )
+            ->where(
+                'account_balance_id',
+                $accountBalance->id
+            )
+            ->first();
+
+
+        if (!$dailyBalance) {
+
+            return back()
+                ->withInput()
+                ->with(
+                    'error',
+                    'La moneda seleccionada no está disponible en la jornada actual.'
+                );
+        }
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Leer extracto
+    |--------------------------------------------------------------------------
+    */
+
+        try {
+
+            $file = $request->file('statement');
+
+            $statement = $movementControlService->readStatement($file);
+
+            $temporaryPath = $movementControlService->storeTemporaryStatement($file);
+        } catch (\Throwable $e) {
+
+            dd([
+                'message' => $e->getMessage(),
+                'class' => get_class($e),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ]);
+        }
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Resultado temporal
+    |--------------------------------------------------------------------------
+    |
+    | Por ahora detenemos el flujo acá.
+    |
+    | Esto nos permite verificar exactamente qué encabezados y filas
+    | detectó AERIA antes de construir la pantalla de mapeo.
+    |
+    */
+
+        return view(
+            'accounts.movement-control-mapping',
+            [
+                'account' => $account,
+                'accountBalance' => $accountBalance,
+                'day' => $day,
+                'statement' => $statement,
+                'temporaryPath' => $temporaryPath,
+            ]
+        );
+    }
+
+
+    /*
     |--------------------------------------------------------------------------
     | Exportar movimientos
     |--------------------------------------------------------------------------
@@ -706,5 +988,257 @@ class AccountController extends Controller
                 . '.xlsx'
 
         );
+    }
+
+    public function compareMovementControl(
+        Request $request,
+        Account $account,
+        MovementControlService $movementControlService
+    ) {
+        /*
+    |--------------------------------------------------------------------------
+    | Validar mapeo
+    |--------------------------------------------------------------------------
+    */
+
+        $data = $request->validate([
+            'account_balance_id' => [
+                'required',
+                'integer',
+            ],
+
+            'temporary_path' => [
+                'required',
+                'string',
+            ],
+
+            'date_column' => [
+                'required',
+                'integer',
+                'min:0',
+            ],
+
+            'description_column' => [
+                'nullable',
+                'integer',
+                'min:0',
+            ],
+
+            'amount_column' => [
+                'required',
+                'integer',
+                'min:0',
+            ],
+
+            'balance_column' => [
+                'nullable',
+                'integer',
+                'min:0',
+            ],
+        ], [
+            'account_balance_id.required' =>
+            'No se pudo identificar la moneda seleccionada.',
+
+            'temporary_path.required' =>
+            'No se pudo identificar el extracto bancario.',
+
+            'date_column.required' =>
+            'Seleccioná la columna correspondiente a la fecha.',
+
+            'amount_column.required' =>
+            'Seleccioná la columna correspondiente al importe.',
+        ]);
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Verificar cuenta / moneda
+    |--------------------------------------------------------------------------
+    */
+
+        $accountBalance = AccountBalance::query()
+            ->where('id', $data['account_balance_id'])
+            ->where('account_id', $account->id)
+            ->first();
+
+
+        if (!$accountBalance) {
+
+            return redirect()
+                ->route(
+                    'accounts.movement-control',
+                    $account->id
+                )
+                ->with(
+                    'error',
+                    'La moneda seleccionada no pertenece a esta cuenta.'
+                );
+        }
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Seguridad del archivo temporal
+    |--------------------------------------------------------------------------
+    |
+    | El navegador nos devuelve temporary_path,
+    | pero no confiamos directamente en ese valor.
+    |
+    | El archivo debe pertenecer al directorio temporal
+    | del usuario autenticado.
+    |--------------------------------------------------------------------------
+    */
+
+        $expectedPrefix =
+            'movement-control/' . auth()->id() . '/';
+
+
+        if (
+            !str_starts_with(
+                $data['temporary_path'],
+                $expectedPrefix
+            )
+        ) {
+
+            return redirect()
+                ->route(
+                    'accounts.movement-control',
+                    $account->id
+                )
+                ->with(
+                    'error',
+                    'El extracto bancario no es válido.'
+                );
+        }
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Preparar mapeo
+    |--------------------------------------------------------------------------
+    */
+
+        $mapping = [
+            'date' =>
+            (int) $data['date_column'],
+
+            'description' =>
+            isset($data['description_column'])
+                ? (int) $data['description_column']
+                : null,
+
+            'amount' =>
+            (int) $data['amount_column'],
+
+            'balance' =>
+            isset($data['balance_column'])
+                ? (int) $data['balance_column']
+                : null,
+        ];
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Comparar
+    |--------------------------------------------------------------------------
+    */
+
+        try {
+
+            $result = $movementControlService->compare(
+                $data['temporary_path'],
+                $accountBalance,
+                $mapping
+            );
+        } catch (\Throwable $e) {
+
+            report($e);
+
+
+            return redirect()
+                ->route(
+                    'accounts.movement-control',
+                    $account->id
+                )
+                ->with(
+                    'error',
+                    'No se pudo comparar el extracto bancario.'
+                );
+        }
+
+        $movementControlService->deleteTemporaryStatement(
+            $data['temporary_path']
+        );
+
+        return view(
+            'accounts.movement-control-results',
+            [
+                'account' => $account,
+                'accountBalance' => $accountBalance,
+                'result' => $result,
+            ]
+        );
+    }
+
+    public function alerts(Account $account)
+    {
+        $account->load([
+            'balances' => function ($query) {
+                $query->orderBy('currency');
+            }
+        ]);
+
+        return view(
+            'accounts.alerts',
+            compact('account')
+        );
+    }
+
+    public function updateAlerts(
+        Request $request,
+        Account $account
+    ) {
+        $validated = $request->validate([
+            'thresholds' => [
+                'nullable',
+                'array',
+            ],
+
+            'thresholds.*' => [
+                'nullable',
+                'numeric',
+                'min:0',
+            ],
+        ]);
+
+
+        $thresholds = $validated['thresholds'] ?? [];
+
+
+        $balances = $account
+            ->balances()
+            ->get();
+
+
+        foreach ($balances as $balance) {
+
+            $threshold = $thresholds[$balance->id] ?? null;
+
+
+            $balance->update([
+                'low_balance_threshold' =>
+                $threshold !== null && $threshold !== ''
+                    ? $threshold
+                    : null,
+            ]);
+        }
+
+
+        return redirect()
+            ->route('accounts.alerts', $account->id)
+            ->with(
+                'success',
+                'Las alertas fueron actualizadas correctamente.'
+            );
     }
 }

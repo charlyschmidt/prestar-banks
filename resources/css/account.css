@@ -328,6 +328,34 @@
 
 }
 
+/* ==========================
+   ACCOUNT CARD ALERTS
+========================== */
+
+.account-card-alerts {
+
+    width: auto;
+
+    min-width: 0;
+
+    padding: 0 12px;
+
+    gap: 7px;
+
+    margin-right: auto;
+
+}
+
+
+.account-card-alerts span {
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    line-height: 1;
+
+}
 
 
 

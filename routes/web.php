@@ -205,9 +205,9 @@ Route::middleware('auth')->group(function () {
             */
 
             /*
-             * IMPORTANTE:
-             * estas rutas específicas van ANTES del resource.
-             */
+            * IMPORTANTE:
+            * estas rutas específicas van ANTES del resource.
+            */
 
             Route::get(
                 '/accounts/{account}/export',
@@ -226,6 +226,40 @@ Route::middleware('auth')->group(function () {
                 ]
             )->name('accounts.movements');
 
+
+            Route::get(
+                '/accounts/{account}/movement-control',
+                [
+                    AccountController::class,
+                    'movementControl'
+                ]
+            )->name('accounts.movement-control');
+
+            Route::post(
+                '/accounts/{account}/movement-control',
+                [
+                    AccountController::class,
+                    'processMovementControl'
+                ]
+            )->name('accounts.movement-control.process');
+
+            Route::post(
+                '/accounts/{account}/movement-control/compare',
+                [
+                    AccountController::class,
+                    'compareMovementControl'
+                ]
+            )->name('accounts.movement-control.compare');
+
+            Route::get(
+                '/accounts/{account}/alerts',
+                [AccountController::class, 'alerts']
+            )->name('accounts.alerts');
+
+            Route::put(
+                '/accounts/{account}/alerts',
+                [AccountController::class, 'updateAlerts']
+            )->name('accounts.alerts.update');
 
             Route::resource(
                 'accounts',

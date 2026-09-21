@@ -1,0 +1,825 @@
+/* ==========================================================
+   AERIA FINANCE
+   MOVEMENT CONTROL
+   MOBILE FIRST
+========================================================== */
+
+
+/* ==========================
+   CARD
+========================== */
+
+.movement-control-card {
+    width: 100%;
+
+    background: var(--company-card);
+
+    border: 1px solid var(--company-border);
+    border-radius: 16px;
+
+    overflow: hidden;
+}
+
+
+/* ==========================
+   HEADER
+========================== */
+
+.movement-control-header {
+    display: flex;
+    flex-direction: column;
+
+    gap: 14px;
+
+    padding: 18px;
+
+    border-bottom: 1px solid var(--company-border);
+}
+
+
+.movement-control-header h2 {
+    margin: 0;
+
+    color: var(--company-text);
+
+    font-size: 17px;
+    font-weight: 700;
+
+    line-height: 1.3;
+}
+
+
+.movement-control-header p {
+    max-width: 650px;
+
+    margin: 6px 0 0;
+
+    color: var(--company-muted);
+
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+
+/* ==========================
+   DAY
+========================== */
+
+.movement-control-day {
+    display: inline-flex;
+    align-items: center;
+
+    width: fit-content;
+
+    gap: 7px;
+
+    padding: 7px 10px;
+
+    background: var(--company-hover);
+
+    border: 1px solid var(--company-border);
+    border-radius: 8px;
+
+    color: var(--company-muted);
+
+    font-size: 11px;
+    font-weight: 500;
+}
+
+
+.movement-control-day i {
+    color: var(--company-text);
+
+    font-size: 12px;
+}
+
+
+/* ==========================
+   FORM
+========================== */
+
+.movement-control-form {
+    width: 100%;
+}
+
+
+/* ==========================
+   SECTION
+========================== */
+
+.movement-control-section {
+    padding: 20px 18px;
+}
+
+
+.movement-control-section +
+.movement-control-section {
+    border-top: 1px solid var(--company-border);
+}
+
+
+/* ==========================
+   SECTION TITLE
+========================== */
+
+.movement-control-section-title {
+    display: flex;
+    align-items: flex-start;
+
+    gap: 11px;
+
+    margin-bottom: 16px;
+}
+
+
+.movement-control-section-title h3 {
+    margin: 0;
+
+    color: var(--company-text);
+
+    font-size: 14px;
+    font-weight: 700;
+
+    line-height: 1.3;
+}
+
+
+.movement-control-section-title p {
+    margin: 4px 0 0;
+
+    color: var(--company-muted);
+
+    font-size: 11px;
+    line-height: 1.45;
+}
+
+
+/* ==========================
+   STEP
+========================== */
+
+.movement-control-step {
+    width: 26px;
+    height: 26px;
+
+    flex: 0 0 26px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: var(--company-hover);
+
+    border: 1px solid var(--company-border);
+    border-radius: 7px;
+
+    color: var(--company-text);
+
+    font-size: 11px;
+    font-weight: 700;
+}
+
+
+/* ==========================
+   CURRENCIES
+========================== */
+
+.movement-control-currencies {
+    display: grid;
+
+    grid-template-columns: 1fr;
+
+    gap: 9px;
+}
+
+
+/* ==========================
+   CURRENCY OPTION
+========================== */
+
+.movement-control-currency {
+    position: relative;
+
+    display: block;
+
+    margin: 0;
+
+    cursor: pointer;
+
+    user-select: none;
+}
+
+
+.movement-control-currency > input {
+    position: absolute;
+
+    width: 1px;
+    height: 1px;
+
+    opacity: 0;
+
+    pointer-events: none;
+}
+
+
+.movement-control-currency-content {
+    min-height: 52px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 12px;
+
+    padding: 11px 13px;
+
+    background: var(--company-hover);
+
+    border: 1px solid var(--company-border);
+    border-radius: 10px;
+
+    transition:
+        background .18s ease,
+        border-color .18s ease;
+}
+
+
+.movement-control-currency-code {
+    color: var(--company-text);
+
+    font-size: 13px;
+    font-weight: 700;
+
+    line-height: 1;
+}
+
+
+/* ==========================
+   CURRENCY CHECK
+========================== */
+
+.movement-control-currency-check {
+    width: 24px;
+    height: 24px;
+
+    flex: 0 0 24px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid var(--company-border);
+    border-radius: 7px;
+
+    color: transparent;
+
+    font-size: 13px;
+
+    transition:
+        background .18s ease,
+        border-color .18s ease,
+        color .18s ease;
+}
+
+
+/* ==========================
+   SELECTED CURRENCY
+========================== */
+
+.movement-control-currency
+    > input:checked
+    + .movement-control-currency-content {
+
+    background: var(--company-hover);
+
+    border-color: var(--company-text);
+}
+
+
+.movement-control-currency
+    > input:checked
+    + .movement-control-currency-content
+    .movement-control-currency-check {
+
+    background: var(--company-text);
+
+    border-color: var(--company-text);
+
+    color: var(--company-bg);
+}
+
+
+/* ==========================
+   KEYBOARD FOCUS
+========================== */
+
+.movement-control-currency
+    > input:focus-visible
+    + .movement-control-currency-content {
+
+    outline: 2px solid var(--company-text);
+    outline-offset: 2px;
+}
+
+
+/* ==========================
+   FILE
+========================== */
+
+.movement-control-file {
+    position: relative;
+
+    width: 100%;
+    min-height: 82px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+
+    padding: 14px;
+
+    background: var(--company-hover);
+
+    border: 1px dashed var(--company-border);
+    border-radius: 12px;
+
+    cursor: pointer;
+
+    transition:
+        background .18s ease,
+        border-color .18s ease;
+}
+
+
+.movement-control-file > input {
+    position: absolute;
+
+    width: 1px;
+    height: 1px;
+
+    opacity: 0;
+
+    pointer-events: none;
+}
+
+
+/* ==========================
+   FILE ICON
+========================== */
+
+.movement-control-file-icon {
+    width: 42px;
+    height: 42px;
+
+    flex: 0 0 42px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: var(--company-card);
+
+    border: 1px solid var(--company-border);
+    border-radius: 10px;
+
+    color: var(--company-text);
+
+    font-size: 18px;
+}
+
+
+/* ==========================
+   FILE INFO
+========================== */
+
+.movement-control-file-info {
+    min-width: 0;
+
+    flex: 1;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 3px;
+}
+
+
+.movement-control-file-info strong {
+    overflow: hidden;
+
+    color: var(--company-text);
+
+    font-size: 12px;
+    font-weight: 600;
+
+    line-height: 1.3;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+.movement-control-file-info small {
+    color: var(--company-muted);
+
+    font-size: 10px;
+
+    line-height: 1.3;
+}
+
+
+/* ==========================
+   FILE ACTION
+========================== */
+
+.movement-control-file-action {
+    width: 32px;
+    height: 32px;
+
+    flex: 0 0 32px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: var(--company-muted);
+
+    font-size: 14px;
+}
+
+
+/* ==========================
+   ACTIONS
+========================== */
+
+.movement-control-actions {
+    display: flex;
+    flex-direction: column;
+
+    align-items: stretch;
+
+    gap: 15px;
+
+    padding: 18px;
+
+    background: var(--company-hover);
+
+    border-top: 1px solid var(--company-border);
+}
+
+
+/* ==========================
+   NOTICE
+========================== */
+
+.movement-control-notice {
+    display: flex;
+    align-items: flex-start;
+
+    gap: 8px;
+
+    color: var(--company-muted);
+
+    font-size: 11px;
+    line-height: 1.45;
+}
+
+
+.movement-control-notice i {
+    flex-shrink: 0;
+
+    margin-top: 1px;
+
+    color: var(--company-muted);
+
+    font-size: 13px;
+}
+
+
+/* ==========================
+   SUBMIT
+========================== */
+
+.movement-control-submit {
+    width: 100%;
+
+    justify-content: center;
+}
+
+
+.movement-control-submit:disabled {
+    opacity: .45;
+
+    cursor: not-allowed;
+}
+
+
+/* ==========================================================
+   TABLET
+========================================================== */
+
+@media (min-width: 601px) {
+
+    .movement-control-header {
+        flex-direction: row;
+
+        align-items: center;
+        justify-content: space-between;
+
+        gap: 24px;
+
+        padding: 20px;
+    }
+
+
+    .movement-control-section {
+        padding: 22px 20px;
+    }
+
+
+    .movement-control-currencies {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+
+    .movement-control-actions {
+        flex-direction: row;
+
+        align-items: center;
+        justify-content: space-between;
+
+        gap: 24px;
+
+        padding: 18px 20px;
+    }
+
+
+    .movement-control-notice {
+        max-width: 520px;
+    }
+
+
+    .movement-control-submit {
+        width: auto;
+
+        flex-shrink: 0;
+    }
+
+}
+
+
+/* ==========================================================
+   DESKTOP
+========================================================== */
+
+@media (min-width: 992px) {
+
+    .movement-control-card {
+        max-width: 900px;
+    }
+
+
+    .movement-control-header {
+        padding: 22px;
+    }
+
+
+    .movement-control-header h2 {
+        font-size: 18px;
+    }
+
+
+    .movement-control-section {
+        padding: 24px 22px;
+    }
+
+
+    .movement-control-currencies {
+        grid-template-columns:
+            repeat(3, minmax(0, 1fr));
+    }
+
+
+    .movement-control-file {
+        min-height: 88px;
+
+        padding: 16px;
+    }
+
+
+    .movement-control-actions {
+        padding: 19px 22px;
+    }
+
+}
+
+
+/* ==========================================================
+   HOVER
+========================================================== */
+
+@media (hover: hover) {
+
+    .movement-control-currency:hover
+    .movement-control-currency-content {
+
+        border-color: var(--company-muted);
+    }
+
+
+    .movement-control-file:hover {
+        background: var(--company-card);
+
+        border-color: var(--company-muted);
+    }
+
+}
+
+/* ==========================
+   MAPPING
+========================== */
+
+.movement-control-mapping-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+}
+
+
+.movement-control-mapping-field {
+    min-width: 0;
+
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+
+    padding: 14px;
+
+    background: var(--company-card);
+
+    border: 1px solid var(--company-border);
+    border-radius: 12px;
+}
+
+
+.movement-control-mapping-field label {
+    color: var(--company-text);
+
+    font-size: 13px;
+    font-weight: 700;
+}
+
+
+.movement-control-mapping-field select {
+    width: 100%;
+    height: 44px;
+
+    padding: 0 38px 0 12px;
+
+    background: var(--company-bg);
+
+    border: 1px solid var(--company-border);
+    border-radius: 9px;
+
+    color: var(--company-text);
+
+    font-size: 14px;
+
+    outline: none;
+
+    cursor: pointer;
+
+    transition:
+        border-color .18s ease,
+        background .18s ease;
+}
+
+
+.movement-control-mapping-field select:focus {
+    border-color: var(--company-text);
+}
+
+
+.movement-control-mapping-field select option {
+    background: var(--company-bg);
+    color: var(--company-text);
+}
+
+
+.movement-control-mapping-field > span {
+    color: var(--company-muted);
+
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+
+
+/* ==========================
+   PREVIEW
+========================== */
+
+.movement-control-preview {
+    width: 100%;
+
+    overflow: hidden;
+
+    border: 1px solid var(--company-border);
+    border-radius: 12px;
+}
+
+
+.movement-control-preview .table-responsive {
+    width: 100%;
+    overflow-x: auto;
+}
+
+
+.movement-control-preview table {
+    width: 100%;
+    min-width: 760px;
+
+    margin: 0;
+
+    border-collapse: collapse;
+
+    background: transparent;
+
+    color: var(--company-text);
+}
+
+
+.movement-control-preview thead th {
+    padding: 12px 14px;
+
+    background: var(--company-card);
+
+    border-bottom: 1px solid var(--company-border);
+
+    color: var(--company-muted);
+
+    font-size: 11px;
+    font-weight: 700;
+
+    text-align: left;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+
+    white-space: nowrap;
+}
+
+
+.movement-control-preview tbody td {
+    padding: 13px 14px;
+
+    background: transparent;
+
+    border-bottom: 1px solid var(--company-border);
+
+    color: var(--company-text);
+
+    font-size: 13px;
+
+    white-space: nowrap;
+}
+
+
+.movement-control-preview tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+
+
+/* ==========================
+   TABLET
+========================== */
+
+@media (min-width: 601px) {
+
+    .movement-control-mapping-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+}
+
+
+
+/* ==========================
+   DESKTOP
+========================== */
+
+@media (min-width: 992px) {
+
+    .movement-control-mapping-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+
+    .movement-control-mapping-field {
+        padding: 16px;
+    }
+
+}

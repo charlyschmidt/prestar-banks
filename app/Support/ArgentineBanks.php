@@ -64,6 +64,8 @@ class ArgentineBanks
 
         'Banco Santander Argentina',
 
+        'Banco Santiago del Estero',
+
         'Banco Supervielle',
 
         'BBVA Argentina',

@@ -1,0 +1,669 @@
+/* ==========================
+   MOVEMENT CONTROL RESULTS
+   Mobile first
+========================== */
+
+
+/* ==========================
+   PAGE
+========================== */
+
+.movement-control-results-page {
+    width: 100%;
+    max-width: none;
+
+    margin: 0;
+    padding: 16px;
+}
+
+
+/* ==========================
+   RESULTS CONTAINER
+========================== */
+
+.movement-control-results {
+    width: 100%;
+    max-width: none;
+
+    padding: 18px;
+
+    background: var(--company-card);
+
+    border: 1px solid var(--company-border);
+    border-radius: 16px;
+}
+
+
+/* ==========================
+   HEADER
+========================== */
+
+.movement-control-results-header {
+    display: flex;
+    flex-direction: column;
+
+    gap: 14px;
+
+    padding-bottom: 20px;
+
+    border-bottom: 1px solid var(--company-border);
+}
+
+
+.movement-control-results-header h2 {
+    margin: 0;
+
+    color: var(--company-text);
+
+    font-size: 17px;
+    font-weight: 700;
+
+    line-height: 1.3;
+}
+
+
+.movement-control-results-header p {
+    max-width: 650px;
+
+    margin: 6px 0 0;
+
+    color: var(--company-muted);
+
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+
+/* ==========================
+   PERIOD
+========================== */
+
+.movement-control-results-period {
+    display: inline-flex;
+    align-items: center;
+
+    width: fit-content;
+
+    gap: 7px;
+
+    padding: 7px 10px;
+
+    background: var(--company-hover);
+
+    border: 1px solid var(--company-border);
+    border-radius: 8px;
+
+    color: var(--company-muted);
+
+    font-size: 11px;
+    font-weight: 500;
+}
+
+
+.movement-control-results-period i {
+    color: var(--company-text);
+
+    font-size: 12px;
+}
+
+/* ==========================
+   SUMMARY
+========================== */
+
+.movement-control-result-summary {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+
+    margin-top: 22px;
+}
+
+
+.movement-control-result-card {
+    min-width: 0;
+
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    padding: 16px;
+
+    background: var(--company-card);
+
+    border: 1px solid var(--company-border);
+    border-radius: 12px;
+}
+
+
+.movement-control-result-card strong {
+    color: var(--company-text);
+
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+
+.movement-control-result-card>span:last-child {
+    color: var(--company-muted);
+
+    font-size: 12px;
+}
+
+
+.movement-control-result-label {
+    margin-bottom: 5px;
+
+    color: var(--company-muted);
+
+    font-size: 11px;
+    font-weight: 700;
+
+    text-transform: uppercase;
+    letter-spacing: .04em;
+}
+
+
+/* ==========================
+   SUMMARY STATES
+========================== */
+
+.movement-control-result-card-success {
+    border-color: rgba(34, 197, 94, .28);
+}
+
+
+.movement-control-result-card-success strong {
+    color: #22c55e;
+}
+
+
+.movement-control-result-card-warning {
+    border-color: rgba(245, 158, 11, .35);
+}
+
+
+.movement-control-result-card-warning strong {
+    color: #f59e0b;
+}
+
+
+
+/* ==========================
+   GENERAL RESULT MESSAGE
+========================== */
+
+.movement-control-result-ok,
+.movement-control-result-alert {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+
+    margin-top: 18px;
+    padding: 14px 16px;
+
+    border-radius: 11px;
+}
+
+
+.movement-control-result-ok {
+    background: rgba(34, 197, 94, .08);
+    border: 1px solid rgba(34, 197, 94, .20);
+}
+
+
+.movement-control-result-alert {
+    background: rgba(245, 158, 11, .08);
+    border: 1px solid rgba(245, 158, 11, .22);
+}
+
+
+.movement-control-result-ok>i,
+.movement-control-result-alert>i {
+    flex-shrink: 0;
+
+    margin-top: 2px;
+
+    font-size: 17px;
+}
+
+
+.movement-control-result-ok>i {
+    color: #22c55e;
+}
+
+
+.movement-control-result-alert>i {
+    color: #f59e0b;
+}
+
+
+.movement-control-result-ok>div,
+.movement-control-result-alert>div {
+    min-width: 0;
+
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+
+.movement-control-result-ok strong,
+.movement-control-result-alert strong {
+    color: var(--company-text);
+
+    font-size: 13px;
+    font-weight: 700;
+}
+
+
+.movement-control-result-ok span,
+.movement-control-result-alert span {
+    color: var(--company-muted);
+
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+
+
+/* ==========================
+   RESULT SECTIONS
+========================== */
+
+.movement-control-result-section {
+    margin-top: 36px;
+}
+
+
+.movement-control-result-section-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+
+    margin-bottom: 16px;
+}
+
+
+.movement-control-result-section-header>div {
+    min-width: 0;
+}
+
+
+.movement-control-result-section-header h3 {
+    margin: 0 0 4px;
+
+    color: var(--company-text);
+
+    font-size: 15px;
+    font-weight: 700;
+}
+
+
+.movement-control-result-section-header p {
+    margin: 0;
+
+    color: var(--company-muted);
+
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+
+.movement-control-result-count {
+    flex-shrink: 0;
+
+    min-width: 32px;
+    height: 28px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0 9px;
+
+    background: var(--company-card);
+
+    border: 1px solid var(--company-border);
+    border-radius: 8px;
+
+    color: var(--company-text);
+
+    font-size: 12px;
+    font-weight: 700;
+}
+
+
+
+/* ==========================
+   RESULT TABLE
+========================== */
+
+.movement-control-result-table {
+    width: 100%;
+
+    overflow: hidden;
+
+    border: 1px solid var(--company-border);
+    border-radius: 12px;
+}
+
+
+.movement-control-result-table .table-responsive {
+    width: 100%;
+    overflow-x: auto;
+}
+
+
+.movement-control-result-table table {
+    width: 100%;
+    min-width: 720px;
+
+    margin: 0;
+
+    border-collapse: collapse;
+
+    background: transparent;
+
+    color: var(--company-text);
+}
+
+
+.movement-control-result-table thead th {
+    padding: 11px 14px;
+
+    background: var(--company-card);
+
+    border-bottom: 1px solid var(--company-border);
+
+    color: var(--company-muted);
+
+    font-size: 10px;
+    font-weight: 700;
+
+    text-transform: uppercase;
+    letter-spacing: .05em;
+
+    white-space: nowrap;
+}
+
+
+.movement-control-result-table tbody td {
+    padding: 13px 14px;
+
+    background: transparent;
+
+    border-bottom: 1px solid var(--company-border);
+
+    color: var(--company-text);
+
+    font-size: 13px;
+    vertical-align: middle;
+}
+
+
+.movement-control-result-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+
+.movement-control-result-table tbody tr {
+    transition: background .15s ease;
+}
+
+
+
+/* ==========================
+   MOVEMENT TYPE
+========================== */
+
+.movement-control-result-type {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+
+    padding: 5px 8px;
+
+    border-radius: 7px;
+
+    font-size: 11px;
+    font-weight: 700;
+
+    white-space: nowrap;
+}
+
+
+.movement-control-result-type.income {
+    background: rgba(34, 197, 94, .10);
+    color: #22c55e;
+}
+
+
+.movement-control-result-type.expense {
+    background: rgba(239, 68, 68, .10);
+    color: #ef4444;
+}
+
+
+
+/* ==========================
+   AMOUNT
+========================== */
+
+.movement-control-result-amount {
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+
+.movement-control-result-amount.income {
+    color: #22c55e;
+}
+
+
+.movement-control-result-amount.expense {
+    color: #ef4444;
+}
+
+
+
+/* ==========================
+   EMPTY STATE
+========================== */
+
+.movement-control-result-empty {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+
+    padding: 16px;
+
+    background: var(--company-card);
+
+    border: 1px solid var(--company-border);
+    border-radius: 11px;
+
+    color: var(--company-muted);
+
+    font-size: 13px;
+}
+
+
+.movement-control-result-empty i {
+    flex-shrink: 0;
+
+    color: #22c55e;
+
+    font-size: 16px;
+}
+
+
+
+/* ==========================
+   MATCHED SUMMARY
+========================== */
+
+.movement-control-result-matched {
+    display: flex;
+    align-items: flex-start;
+    gap: 11px;
+
+    margin-top: 28px;
+    padding: 14px 16px;
+
+    background: rgba(34, 197, 94, .06);
+
+    border: 1px solid rgba(34, 197, 94, .18);
+    border-radius: 11px;
+}
+
+
+.movement-control-result-matched>i {
+    flex-shrink: 0;
+
+    margin-top: 1px;
+
+    color: #22c55e;
+
+    font-size: 17px;
+}
+
+
+.movement-control-result-matched>div {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+
+.movement-control-result-matched strong {
+    color: var(--company-text);
+
+    font-size: 13px;
+}
+
+
+.movement-control-result-matched span {
+    color: var(--company-muted);
+
+    font-size: 12px;
+}
+
+
+
+/* ==========================
+   ACTIONS
+========================== */
+
+.movement-control-result-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    margin-top: 28px;
+    padding-top: 20px;
+
+    border-top: 1px solid var(--company-border);
+}
+
+
+.movement-control-result-actions .secondary-button,
+.movement-control-result-actions .primary-action-button {
+    width: 100%;
+    justify-content: center;
+}
+
+
+
+/* ==========================
+   TABLET
+========================== */
+
+@media (min-width: 601px) {
+
+
+    .movement-control-results-page {
+        padding: 20px;
+    }
+
+
+    .movement-control-results {
+        padding: 22px;
+    }
+
+
+    .movement-control-results-header {
+        flex-direction: row;
+
+        align-items: center;
+        justify-content: space-between;
+
+        gap: 24px;
+    }
+
+    .movement-control-result-summary {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+
+    .movement-control-result-actions {
+        flex-direction: row;
+        justify-content: flex-end;
+    }
+
+
+    .movement-control-result-actions .secondary-button,
+    .movement-control-result-actions .primary-action-button {
+        width: auto;
+    }
+
+}
+
+
+
+/* ==========================
+   DESKTOP
+========================== */
+
+@media (min-width: 992px) {
+
+    .movement-control-results-page {
+        padding: 24px;
+    }
+
+
+    .movement-control-results {
+        width: 100%;
+        max-width: none;
+
+        padding: 28px;
+    }
+
+
+    .movement-control-results-header h2 {
+        font-size: 18px;
+    }
+
+
+    .movement-control-result-card {
+        padding: 18px;
+    }
+
+
+    .movement-control-result-card strong {
+        font-size: 30px;
+    }
+
+
+    .movement-control-result-section {
+        margin-top: 36px;
+    }
+
+
+    .movement-control-result-table tbody tr:hover {
+        background: var(--company-hover);
+    }
+
+}
