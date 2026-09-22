@@ -85,6 +85,15 @@
     @vite(['resources/js/app.js'])
 
 
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png') }}">
+
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon-32x32.png') }}">
+
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('favicon-16x16.png') }}">
+
+    <link rel="manifest" href="{{ asset('site.webmanifest') }}">
+
+    <meta name="auth-user-id" content="{{ auth()->id() }}">
     {{-- ==========================
          TEMA DE EMPRESA
     ========================== --}}
@@ -197,7 +206,7 @@
 
     </div>
 
-
+    <div id="reminder-toast-container" class="reminder-toast-container" aria-live="polite" aria-atomic="false"></div>
 </body>
 
 </html>

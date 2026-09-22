@@ -800,9 +800,44 @@ body[data-theme="dark"] .sidebar-close {
     white-space: nowrap;
 }
 
-.header-currency-list-balance .header-currency-value {
-    font-size: 16px;
+/* ==========================
+   BALANCE MULTIMONEDA
+========================== */
+
+.header-currency-list.header-currency-list-balance {
+
+    display: grid;
+
+    grid-template-columns: repeat(2, max-content);
+
+    column-gap: 14px;
+
+    row-gap: 3px;
+
+    align-items: center;
+
+    justify-content: start;
+
 }
+
+
+.header-currency-list.header-currency-list-balance
+.header-currency-value {
+
+    display: block;
+
+    width: auto;
+
+    white-space: nowrap;
+
+}
+
+.header-currency-list-balance .header-currency-value:only-child {
+
+    grid-column: 1 / -1;
+
+}
+
 
 .header-currency-empty {
     font-size: 15px;
@@ -868,7 +903,7 @@ body[data-theme="dark"] .sidebar-close {
 
     color: var(--company-muted);
 
-    font-size: 12px;
+    font-size: 13px;
 }
 
 
@@ -1405,7 +1440,7 @@ body[data-theme="dark"] .sidebar-close {
     ========================== */
 
     .top-header {
-        height: 85px;
+        height: auto;
         min-height: 85px;
 
         display: flex;

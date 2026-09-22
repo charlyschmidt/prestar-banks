@@ -300,7 +300,7 @@ class UserController extends Controller
 
 
         return redirect()
-            ->route('usuarios.index')
+            ->route('users.index')
             ->with(
                 'success',
                 'Usuario agregado correctamente.'
@@ -510,7 +510,7 @@ class UserController extends Controller
 
 
         return redirect()
-            ->route('usuarios.index')
+            ->route('users.index')
             ->with(
                 'success',
                 'Usuario actualizado correctamente.'
@@ -550,7 +550,7 @@ class UserController extends Controller
             $currentUser->id
         ) {
             return redirect()
-                ->route('usuarios.index')
+                ->route('users.index')
                 ->with(
                     'error',
                     'No podés quitar tu propio usuario de la empresa.'
@@ -570,7 +570,7 @@ class UserController extends Controller
             $this->superAdminCount() <= 1
         ) {
             return redirect()
-                ->route('usuarios.index')
+                ->route('users.index')
                 ->with(
                     'error',
                     'No se puede quitar al último Super Admin de la empresa.'
@@ -599,7 +599,7 @@ class UserController extends Controller
 
 
         return redirect()
-            ->route('usuarios.index')
+            ->route('users.index')
             ->with(
                 'success',
                 'Usuario quitado de la empresa correctamente.'

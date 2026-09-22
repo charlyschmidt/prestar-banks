@@ -2,10 +2,10 @@
 
 namespace App\Services;
 
+use App\Models\FinancialReminder;
 
 class HeaderService
 {
-
     public function __construct(
         protected BalanceDayService $balanceDayService,
         protected LowBalanceAlertService $lowBalanceAlertService
@@ -15,7 +15,6 @@ class HeaderService
 
     public function getData(): array
     {
-
         $summary =
             $this->balanceDayService
                 ->getDashboardSummary();
@@ -23,23 +22,61 @@ class HeaderService
 
         /*
         |--------------------------------------------------------------------------
-        | Alertas activas
+        | Alertas de saldo bajo
         |--------------------------------------------------------------------------
         */
 
-        $alerts =
+        $lowBalanceAlerts =
             $this->lowBalanceAlertService
                 ->getActiveAlerts();
 
 
         /*
         |--------------------------------------------------------------------------
-        | Sin jornada abierta
+        | Recordatorios vencidos del usuario
         |--------------------------------------------------------------------------
         |
-        | Los valores monetarios SIEMPRE deben mantener
-        | el mismo formato multimoneda.
+        | Los recordatorios funcionan independientemente
+        | de que exista o no una jornada financiera abierta.
         |
+        */
+
+        $reminders = FinancialReminder::query()
+            ->where(
+                'user_id',
+                auth()->id()
+            )
+            ->where(
+                'status',
+                'pending'
+            )
+            ->where(
+                'scheduled_at',
+                '<=',
+                now()
+            )
+            ->orderBy(
+                'scheduled_at'
+            )
+            ->get();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Total de alertas
+        |--------------------------------------------------------------------------
+        */
+
+        $alertsCount =
+            $lowBalanceAlerts->count()
+            +
+            $reminders->count();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Sin jornada abierta
+        |--------------------------------------------------------------------------
         */
 
         if (!$summary['has_day']) {
@@ -62,10 +99,13 @@ class HeaderService
                     0,
 
                 'alerts' =>
-                    [],
+                    $lowBalanceAlerts,
+
+                'reminders' =>
+                    $reminders,
 
                 'alerts_count' =>
-                    0,
+                    $alertsCount,
 
             ];
 
@@ -96,13 +136,14 @@ class HeaderService
                 $summary['movimientos_total'] ?? 0,
 
             'alerts' =>
-                $alerts,
+                $lowBalanceAlerts,
+
+            'reminders' =>
+                $reminders,
 
             'alerts_count' =>
-                $alerts->count(),
+                $alertsCount,
 
         ];
-
     }
-
 }

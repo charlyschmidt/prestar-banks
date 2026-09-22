@@ -52,23 +52,40 @@
 
     <div class="mobile-header-bar">
 
-        <button type="button" class="mobile-menu-button" data-bs-toggle="offcanvas" data-bs-target="#mobileSidebar"
-            aria-controls="mobileSidebar" aria-label="Abrir menú">
+        <button
+            type="button"
+            class="mobile-menu-button"
+            data-bs-toggle="offcanvas"
+            data-bs-target="#mobileSidebar"
+            aria-controls="mobileSidebar"
+            aria-label="Abrir menú"
+        >
             <i class="bi bi-list"></i>
         </button>
 
 
         <div class="mobile-header-brand">
 
-            <a href="{{ route('dashboard') }}" class="mobile-header-brand-link" aria-label="Ir al dashboard">
+            <a
+                href="{{ route('dashboard') }}"
+                class="mobile-header-brand-link"
+                aria-label="Ir al dashboard"
+            >
 
                 @if ($activeCompany?->logo)
-                    <img src="{{ asset('storage/' . $activeCompany->logo) }}" alt="{{ $activeCompany->name }}"
-                        class="mobile-company-logo">
+
+                    <img
+                        src="{{ asset('storage/' . $activeCompany->logo) }}"
+                        alt="{{ $activeCompany->name }}"
+                        class="mobile-company-logo"
+                    >
+
                 @else
+
                     <span class="mobile-aeria-brand">
                         AERIA <span>Finance</span>
                     </span>
+
                 @endif
 
             </a>
@@ -85,17 +102,23 @@
 
             <div class="dropdown header-alerts">
 
-                <button type="button" class="header-alert-button" data-bs-toggle="dropdown" aria-expanded="false"
-                    title="Alertas" aria-label="Alertas">
+                <button
+                    type="button"
+                    class="header-alert-button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                    title="Alertas"
+                    aria-label="Alertas"
+                >
 
                     <i class="bi bi-bell"></i>
 
-
-                    @if (($header['alerts_count'] ?? 0) > 0)
-                        <span class="header-alert-count" data-header-alert-count>
-                            {{ $header['alerts_count'] }}
-                        </span>
-                    @endif
+                    <span
+                        class="header-alert-count {{ ($header['alerts_count'] ?? 0) > 0 ? '' : 'd-none' }}"
+                        data-header-alert-count
+                    >
+                        {{ $header['alerts_count'] ?? 0 }}
+                    </span>
 
                 </button>
 
@@ -118,11 +141,12 @@
                         </div>
 
 
-                        @if (($header['alerts_count'] ?? 0) > 0)
-                            <span class="header-alert-total">
-                                {{ $header['alerts_count'] }}
-                            </span>
-                        @endif
+                        <span
+                            class="header-alert-total {{ ($header['alerts_count'] ?? 0) > 0 ? '' : 'd-none' }}"
+                            data-header-alert-total
+                        >
+                            {{ $header['alerts_count'] ?? 0 }}
+                        </span>
 
                     </div>
 
@@ -130,11 +154,18 @@
                     <div class="header-alert-dropdown-divider"></div>
 
 
-                    <div class="header-alert-list">
+                    <div
+                        class="header-alert-list"
+                        data-header-alert-list
+                    >
 
 
                         @forelse (($header['alerts'] ?? collect()) as $alert)
-                            <a href="{{ route('accounts.alerts', $alert->account_id) }}" class="header-alert-item">
+
+                            <a
+                                href="{{ route('accounts.alerts', $alert->account_id) }}"
+                                class="header-alert-item"
+                            >
 
                                 <div class="header-alert-item-icon">
 
@@ -171,26 +202,72 @@
 
                         @empty
 
-                            <div class="header-alert-empty">
+                            @if (($header['reminders'] ?? collect())->isEmpty())
 
-                                <div class="header-alert-empty-icon">
-                                    <i class="bi bi-check-lg"></i>
+                                <div
+                                    class="header-alert-empty"
+                                    data-header-alert-empty
+                                >
+
+                                    <div class="header-alert-empty-icon">
+                                        <i class="bi bi-check-lg"></i>
+                                    </div>
+
+                                    <div>
+
+                                        <strong>
+                                            Sin alertas
+                                        </strong>
+
+                                        <span>
+                                            No tenés avisos pendientes.
+                                        </span>
+
+                                    </div>
+
                                 </div>
 
-                                <div>
+                            @endif
+
+                        @endforelse
+
+
+                        {{-- RECORDATORIOS VENCIDOS --}}
+
+                        @foreach ($header['reminders'] ?? collect() as $reminder)
+
+                            <a
+                                href="{{ route('reminders.index') }}"
+                                class="header-alert-item"
+                                data-header-reminder="{{ $reminder->id }}"
+                            >
+
+                                <div class="header-alert-item-icon">
+
+                                    <i class="bi bi-bell-fill"></i>
+
+                                </div>
+
+
+                                <div class="header-alert-item-content">
 
                                     <strong>
-                                        Sin alertas
+                                        {{ $reminder->title }}
                                     </strong>
 
                                     <span>
-                                        Todos los saldos están dentro de los límites configurados.
+                                        Recordatorio pendiente
                                     </span>
+
+                                    <small>
+                                        {{ $reminder->scheduled_at->format('d/m/Y H:i') }}
+                                    </small>
 
                                 </div>
 
-                            </div>
-                        @endforelse
+                            </a>
+
+                        @endforeach
 
 
                     </div>
@@ -204,8 +281,13 @@
 
             <div class="dropdown user-menu mobile-user-menu">
 
-                <button type="button" class="user-avatar user-avatar-button" data-bs-toggle="dropdown"
-                    aria-expanded="false" title="Menú de usuario">
+                <button
+                    type="button"
+                    class="user-avatar user-avatar-button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                    title="Menú de usuario"
+                >
                     {{ strtoupper(substr(auth()->user()->name ?? auth()->user()->username, 0, 1)) }}
                 </button>
 
@@ -226,17 +308,23 @@
 
 
                             @if (auth()->user()->isSuperAdmin())
+
                                 <span>
                                     Super Admin
                                 </span>
+
                             @elseif (auth()->user()->isAdministration())
+
                                 <span>
                                     Administración
                                 </span>
+
                             @else
+
                                 <span>
                                     Operador
                                 </span>
+
                             @endif
 
                         </div>
@@ -247,40 +335,60 @@
                     <div class="user-dropdown-divider"></div>
 
 
-                    <a href="{{ route('dashboard') }}" class="user-dropdown-link">
+                    <a
+                        href="{{ route('dashboard') }}"
+                        class="user-dropdown-link"
+                    >
                         <i class="bi bi-grid"></i>
                         Dashboard
                     </a>
 
 
-                    <a href="{{ route('transactions.index') }}" class="user-dropdown-link">
+                    <a
+                        href="{{ route('transactions.index') }}"
+                        class="user-dropdown-link"
+                    >
                         <i class="bi bi-arrow-left-right"></i>
                         Movimientos
                     </a>
 
 
                     @if (auth()->user()->isSuperAdmin())
-                        <a href="{{ route('history.index') }}" class="user-dropdown-link">
+
+                        <a
+                            href="{{ route('history.index') }}"
+                            class="user-dropdown-link"
+                        >
                             <i class="bi bi-clock-history"></i>
                             Historial
                         </a>
 
 
-                        <a href="{{ route('settings.index') }}" class="user-dropdown-link">
+                        <a
+                            href="{{ route('settings.index') }}"
+                            class="user-dropdown-link"
+                        >
                             <i class="bi bi-gear"></i>
                             Configuración
                         </a>
+
                     @endif
 
 
                     <div class="user-dropdown-divider"></div>
 
 
-                    <form method="POST" action="{{ route('logout') }}">
+                    <form
+                        method="POST"
+                        action="{{ route('logout') }}"
+                    >
 
                         @csrf
 
-                        <button type="submit" class="user-dropdown-link user-dropdown-button">
+                        <button
+                            type="submit"
+                            class="user-dropdown-link user-dropdown-button"
+                        >
                             <i class="bi bi-box-arrow-right"></i>
                             Salir
                         </button>
@@ -292,7 +400,8 @@
             </div>
 
         </div>
-    </div> {{-- .mobile-header-actions --}}
+
+    </div>
 
 
     {{-- ==========================
@@ -308,13 +417,19 @@
             </span>
 
 
-            <strong class="header-currency-list header-currency-list-balance" data-header-balance>
+            <strong
+                class="header-currency-list header-currency-list-balance"
+                data-header-balance
+            >
 
                 @php
-                    $nonZeroBalances = collect($header['balance'] ?? [])->filter(fn($amount) => (float) $amount != 0);
+                    $nonZeroBalances = collect($header['balance'] ?? [])
+                        ->filter(fn($amount) => (float) $amount != 0);
                 @endphp
 
+
                 @forelse ($nonZeroBalances as $currency => $amount)
+
                     <span class="header-currency-value">
                         {{ $currency }}
                         {{ number_format((float) $amount, 2, ',', '.') }}
@@ -325,6 +440,7 @@
                     <span class="header-currency-value">
                         0,00
                     </span>
+
                 @endforelse
 
             </strong>
@@ -334,8 +450,12 @@
 
         {{-- BOTÓN NUEVO MOVIMIENTO MOBILE --}}
 
-        <a href="{{ route('transactions.create') }}" class="mobile-new-movement" aria-label="Nuevo movimiento"
-            title="Nuevo movimiento">
+        <a
+            href="{{ route('transactions.create') }}"
+            class="mobile-new-movement"
+            aria-label="Nuevo movimiento"
+            title="Nuevo movimiento"
+        >
             <i class="bi bi-plus-lg"></i>
         </a>
 
@@ -348,16 +468,31 @@
     ========================== --}}
 
     @if (auth()->user()->isSuperAdmin())
-        <form action="{{ route('history.index') }}" method="GET" class="header-global-search">
+
+        <form
+            action="{{ route('history.index') }}"
+            method="GET"
+            class="header-global-search"
+        >
 
             <i class="bi bi-search"></i>
 
-            <input type="text" name="search" value="{{ request()->routeIs('history.*') ? request('search') : '' }}"
-                placeholder="Buscar movimientos..." autocomplete="off">
+            <input
+                type="text"
+                name="search"
+                value="{{ request()->routeIs('history.*') ? request('search') : '' }}"
+                placeholder="Buscar movimientos..."
+                autocomplete="off"
+            >
 
-            <input type="hidden" name="results" value="1">
+            <input
+                type="hidden"
+                name="results"
+                value="1"
+            >
 
         </form>
+
     @endif
 
 
@@ -378,13 +513,19 @@
             </span>
 
 
-            <strong class="text-income header-currency-list" data-header-income>
+            <strong
+                class="text-income header-currency-list"
+                data-header-income
+            >
 
                 @php
-                    $nonZeroIncome = collect($header['income'] ?? [])->filter(fn($amount) => (float) $amount != 0);
+                    $nonZeroIncome = collect($header['income'] ?? [])
+                        ->filter(fn($amount) => (float) $amount != 0);
                 @endphp
 
+
                 @forelse ($nonZeroIncome as $currency => $amount)
+
                     <span class="header-currency-value">
                         + {{ $currency }}
                         {{ number_format((float) $amount, 2, ',', '.') }}
@@ -395,6 +536,7 @@
                     <span class="header-currency-value">
                         + 0,00
                     </span>
+
                 @endforelse
 
             </strong>
@@ -412,13 +554,19 @@
             </span>
 
 
-            <strong class="text-expense header-currency-list" data-header-expense>
+            <strong
+                class="text-expense header-currency-list"
+                data-header-expense
+            >
 
                 @php
-                    $nonZeroExpense = collect($header['expense'] ?? [])->filter(fn($amount) => (float) $amount != 0);
+                    $nonZeroExpense = collect($header['expense'] ?? [])
+                        ->filter(fn($amount) => (float) $amount != 0);
                 @endphp
 
+
                 @forelse ($nonZeroExpense as $currency => $amount)
+
                     <span class="header-currency-value">
                         - {{ $currency }}
                         {{ number_format((float) $amount, 2, ',', '.') }}
@@ -429,6 +577,7 @@
                     <span class="header-currency-value">
                         - 0,00
                     </span>
+
                 @endforelse
 
             </strong>
@@ -439,7 +588,10 @@
 
         {{-- NUEVO MOVIMIENTO DESKTOP --}}
 
-        <a href="{{ route('transactions.create') }}" class="new-movement-button">
+        <a
+            href="{{ route('transactions.create') }}"
+            class="new-movement-button"
+        >
 
             <i class="bi bi-plus-lg"></i>
 
@@ -459,36 +611,49 @@
 
 
             @if (auth()->user()->isSuperAdmin())
+
                 <span class="role-badge admin">
                     SUPER ADMIN
                 </span>
+
             @elseif (auth()->user()->isAdministration())
+
                 <span class="role-badge administration">
                     ADMINISTRACIÓN
                 </span>
+
             @else
+
                 <span class="role-badge user">
                     OPERADOR
                 </span>
+
             @endif
 
+
             {{-- ==========================
-     ALERTAS
-========================== --}}
+                 ALERTAS
+            ========================== --}}
 
             <div class="dropdown header-alerts">
 
-                <button type="button" class="header-alert-button" data-bs-toggle="dropdown" aria-expanded="false"
-                    title="Alertas" aria-label="Alertas">
+                <button
+                    type="button"
+                    class="header-alert-button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                    title="Alertas"
+                    aria-label="Alertas"
+                >
 
                     <i class="bi bi-bell"></i>
 
-
-                    @if (($header['alerts_count'] ?? 0) > 0)
-                        <span class="header-alert-count" data-header-alert-count>
-                            {{ $header['alerts_count'] }}
-                        </span>
-                    @endif
+                    <span
+                        class="header-alert-count {{ ($header['alerts_count'] ?? 0) > 0 ? '' : 'd-none' }}"
+                        data-header-alert-count
+                    >
+                        {{ $header['alerts_count'] ?? 0 }}
+                    </span>
 
                 </button>
 
@@ -511,11 +676,12 @@
                         </div>
 
 
-                        @if (($header['alerts_count'] ?? 0) > 0)
-                            <span class="header-alert-total">
-                                {{ $header['alerts_count'] }}
-                            </span>
-                        @endif
+                        <span
+                            class="header-alert-total {{ ($header['alerts_count'] ?? 0) > 0 ? '' : 'd-none' }}"
+                            data-header-alert-total
+                        >
+                            {{ $header['alerts_count'] ?? 0 }}
+                        </span>
 
                     </div>
 
@@ -523,12 +689,18 @@
                     <div class="header-alert-dropdown-divider"></div>
 
 
-                    <div class="header-alert-list">
+                    <div
+                        class="header-alert-list"
+                        data-header-alert-list
+                    >
 
 
                         @forelse (($header['alerts'] ?? collect()) as $alert)
-                            <a href="{{ route('accounts.alerts', $alert->account_id) }}" class="header-alert-item">
 
+                            <a
+                                href="{{ route('accounts.alerts', $alert->account_id) }}"
+                                class="header-alert-item"
+                            >
 
                                 <div class="header-alert-item-icon">
 
@@ -539,84 +711,118 @@
 
                                 <div class="header-alert-item-content">
 
-
                                     <strong>
                                         {{ $alert->account?->name ?? 'Cuenta' }}
                                     </strong>
-
 
                                     <span>
                                         Saldo bajo · {{ $alert->accountBalance?->currency }}
                                     </span>
 
-
                                     <small>
-
                                         Disponible:
-
                                         {{ $alert->accountBalance?->currency }}
-
                                         {{ number_format((float) $alert->current_balance, 2, ',', '.') }}
-
                                     </small>
-
 
                                     <small>
-
                                         Límite:
-
                                         {{ $alert->accountBalance?->currency }}
-
                                         {{ number_format((float) $alert->accountBalance?->low_balance_threshold, 2, ',', '.') }}
-
                                     </small>
-
 
                                 </div>
-
 
                             </a>
 
-
                         @empty
 
+                            @if (($header['reminders'] ?? collect())->isEmpty())
 
-                            <div class="header-alert-empty">
+                                <div
+                                    class="header-alert-empty"
+                                    data-header-alert-empty
+                                >
 
-                                <div class="header-alert-empty-icon">
+                                    <div class="header-alert-empty-icon">
+                                        <i class="bi bi-check-lg"></i>
+                                    </div>
 
-                                    <i class="bi bi-check-lg"></i>
+                                    <div>
+
+                                        <strong>
+                                            Sin alertas
+                                        </strong>
+
+                                        <span>
+                                            No tenés avisos pendientes.
+                                        </span>
+
+                                    </div>
 
                                 </div>
 
+                            @endif
 
-                                <div>
-
-                                    <strong>
-                                        Sin alertas
-                                    </strong>
-
-                                    <span>
-                                        Todos los saldos están dentro de los límites configurados.
-                                    </span>
-
-                                </div>
-
-                            </div>
                         @endforelse
 
 
-                    </div>
+                        {{-- RECORDATORIOS VENCIDOS --}}
 
+                        @foreach ($header['reminders'] ?? collect() as $reminder)
+
+                            <a
+                                href="{{ route('reminders.index') }}"
+                                class="header-alert-item"
+                                data-header-reminder="{{ $reminder->id }}"
+                            >
+
+                                <div class="header-alert-item-icon">
+
+                                    <i class="bi bi-bell-fill"></i>
+
+                                </div>
+
+
+                                <div class="header-alert-item-content">
+
+                                    <strong>
+                                        {{ $reminder->title }}
+                                    </strong>
+
+                                    <span>
+                                        Recordatorio pendiente
+                                    </span>
+
+                                    <small>
+                                        {{ $reminder->scheduled_at->format('d/m/Y H:i') }}
+                                    </small>
+
+                                </div>
+
+                            </a>
+
+                        @endforeach
+
+
+                    </div>
 
                 </div>
 
             </div>
 
+
+            {{-- USUARIO --}}
+
             <div class="dropdown user-menu">
 
-                <button type="button" class="user-avatar user-avatar-button" data-bs-toggle="dropdown"
-                    aria-expanded="false" title="Menú de usuario">
+                <button
+                    type="button"
+                    class="user-avatar user-avatar-button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                    title="Menú de usuario"
+                >
                     {{ strtoupper(substr(auth()->user()->name ?? auth()->user()->username, 0, 1)) }}
                 </button>
 
@@ -637,17 +843,23 @@
 
 
                             @if (auth()->user()->isSuperAdmin())
+
                                 <span>
                                     Super Admin
                                 </span>
+
                             @elseif (auth()->user()->isAdministration())
+
                                 <span>
                                     Administración
                                 </span>
+
                             @else
+
                                 <span>
                                     Operador
                                 </span>
+
                             @endif
 
                         </div>
@@ -658,40 +870,60 @@
                     <div class="user-dropdown-divider"></div>
 
 
-                    <a href="{{ route('dashboard') }}" class="user-dropdown-link">
+                    <a
+                        href="{{ route('dashboard') }}"
+                        class="user-dropdown-link"
+                    >
                         <i class="bi bi-grid"></i>
                         Dashboard
                     </a>
 
 
-                    <a href="{{ route('transactions.index') }}" class="user-dropdown-link">
+                    <a
+                        href="{{ route('transactions.index') }}"
+                        class="user-dropdown-link"
+                    >
                         <i class="bi bi-arrow-left-right"></i>
                         Movimientos
                     </a>
 
 
                     @if (auth()->user()->isSuperAdmin())
-                        <a href="{{ route('history.index') }}" class="user-dropdown-link">
+
+                        <a
+                            href="{{ route('history.index') }}"
+                            class="user-dropdown-link"
+                        >
                             <i class="bi bi-clock-history"></i>
                             Historial
                         </a>
 
 
-                        <a href="{{ route('settings.index') }}" class="user-dropdown-link">
+                        <a
+                            href="{{ route('settings.index') }}"
+                            class="user-dropdown-link"
+                        >
                             <i class="bi bi-gear"></i>
                             Configuración
                         </a>
+
                     @endif
 
 
                     <div class="user-dropdown-divider"></div>
 
 
-                    <form method="POST" action="{{ route('logout') }}">
+                    <form
+                        method="POST"
+                        action="{{ route('logout') }}"
+                    >
 
                         @csrf
 
-                        <button type="submit" class="user-dropdown-link user-dropdown-button">
+                        <button
+                            type="submit"
+                            class="user-dropdown-link user-dropdown-button"
+                        >
                             <i class="bi bi-box-arrow-right"></i>
                             Salir
                         </button>

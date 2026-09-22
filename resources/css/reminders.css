@@ -1,0 +1,1006 @@
+/* =========================================================
+   REMINDERS
+   Mobile first
+========================================================= */
+
+
+/* ==========================
+   HEADER
+========================== */
+
+.reminders-page-header .primary-action-button {
+    width: 100%;
+}
+
+
+/* ==========================
+   FEEDBACK
+========================== */
+
+.reminder-success,
+.reminder-error {
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    margin-bottom: 20px;
+    padding: 12px 14px;
+
+    border-radius: 12px;
+
+    font-size: 13px;
+    font-weight: 500;
+}
+
+
+.reminder-success {
+    background: rgba(115, 177, 138, .10);
+    color: var(--income);
+
+    border: 1px solid rgba(115, 177, 138, .24);
+}
+
+
+.reminder-error {
+    background: rgba(164, 73, 73, .12);
+    color: var(--expense);
+
+    border: 1px solid rgba(164, 73, 73, .26);
+}
+
+
+/* ==========================
+   SECTION
+========================== */
+
+.reminders-section {
+    width: 100%;
+
+    margin-bottom: 28px;
+}
+
+
+.reminders-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 12px;
+}
+
+
+.reminders-section-header h2 {
+    margin: 0;
+
+    color: var(--company-text);
+
+    font-size: 17px;
+    font-weight: 650;
+}
+
+
+.reminders-section-header span {
+    display: block;
+
+    margin-top: 3px;
+
+    color: var(--company-muted);
+
+    font-size: 12px;
+}
+
+
+/* ==========================
+   LIST
+========================== */
+
+.reminders-list {
+    display: flex;
+    flex-direction: column;
+
+    width: 100%;
+
+    background: var(--company-card);
+
+    border: 1px solid var(--company-border);
+    border-radius: 16px;
+
+    overflow: hidden;
+}
+
+
+/* ==========================
+   ITEM
+========================== */
+
+.reminder-item {
+    position: relative;
+
+    display: grid;
+
+    grid-template-columns: 44px minmax(0, 1fr);
+    gap: 12px;
+
+    width: 100%;
+
+    padding: 16px;
+
+    background: var(--company-card);
+
+    border-bottom: 1px solid var(--company-border);
+}
+
+
+.reminder-item:last-child {
+    border-bottom: none;
+}
+
+
+/* ==========================
+   DATE
+========================== */
+
+.reminder-date {
+    width: 44px;
+    height: 50px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    background: var(--company-hover);
+
+    border: 1px solid var(--company-border);
+    border-radius: 11px;
+}
+
+
+.reminder-date-day {
+    color: var(--company-text);
+
+    font-size: 17px;
+    font-weight: 700;
+
+    line-height: 18px;
+}
+
+
+.reminder-date-month {
+    margin-top: 3px;
+
+    color: var(--company-muted);
+
+    font-size: 9px;
+    font-weight: 700;
+
+    letter-spacing: .6px;
+}
+
+
+/* ==========================
+   CONTENT
+========================== */
+
+.reminder-content {
+    min-width: 0;
+}
+
+
+.reminder-title-row {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+
+    gap: 7px;
+}
+
+
+.reminder-content strong,
+.reminder-title-row strong {
+    display: block;
+
+    color: var(--company-text);
+
+    font-size: 14px;
+    font-weight: 600;
+
+    line-height: 1.4;
+}
+
+
+/* ==========================
+   META
+========================== */
+
+.reminder-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+
+    gap: 7px 12px;
+
+    margin-top: 7px;
+
+    color: var(--company-muted);
+
+    font-size: 11px;
+}
+
+
+.reminder-meta span {
+    display: inline-flex;
+    align-items: center;
+
+    gap: 5px;
+}
+
+
+.reminder-meta i {
+    font-size: 11px;
+}
+
+
+.reminder-amount {
+    color: var(--company-text) !important;
+
+    font-weight: 600;
+}
+
+
+/* ==========================
+   DUE
+========================== */
+
+.reminder-item.is-due {
+    background:
+        linear-gradient(
+            90deg,
+            rgba(255, 255, 255, .025),
+            transparent 35%
+        ),
+        var(--company-card);
+}
+
+
+.reminder-item.is-due::before {
+    content: "";
+
+    position: absolute;
+
+    top: 0;
+    bottom: 0;
+    left: 0;
+
+    width: 3px;
+
+    background: var(--company-text);
+}
+
+
+.reminder-due-badge {
+    display: inline-flex;
+    align-items: center;
+
+    gap: 5px;
+
+    padding: 4px 8px;
+
+    background: var(--company-hover);
+
+    border: 1px solid var(--company-border);
+    border-radius: 999px;
+
+    color: var(--company-text);
+
+    font-size: 10px;
+    font-weight: 600;
+
+    white-space: nowrap;
+}
+
+
+/* ==========================
+   ACTIONS
+========================== */
+
+.reminder-actions {
+    grid-column: 1 / -1;
+
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+
+    gap: 8px;
+
+    padding-top: 4px;
+}
+
+
+.reminder-actions form {
+    margin: 0;
+}
+
+
+.reminder-complete-button,
+.reminder-delete-button {
+    height: 34px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 6px;
+
+    background: transparent;
+
+    border: 1px solid var(--company-border);
+    border-radius: 9px;
+
+    color: var(--company-muted);
+
+    cursor: pointer;
+
+    font-size: 11px;
+
+    transition:
+        background .2s ease,
+        color .2s ease,
+        border-color .2s ease;
+}
+
+
+.reminder-complete-button {
+    padding: 0 11px;
+}
+
+
+.reminder-delete-button {
+    width: 34px;
+    padding: 0;
+}
+
+
+/* ==========================
+   COMPLETED
+========================== */
+
+.reminders-completed-section {
+    margin-top: 34px;
+}
+
+
+.reminder-item.is-completed {
+    grid-template-columns: 34px minmax(0, 1fr);
+    opacity: .65;
+}
+
+
+.reminder-completed-icon {
+    width: 34px;
+    height: 34px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: var(--company-hover);
+
+    border: 1px solid var(--company-border);
+    border-radius: 50%;
+
+    color: var(--company-muted);
+
+    font-size: 14px;
+}
+
+
+.reminder-item.is-completed .reminder-content strong {
+    text-decoration: line-through;
+}
+
+
+/* ==========================
+   EMPTY
+========================== */
+
+.reminders-empty {
+    min-height: 230px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    padding: 32px 20px;
+
+    text-align: center;
+}
+
+
+.reminders-empty-icon {
+    width: 46px;
+    height: 46px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin-bottom: 14px;
+
+    background: var(--company-hover);
+
+    border: 1px solid var(--company-border);
+    border-radius: 13px;
+
+    color: var(--company-muted);
+
+    font-size: 18px;
+}
+
+
+.reminders-empty strong {
+    color: var(--company-text);
+
+    font-size: 14px;
+    font-weight: 600;
+}
+
+
+.reminders-empty span {
+    max-width: 340px;
+
+    margin-top: 6px;
+
+    color: var(--company-muted);
+
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   MODAL
+========================================================= */
+
+.reminder-modal {
+    background: var(--company-bg);
+
+    border: 1px solid var(--company-border);
+    border-radius: 18px;
+
+    color: var(--company-text);
+
+    overflow: hidden;
+}
+
+
+.reminder-modal-header {
+    display: flex;
+    align-items: flex-start;
+
+    padding: 20px;
+
+    border-bottom: 1px solid var(--company-border);
+}
+
+
+.reminder-modal-header h2 {
+    margin: 0;
+
+    color: var(--company-text);
+
+    font-size: 19px;
+    font-weight: 650;
+}
+
+
+.reminder-modal-header p {
+    margin: 5px 0 0;
+
+    color: var(--company-muted);
+
+    font-size: 12px;
+}
+
+
+.reminder-modal-body {
+    padding: 20px;
+}
+
+
+.reminder-modal-footer {
+    display: flex;
+    flex-direction: column-reverse;
+
+    gap: 10px;
+
+    padding: 16px 20px 20px;
+
+    border-top: 1px solid var(--company-border);
+}
+
+
+.reminder-modal-footer > * {
+    width: 100%;
+}
+
+
+/* ==========================
+   FORM
+========================== */
+
+.reminder-form-group {
+    margin-bottom: 18px;
+}
+
+
+.reminder-form-group:last-child {
+    margin-bottom: 0;
+}
+
+
+.reminder-form-group label {
+    display: block;
+
+    margin-bottom: 7px;
+
+    color: var(--company-text);
+
+    font-size: 12px;
+    font-weight: 500;
+}
+
+
+.reminder-optional {
+    margin-top: 24px;
+    padding-top: 20px;
+
+    border-top: 1px solid var(--company-border);
+}
+
+
+.reminder-optional-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 12px;
+
+    margin-bottom: 17px;
+}
+
+
+.reminder-optional-title span {
+    color: var(--company-text);
+
+    font-size: 12px;
+    font-weight: 600;
+}
+
+
+.reminder-optional-title small {
+    padding: 3px 7px;
+
+    background: var(--company-hover);
+
+    border: 1px solid var(--company-border);
+    border-radius: 999px;
+
+    color: var(--company-muted);
+
+    font-size: 9px;
+    font-weight: 600;
+
+    text-transform: uppercase;
+    letter-spacing: .4px;
+}
+
+
+/* ==========================
+   DATE INPUT
+========================== */
+
+.reminder-form-group input[type="datetime-local"] {
+    color-scheme: dark;
+}
+
+
+body[data-theme="light"]
+.reminder-form-group input[type="datetime-local"] {
+    color-scheme: light;
+}
+
+
+/* =========================================================
+   TABLET / DESKTOP
+========================================================= */
+
+@media (min-width: 769px) {
+
+    .reminders-page-header .primary-action-button {
+        width: auto;
+    }
+
+
+    .reminder-item {
+        grid-template-columns:
+            50px
+            minmax(0, 1fr)
+            auto;
+
+        align-items: center;
+
+        gap: 16px;
+
+        padding: 17px 20px;
+    }
+
+
+    .reminder-date {
+        width: 50px;
+        height: 54px;
+    }
+
+
+    .reminder-date-day {
+        font-size: 19px;
+    }
+
+
+    .reminder-title-row {
+        flex-direction: row;
+        align-items: center;
+
+        gap: 10px;
+    }
+
+
+    .reminder-content strong,
+    .reminder-title-row strong {
+        font-size: 14px;
+    }
+
+
+    .reminder-meta {
+        font-size: 12px;
+    }
+
+
+    .reminder-actions {
+        grid-column: auto;
+
+        padding-top: 0;
+    }
+
+
+    .reminder-item.is-completed {
+        grid-template-columns:
+            38px
+            minmax(0, 1fr)
+            auto;
+    }
+
+
+    .reminder-modal-header {
+        padding: 24px;
+    }
+
+
+    .reminder-modal-body {
+        padding: 24px;
+    }
+
+
+    .reminder-modal-footer {
+        flex-direction: row;
+        justify-content: flex-end;
+
+        padding: 18px 24px 24px;
+    }
+
+
+    .reminder-modal-footer > * {
+        width: auto;
+    }
+
+}
+
+
+/* =========================================================
+   HOVER
+========================================================= */
+
+@media (hover: hover) {
+
+    .reminder-complete-button:hover {
+        background: var(--company-hover);
+
+        border-color: var(--company-text);
+
+        color: var(--company-text);
+    }
+
+
+    .reminder-delete-button:hover {
+        background: rgba(248, 113, 113, .08);
+
+        border-color: rgba(248, 113, 113, .25);
+
+        color: #f87171;
+    }
+
+}
+
+/* =========================================================
+   REMINDER TOAST
+   Mobile first
+========================================================= */
+
+.reminder-toast-container {
+    position: fixed;
+
+    right: 14px;
+    bottom: 14px;
+    left: 14px;
+
+    z-index: 1090;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 10px;
+
+    pointer-events: none;
+}
+
+
+.reminder-toast {
+    position: relative;
+
+    display: grid;
+    grid-template-columns: 40px minmax(0, 1fr) 30px;
+
+    gap: 12px;
+
+    width: 100%;
+
+    padding: 14px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(196, 145, 62, .13),
+            rgba(196, 145, 62, .045)
+        ),
+        var(--company-card);
+
+    border: 1px solid rgba(196, 145, 62, .38);
+    border-radius: 14px;
+
+    box-shadow:
+        0 16px 40px rgba(0, 0, 0, .24),
+        0 0 0 1px rgba(196, 145, 62, .035);
+
+    opacity: 0;
+
+    transform: translateY(16px);
+
+    pointer-events: auto;
+
+    transition:
+        opacity .25s ease,
+        transform .25s ease;
+}
+
+
+.reminder-toast.is-visible {
+    opacity: 1;
+
+    transform: translateY(0);
+}
+
+
+.reminder-toast.is-hiding {
+    opacity: 0;
+
+    transform: translateY(10px);
+}
+
+
+.reminder-toast-icon {
+    width: 40px;
+    height: 40px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: var(--company-hover);
+
+    border: 1px solid var(--company-border);
+    border-radius: 11px;
+
+    color: var(--company-text);
+
+    font-size: 15px;
+}
+
+
+.reminder-toast-content {
+    min-width: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    justify-content: center;
+}
+
+
+.reminder-toast-label {
+    margin-bottom: 3px;
+
+    color: #c99a4c;
+
+    font-size: 10px;
+    font-weight: 650;
+
+    text-transform: uppercase;
+    letter-spacing: .6px;
+}
+
+
+.reminder-toast-title {
+    overflow: hidden;
+
+    color: var(--company-text);
+
+    font-size: 13px;
+    font-weight: 650;
+
+    line-height: 1.35;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+.reminder-toast-date {
+    margin-top: 4px;
+
+    color: var(--company-muted);
+
+    font-size: 11px;
+}
+
+
+.reminder-toast-close {
+    width: 30px;
+    height: 30px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+
+    background: transparent;
+
+    border: none;
+    border-radius: 8px;
+
+    color: var(--company-muted);
+
+    cursor: pointer;
+
+    font-size: 12px;
+
+    transition:
+        background .2s ease,
+        color .2s ease;
+}
+
+
+@media (min-width: 769px) {
+
+    .reminder-toast-container {
+        right: 22px;
+        bottom: 22px;
+        left: auto;
+
+        width: 360px;
+    }
+
+
+    .reminder-toast {
+        transform: translateX(30px);
+    }
+
+
+    .reminder-toast.is-visible {
+        transform: translateX(0);
+    }
+
+
+    .reminder-toast.is-hiding {
+        transform: translateX(30px);
+    }
+
+}
+
+
+@media (hover: hover) {
+
+    .reminder-toast-close:hover {
+        background: var(--company-hover);
+
+        color: var(--company-text);
+    }
+
+}
+
+/* ==========================
+   TOAST ACTIONS
+========================== */
+
+.reminder-toast-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: space-between;
+
+    gap: 8px;
+}
+
+
+.reminder-toast-complete {
+    min-height: 30px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 5px;
+
+    padding: 0 9px;
+
+    background: rgba(196, 145, 62, .14);
+
+    border: 1px solid rgba(196, 145, 62, .30);
+    border-radius: 8px;
+
+    color: #d7a854;
+
+    cursor: pointer;
+
+    font-size: 10px;
+    font-weight: 600;
+
+    white-space: nowrap;
+
+    transition:
+        background .2s ease,
+        border-color .2s ease,
+        opacity .2s ease;
+}
+
+
+.reminder-toast-complete:disabled {
+    cursor: default;
+
+    opacity: .55;
+}
+
+
+@media (hover: hover) {
+
+    .reminder-toast-complete:hover:not(:disabled) {
+        background: rgba(196, 145, 62, .22);
+
+        border-color: rgba(196, 145, 62, .48);
+    }
+
+}

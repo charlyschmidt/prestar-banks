@@ -43,7 +43,7 @@
 
         <form
             method="POST"
-            action="{{ route('usuarios.store') }}"
+            action="{{ route('users.store') }}"
         >
 
             @csrf

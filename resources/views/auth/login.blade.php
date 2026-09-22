@@ -94,15 +94,24 @@
                 </div>
 
 
-                <label for="remember" class="login-remember">
+                <div class="login-options">
 
-                    <input id="remember" type="checkbox" name="remember">
+                    <label for="remember" class="login-remember">
 
-                    <span>
-                        Recordarme
-                    </span>
+                        <input id="remember" type="checkbox" name="remember">
 
-                </label>
+                        <span>
+                            Recordarme
+                        </span>
+
+                    </label>
+
+
+                    <a href="{{ route('password.request') }}" class="login-forgot">
+                        ¿Olvidaste tu contraseña?
+                    </a>
+
+                </div>
 
 
                 <button type="submit" class="login-button">

@@ -7,6 +7,7 @@ use App\Models\Company;
 use App\Models\FinancialDay;
 use App\Models\Transaction;
 use Illuminate\Http\RedirectResponse;
+use App\Services\AeriaMailService;
 
 class PlatformAdminController extends Controller
 {
@@ -378,8 +379,11 @@ class PlatformAdminController extends Controller
     |--------------------------------------------------------------------------
     */
 
-    public function approve(Company $company): RedirectResponse
-    {
+    public function approve(
+        Company $company,
+        AeriaMailService $mailService
+    ): RedirectResponse {
+
         if ($company->status === 'active') {
 
             return back()->with(
@@ -388,9 +392,31 @@ class PlatformAdminController extends Controller
             );
         }
 
+
         $company->update([
             'status' => 'active',
         ]);
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Notificar administradores de la empresa
+    |--------------------------------------------------------------------------
+    */
+
+        $admins = $company
+            ->users()
+            ->wherePivot('is_admin', true)
+            ->get();
+
+
+        foreach ($admins as $admin) {
+
+            $mailService->sendAccountApproved(
+                $admin
+            );
+        }
+
 
         return back()->with(
             'success',

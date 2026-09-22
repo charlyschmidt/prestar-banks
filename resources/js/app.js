@@ -70,6 +70,8 @@ import '../css/movement-control-results.css';
 
 import '../css/account-alerts.css';
 
+import '../css/reminders.css';
+
 
 /*
 |--------------------------------------------------------------------------
@@ -88,5 +90,11 @@ import './settings';
 import './shortcuts';
 
 import './movement-control';
+
+import './reminders';
+
+import './echo';
+
+import './reminder-notifications';
 
 

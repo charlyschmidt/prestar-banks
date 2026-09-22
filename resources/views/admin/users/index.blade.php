@@ -26,7 +26,7 @@
         <div>
 
             <a
-                href="{{ route('usuarios.create') }}"
+                href="{{ route('users.create') }}"
                 class="primary-action-button"
             >
                 <i class="bi bi-person-plus"></i>
@@ -220,7 +220,7 @@
 
 
                                     <a
-                                        href="{{ route('usuarios.edit', $user->id) }}"
+                                        href="{{ route('users.edit', $user->id) }}"
                                         class="action-button"
                                         title="Editar usuario"
                                     >
@@ -233,7 +233,7 @@
                                     @if ($user->id !== auth()->id())
 
                                         <form
-                                            action="{{ route('usuarios.destroy', $user->id) }}"
+                                            action="{{ route('users.destroy', $user->id) }}"
                                             method="POST"
                                         >
 

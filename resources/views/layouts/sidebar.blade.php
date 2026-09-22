@@ -2,12 +2,8 @@
      SIDEBAR MOBILE
 ========================== --}}
 
-<div
-    class="offcanvas offcanvas-start sidebar-offcanvas"
-    tabindex="-1"
-    id="mobileSidebar"
-    aria-labelledby="mobileSidebarLabel"
->
+<div class="offcanvas offcanvas-start sidebar-offcanvas" tabindex="-1" id="mobileSidebar"
+    aria-labelledby="mobileSidebarLabel">
 
     <div class="offcanvas-header">
 
@@ -19,44 +15,27 @@
             <a href="{{ route('dashboard') }}">
 
                 @if ($activeCompany?->logo)
-
-                    <img
-                        src="{{ asset('storage/' . $activeCompany->logo) }}"
-                        alt="{{ $activeCompany->name }}"
-                        class="sidebar-company-logo"
-                    >
-
+                    <img src="{{ asset('storage/' . $activeCompany->logo) }}" alt="{{ $activeCompany->name }}"
+                        class="sidebar-company-logo">
                 @else
-
                     <div class="sidebar-aeria-brand">
                         AERIA <span>Finance</span>
                     </div>
-
                 @endif
 
             </a>
 
 
             @if ($activeCompany)
-
-                <div
-                    class="sidebar-company-name"
-                    id="mobileSidebarLabel"
-                >
+                <div class="sidebar-company-name" id="mobileSidebarLabel">
                     {{ $activeCompany->name }}
                 </div>
-
             @endif
 
         </div>
 
 
-        <button
-            type="button"
-            class="btn-close sidebar-close"
-            data-bs-dismiss="offcanvas"
-            aria-label="Cerrar"
-        ></button>
+        <button type="button" class="btn-close sidebar-close" data-bs-dismiss="offcanvas" aria-label="Cerrar"></button>
 
     </div>
 
@@ -67,10 +46,7 @@
         <nav class="sidebar-nav">
 
 
-            <a
-                href="{{ route('dashboard') }}"
-                class="{{ request()->routeIs('dashboard') ? 'active' : '' }}"
-            >
+            <a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard') ? 'active' : '' }}">
 
                 <i class="bi bi-grid"></i>
 
@@ -79,10 +55,7 @@
             </a>
 
 
-            <a
-                href="{{ route('accounts.index') }}"
-                class="{{ request()->routeIs('accounts.*') ? 'active' : '' }}"
-            >
+            <a href="{{ route('accounts.index') }}" class="{{ request()->routeIs('accounts.*') ? 'active' : '' }}">
 
                 <i class="bi bi-wallet2"></i>
 
@@ -91,10 +64,8 @@
             </a>
 
 
-            <a
-                href="{{ route('transactions.index') }}"
-                class="{{ request()->routeIs('transactions.*') ? 'active' : '' }}"
-            >
+            <a href="{{ route('transactions.index') }}"
+                class="{{ request()->routeIs('transactions.*') ? 'active' : '' }}">
 
                 <i class="bi bi-arrow-left-right"></i>
 
@@ -102,66 +73,55 @@
 
             </a>
 
+            <a href="{{ route('reminders.index') }}" class="{{ request()->routeIs('reminders.*') ? 'active' : '' }}">
+
+                <i class="bi bi-calendar2-check"></i>
+
+                Recordatorios
+
+            </a>
+
 
             @if (auth()->user()->isSuperAdmin())
-
-                <a
-                    href="{{ route('history.index') }}"
-                    class="{{ request()->routeIs('history.*') ? 'active' : '' }}"
-                >
+                <a href="{{ route('history.index') }}" class="{{ request()->routeIs('history.*') ? 'active' : '' }}">
 
                     <i class="bi bi-clock-history"></i>
 
                     Historial
 
                 </a>
-
             @endif
 
 
             @if (auth()->user()->isSuperAdmin())
-
-                <a
-                    href="{{ route('usuarios.index') }}"
-                    class="{{ request()->routeIs('usuarios.*') ? 'active' : '' }}"
-                >
+                <a href="{{ route('users.index') }}"
+                    class="{{ request()->routeIs('usuarios.*') ? 'active' : '' }}">
 
                     <i class="bi bi-people"></i>
 
                     Usuarios
 
                 </a>
-
             @endif
 
 
             @if (auth()->user()->isSuperAdmin())
-
-                <a
-                    href="{{ route('settings.index') }}"
-                    class="{{ request()->routeIs('settings.*') ? 'active' : '' }}"
-                >
+                <a href="{{ route('settings.index') }}"
+                    class="{{ request()->routeIs('settings.*') ? 'active' : '' }}">
 
                     <i class="bi bi-gear"></i>
 
                     Configuración
 
                 </a>
-
             @endif
 
 
-            <form
-                method="POST"
-                action="{{ route('logout') }}"
-            >
+            <form method="POST" action="{{ route('logout') }}">
 
                 @csrf
 
-                <button
-                    type="submit"
-                    class="sidebar-link-button"
-                >
+                <button type="submit" class="sidebar-link-button">
 
                     <i class="bi bi-box-arrow-right"></i>
 
@@ -194,30 +154,21 @@
         <a href="{{ route('dashboard') }}">
 
             @if ($activeCompany?->logo)
-
-                <img
-                    src="{{ asset('storage/' . $activeCompany->logo) }}"
-                    alt="{{ $activeCompany->name }}"
-                    class="sidebar-company-logo"
-                >
-
+                <img src="{{ asset('storage/' . $activeCompany->logo) }}" alt="{{ $activeCompany->name }}"
+                    class="sidebar-company-logo">
             @else
-
                 <div class="sidebar-aeria-brand">
                     AERIA <span>Finance</span>
                 </div>
-
             @endif
 
         </a>
 
 
         @if ($activeCompany)
-
             <div class="sidebar-company-name">
                 {{ $activeCompany->name }}
             </div>
-
         @endif
 
     </div>
@@ -229,10 +180,7 @@
     <nav>
 
 
-        <a
-            href="{{ route('dashboard') }}"
-            class="{{ request()->routeIs('dashboard') ? 'active' : '' }}"
-        >
+        <a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard') ? 'active' : '' }}">
 
             <i class="bi bi-grid"></i>
 
@@ -241,10 +189,7 @@
         </a>
 
 
-        <a
-            href="{{ route('accounts.index') }}"
-            class="{{ request()->routeIs('accounts.*') ? 'active' : '' }}"
-        >
+        <a href="{{ route('accounts.index') }}" class="{{ request()->routeIs('accounts.*') ? 'active' : '' }}">
 
             <i class="bi bi-wallet2"></i>
 
@@ -253,10 +198,8 @@
         </a>
 
 
-        <a
-            href="{{ route('transactions.index') }}"
-            class="{{ request()->routeIs('transactions.*') ? 'active' : '' }}"
-        >
+        <a href="{{ route('transactions.index') }}"
+            class="{{ request()->routeIs('transactions.*') ? 'active' : '' }}">
 
             <i class="bi bi-arrow-left-right"></i>
 
@@ -264,66 +207,53 @@
 
         </a>
 
+        <a href="{{ route('reminders.index') }}" class="{{ request()->routeIs('reminders.*') ? 'active' : '' }}">
+
+            <i class="bi bi-calendar2-check"></i>
+
+            Recordatorios
+
+        </a>
+
 
         @if (auth()->user()->isSuperAdmin())
-
-            <a
-                href="{{ route('history.index') }}"
-                class="{{ request()->routeIs('history.*') ? 'active' : '' }}"
-            >
+            <a href="{{ route('history.index') }}" class="{{ request()->routeIs('history.*') ? 'active' : '' }}">
 
                 <i class="bi bi-clock-history"></i>
 
                 Historial
 
             </a>
-
         @endif
 
 
         @if (auth()->user()->isSuperAdmin())
-
-            <a
-                href="{{ route('usuarios.index') }}"
-                class="{{ request()->routeIs('usuarios.*') ? 'active' : '' }}"
-            >
+            <a href="{{ route('users.index') }}" class="{{ request()->routeIs('usuarios.*') ? 'active' : '' }}">
 
                 <i class="bi bi-people"></i>
 
                 Usuarios
 
             </a>
-
         @endif
 
 
         @if (auth()->user()->isSuperAdmin())
-
-            <a
-                href="{{ route('settings.index') }}"
-                class="{{ request()->routeIs('settings.*') ? 'active' : '' }}"
-            >
+            <a href="{{ route('settings.index') }}" class="{{ request()->routeIs('settings.*') ? 'active' : '' }}">
 
                 <i class="bi bi-gear"></i>
 
                 Configuración
 
             </a>
-
         @endif
 
 
-        <form
-            method="POST"
-            action="{{ route('logout') }}"
-        >
+        <form method="POST" action="{{ route('logout') }}">
 
             @csrf
 
-            <button
-                type="submit"
-                class="sidebar-link-button"
-            >
+            <button type="submit" class="sidebar-link-button">
 
                 <i class="bi bi-box-arrow-right"></i>
 

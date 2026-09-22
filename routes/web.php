@@ -11,10 +11,12 @@ use App\Http\Controllers\HistoryController;
 use App\Http\Controllers\CompanySelectionController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\PlatformAdminController;
+use App\Http\Controllers\FinancialReminderController;
+
 
 /*
 |--------------------------------------------------------------------------
-| Entrada principal
+| Main Entry
 |--------------------------------------------------------------------------
 */
 
@@ -25,16 +27,20 @@ Route::get('/', function () {
     }
 
     return view('welcome');
+
 })->name('home');
 
-Route::get('/registro/pendiente', function () {
+
+Route::get('/register/pending', function () {
 
     return view('auth.register-pending');
+
 })->name('register.pending');
+
 
 /*
 |--------------------------------------------------------------------------
-| Usuario autenticado
+| Authenticated User
 |--------------------------------------------------------------------------
 */
 
@@ -43,7 +49,7 @@ Route::middleware('auth')->group(function () {
 
     /*
     |--------------------------------------------------------------------------
-    | Selección de empresa
+    | Company Selection
     |--------------------------------------------------------------------------
     |
     | Estas rutas NO llevan middleware company porque justamente
@@ -52,20 +58,20 @@ Route::middleware('auth')->group(function () {
     */
 
     Route::get(
-        '/seleccionar-empresa',
+        '/company/select',
         [CompanySelectionController::class, 'index']
     )->name('company.select');
 
 
     Route::post(
-        '/seleccionar-empresa',
+        '/company/select',
         [CompanySelectionController::class, 'store']
     )->name('company.select.store');
 
 
     /*
     |--------------------------------------------------------------------------
-    | Sistema con empresa activa
+    | Active Company
     |--------------------------------------------------------------------------
     */
 
@@ -90,7 +96,7 @@ Route::middleware('auth')->group(function () {
 
         /*
         |--------------------------------------------------------------------------
-        | Jornada financiera
+        | Financial Day
         |--------------------------------------------------------------------------
         |
         | Deben ser accesibles SIN jornada abierta,
@@ -99,7 +105,7 @@ Route::middleware('auth')->group(function () {
         */
 
         Route::get(
-            '/jornada/apertura',
+            '/financial-days/open',
             [
                 FinancialDayController::class,
                 'create'
@@ -108,7 +114,7 @@ Route::middleware('auth')->group(function () {
 
 
         Route::post(
-            '/jornada/apertura',
+            '/financial-days/open',
             [
                 FinancialDayController::class,
                 'store'
@@ -118,7 +124,7 @@ Route::middleware('auth')->group(function () {
 
         /*
         |--------------------------------------------------------------------------
-        | Configuración
+        | Settings
         |--------------------------------------------------------------------------
         |
         | No depende de una jornada financiera.
@@ -126,20 +132,20 @@ Route::middleware('auth')->group(function () {
         */
 
         Route::get(
-            '/configuracion',
+            '/settings',
             [SettingsController::class, 'index']
         )->name('settings.index');
 
 
         Route::patch(
-            '/configuracion/apariencia',
+            '/settings/branding',
             [SettingsController::class, 'updateBranding']
         )->name('settings.branding.update');
 
 
         /*
         |--------------------------------------------------------------------------
-        | Usuarios
+        | Users
         |--------------------------------------------------------------------------
         |
         | La administración de usuarios pertenece a la empresa,
@@ -148,7 +154,7 @@ Route::middleware('auth')->group(function () {
         */
 
         Route::resource(
-            'usuarios',
+            'users',
             UserController::class
         )->except([
             'show'
@@ -157,7 +163,41 @@ Route::middleware('auth')->group(function () {
 
         /*
         |--------------------------------------------------------------------------
-        | Requieren jornada abierta
+        | Financial Reminders
+        |--------------------------------------------------------------------------
+        |
+        | Los recordatorios pertenecen al usuario y a la empresa activa.
+        | No requieren una jornada financiera abierta.
+        |
+        */
+
+        Route::get(
+            '/reminders',
+            [FinancialReminderController::class, 'index']
+        )->name('reminders.index');
+
+
+        Route::post(
+            '/reminders',
+            [FinancialReminderController::class, 'store']
+        )->name('reminders.store');
+
+
+        Route::patch(
+            '/reminders/{reminder}/complete',
+            [FinancialReminderController::class, 'complete']
+        )->name('reminders.complete');
+
+
+        Route::delete(
+            '/reminders/{reminder}',
+            [FinancialReminderController::class, 'destroy']
+        )->name('reminders.destroy');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Requires Open Financial Day
         |--------------------------------------------------------------------------
         |
         | Todo lo que esté dentro de este grupo queda bloqueado
@@ -182,31 +222,30 @@ Route::middleware('auth')->group(function () {
 
             /*
             |--------------------------------------------------------------------------
-            | Historial
+            | History
             |--------------------------------------------------------------------------
             */
 
             Route::get(
-                '/historial/exportar',
+                '/history/export',
                 [HistoryController::class, 'export']
             )->name('history.export');
 
 
             Route::get(
-                '/historial',
+                '/history',
                 [HistoryController::class, 'index']
             )->name('history.index');
 
 
             /*
             |--------------------------------------------------------------------------
-            | Cuentas
+            | Accounts
             |--------------------------------------------------------------------------
-            */
-
-            /*
-            * IMPORTANTE:
-            * estas rutas específicas van ANTES del resource.
+            |
+            | IMPORTANTE:
+            | Estas rutas específicas van ANTES del resource.
+            |
             */
 
             Route::get(
@@ -235,6 +274,7 @@ Route::middleware('auth')->group(function () {
                 ]
             )->name('accounts.movement-control');
 
+
             Route::post(
                 '/accounts/{account}/movement-control',
                 [
@@ -242,6 +282,7 @@ Route::middleware('auth')->group(function () {
                     'processMovementControl'
                 ]
             )->name('accounts.movement-control.process');
+
 
             Route::post(
                 '/accounts/{account}/movement-control/compare',
@@ -251,15 +292,24 @@ Route::middleware('auth')->group(function () {
                 ]
             )->name('accounts.movement-control.compare');
 
+
             Route::get(
                 '/accounts/{account}/alerts',
-                [AccountController::class, 'alerts']
+                [
+                    AccountController::class,
+                    'alerts'
+                ]
             )->name('accounts.alerts');
+
 
             Route::put(
                 '/accounts/{account}/alerts',
-                [AccountController::class, 'updateAlerts']
+                [
+                    AccountController::class,
+                    'updateAlerts'
+                ]
             )->name('accounts.alerts.update');
+
 
             Route::resource(
                 'accounts',
@@ -269,15 +319,14 @@ Route::middleware('auth')->group(function () {
 
             /*
             |--------------------------------------------------------------------------
-            | Movimientos
+            | Transactions
             |--------------------------------------------------------------------------
+            |
+            | IMPORTANTE:
+            | /transactions/export debe declararse
+            | ANTES del resource.
+            |
             */
-
-            /*
-             * IMPORTANTE:
-             * /transactions/export debe declararse
-             * ANTES del resource.
-             */
 
             Route::get(
                 '/transactions/export',
@@ -301,18 +350,28 @@ Route::middleware('auth')->group(function () {
                 'transactions',
                 TransactionController::class
             );
+
         });
+
     });
+
 });
 
 
 /*
 |--------------------------------------------------------------------------
-| Autenticación
+| Authentication
 |--------------------------------------------------------------------------
 */
 
 require __DIR__ . '/auth.php';
+
+
+/*
+|--------------------------------------------------------------------------
+| Platform Administration
+|--------------------------------------------------------------------------
+*/
 
 Route::middleware([
     'auth',
@@ -321,6 +380,7 @@ Route::middleware([
     ->prefix('aeria-admin')
     ->name('aeria-admin.')
     ->group(function () {
+
 
         Route::get(
             '/',
@@ -339,8 +399,10 @@ Route::middleware([
             [PlatformAdminController::class, 'suspend']
         )->name('companies.suspend');
 
+
         Route::get(
             '/companies/{company}',
             [PlatformAdminController::class, 'show']
         )->name('companies.show');
+
     });

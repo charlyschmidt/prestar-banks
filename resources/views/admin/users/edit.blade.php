@@ -56,7 +56,7 @@
 
         <form
             method="POST"
-            action="{{ route('usuarios.update', $user->id) }}"
+            action="{{ route('users.update', $user->id) }}"
         >
 
             @csrf

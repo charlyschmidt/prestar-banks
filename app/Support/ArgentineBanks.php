@@ -25,8 +25,7 @@ class ArgentineBanks
         'Banco de la Nación Argentina',
 
         'Banco de la Provincia de Buenos Aires',
-        
-        'Banco de la Provincia de Neuquén',
+	 'Banco de la Provincia de Neuquen',
 
         'Banco de San Juan',
 
@@ -69,6 +68,8 @@ class ArgentineBanks
         'Banco Supervielle',
 
         'BBVA Argentina',
+
+	'Bibank S.A.',
 
         'Brubank',
 

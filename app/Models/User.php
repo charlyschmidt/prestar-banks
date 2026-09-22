@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Services\AeriaMailService;
 
 #[Fillable([
     'name',
@@ -153,9 +154,9 @@ class User extends Authenticatable
         }
 
         return (bool)
-            $membership
-                ->pivot
-                ->is_admin;
+        $membership
+            ->pivot
+            ->is_admin;
     }
 
 
@@ -181,9 +182,9 @@ class User extends Authenticatable
                 ->is_admin
             &&
             $membership
-                ->pivot
-                ->role
-                === 'administration';
+            ->pivot
+            ->role
+            === 'administration';
     }
 
 
@@ -209,9 +210,9 @@ class User extends Authenticatable
                 ->is_admin
             &&
             $membership
-                ->pivot
-                ->role
-                === 'operator';
+            ->pivot
+            ->role
+            === 'operator';
     }
 
 
@@ -244,5 +245,16 @@ class User extends Authenticatable
     public function isPlatformAdmin(): bool
     {
         return (bool) $this->is_platform_admin;
+    }
+
+    public function sendPasswordResetNotification(
+        $token
+    ): void {
+
+        app(AeriaMailService::class)
+            ->sendPasswordReset(
+                $this,
+                $token
+            );
     }
 }

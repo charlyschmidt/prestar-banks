@@ -1,39 +1,184 @@
-<x-guest-layout>
-    <form method="POST" action="{{ route('password.store') }}">
-        @csrf
+<!DOCTYPE html>
+<html lang="es">
 
-        <!-- Password Reset Token -->
-        <input type="hidden" name="token" value="{{ $request->route('token') }}">
+<head>
 
-        <!-- Email Address -->
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email', $request->email)" required autofocus autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="description"
+        content="Crear nueva contraseña en AERIA Finance"
+    >
+
+    <title>
+        Nueva contraseña | AERIA Finance
+    </title>
+
+    @vite(['resources/js/app.js'])
+
+</head>
+
+<body class="login-page">
+
+    <main class="login-wrapper">
+
+        <div class="login-container">
+
+
+            <div class="login-brand-row">
+
+                <a
+                    href="{{ route('login') }}"
+                    class="login-back"
+                    aria-label="Volver al inicio de sesión"
+                >
+                    <i class="bi bi-arrow-left"></i>
+                </a>
+
+                <a
+                    href="{{ route('home') }}"
+                    class="login-brand"
+                >
+                    AERIA <span>Finance</span>
+                </a>
+
+            </div>
+
+
+            <div class="login-header">
+
+                <h1>
+                    Nueva contraseña
+                </h1>
+
+                <p>
+                    Creá una nueva contraseña para acceder a tu cuenta.
+                </p>
+
+            </div>
+
+
+            @if ($errors->any())
+
+                <div class="login-error">
+                    {{ $errors->first() }}
+                </div>
+
+            @endif
+
+
+            <form
+                method="POST"
+                action="{{ route('password.store') }}"
+                class="login-form"
+            >
+
+                @csrf
+
+
+                <input
+                    type="hidden"
+                    name="token"
+                    value="{{ $request->route('token') }}"
+                >
+
+
+                <div class="login-group">
+
+                    <label
+                        for="email"
+                        class="login-label"
+                    >
+                        Email
+                    </label>
+
+                    <input
+                        id="email"
+                        type="email"
+                        name="email"
+                        value="{{ old('email', $request->email) }}"
+                        class="login-input"
+                        required
+                        autofocus
+                        autocomplete="username"
+                    >
+
+                </div>
+
+
+                <div class="login-group">
+
+                    <label
+                        for="password"
+                        class="login-label"
+                    >
+                        Nueva contraseña
+                    </label>
+
+                    <input
+                        id="password"
+                        type="password"
+                        name="password"
+                        class="login-input"
+                        required
+                        autocomplete="new-password"
+                        placeholder="Nueva contraseña"
+                    >
+
+                </div>
+
+
+                <div class="login-group">
+
+                    <label
+                        for="password_confirmation"
+                        class="login-label"
+                    >
+                        Confirmar contraseña
+                    </label>
+
+                    <input
+                        id="password_confirmation"
+                        type="password"
+                        name="password_confirmation"
+                        class="login-input"
+                        required
+                        autocomplete="new-password"
+                        placeholder="Repetí la nueva contraseña"
+                    >
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="login-button"
+                >
+                    Guardar nueva contraseña
+                </button>
+
+            </form>
+
+
+            <div class="login-footer">
+
+                <span>
+                    ¿Recordaste tu contraseña?
+                </span>
+
+                <a href="{{ route('login') }}">
+                    Iniciar sesión
+                </a>
+
+            </div>
+
+
         </div>
 
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
-            <x-text-input id="password" class="block mt-1 w-full" type="password" name="password" required autocomplete="new-password" />
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
-        </div>
+    </main>
 
-        <!-- Confirm Password -->
-        <div class="mt-4">
-            <x-input-label for="password_confirmation" :value="__('Confirm Password')" />
+</body>
 
-            <x-text-input id="password_confirmation" class="block mt-1 w-full"
-                                type="password"
-                                name="password_confirmation" required autocomplete="new-password" />
-
-            <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
-        </div>
-
-        <div class="flex items-center justify-end mt-4">
-            <x-primary-button>
-                {{ __('Reset Password') }}
-            </x-primary-button>
-        </div>
-    </form>
-</x-guest-layout>
+</html>

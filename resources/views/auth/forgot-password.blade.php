@@ -1,25 +1,135 @@
-<x-guest-layout>
-    <div class="mb-4 text-sm text-gray-600 dark:text-gray-400">
-        {{ __('Forgot your password? No problem. Just let us know your email address and we will email you a password reset link that will allow you to choose a new one.') }}
-    </div>
+<!DOCTYPE html>
+<html lang="es">
 
-    <!-- Session Status -->
-    <x-auth-session-status class="mb-4" :status="session('status')" />
+<head>
 
-    <form method="POST" action="{{ route('password.email') }}">
-        @csrf
+    <meta charset="UTF-8">
 
-        <!-- Email Address -->
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="description" content="Recuperar contraseña de AERIA Finance">
+
+    <title>Recuperar contraseña | AERIA Finance</title>
+
+    @vite(['resources/js/app.js'])
+
+</head>
+
+<body class="login-page">
+
+    <main class="login-wrapper">
+
+        <div class="login-container">
+
+
+            <div class="login-brand-row">
+
+                <a
+                    href="{{ route('login') }}"
+                    class="login-back"
+                    aria-label="Volver al inicio de sesión"
+                >
+                    <i class="bi bi-arrow-left"></i>
+                </a>
+
+                <a href="{{ route('home') }}" class="login-brand">
+                    AERIA <span>Finance</span>
+                </a>
+
+            </div>
+
+
+            <div class="login-header">
+
+                <h1>
+                    Recuperar contraseña
+                </h1>
+
+                <p>
+                    Ingresá tu email y te enviaremos un enlace para crear una nueva contraseña.
+                </p>
+
+            </div>
+
+
+            @if ($errors->any())
+
+                <div class="login-error">
+                    {{ $errors->first() }}
+                </div>
+
+            @endif
+
+
+            @if (session('status'))
+
+                <div class="login-status">
+                    {{ session('status') }}
+                </div>
+
+            @endif
+
+
+            <form
+                method="POST"
+                action="{{ route('password.email') }}"
+                class="login-form"
+            >
+
+                @csrf
+
+
+                <div class="login-group">
+
+                    <label
+                        for="email"
+                        class="login-label"
+                    >
+                        Email
+                    </label>
+
+                    <input
+                        id="email"
+                        type="email"
+                        name="email"
+                        value="{{ old('email') }}"
+                        class="login-input"
+                        required
+                        autofocus
+                        autocomplete="email"
+                        placeholder="nombre@empresa.com"
+                    >
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="login-button"
+                >
+                    Enviar enlace de recuperación
+                </button>
+
+            </form>
+
+
+            <div class="login-footer">
+
+                <span>
+                    ¿Recordaste tu contraseña?
+                </span>
+
+                <a href="{{ route('login') }}">
+                    Iniciar sesión
+                </a>
+
+            </div>
+
+
         </div>
 
-        <div class="flex items-center justify-end mt-4">
-            <x-primary-button>
-                {{ __('Email Password Reset Link') }}
-            </x-primary-button>
-        </div>
-    </form>
-</x-guest-layout>
+    </main>
+
+</body>
+
+</html>

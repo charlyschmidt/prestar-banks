@@ -22,10 +22,20 @@ class CompanySelectionController extends Controller
             )
             ->get();
 
+
+        /*
+    |--------------------------------------------------------------------------
+    | Una sola empresa
+    |--------------------------------------------------------------------------
+    |
+    | La seleccionamos automáticamente.
+    |
+    */
+
         if ($companies->count() === 1) {
 
             app(
-                CompanyContext::class
+                CompanyContextService::class
             )->set(
                 $companies->first()
             );
@@ -33,6 +43,13 @@ class CompanySelectionController extends Controller
             return redirect()
                 ->route('dashboard');
         }
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Varias empresas o ninguna
+    |--------------------------------------------------------------------------
+    */
 
         return view(
             'companies.select',
