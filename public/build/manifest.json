@@ -20,17 +20,43 @@
       "assets/bootstrap-icons-BeopsB42.woff"
     ]
   },
+  "resources/css/register-pending.css": {
+    "file": "assets/register-pending-LXepLUu1.css",
+    "name": "register-pending",
+    "names": [
+      "register-pending.css"
+    ],
+    "src": "resources/css/register-pending.css",
+    "isEntry": true
+  },
+  "resources/css/welcome.css": {
+    "file": "assets/welcome-Dm9DVn12.css",
+    "name": "welcome",
+    "names": [
+      "welcome.css"
+    ],
+    "src": "resources/css/welcome.css",
+    "isEntry": true
+  },
   "resources/js/app.js": {
-    "file": "assets/app-B868FPnJ.js",
+    "file": "assets/app-D2RlT5zo.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
     "css": [
-      "assets/app-DxJr_Wpt.css"
+      "assets/app-3DRkvW74.css",
+      "assets/welcome-Dm9DVn12.css",
+      "assets/register-pending-LXepLUu1.css"
     ],
     "assets": [
       "assets/bootstrap-icons-mSm7cUeB.woff2",
       "assets/bootstrap-icons-BeopsB42.woff"
     ]
+  },
+  "resources/js/welcome.js": {
+    "file": "assets/welcome-XtZ0mlGr.js",
+    "name": "welcome",
+    "src": "resources/js/welcome.js",
+    "isEntry": true
   }
 }
