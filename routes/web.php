@@ -12,6 +12,7 @@ use App\Http\Controllers\CompanySelectionController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\PlatformAdminController;
 use App\Http\Controllers\FinancialReminderController;
+use App\Http\Controllers\OpeningBalanceImportController;
 
 
 /*
@@ -27,14 +28,12 @@ Route::get('/', function () {
     }
 
     return view('welcome');
-
 })->name('home');
 
 
 Route::get('/register/pending', function () {
 
     return view('auth.register-pending');
-
 })->name('register.pending');
 
 
@@ -121,6 +120,15 @@ Route::middleware('auth')->group(function () {
             ]
         )->name('financial-days.store');
 
+        Route::post(
+            '/financial-days/import-balances/analyze',
+            [OpeningBalanceImportController::class, 'analyze']
+        )->name('financial-days.import-balances.analyze');
+
+        Route::delete(
+            '/financial-days/current/reset',
+            [FinancialDayController::class, 'resetCurrent']
+        )->name('financial-days.reset-current');
 
         /*
         |--------------------------------------------------------------------------
@@ -350,11 +358,8 @@ Route::middleware('auth')->group(function () {
                 'transactions',
                 TransactionController::class
             );
-
         });
-
     });
-
 });
 
 
@@ -404,5 +409,4 @@ Route::middleware([
             '/companies/{company}',
             [PlatformAdminController::class, 'show']
         )->name('companies.show');
-
     });

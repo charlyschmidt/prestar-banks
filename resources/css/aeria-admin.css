@@ -165,9 +165,9 @@ body {
 .page-header p {
     margin: 7px 0 0;
 
-    color: rgba(255, 255, 255, .42);
+    color: var(--company-muted);
 
-    font-size: 12px;
+    font-size: 14px;
 }
 
 

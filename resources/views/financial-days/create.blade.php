@@ -45,6 +45,45 @@
         @endif
 
 
+        {{-- =========================================================
+    IMPORTAR SALDOS
+========================================================== --}}
+
+        <div class="opening-import" id="opening-balance-import"
+            data-analyze-url="{{ route('financial-days.import-balances.analyze') }}" data-csrf="{{ csrf_token() }}">
+
+            <div class="opening-import-info">
+
+                <div class="opening-import-icon">
+                    <i class="bi bi-file-earmark-spreadsheet"></i>
+                </div>
+
+                <div>
+                    <strong>
+                        Importar saldos
+                    </strong>
+
+                    <span>
+                        Cargá un archivo Excel o CSV para completar automáticamente los saldos iniciales.
+                    </span>
+                </div>
+
+            </div>
+
+
+            <div class="opening-import-action">
+
+                <input type="file" id="opening-balance-file" accept=".xlsx,.xls,.csv" hidden>
+
+                <button type="button" class="secondary-button" id="opening-balance-file-button">
+                    <i class="bi bi-upload"></i>
+
+                    Seleccionar archivo
+                </button>
+
+            </div>
+
+        </div>
 
         {{-- =========================================================
         FORMULARIO
@@ -148,10 +187,11 @@
 
 
                                         <input type="text" class="opening-money-input money-input"
-                                            name="balances[{{ $balance->id }}]"
-                                            placeholder="0,00" 
+                                            name="balances[{{ $balance->id }}]" placeholder="0,00"
                                             value="{{ old('balances.' . $balance->id) }}" inputmode="decimal"
-                                            autocomplete="off"
+                                            autocomplete="off" data-account-name="{{ $account->name }}"
+                                            data-currency="{{ $balance->currency }}"
+                                            data-account-balance-id="{{ $balance->id }}"
                                             aria-label="Saldo inicial {{ $balance->currency }} de {{ $account->name }}"
                                             required>
 

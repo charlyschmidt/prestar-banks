@@ -48,6 +48,10 @@
         $cardColor = 'rgba(0, 0, 0, .045)';
 
         $hoverColor = 'rgba(0, 0, 0, .07)';
+
+        $buttonColor = '#111111';
+
+        $buttonTextColor = '#ffffff';
     } else {
         $textColor = '#ffffff';
 
@@ -58,6 +62,10 @@
         $cardColor = 'rgba(0, 0, 0, .20)';
 
         $hoverColor = 'rgba(255, 255, 255, .08)';
+
+        $buttonColor = '#ffffff';
+
+        $buttonTextColor = '#111111';
     }
 
 @endphp
@@ -112,6 +120,10 @@
             --company-border: {{ $borderColor }};
 
             --company-hover: {{ $hoverColor }};
+
+            --company-button: {{ $buttonColor }};
+
+            --company-button-text: {{ $buttonTextColor }};
 
         }
     </style>

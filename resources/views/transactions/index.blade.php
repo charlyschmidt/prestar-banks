@@ -383,7 +383,7 @@
 
                                         {{-- EDITAR / ELIMINAR --}}
 
-                                        @if ($canManage)
+                                        @if ($canManage && !$transaction->executed_at)
                                             <a href="{{ route('transactions.edit', $transaction) }}" class="icon-button"
                                                 title="Editar movimiento">
 

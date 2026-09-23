@@ -8,7 +8,7 @@
     "src": "node_modules/bootstrap-icons/font/fonts/bootstrap-icons.woff2"
   },
   "resources/css/app.css": {
-    "file": "assets/app-CCzwmdy4.css",
+    "file": "assets/app-UIUrVDjO.css",
     "name": "app",
     "names": [
       "app.css"
@@ -39,12 +39,12 @@
     "isEntry": true
   },
   "resources/js/app.js": {
-    "file": "assets/app-mfRp_lWb.js",
+    "file": "assets/app-D2YlmZ27.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
     "css": [
-      "assets/app-CTpQFsH8.css",
+      "assets/app-D4MJROtj.css",
       "assets/welcome-Dm9DVn12.css",
       "assets/register-pending-LXepLUu1.css"
     ],

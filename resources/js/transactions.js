@@ -322,12 +322,33 @@ document.addEventListener('click', async (event) => {
     }
 
 
-    const confirmed = confirm(
-        '¿Confirmás que esta transferencia fue realizada?'
-    );
+    const result = await Swal.fire({
+        icon: 'question',
+
+        title: 'Confirmar transferencia',
+
+        text: '¿Confirmás que esta transferencia fue realizada?',
+
+        showCancelButton: true,
+
+        confirmButtonText: 'Sí, confirmar',
+
+        cancelButtonText: 'Cancelar',
+
+        buttonsStyling: false,
+
+        customClass: {
+            popup: 'aeria-swal',
+            title: 'aeria-swal-title',
+            htmlContainer: 'aeria-swal-text',
+            actions: 'aeria-swal-actions',
+            confirmButton: 'aeria-swal-confirm',
+            cancelButton: 'aeria-swal-cancel'
+        }
+    });
 
 
-    if (!confirmed) {
+    if (!result.isConfirmed) {
         return;
     }
 

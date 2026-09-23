@@ -76,16 +76,16 @@ class FinancialDayService
                 $day = FinancialDay::create([
 
                     'date' =>
-                        today(),
+                    today(),
 
                     'status' =>
-                        'open',
+                    'open',
 
                     'opened_by' =>
-                        auth()->id(),
+                    auth()->id(),
 
                     'opened_at' =>
-                        now(),
+                    now(),
 
                 ]);
 
@@ -129,9 +129,9 @@ class FinancialDayService
 
                     $accountBalance =
                         AccountBalance::with('account')
-                            ->findOrFail(
-                                $accountBalanceId
-                            );
+                        ->findOrFail(
+                            $accountBalanceId
+                        );
 
 
                     /*
@@ -144,10 +144,10 @@ class FinancialDayService
 
                         [
                             'financial_day_id' =>
-                                $day->id,
+                            $day->id,
 
                             'account_balance_id' =>
-                                $accountBalance->id,
+                            $accountBalance->id,
                         ],
 
                         [
@@ -158,13 +158,13 @@ class FinancialDayService
                              */
 
                             'account_id' =>
-                                $accountBalance->account_id,
+                            $accountBalance->account_id,
 
                             'initial_balance' =>
-                                $amount,
+                            $amount,
 
                             'current_balance' =>
-                                $amount,
+                            $amount,
                         ]
 
                     );
@@ -176,6 +176,64 @@ class FinancialDayService
         );
     }
 
+
+    /*
+|--------------------------------------------------------------------------
+| Reiniciar jornada actual
+|--------------------------------------------------------------------------
+*/
+
+    public function resetCurrent()
+    {
+        $day = $this->current();
+
+        if (!$day) {
+            return false;
+        }
+
+
+        DB::transaction(function () use ($day) {
+
+            /*
+        |--------------------------------------------------------------------------
+        | Movimientos de la jornada
+        |--------------------------------------------------------------------------
+        */
+
+            DB::table('transactions')
+                ->where(
+                    'financial_day_id',
+                    $day->id
+                )
+                ->delete();
+
+
+            /*
+        |--------------------------------------------------------------------------
+        | Saldos diarios
+        |--------------------------------------------------------------------------
+        */
+
+            DB::table('account_daily_balances')
+                ->where(
+                    'financial_day_id',
+                    $day->id
+                )
+                ->delete();
+
+
+            /*
+        |--------------------------------------------------------------------------
+        | Jornada
+        |--------------------------------------------------------------------------
+        */
+
+            $day->delete();
+        });
+
+
+        return true;
+    }
 
     /*
     |--------------------------------------------------------------------------
@@ -197,10 +255,10 @@ class FinancialDayService
         $day->update([
 
             'status' =>
-                'closed',
+            'closed',
 
             'closed_at' =>
-                now(),
+            now(),
 
         ]);
 

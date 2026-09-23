@@ -49,7 +49,6 @@ class FinancialDayController extends Controller
             'balances' => function ($query) {
 
                 $query->orderBy('currency');
-
             }
         ])
             ->orderBy('name')
@@ -83,30 +82,30 @@ class FinancialDayController extends Controller
         $data = $request->validate([
 
             'balances' =>
-                'required|array|min:1',
+            'required|array|min:1',
 
             'balances.*' =>
-                'required|numeric|min:0',
+            'required|numeric|min:0',
 
         ], [
 
             'balances.required' =>
-                'Debés ingresar los saldos iniciales.',
+            'Debés ingresar los saldos iniciales.',
 
             'balances.array' =>
-                'Los saldos enviados no son válidos.',
+            'Los saldos enviados no son válidos.',
 
             'balances.min' =>
-                'Debés ingresar al menos un saldo.',
+            'Debés ingresar al menos un saldo.',
 
             'balances.*.required' =>
-                'Todos los saldos son obligatorios.',
+            'Todos los saldos son obligatorios.',
 
             'balances.*.numeric' =>
-                'Todos los saldos deben ser numéricos.',
+            'Todos los saldos deben ser numéricos.',
 
             'balances.*.min' =>
-                'Los saldos iniciales no pueden ser negativos.',
+            'Los saldos iniciales no pueden ser negativos.',
 
         ]);
 
@@ -148,5 +147,38 @@ class FinancialDayController extends Controller
 
         return redirect()
             ->route('dashboard');
+    }
+
+    /*
+|--------------------------------------------------------------------------
+| Reiniciar jornada actual
+|--------------------------------------------------------------------------
+*/
+
+    public function resetCurrent(
+        FinancialDayService $financialDayService
+    ) {
+
+        $reset =
+            $financialDayService->resetCurrent();
+
+
+        if (!$reset) {
+
+            return redirect()
+                ->route('financial-days.create')
+                ->with(
+                    'error',
+                    'No hay una jornada abierta para reiniciar.'
+                );
+        }
+
+
+        return redirect()
+            ->route('financial-days.create')
+            ->with(
+                'success',
+                'La jornada fue reiniciada correctamente.'
+            );
     }
 }

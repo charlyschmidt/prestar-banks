@@ -821,8 +821,7 @@ body[data-theme="dark"] .sidebar-close {
 }
 
 
-.header-currency-list.header-currency-list-balance
-.header-currency-value {
+.header-currency-list.header-currency-list-balance .header-currency-value {
 
     display: block;
 
@@ -1560,4 +1559,145 @@ body[data-theme="dark"] .sidebar-close {
         color: var(--company-text);
     }
 
+}
+
+/* ==========================
+   AERIA — SWEETALERT
+========================== */
+
+.aeria-swal {
+    width: min(92vw, 420px) !important;
+    padding: 28px 24px 22px !important;
+
+    background: var(--company-bg) !important;
+    border: 1px solid var(--company-border) !important;
+    border-radius: 18px !important;
+
+    color: var(--company-text) !important;
+
+    box-shadow:
+        0 24px 60px rgba(0, 0, 0, 0.45) !important;
+}
+
+
+.aeria-swal-confirm {
+    min-width: 130px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    padding: 12px 18px;
+
+    background: var(--company-button) !important;
+    color: var(--company-button-text) !important;
+
+    border: none;
+    border-radius: 12px;
+
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+
+    text-decoration: none;
+    cursor: pointer;
+
+    box-shadow: none !important;
+    outline: none;
+
+    transition:
+        opacity .2s ease,
+        transform .2s ease;
+}
+
+
+.aeria-swal-confirm:hover {
+    background: var(--company-button) !important;
+    color: var(--company-button-text) !important;
+
+    opacity: .85;
+    transform: translateY(-1px);
+}
+
+
+.aeria-swal-confirm:active {
+    transform: translateY(0);
+}
+
+
+.aeria-swal-confirm:focus-visible {
+    outline: 2px solid var(--company-text);
+    outline-offset: 3px;
+}
+
+
+.aeria-swal-title {
+    padding: 0 !important;
+    margin-top: 6px !important;
+
+    color: var(--company-text) !important;
+
+    font-size: 20px !important;
+    font-weight: 700 !important;
+}
+
+
+.aeria-swal-text {
+    margin-top: 10px !important;
+
+    color: var(--company-muted) !important;
+
+    font-size: 14px !important;
+    line-height: 1.5 !important;
+}
+
+.aeria-swal-cancel {
+    min-width: 130px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 12px 18px;
+
+    background: transparent !important;
+    color: var(--company-text) !important;
+
+    border: 1px solid var(--company-border) !important;
+    border-radius: 12px;
+
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background .2s ease,
+        transform .2s ease;
+}
+
+
+.aeria-swal-cancel:hover {
+    background: var(--company-hover) !important;
+    color: var(--company-text) !important;
+
+    transform: translateY(-1px);
+}
+
+
+.aeria-swal-cancel:active {
+    transform: translateY(0);
+}
+
+.aeria-swal-actions {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+
+    gap: 10px !important;
+
+    width: 100%;
+    margin-top: 22px !important;
 }

@@ -401,7 +401,7 @@
 .transaction-detail-content {
     overflow: hidden;
 
-    background: var(--company-card);
+    background: var(--company-bg);
 
     border: 1px solid var(--company-border);
     border-radius: 18px;
