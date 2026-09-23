@@ -2,7 +2,6 @@
 
 
 @section('content')
-
     <div class="page-container">
 
 
@@ -27,10 +26,7 @@
         <div class="form-card transaction-form-card">
 
 
-            <form
-                method="POST"
-                action="{{ route('transactions.store') }}"
-            >
+            <form method="POST" action="{{ route('transactions.store') }}">
 
                 @csrf
 
@@ -46,24 +42,15 @@
                             Cuenta
                         </label>
 
-                        <select
-                            name="account_id"
-                            id="account-select"
-                            class="dark-input"
-                            required
-                        >
+                        <select name="account_id" id="account-select" class="dark-input" required>
 
                             @foreach ($accounts as $account)
-
-                                <option
-                                    value="{{ $account->id }}"
-                                    {{ old('account_id') == $account->id ? 'selected' : '' }}
-                                >
+                                <option value="{{ $account->id }}"
+                                    {{ old('account_id') == $account->id ? 'selected' : '' }}>
 
                                     {{ $account->name }}
 
                                 </option>
-
                             @endforeach
 
                         </select>
@@ -80,42 +67,27 @@
                             Moneda
                         </label>
 
-                        <select
-                            name="account_balance_id"
-                            id="currency-select"
-                            class="dark-input"
-                            required
-                        >
+                        <select name="account_balance_id" id="currency-select" class="dark-input" required>
 
                             @foreach ($accounts as $account)
-
                                 @foreach ($account->balances as $accountBalance)
-
                                     @php
 
-                                        $dailyBalance =
-                                            $accountBalance->dailyBalance;
+                                        $dailyBalance = $accountBalance->dailyBalance;
 
-                                        $currentBalance =
-                                            $dailyBalance?->current_balance ?? 0;
+                                        $currentBalance = $dailyBalance?->current_balance ?? 0;
 
                                     @endphp
 
 
-                                    <option
-                                        value="{{ $accountBalance->id }}"
-                                        data-account="{{ $account->id }}"
-                                        data-currency="{{ $accountBalance->currency }}"
-                                        data-balance="{{ $currentBalance }}"
-                                        {{ old('account_balance_id') == $accountBalance->id ? 'selected' : '' }}
-                                    >
+                                    <option value="{{ $accountBalance->id }}" data-account="{{ $account->id }}"
+                                        data-currency="{{ $accountBalance->currency }}" data-balance="{{ $currentBalance }}"
+                                        {{ old('account_balance_id') == $accountBalance->id ? 'selected' : '' }}>
 
                                         {{ $accountBalance->currency }}
 
                                     </option>
-
                                 @endforeach
-
                             @endforeach
 
                         </select>
@@ -148,31 +120,17 @@
                             Tipo
                         </label>
 
-                        <select
-                            name="type"
-                            id="transaction-type"
-                            class="dark-input"
-                            required
-                        >
+                        <select name="type" id="transaction-type" class="dark-input" required>
 
-                            <option
-                                value="income"
-                                {{ old('type') === 'income' ? 'selected' : '' }}
-                            >
+                            <option value="income" {{ old('type') === 'income' ? 'selected' : '' }}>
                                 Ingreso
                             </option>
 
-                            <option
-                                value="expense"
-                                {{ old('type') === 'expense' ? 'selected' : '' }}
-                            >
+                            <option value="expense" {{ old('type') === 'expense' ? 'selected' : '' }}>
                                 Egreso
                             </option>
 
-                            <option
-                                value="reserve"
-                                {{ old('type') === 'reserve' ? 'selected' : '' }}
-                            >
+                            <option value="reserve" {{ old('type') === 'reserve' ? 'selected' : '' }}>
                                 Reserva
                             </option>
 
@@ -184,38 +142,33 @@
 
                     {{-- BANCO DESTINO --}}
 
-                    <div
-                        class="form-group"
-                        id="destination-bank-group"
-                        style="display:none;"
-                    >
 
-                        <label>
+
+                    <div class="form-group" id="destination-bank-group" style="display:none;">
+
+                        <label for="destination-bank-search">
                             Banco destino
                         </label>
 
-                        <select
-                            name="destination_bank"
-                            id="destination-bank"
-                            class="dark-input"
-                        >
+                        <div class="bank-search-select">
 
-                            <option value="">
-                                Seleccionar banco destino
-                            </option>
+                            <input type="text" id="destination-bank-search" class="dark-input"
+                                placeholder="Escribí para buscar un banco..." autocomplete="off">
 
-                            @foreach ($banks as $bank)
+                            <input type="hidden" name="destination_bank" id="destination-bank"
+                                value="{{ old('destination_bank') }}">
 
-                                <option
-                                    value="{{ $bank }}"
-                                    {{ old('destination_bank') === $bank ? 'selected' : '' }}
-                                >
-                                    {{ $bank }}
-                                </option>
+                            <div id="destination-bank-options" class="bank-search-options" hidden>
 
-                            @endforeach
+                                @foreach ($banks as $bank)
+                                    <button type="button" class="bank-search-option" data-value="{{ $bank }}">
+                                        {{ $bank }}
+                                    </button>
+                                @endforeach
 
-                        </select>
+                            </div>
+
+                        </div>
 
                     </div>
 
@@ -229,16 +182,8 @@
                             Monto
                         </label>
 
-                        <input
-                            type="text"
-                            name="amount"
-                            class="dark-input money-input"
-                            placeholder="0,00"
-                            inputmode="decimal"
-                            autocomplete="off"
-                            value="{{ old('amount') }}"
-                            required
-                        >
+                        <input type="text" name="amount" class="dark-input money-input" placeholder="0,00"
+                            inputmode="decimal" autocomplete="off" value="{{ old('amount') }}" required>
 
                     </div>
 
@@ -252,16 +197,8 @@
                             Fecha
                         </label>
 
-                        <input
-                            type="datetime-local"
-                            name="date"
-                            value="{{ old(
-                                'date',
-                                date('Y-m-d\TH:i')
-                            ) }}"
-                            class="dark-input"
-                            required
-                        >
+                        <input type="datetime-local" name="date" value="{{ old('date', date('Y-m-d\TH:i')) }}"
+                            class="dark-input" required>
 
                     </div>
 
@@ -275,12 +212,8 @@
                             Descripción
                         </label>
 
-                        <input
-                            name="description"
-                            class="dark-input"
-                            placeholder="Ej: Compra supermercado"
-                            value="{{ old('description') }}"
-                        >
+                        <input name="description" class="dark-input" placeholder="Ej: Compra supermercado"
+                            value="{{ old('description') }}">
 
                     </div>
 
@@ -291,18 +224,12 @@
 
                 <div class="form-actions">
 
-                    <a
-                        href="{{ route('transactions.index') }}"
-                        class="secondary-button"
-                    >
+                    <a href="{{ route('transactions.index') }}" class="secondary-button">
                         Cancelar
                     </a>
 
 
-                    <button
-                        type="submit"
-                        class="primary-action-button"
-                    >
+                    <button type="submit" class="primary-action-button">
 
                         <i class="bi bi-check-lg"></i>
 
@@ -324,12 +251,11 @@
 
 
     <script>
-
         /*
-        |--------------------------------------------------------------------------
-        | Cuenta + moneda
-        |--------------------------------------------------------------------------
-        */
+                |--------------------------------------------------------------------------
+                | Cuenta + moneda
+                |--------------------------------------------------------------------------
+                */
 
         const accountSelect =
             document.getElementById(
@@ -363,20 +289,15 @@
                 currencySelect.options
             ).map(option => ({
 
-                value:
-                    option.value,
+                value: option.value,
 
-                account:
-                    option.dataset.account,
+                account: option.dataset.account,
 
-                currency:
-                    option.dataset.currency,
+                currency: option.dataset.currency,
 
-                balance:
-                    option.dataset.balance,
+                balance: option.dataset.balance,
 
-                selected:
-                    option.selected
+                selected: option.selected
 
             }));
 
@@ -400,8 +321,7 @@
             try {
 
                 return new Intl.NumberFormat(
-                    'es-AR',
-                    {
+                    'es-AR', {
                         style: 'currency',
                         currency: currency,
                         minimumFractionDigits: 2,
@@ -413,8 +333,7 @@
 
                 return currency + ' ' +
                     value.toLocaleString(
-                        'es-AR',
-                        {
+                        'es-AR', {
                             minimumFractionDigits: 2,
                             maximumFractionDigits: 2
                         }
@@ -432,8 +351,7 @@
         |--------------------------------------------------------------------------
         */
 
-        function updateBalance()
-        {
+        function updateBalance() {
 
             const selected =
                 currencySelect.options[
@@ -497,8 +415,7 @@
         |--------------------------------------------------------------------------
         */
 
-        function updateCurrencies()
-        {
+        function updateCurrencies() {
 
             const accountId =
                 accountSelect.value;
@@ -515,7 +432,7 @@
             const availableOptions =
                 currencyOptions.filter(
                     option =>
-                        option.account === accountId
+                    option.account === accountId
                 );
 
 
@@ -606,30 +523,180 @@
 
 
         /*
+    |--------------------------------------------------------------------------
+    | Banco destino
+    |--------------------------------------------------------------------------
+    */
+
+        const transactionType =
+            document.getElementById('transaction-type');
+
+        const destinationBankGroup =
+            document.getElementById('destination-bank-group');
+
+        const destinationBank =
+            document.getElementById('destination-bank');
+
+        const destinationBankSearch =
+            document.getElementById('destination-bank-search');
+
+        const destinationBankOptions =
+            document.getElementById('destination-bank-options');
+
+        const bankOptions =
+            Array.from(
+                document.querySelectorAll('.bank-search-option')
+            );
+
+
+        /*
         |--------------------------------------------------------------------------
-        | Banco destino
+        | Normalizar texto para búsqueda
         |--------------------------------------------------------------------------
         */
 
-        const transactionType =
-            document.getElementById(
-                'transaction-type'
+        function normalizeBankText(text) {
+            return text
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .toLowerCase()
+                .trim();
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Filtrar bancos
+        |--------------------------------------------------------------------------
+        */
+
+        function filterBanks() {
+            const search =
+                normalizeBankText(
+                    destinationBankSearch.value
+                );
+
+            let visibleCount = 0;
+
+            bankOptions.forEach(option => {
+
+                const bankName =
+                    normalizeBankText(
+                        option.dataset.value
+                    );
+
+                const visible =
+                    bankName.includes(search);
+
+                option.hidden = !visible;
+
+                if (visible) {
+                    visibleCount++;
+                }
+
+            });
+
+            destinationBankOptions.hidden =
+                visibleCount === 0;
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Abrir listado
+        |--------------------------------------------------------------------------
+        */
+
+        destinationBankSearch.addEventListener(
+            'focus',
+            function() {
+
+                filterBanks();
+
+            }
+        );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Buscar mientras escribe
+        |--------------------------------------------------------------------------
+        */
+
+        destinationBankSearch.addEventListener(
+            'input',
+            function() {
+
+                destinationBank.value = '';
+
+                filterBanks();
+
+            }
+        );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Seleccionar banco
+        |--------------------------------------------------------------------------
+        */
+
+        bankOptions.forEach(option => {
+
+            option.addEventListener(
+                'click',
+                function() {
+
+                    const bank =
+                        this.dataset.value;
+
+                    destinationBank.value =
+                        bank;
+
+                    destinationBankSearch.value =
+                        bank;
+
+                    destinationBankOptions.hidden =
+                        true;
+
+                }
             );
 
-        const destinationBankGroup =
-            document.getElementById(
-                'destination-bank-group'
-            );
-
-        const destinationBank =
-            document.getElementById(
-                'destination-bank'
-            );
+        });
 
 
-        function updateDestinationBank()
-        {
+        /*
+        |--------------------------------------------------------------------------
+        | Cerrar al hacer click afuera
+        |--------------------------------------------------------------------------
+        */
 
+        document.addEventListener(
+            'click',
+            function(event) {
+
+                if (
+                    !destinationBankGroup.contains(
+                        event.target
+                    )
+                ) {
+
+                    destinationBankOptions.hidden =
+                        true;
+
+                }
+
+            }
+        );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Mostrar banco destino solamente en egresos
+        |--------------------------------------------------------------------------
+        */
+
+        function updateDestinationBank() {
             if (
                 transactionType.value ===
                 'expense'
@@ -652,8 +719,13 @@
                 destinationBank.value =
                     '';
 
-            }
+                destinationBankSearch.value =
+                    '';
 
+                destinationBankOptions.hidden =
+                    true;
+
+            }
         }
 
 
@@ -663,8 +735,20 @@
         );
 
 
+        /*
+        |--------------------------------------------------------------------------
+        | Restaurar valor anterior
+        |--------------------------------------------------------------------------
+        */
+
+        if (destinationBank.value) {
+
+            destinationBankSearch.value =
+                destinationBank.value;
+
+        }
+
+
         updateDestinationBank();
-
     </script>
-
 @endsection
