@@ -180,7 +180,7 @@
                                 <option value="{{ $user->id }}"
                                     {{ (string) request('user_id') === (string) $user->id ? 'selected' : '' }}>
 
-                                    {{ $user->name ?? $user->username }}
+                                    {{ $user->email ? \Illuminate\Support\Str::before($user->email, '@') : 'Sin registro' }}
 
                                     @if ($user->trashed())
                                         (eliminado)

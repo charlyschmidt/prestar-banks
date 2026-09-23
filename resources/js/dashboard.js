@@ -655,14 +655,53 @@ function normalizeRealtimeEvent(event) {
 }
 
 
+
+function renumberDashboardMovements() {
+
+    const tbody =
+        document.querySelector(
+            '#movements-body'
+        );
+
+    if (!tbody) {
+        return;
+    }
+
+    const rows =
+        tbody.querySelectorAll(
+            'tr[data-transaction-id]'
+        );
+
+    const total =
+        rows.length;
+
+    rows.forEach(
+        (row, index) => {
+
+            const counter =
+                row.querySelector(
+                    '[data-movement-counter]'
+                );
+
+            if (counter) {
+
+                counter.textContent =
+                    total - index;
+
+            }
+
+        }
+    );
+
+}
+
 /*
 |--------------------------------------------------------------------------
 | Agregar movimiento a la tabla
 |--------------------------------------------------------------------------
 */
 
-function addMovementToTable(event, animate = true)
-{
+function addMovementToTable(event, animate = true) {
 
     const tbody =
         document.querySelector(
@@ -873,9 +912,15 @@ function addMovementToTable(event, animate = true)
 
     row.innerHTML = `
 
-        <td>
+    <!-- CONTEO -->
+    <td data-movement-counter>
+        0
+    </td>
 
-            <div class="movement-date">
+    <!-- FECHA -->
+    <td>
+
+        <div class="movement-date">
 
                 <strong>
                     ${dateText}
@@ -898,10 +943,10 @@ function addMovementToTable(event, animate = true)
 
                 <span>
                     ${escapeHtml(
-                        movement.user?.name
-                        ||
-                        'Sin registro'
-                    )}
+        movement.user?.email
+            ? movement.user.email.split('@')[0]
+            : 'Sin registro'
+    )}
                 </span>
 
             </div>
@@ -913,22 +958,28 @@ function addMovementToTable(event, animate = true)
 
             <strong>
                 ${escapeHtml(
-                    movement.description
-                    ||
-                    'Sin descripción'
-                )}
+        movement.description
+        ||
+        'Sin descripción'
+    )}
             </strong>
 
         </td>
 
 
-        <td>
+       <td>
 
-            ${escapeHtml(
-                event.account?.name
-                ||
-                ''
-            )}
+            ${event.account?.id
+                    ? `
+                    <a
+                        href="/accounts/${event.account.id}/movements"
+                        class="account-cell-link"
+                    >
+                        ${escapeHtml(event.account.name || '')}
+                    </a>
+                `
+                    : ''
+                }
 
         </td>
 
@@ -951,25 +1002,24 @@ function addMovementToTable(event, animate = true)
 
         <td class="amount">
 
-            ${
-                isIncome
-                    ? `
+            ${isIncome
+            ? `
                         <span class="amount-income">
                             +
                             ${formatMoney(
-                                movement.amount
-                            )}
+                movement.amount
+            )}
                         </span>
                     `
-                    : `
+            : `
                         <span class="amount-expense">
                             -
                             ${formatMoney(
-                                movement.amount
-                            )}
+                movement.amount
+            )}
                         </span>
                     `
-            }
+        }
 
         </td>
 
@@ -977,12 +1027,12 @@ function addMovementToTable(event, animate = true)
         <td>
 
             ${formatMoney(
-                event.initialBalance
-                ??
-                movement.initial_balance
-                ??
-                0
-            )}
+            event.initialBalance
+            ??
+            movement.initial_balance
+            ??
+            0
+        )}
 
         </td>
 
@@ -990,10 +1040,10 @@ function addMovementToTable(event, animate = true)
         <td>
 
             ${formatMoney(
-                movement.balance_after
-                ??
-                0
-            )}
+            movement.balance_after
+            ??
+            0
+        )}
 
         </td>
 
@@ -1010,6 +1060,7 @@ function addMovementToTable(event, animate = true)
         row
     );
 
+    renumberDashboardMovements();
 
     /*
     |--------------------------------------------------------------------------
@@ -1267,8 +1318,8 @@ async function syncDashboard() {
                                 incomeElement.innerHTML = `
                                     <i class="bi bi-arrow-up"></i>
                                     ${formatMoney(
-                                        balance.income
-                                    )}
+                                    balance.income
+                                )}
                                 `;
 
                             }
@@ -1291,8 +1342,8 @@ async function syncDashboard() {
                                 expenseElement.innerHTML = `
                                     <i class="bi bi-arrow-down"></i>
                                     ${formatMoney(
-                                        balance.expense
-                                    )}
+                                    balance.expense
+                                )}
                                 `;
 
                             }
@@ -1315,8 +1366,8 @@ async function syncDashboard() {
                                 reserveElement.innerHTML = `
                                     <i class="bi bi-lock"></i>
                                     ${formatMoney(
-                                        balance.reserve
-                                    )}
+                                    balance.reserve
+                                )}
                                 `;
 
                             }
@@ -1477,7 +1528,7 @@ async function syncDashboard() {
 
                 row.innerHTML = `
                     <td
-                        colspan="9"
+                        colspan="10"
                         class="text-center"
                     >
                         Sin movimientos todavía.
@@ -1712,7 +1763,7 @@ function playRealtimeSound() {
 
             audio
                 .play()
-                .catch(() => {});
+                .catch(() => { });
 
         }
 

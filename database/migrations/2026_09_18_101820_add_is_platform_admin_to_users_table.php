@@ -8,22 +8,29 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
+        if (!Schema::hasColumn('users', 'is_platform_admin')) {
 
-            $table->boolean('is_platform_admin')
-                ->default(false)
-                ->after('is_admin');
+            Schema::table('users', function (Blueprint $table) {
 
-        });
+                $table->boolean('is_platform_admin')
+                    ->default(false)
+                    ->after('is_admin');
+
+            });
+
+        }
     }
-
 
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {
+        if (Schema::hasColumn('users', 'is_platform_admin')) {
 
-            $table->dropColumn('is_platform_admin');
+            Schema::table('users', function (Blueprint $table) {
 
-        });
+                $table->dropColumn('is_platform_admin');
+
+            });
+
+        }
     }
 };

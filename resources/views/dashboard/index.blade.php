@@ -272,6 +272,7 @@
                     <thead>
 
                         <tr>
+                            <th>#</th>
 
                             <th>
                                 Fecha
@@ -328,6 +329,12 @@
                             <tr data-transaction-id="{{ $movement->id }}"
                                 data-account-balance-id="{{ $movement->account_balance_id }}">
 
+                                {{-- conteo --}}
+
+                                <td>
+                                    {{ $loop->count - $loop->index }}
+                                </td>
+
 
                                 {{-- FECHA --}}
 
@@ -362,9 +369,7 @@
                                         <i class="bi bi-person-circle"></i>
 
                                         <span>
-
-                                            {{ $movement->user?->name ?? 'Sin registro' }}
-
+                                            {{ $movement->user?->email ? \Illuminate\Support\Str::before($movement->user->email, '@') : 'Sin registro' }}
                                         </span>
 
                                     </div>
@@ -391,10 +396,13 @@
 
                                 <td>
 
-                                    {{ $movement->account->name }}
+                                    <a href="{{ route('accounts.movements', $movement->account) }}" class="account-cell-link">
+
+                                        {{ $movement->account->name }}
+
+                                    </a>
 
                                 </td>
-
 
 
                                 {{-- MONEDA --}}
@@ -502,7 +510,7 @@
 
                             <tr data-empty-row>
 
-                                <td colspan="9" class="text-center">
+                                <td colspan="10" class="text-center">
 
                                     Sin movimientos todavía.
 

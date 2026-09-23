@@ -77,6 +77,10 @@
                         <tr>
 
                             <th>
+                                #
+                            </th>
+
+                            <th>
                                 Fecha
                             </th>
 
@@ -134,6 +138,10 @@
                             <tr data-transaction-id="{{ $transaction->id }}"
                                 data-account-balance-id="{{ $transaction->account_balance_id }}">
 
+                                {{-- conteo --}}
+                                <td data-movement-counter>
+                                    {{ $loop->count - $loop->index }}
+                                </td>
 
                                 {{-- FECHA --}}
 
@@ -159,25 +167,37 @@
 
                                 <td>
 
-                                    <div class="account-cell">
+                                    @if ($transaction->account)
+                                        <a href="{{ route('accounts.movements', $transaction->account) }}"
+                                            class="account-cell account-cell-link">
 
-                                        @if ($transaction->account?->logo)
-                                            <img src="{{ Storage::url($transaction->account->logo) }}"
-                                                alt="{{ $transaction->account->name }}">
-                                        @else
+                                            @if ($transaction->account->logo)
+                                                <img src="{{ Storage::url($transaction->account->logo) }}"
+                                                    alt="{{ $transaction->account->name }}">
+                                            @else
+                                                <div class="mini-logo">
+                                                    <i class="bi bi-bank"></i>
+                                                </div>
+                                            @endif
+
+                                            <span>
+                                                {{ $transaction->account->name }}
+                                            </span>
+
+                                        </a>
+                                    @else
+                                        <div class="account-cell">
+
                                             <div class="mini-logo">
-
                                                 <i class="bi bi-bank"></i>
-
                                             </div>
-                                        @endif
 
+                                            <span>
+                                                Cuenta eliminada
+                                            </span>
 
-                                        <span>
-                                            {{ $transaction->account?->name ?? 'Cuenta eliminada' }}
-                                        </span>
-
-                                    </div>
+                                        </div>
+                                    @endif
 
                                 </td>
 
@@ -228,7 +248,9 @@
                                         <i class="bi bi-person-circle"></i>
 
                                         <span>
-                                            {{ $transaction->user?->name ?? 'Sin registro' }}
+                                            {{ $transaction->user?->email
+                                                ? \Illuminate\Support\Str::before($transaction->user->email, '@')
+                                                : 'Sin registro' }}
                                         </span>
 
                                     </div>
@@ -410,7 +432,7 @@
 
                             <tr>
 
-                                <td colspan="9" class="text-center">
+                                <td colspan="10" class="text-center">
                                     Sin movimientos en esta jornada
                                 </td>
 

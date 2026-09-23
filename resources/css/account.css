@@ -2249,3 +2249,13 @@
     }
 
 }
+
+.account-cell-link {
+    color: inherit;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.account-cell-link:hover span {
+    text-decoration: underline;
+}

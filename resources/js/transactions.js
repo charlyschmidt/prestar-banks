@@ -1,3 +1,33 @@
+function renumberTransactions() {
+
+    const tbody = document.getElementById(
+        'transactions-body'
+    );
+
+    if (!tbody) {
+        return;
+    }
+
+    const rows = tbody.querySelectorAll(
+        'tr[data-transaction-id]'
+    );
+
+    const total = rows.length;
+
+    rows.forEach((row, index) => {
+
+        const counter = row.querySelector(
+            '[data-movement-counter]'
+        );
+
+        if (counter) {
+            counter.textContent = total - index;
+        }
+
+    });
+
+}
+
 document.addEventListener('DOMContentLoaded', () => {
 
 
@@ -38,6 +68,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const row = `
 
 <tr>
+<tr data-transaction-id="${transaction.id}">
+
+    <!-- CONTADOR -->
+    <td data-movement-counter>
+        0
+    </td>
+
 
     <!-- FECHA -->
     <td>
@@ -118,7 +155,10 @@ document.addEventListener('DOMContentLoaded', () => {
             <i class="bi bi-person-circle"></i>
 
             <span>
-                ${transaction.user?.name ?? 'Sin registro'}
+                ${transaction.user?.email
+                    ? transaction.user.email.split('@')[0]
+                    : 'Sin registro'
+                }
             </span>
 
         </div>
@@ -257,7 +297,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 'afterbegin',
                 row
             );
-
+            renumberTransactions();
 
         });
 
