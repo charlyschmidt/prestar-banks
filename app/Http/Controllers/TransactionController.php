@@ -532,6 +532,24 @@ class TransactionController extends Controller
 
     public function edit(Transaction $transaction)
     {
+
+        /*
+|--------------------------------------------------------------------------
+| Movimiento ejecutado
+|--------------------------------------------------------------------------
+*/
+
+        if ($transaction->executed_at) {
+
+            return redirect()
+                ->route('transactions.index')
+                ->with(
+                    'error',
+                    'Una transferencia ejecutada no puede modificarse.'
+                );
+        }
+
+
         /*
     |--------------------------------------------------------------------------
     | Solo puede editarlo el usuario que lo creó
@@ -648,6 +666,22 @@ class TransactionController extends Controller
         Transaction $transaction,
         FinancialDayService $financialDayService
     ) {
+
+        /*
+|--------------------------------------------------------------------------
+| Movimiento ejecutado
+|--------------------------------------------------------------------------
+*/
+
+        if ($transaction->executed_at) {
+
+            return redirect()
+                ->route('transactions.index')
+                ->with(
+                    'error',
+                    'Una transferencia ejecutada no puede modificarse.'
+                );
+        }
 
         /*
     |--------------------------------------------------------------------------
@@ -1071,11 +1105,29 @@ class TransactionController extends Controller
 
     public function destroy(Transaction $transaction)
     {
+
+
         /*
-    |--------------------------------------------------------------------------
-    | Solo puede eliminarlo el usuario que lo creó
-    |--------------------------------------------------------------------------
-    */
+        |--------------------------------------------------------------------------
+        | Movimiento ejecutado
+        |--------------------------------------------------------------------------
+        */
+
+        if ($transaction->executed_at) {
+
+            return back()
+                ->with(
+                    'error',
+                    'Una transferencia ejecutada no puede eliminarse.'
+                );
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Solo puede eliminarlo el usuario que lo creó
+        |--------------------------------------------------------------------------
+        */
 
         if (
             !auth()->user()->isSuperAdmin() &&
