@@ -16,6 +16,11 @@ if (canvas) {
     let currentX = 0;
     let currentY = 0;
 
+    const nebulaClouds = [
+        document.querySelector('.welcome-nebula-cloud-1'),
+        document.querySelector('.welcome-nebula-cloud-2'),
+        document.querySelector('.welcome-nebula-cloud-3')
+    ];
 
     /* ==========================
        RESIZE
@@ -170,6 +175,72 @@ if (canvas) {
             (mouseY - currentY) *
             0.06;
 
+            /* ==========================
+   NEBULOSA
+========================== */
+
+nebulaClouds.forEach(
+    function (cloud, index) {
+
+        if (!cloud) {
+            return;
+        }
+
+        /*
+         * Movimiento muy corto.
+         * La nube es enorme, no queremos
+         * desplazarla fuera de su posición.
+         */
+
+        const mouseDepth = [
+            8,
+            5,
+            10
+        ][index];
+
+        const floatAmount = [
+            6,
+            4,
+            7
+        ][index];
+
+
+        /*
+         * Flotación lenta
+         */
+
+        const floatX =
+            Math.sin(
+                time * 0.00006 +
+                index * 2.1
+            ) * floatAmount;
+
+        const floatY =
+            Math.cos(
+                time * 0.000045 +
+                index * 1.7
+            ) * floatAmount;
+
+
+        /*
+         * Reacción al mouse
+         */
+
+        const mouseOffsetX =
+            currentX * mouseDepth;
+
+        const mouseOffsetY =
+            currentY * mouseDepth;
+
+
+        cloud.style.transform =
+            `translate3d(
+                ${floatX + mouseOffsetX}px,
+                ${floatY + mouseOffsetY}px,
+                0
+            )`;
+    }
+);
 
         particles.forEach(
             function (particle) {

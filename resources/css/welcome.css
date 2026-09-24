@@ -56,20 +56,16 @@ body {
 ========================== */
 
 .welcome-particles {
-    position: absolute;
-
+    position: fixed;
     inset: 0;
 
     width: 100%;
     height: 100%;
 
-    display: block;
-
     pointer-events: none;
 
-    z-index: 0;
+    z-index: 1;
 }
-
 
 /* ==========================
    PAGE
@@ -77,7 +73,7 @@ body {
 
 .welcome-page {
     position: relative;
-    z-index: 1;
+    z-index: 2;
 
     width: 100%;
 }
@@ -872,4 +868,105 @@ body {
     font-weight: 400;
 
     text-align: center;
+}
+
+/* ==========================
+   NEBULOSA
+========================== */
+
+.welcome-nebula {
+    position: fixed;
+    inset: 0;
+
+    overflow: hidden;
+
+    pointer-events: none;
+
+    z-index: 0;
+}
+
+
+.welcome-nebula-cloud {
+    position: absolute;
+
+    border-radius: 50%;
+
+    filter: blur(80px);
+
+    opacity: .55;
+
+    will-change: transform;
+
+    transform: translate3d(0, 0, 0);
+}
+
+
+/* Rojo profundo */
+
+.welcome-nebula-cloud-1 {
+    width: 65vw;
+    height: 55vw;
+
+    min-width: 600px;
+    min-height: 500px;
+
+    left: -25vw;
+    top: -15vw;
+
+    background:
+        radial-gradient(
+            ellipse at center,
+            rgba(75, 0, 8, .95) 0%,
+            rgba(48, 0, 6, .80) 30%,
+            rgba(22, 0, 3, .50) 55%,
+            rgba(5, 0, 1, .20) 70%,
+            transparent 82%
+        );
+}
+
+
+/* Masa oscura */
+
+.welcome-nebula-cloud-2 {
+    width: 75vw;
+    height: 65vw;
+
+    min-width: 700px;
+    min-height: 600px;
+
+    right: -30vw;
+    top: 20vh;
+
+    background:
+        radial-gradient(
+            circle at center,
+            rgba(20, 0, 5, .85) 0%,
+            rgba(35, 2, 8, .55) 35%,
+            rgba(10, 0, 2, .25) 60%,
+            transparent 78%
+        );
+}
+
+
+/* Rojo secundario */
+
+.welcome-nebula-cloud-3 {
+    width: 55vw;
+    height: 50vw;
+
+    min-width: 500px;
+    min-height: 450px;
+
+    left: 30vw;
+    bottom: -30vw;
+
+    background:
+        radial-gradient(
+            ellipse at center,
+            rgba(85, 0, 10, .85) 0%,
+            rgba(52, 0, 7, .65) 32%,
+            rgba(25, 0, 4, .40) 58%,
+            rgba(8, 0, 2, .15) 72%,
+            transparent 84%
+        );
 }

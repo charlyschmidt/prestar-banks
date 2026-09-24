@@ -314,7 +314,7 @@ class UserController extends Controller
     |--------------------------------------------------------------------------
     */
 
-    public function edit(User $usuario)
+    public function edit(User $user)
     {
         $currentUser = auth()->user();
 
@@ -324,14 +324,14 @@ class UserController extends Controller
 
         $membership =
             $this->membershipForCurrentCompany(
-                $usuario
+                $user
             );
 
 
         return view(
             'admin.users.edit',
             [
-                'user' => $usuario,
+                'user' => $user,
                 'membership' => $membership
             ]
         );
@@ -346,7 +346,7 @@ class UserController extends Controller
 
     public function update(
         Request $request,
-        User $usuario
+        User $user
     ) {
         $currentUser = auth()->user();
 
@@ -357,7 +357,7 @@ class UserController extends Controller
 
         $membership =
             $this->membershipForCurrentCompany(
-                $usuario
+                $user
             );
 
 
@@ -378,7 +378,7 @@ class UserController extends Controller
                         'users',
                         'email'
                     )->ignore(
-                        $usuario->id
+                        $user->id
                     )
                 ],
 
@@ -455,7 +455,7 @@ class UserController extends Controller
 
         DB::transaction(
             function () use (
-                $usuario,
+                $user,
                 $data,
                 $willBeSuperAdmin
             ) {
@@ -464,22 +464,22 @@ class UserController extends Controller
                  * Datos globales del usuario.
                  */
 
-                $usuario->name =
+                $user->name =
                     $data['name'];
 
-                $usuario->email =
+                $user->email =
                     $data['email'];
 
 
                 if (!empty($data['password'])) {
-                    $usuario->password =
+                    $user->password =
                         Hash::make(
                             $data['password']
                         );
                 }
 
 
-                $usuario->save();
+                $user->save();
 
 
                 /*
@@ -491,7 +491,7 @@ class UserController extends Controller
                 )->id();
 
 
-                $usuario
+                $user
                     ->companies()
                     ->updateExistingPivot(
                         $companyId,
@@ -524,7 +524,7 @@ class UserController extends Controller
     |--------------------------------------------------------------------------
     */
 
-    public function destroy(User $usuario)
+    public function destroy(User $user)
     {
         $currentUser = auth()->user();
 
@@ -535,18 +535,18 @@ class UserController extends Controller
 
         $membership =
             $this->membershipForCurrentCompany(
-                $usuario
+                $user
             );
 
 
         /*
-        |--------------------------------------------------------------------------
-        | No quitarse a sí mismo
-        |--------------------------------------------------------------------------
-        */
+    |--------------------------------------------------------------------------
+    | No quitarse a sí mismo
+    |--------------------------------------------------------------------------
+    */
 
         if (
-            $usuario->id ===
+            $user->id ===
             $currentUser->id
         ) {
             return redirect()
@@ -559,10 +559,10 @@ class UserController extends Controller
 
 
         /*
-        |--------------------------------------------------------------------------
-        | Proteger último Super Admin
-        |--------------------------------------------------------------------------
-        */
+    |--------------------------------------------------------------------------
+    | Proteger último Super Admin
+    |--------------------------------------------------------------------------
+    */
 
         if (
             (bool) $membership->pivot->is_admin
@@ -579,17 +579,17 @@ class UserController extends Controller
 
 
         /*
-        |--------------------------------------------------------------------------
-        | IMPORTANTE
-        |--------------------------------------------------------------------------
-        |
-        | No eliminamos User.
-        |
-        | Solamente quitamos la relación con ESTA empresa.
-        |
-        */
+    |--------------------------------------------------------------------------
+    | IMPORTANTE
+    |--------------------------------------------------------------------------
+    |
+    | No eliminamos User.
+    |
+    | Solamente quitamos la relación con ESTA empresa.
+    |
+    */
 
-        $usuario
+        $user
             ->companies()
             ->detach(
                 app(

@@ -39,36 +39,6 @@
     </div>
 
 
-
-    {{-- MENSAJES --}}
-
-    @if (session('success'))
-
-        <div class="alert-success mb-4">
-
-            <i class="bi bi-check-circle"></i>
-
-            {{ session('success') }}
-
-        </div>
-
-    @endif
-
-
-    @if (session('error'))
-
-        <div class="alert-error mb-4">
-
-            <i class="bi bi-exclamation-triangle"></i>
-
-            {{ session('error') }}
-
-        </div>
-
-    @endif
-
-
-
     {{-- LISTADO --}}
 
     <div class="section-title mb-4">

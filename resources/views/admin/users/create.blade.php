@@ -26,21 +26,6 @@
 
     <div class="form-card">
 
-
-        @if ($errors->any())
-
-            <div class="alert-error mb-4">
-
-                <i class="bi bi-exclamation-triangle"></i>
-
-                {{ $errors->first() }}
-
-            </div>
-
-        @endif
-
-
-
         <form
             method="POST"
             action="{{ route('users.store') }}"

@@ -9,7 +9,7 @@
 
     <meta name="description" content="AERIA Finance - Dashboard financiero en tiempo real">
 
-    <title>AERIA Finance</title>
+    <title>AERIA Finance - Control financiero diario, multiempresa, simple y en tiempo real.</title>
 
     @vite(['resources/css/welcome.css', 'resources/js/welcome.js'])
 
@@ -28,6 +28,18 @@
     <main class="welcome">
 
         {{-- Fondo ambiental --}}
+
+        <div class="welcome-nebula" id="welcome-nebula" aria-hidden="true">
+
+            <div class="welcome-nebula-cloud welcome-nebula-cloud-1"></div>
+
+            <div class="welcome-nebula-cloud welcome-nebula-cloud-2"></div>
+
+            <div class="welcome-nebula-cloud welcome-nebula-cloud-3"></div>
+
+        </div>
+
+
         <canvas id="welcome-particles" class="welcome-particles" aria-hidden="true">
         </canvas>
 

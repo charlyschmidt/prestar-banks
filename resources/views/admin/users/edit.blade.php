@@ -26,34 +26,6 @@
 
     <div class="form-card">
 
-
-        @if (session('error'))
-
-            <div class="alert-error mb-4">
-
-                <i class="bi bi-exclamation-triangle"></i>
-
-                {{ session('error') }}
-
-            </div>
-
-        @endif
-
-
-        @if ($errors->any())
-
-            <div class="alert-error mb-4">
-
-                <i class="bi bi-exclamation-triangle"></i>
-
-                {{ $errors->first() }}
-
-            </div>
-
-        @endif
-
-
-
         <form
             method="POST"
             action="{{ route('users.update', $user->id) }}"
