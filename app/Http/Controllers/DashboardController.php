@@ -236,9 +236,8 @@ class DashboardController extends Controller
                             'id' =>
                             $movement->user?->id,
 
-                            'name' =>
-                            $movement->user?->name
-                                ?? 'Sin registro',
+                            'email' =>
+                            $movement->user?->email,
 
                         ],
 
