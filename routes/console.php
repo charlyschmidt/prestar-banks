@@ -8,7 +8,10 @@ use Illuminate\Support\Facades\Schedule;
 use App\Events\ReminderDue;
 use App\Services\FinancialReminderService;
 
-
+Schedule::command('aeria:send-expired-trial-emails')
+    ->hourly()
+    ->withoutOverlapping();
+    
 Schedule::command('movement-control:cleanup')
     ->dailyAt('03:00')
     ->withoutOverlapping();

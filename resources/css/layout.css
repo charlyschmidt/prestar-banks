@@ -238,6 +238,76 @@
     font-weight: 300;
 }
 
+/* ==========================
+   SUBSCRIPTION STATUS
+========================== */
+
+.sidebar-subscription-badge {
+    width: fit-content;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 6px;
+
+    margin: 2px auto 0;
+    padding: 5px 8px;
+
+    background: var(--company-hover);
+
+    border: 1px solid var(--company-border);
+    border-radius: 999px;
+
+    color: var(--company-muted);
+
+    font-size: 9px;
+    font-weight: 700;
+
+    line-height: 1;
+
+    letter-spacing: .45px;
+    text-transform: uppercase;
+
+    white-space: nowrap;
+}
+
+
+.sidebar-subscription-dot {
+    width: 5px;
+    height: 5px;
+
+    flex-shrink: 0;
+
+    border-radius: 50%;
+
+    background: currentColor;
+}
+
+
+.sidebar-subscription-days {
+    padding-left: 6px;
+
+    border-left: 1px solid var(--company-border);
+
+    color: var(--company-text);
+
+    font-weight: 700;
+}
+
+
+/* TRIAL */
+
+.sidebar-subscription-badge.is-trial {
+    color: #d97706;
+}
+
+
+/* ACTIVE */
+
+.sidebar-subscription-badge.is-active {
+    color: #07ff88;
+}
 
 /* ==========================
    MOBILE CLOSE
@@ -1419,7 +1489,7 @@ body[data-theme="dark"] .sidebar-close {
 
 
     .desktop-sidebar .sidebar-brand {
-        margin-bottom: 38px;
+        margin-bottom: 24px;
     }
 
 

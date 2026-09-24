@@ -395,6 +395,10 @@ class PlatformAdminController extends Controller
 
         $company->update([
             'status' => 'active',
+
+            'trial_started_at' => now(),
+
+            'trial_ends_at' => now()->addDays(7),
         ]);
 
 
@@ -413,7 +417,8 @@ class PlatformAdminController extends Controller
         foreach ($admins as $admin) {
 
             $mailService->sendAccountApproved(
-                $admin
+                $admin,
+                $company
             );
         }
 

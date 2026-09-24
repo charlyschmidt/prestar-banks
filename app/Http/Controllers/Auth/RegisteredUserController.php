@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
+use App\Services\AeriaMailService;
 
 class RegisteredUserController extends Controller
 {
@@ -31,8 +32,10 @@ class RegisteredUserController extends Controller
     |--------------------------------------------------------------------------
     */
 
-    public function store(Request $request)
-    {
+    public function store(
+        Request $request,
+        AeriaMailService $mailService
+    ) {
         $data = $request->validate(
             [
                 'company_name' => [
@@ -62,30 +65,30 @@ class RegisteredUserController extends Controller
             ],
             [
                 'company_name.required' =>
-                    'Ingresá el nombre de la empresa.',
+                'Ingresá el nombre de la empresa.',
 
                 'name.required' =>
-                    'Ingresá tu nombre.',
+                'Ingresá tu nombre.',
 
                 'email.required' =>
-                    'Ingresá tu email.',
+                'Ingresá tu email.',
 
                 'email.email' =>
-                    'Ingresá un email válido.',
+                'Ingresá un email válido.',
 
                 'email.unique' =>
-                    'Ya existe una cuenta registrada con ese email.',
+                'Ya existe una cuenta registrada con ese email.',
 
                 'password.required' =>
-                    'Ingresá una contraseña.',
+                'Ingresá una contraseña.',
 
                 'password.confirmed' =>
-                    'Las contraseñas no coinciden.',
+                'Las contraseñas no coinciden.',
             ]
         );
 
 
-        DB::transaction(function () use ($data) {
+        $user = DB::transaction(function () use ($data) {
 
             /*
             |--------------------------------------------------------------------------
@@ -144,8 +147,12 @@ class RegisteredUserController extends Controller
                     'is_admin' => true,
                 ]
             );
-
+            return $user;
         });
+
+        $mailService->sendAccountCreated(
+            $user
+        );
 
 
         /*
@@ -185,7 +192,7 @@ class RegisteredUserController extends Controller
 
         while (
             Company::where('slug', $slug)
-                ->exists()
+            ->exists()
         ) {
 
             $slug =
@@ -234,11 +241,11 @@ class RegisteredUserController extends Controller
 
         while (
             User::withTrashed()
-                ->where(
-                    'username',
-                    $username
-                )
-                ->exists()
+            ->where(
+                'username',
+                $username
+            )
+            ->exists()
         ) {
 
             $username =

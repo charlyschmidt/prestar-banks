@@ -77,7 +77,7 @@ import '../css/account-alerts.css';
 
 import '../css/reminders.css';
 
-
+import '../css/subscription.css';
 /*
 |--------------------------------------------------------------------------
 | Javascript propio

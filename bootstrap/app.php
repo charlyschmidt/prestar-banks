@@ -16,8 +16,15 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'company' =>
             \App\Http\Middleware\EnsureCompanySelected::class,
-            'financial.day' => \App\Http\Middleware\EnsureFinancialDayOpen::class,
-            'platform.admin' => \App\Http\Middleware\PlatformAdmin::class
+
+            'financial.day' =>
+            \App\Http\Middleware\EnsureFinancialDayOpen::class,
+
+            'platform.admin' =>
+            \App\Http\Middleware\PlatformAdmin::class,
+
+            'company.access' =>
+            \App\Http\Middleware\EnsureCompanyHasAccess::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

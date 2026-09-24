@@ -33,7 +33,7 @@
         font-size: 14px;
         line-height: 22px;
     ">
-        Hola {{ $userName }},
+        Hola {{ $recipientName }},
     </p>
 
 

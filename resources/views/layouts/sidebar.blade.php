@@ -32,6 +32,36 @@
                 </div>
             @endif
 
+            @if ($activeCompany)
+
+                @if ($activeCompany->hasActiveSubscription())
+
+                    <div class="sidebar-subscription-badge is-active">
+                        Suscripción activa
+                    </div>
+                @elseif ($activeCompany->isOnTrial())
+                    @php
+                        $trialDaysRemaining = max(
+                            1,
+                            (int) ceil(now()->diffInSeconds($activeCompany->trial_ends_at, false) / 86400),
+                        );
+                    @endphp
+
+                    <div class="sidebar-subscription-badge is-trial">
+
+                        Período de prueba
+
+                        <span class="sidebar-subscription-days">
+                            {{ $trialDaysRemaining }}
+                            {{ $trialDaysRemaining === 1 ? 'día' : 'días' }}
+                        </span>
+
+                    </div>
+
+                @endif
+
+            @endif
+
         </div>
 
 
@@ -94,8 +124,7 @@
 
 
             @if (auth()->user()->isSuperAdmin())
-                <a href="{{ route('users.index') }}"
-                    class="{{ request()->routeIs('usuarios.*') ? 'active' : '' }}">
+                <a href="{{ route('users.index') }}" class="{{ request()->routeIs('usuarios.*') ? 'active' : '' }}">
 
                     <i class="bi bi-people"></i>
 
@@ -169,6 +198,36 @@
             <div class="sidebar-company-name">
                 {{ $activeCompany->name }}
             </div>
+        @endif
+
+        @if ($activeCompany)
+
+            @if ($activeCompany->hasActiveSubscription())
+
+                <div class="sidebar-subscription-badge is-active">
+                    Suscripción activa
+                </div>
+            @elseif ($activeCompany->isOnTrial())
+                @php
+                    $trialDaysRemaining = max(
+                        1,
+                        (int) ceil(now()->diffInSeconds($activeCompany->trial_ends_at, false) / 86400),
+                    );
+                @endphp
+
+                <div class="sidebar-subscription-badge is-trial">
+
+                    Período de prueba
+
+                    <span class="sidebar-subscription-days">
+                        {{ $trialDaysRemaining }}
+                        {{ $trialDaysRemaining === 1 ? 'día' : 'días' }}
+                    </span>
+
+                </div>
+
+            @endif
+
         @endif
 
     </div>

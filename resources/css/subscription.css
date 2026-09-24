@@ -1,0 +1,480 @@
+/* ==========================
+   SUBSCRIPTION — MOBILE FIRST
+========================== */
+
+.subscription-page {
+    position: relative;
+
+    width: 100%;
+    min-height: 100vh;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    overflow: hidden;
+
+    padding: 28px 18px;
+
+    background: #050505;
+    color: #ffffff;
+}
+
+
+/* ==========================
+   CONTAINER
+========================== */
+
+.subscription-container {
+    position: relative;
+    z-index: 5;
+
+    width: 100%;
+    max-width: 520px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+
+/* ==========================
+   BRAND
+========================== */
+
+.subscription-brand {
+    margin-bottom: 24px;
+
+    color: #ffffff;
+
+    font-size: 22px;
+    font-weight: 600;
+
+    letter-spacing: -1px;
+}
+
+.subscription-brand span {
+    font-weight: 300;
+}
+
+
+/* ==========================
+   CARD
+========================== */
+
+.subscription-card {
+    width: 100%;
+
+    padding: 26px 22px;
+
+    background: rgba(10, 10, 10, .76);
+
+    border: 1px solid rgba(255, 255, 255, .10);
+    border-radius: 20px;
+
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+
+    box-shadow:
+        0 24px 70px rgba(0, 0, 0, .42);
+}
+
+
+/* ==========================
+   STATUS
+========================== */
+
+.subscription-status {
+    width: fit-content;
+
+    margin-bottom: 16px;
+    padding: 6px 9px;
+
+    border: 1px solid rgba(239, 68, 68, .22);
+    border-radius: 999px;
+
+    background: rgba(239, 68, 68, .07);
+
+    color: #ef7b7b;
+
+    font-size: 9px;
+    font-weight: 700;
+
+    line-height: 1;
+
+    letter-spacing: .7px;
+}
+
+
+/* ==========================
+   TITLE
+========================== */
+
+.subscription-card h1 {
+    margin: 0;
+
+    color: #ffffff;
+
+    font-size: 27px;
+    font-weight: 600;
+
+    line-height: 1.15;
+
+    letter-spacing: -.8px;
+}
+
+
+/* ==========================
+   DESCRIPTION
+========================== */
+
+.subscription-description {
+    margin: 14px 0 0;
+
+    color: rgba(255, 255, 255, .58);
+
+    font-size: 13px;
+    font-weight: 400;
+
+    line-height: 1.65;
+}
+
+
+/* ==========================
+   DATA SAFE
+========================== */
+
+.subscription-data-safe {
+    width: 100%;
+
+    display: flex;
+    align-items: flex-start;
+
+    gap: 11px;
+
+    margin-top: 22px;
+    padding: 14px;
+
+    background: rgba(255, 255, 255, .035);
+
+    border: 1px solid rgba(255, 255, 255, .07);
+    border-radius: 13px;
+}
+
+
+.subscription-check {
+    width: 23px;
+    height: 23px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin-top: 1px;
+
+    border-radius: 50%;
+
+    background: rgba(34, 197, 94, .10);
+
+    color: #4ade80;
+
+    font-size: 11px;
+    font-weight: 700;
+}
+
+
+.subscription-data-safe strong {
+    display: block;
+
+    color: rgba(255, 255, 255, .88);
+
+    font-size: 12px;
+    font-weight: 600;
+}
+
+
+.subscription-data-safe p {
+    margin: 3px 0 0;
+
+    color: rgba(255, 255, 255, .45);
+
+    font-size: 11px;
+
+    line-height: 1.5;
+}
+
+
+/* ==========================
+   PLAN
+========================== */
+
+.subscription-plan {
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 16px;
+
+    margin-top: 14px;
+    padding: 16px;
+
+    border: 1px solid rgba(255, 255, 255, .10);
+    border-radius: 14px;
+
+    background: rgba(255, 255, 255, .025);
+}
+
+
+.subscription-plan-info {
+    min-width: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 3px;
+}
+
+
+.subscription-plan-info span {
+    color: rgba(255, 255, 255, .42);
+
+    font-size: 9px;
+    font-weight: 600;
+
+    letter-spacing: .6px;
+
+    text-transform: uppercase;
+}
+
+
+.subscription-plan-info strong {
+    color: rgba(255, 255, 255, .90);
+
+    font-size: 13px;
+    font-weight: 600;
+}
+
+
+/* ==========================
+   PRICE
+========================== */
+
+.subscription-price {
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: baseline;
+
+    gap: 4px;
+
+    white-space: nowrap;
+}
+
+
+.subscription-price > span {
+    color: rgba(255, 255, 255, .45);
+
+    font-size: 10px;
+    font-weight: 600;
+}
+
+
+.subscription-price strong {
+    color: #ffffff;
+
+    font-size: 25px;
+    font-weight: 600;
+
+    letter-spacing: -1px;
+}
+
+
+.subscription-price small {
+    color: rgba(255, 255, 255, .42);
+
+    font-size: 10px;
+}
+
+
+/* ==========================
+   PRIMARY BUTTON
+========================== */
+
+.subscription-button {
+    width: 100%;
+    height: 46px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin-top: 18px;
+    padding: 0 18px;
+
+    border: 0;
+    border-radius: 12px;
+
+    background: #ffffff;
+    color: #080808;
+
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        opacity .2s ease,
+        transform .2s ease;
+}
+
+
+.subscription-button:disabled {
+    opacity: .42;
+
+    cursor: not-allowed;
+}
+
+
+/* ==========================
+   COMING SOON
+========================== */
+
+.subscription-coming-soon {
+    display: block;
+
+    margin-top: 9px;
+
+    color: rgba(255, 255, 255, .32);
+
+    font-size: 9px;
+
+    text-align: center;
+}
+
+
+/* ==========================
+   LOGOUT
+========================== */
+
+.subscription-logout-form {
+    margin: 20px 0 0;
+
+    text-align: center;
+}
+
+
+.subscription-logout {
+    padding: 4px 8px;
+
+    background: transparent;
+
+    border: 0;
+
+    color: rgba(255, 255, 255, .45);
+
+    font-family: inherit;
+    font-size: 11px;
+
+    cursor: pointer;
+
+    transition: color .15s ease;
+}
+
+
+.subscription-logout:hover {
+    color: #ffffff;
+}
+
+
+/* ==========================
+   FOOTER
+========================== */
+
+.subscription-footer {
+    margin-top: 22px;
+
+    color: rgba(255, 255, 255, .28);
+
+    font-size: 12px;
+
+    text-align: center;
+}
+
+
+.subscription-footer span {
+    margin: 0 5px;
+
+    opacity: .5;
+}
+
+
+/* ==========================
+   TABLET / DESKTOP
+========================== */
+
+@media (min-width: 768px) {
+
+    .subscription-page {
+        padding: 40px 24px;
+    }
+
+
+    .subscription-brand {
+        margin-bottom: 28px;
+
+        font-size: 24px;
+    }
+
+
+    .subscription-card {
+        padding: 34px;
+    }
+
+
+    .subscription-card h1 {
+        font-size: 32px;
+    }
+
+
+    .subscription-description {
+        max-width: 430px;
+
+        font-size: 14px;
+    }
+
+
+    .subscription-data-safe {
+        padding: 16px;
+    }
+
+
+    .subscription-plan {
+        padding: 18px;
+    }
+
+
+    .subscription-price strong {
+        font-size: 28px;
+    }
+
+}
+
+
+/* ==========================
+   HOVER DEVICES
+========================== */
+
+@media (hover: hover) {
+
+    .subscription-button:not(:disabled):hover {
+        opacity: .88;
+
+        transform: translateY(-1px);
+    }
+
+}

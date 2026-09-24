@@ -68,13 +68,35 @@ Route::middleware('auth')->group(function () {
     )->name('company.select.store');
 
 
+
+    /*
+|--------------------------------------------------------------------------
+| Subscription
+|--------------------------------------------------------------------------
+|
+| Esta pantalla debe quedar fuera de company.access,
+| porque justamente se utiliza cuando la empresa ya no tiene acceso.
+|
+*/
+
+    Route::get(
+        '/subscription/expired',
+        function () {
+            return view('subscription.expired');
+        }
+    )->name('subscription.expired');
+
+
     /*
     |--------------------------------------------------------------------------
     | Active Company
     |--------------------------------------------------------------------------
     */
 
-    Route::middleware('company')->group(function () {
+    Route::middleware([
+        'company',
+        'company.access',
+    ])->group(function () {
 
 
         /*

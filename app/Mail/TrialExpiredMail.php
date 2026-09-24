@@ -2,35 +2,33 @@
 
 namespace App\Mail;
 
-use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class AccountApprovedMail extends Mailable
+class TrialExpiredMail extends Mailable
 {
     use Queueable, SerializesModels;
 
     public function __construct(
         public string $recipientName,
-        public string $loginUrl,
-        public Carbon $trialEndsAt
+        public string $subscriptionUrl
     ) {
     }
 
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Tu cuenta fue aprobada | AERIA Finance'
+            subject: 'Tu período de prueba finalizó | AERIA Finance'
         );
     }
 
     public function content(): Content
     {
         return new Content(
-            view: 'emails.account-approved'
+            view: 'emails.trial-expired'
         );
     }
 

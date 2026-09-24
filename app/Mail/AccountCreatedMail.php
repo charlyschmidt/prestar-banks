@@ -13,7 +13,7 @@ class AccountCreatedMail extends Mailable
     use Queueable, SerializesModels;
 
     public function __construct(
-        public string $userName
+        public string $recipientName
     ) {
     }
 

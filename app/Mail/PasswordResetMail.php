@@ -12,13 +12,11 @@ class PasswordResetMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-
     public function __construct(
-        public string $userName,
+        public string $recipientName,
         public string $resetUrl
     ) {
     }
-
 
     public function envelope(): Envelope
     {
@@ -27,14 +25,12 @@ class PasswordResetMail extends Mailable
         );
     }
 
-
     public function content(): Content
     {
         return new Content(
             view: 'emails.password-reset'
         );
     }
-
 
     public function attachments(): array
     {

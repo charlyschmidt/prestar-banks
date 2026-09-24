@@ -12,7 +12,7 @@
         letter-spacing: 1.2px;
         text-transform: uppercase;
     ">
-        Cuenta habilitada
+        Período de prueba finalizado
     </div>
 
 
@@ -24,7 +24,7 @@
         line-height: 32px;
         letter-spacing: -0.5px;
     ">
-        Tu cuenta fue aprobada
+        Tu prueba gratuita terminó
     </h1>
 
 
@@ -44,9 +44,9 @@
         font-size: 14px;
         line-height: 22px;
     ">
-        Tu cuenta de AERIA Finance ya está habilitada.
-        Desde este momento comienza tu período de prueba gratuito
-        de 7 días.
+        Finalizaron tus 7 días gratuitos de AERIA Finance.
+        Para continuar utilizando la plataforma,
+        necesitás activar tu suscripción.
     </p>
 
 
@@ -66,7 +66,7 @@
             letter-spacing: 1px;
             text-transform: uppercase;
         ">
-            Período de prueba
+            Tus datos están seguros
         </div>
 
         <div style="
@@ -75,7 +75,7 @@
             font-weight: 600;
             line-height: 22px;
         ">
-            7 días gratuitos
+            No perdiste ninguna información
         </div>
 
         <div style="
@@ -84,8 +84,8 @@
             font-size: 12px;
             line-height: 19px;
         ">
-            Disponible hasta el
-            {{ $trialEndsAt->locale('es')->translatedFormat('d \d\e F \d\e Y \a \l\a\s H:i') }} hs.
+            Tus cuentas, movimientos y configuraciones
+            permanecen guardados en AERIA Finance.
         </div>
 
     </div>
@@ -110,7 +110,7 @@
             >
 
                 <a
-                    href="{{ $loginUrl }}"
+                    href="{{ $subscriptionUrl }}"
                     style="
                         display: inline-block;
                         padding: 13px 22px;
@@ -120,7 +120,7 @@
                         text-decoration: none;
                     "
                 >
-                    Comenzar prueba gratuita
+                    Activar suscripción
                 </a>
 
             </td>
@@ -143,8 +143,8 @@
         font-size: 12px;
         line-height: 19px;
     ">
-        Cuando finalice el período de prueba te informaremos
-        cómo continuar utilizando AERIA Finance.
+        Al activar tu suscripción vas a recuperar el acceso
+        y continuar exactamente desde donde estabas.
     </p>
 
 
