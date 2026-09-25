@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
 use App\Mail\AccountCreatedMail;
 use App\Mail\TrialExpiredMail;
+use App\Mail\ContactMessageMail;
 
 class AeriaMailService
 {
@@ -69,7 +70,7 @@ class AeriaMailService
     }
 
     public function sendTrialExpired(
-       User $user
+        User $user
     ): void {
         Mail::to($user->email)
             ->send(
@@ -78,6 +79,21 @@ class AeriaMailService
                     subscriptionUrl: route(
                         'subscription.expired'
                     )
+                )
+            );
+    }
+
+    public function sendContactMessage(
+        string $name,
+        string $email,
+        string $message
+    ): void {
+        Mail::to('ayuda@aeriafinance.com.ar')
+            ->send(
+                new ContactMessageMail(
+                    senderName: $name,
+                    senderEmail: $email,
+                    contactMessage: $message
                 )
             );
     }

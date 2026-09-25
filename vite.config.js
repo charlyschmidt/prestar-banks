@@ -13,6 +13,8 @@ export default defineConfig({
                 'resources/js/app.js',
                 'resources/css/register-pending.css',
                 'resources/css/welcome.css',
+                'resources/css/legal.css',
+                'resources/css/footer.css',
                 'resources/js/welcome.js',
             ],
 

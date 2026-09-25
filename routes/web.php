@@ -13,6 +13,7 @@ use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\PlatformAdminController;
 use App\Http\Controllers\FinancialReminderController;
 use App\Http\Controllers\OpeningBalanceImportController;
+use App\Http\Controllers\ContactController;
 
 
 /*
@@ -36,6 +37,26 @@ Route::get('/register/pending', function () {
     return view('auth.register-pending');
 })->name('register.pending');
 
+
+Route::view(
+    '/contacto',
+    'legal.contact'
+)->name('contact');
+
+Route::post(
+    '/contacto',
+    [ContactController::class, 'store']
+)->name('contact.store');
+
+Route::view(
+    '/terminos-y-condiciones',
+    'legal.terms'
+)->name('terms');
+
+Route::view(
+    '/politica-de-privacidad',
+    'legal.privacy'
+)->name('privacy');
 
 /*
 |--------------------------------------------------------------------------

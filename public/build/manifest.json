@@ -20,6 +20,24 @@
       "assets/bootstrap-icons-BeopsB42.woff"
     ]
   },
+  "resources/css/footer.css": {
+    "file": "assets/footer-BsH1aq0J.css",
+    "name": "footer",
+    "names": [
+      "footer.css"
+    ],
+    "src": "resources/css/footer.css",
+    "isEntry": true
+  },
+  "resources/css/legal.css": {
+    "file": "assets/legal-Db6mz76z.css",
+    "name": "legal",
+    "names": [
+      "legal.css"
+    ],
+    "src": "resources/css/legal.css",
+    "isEntry": true
+  },
   "resources/css/register-pending.css": {
     "file": "assets/register-pending-LXepLUu1.css",
     "name": "register-pending",
@@ -30,7 +48,7 @@
     "isEntry": true
   },
   "resources/css/welcome.css": {
-    "file": "assets/welcome-YrqtyEKG.css",
+    "file": "assets/welcome-DjStwIfC.css",
     "name": "welcome",
     "names": [
       "welcome.css"
@@ -39,13 +57,13 @@
     "isEntry": true
   },
   "resources/js/app.js": {
-    "file": "assets/app-CuVpSG7J.js",
+    "file": "assets/app-CcBdpZ-x.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
     "css": [
       "assets/app-DSQLmhtE.css",
-      "assets/welcome-YrqtyEKG.css",
+      "assets/welcome-DjStwIfC.css",
       "assets/register-pending-LXepLUu1.css"
     ],
     "assets": [

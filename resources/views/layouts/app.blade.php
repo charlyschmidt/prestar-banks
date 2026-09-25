@@ -90,7 +90,7 @@
     </title>
 
 
-    @vite(['resources/js/app.js'])
+    @vite(['resources/js/app.js', 'resources/css/footer.css'])
 
 
     <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png') }}">
@@ -197,21 +197,10 @@
 
 
             </main>
-            <footer class="app-footer">
-
-                <span class="app-footer-brand">
-                    AERIA <strong>Finance</strong>
-                </span>
-
-                <span class="app-footer-separator">
-                    ·
-                </span>
-
-                <span>
-                    Control financiero diario, multiempresa, simple y en tiempo real.
-                </span>
-
-            </footer>
+            
+            @include('partials.public-footer', [
+                'compact' => true,
+            ])
 
         </div>
 

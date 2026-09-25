@@ -1,0 +1,313 @@
+/* =========================================================
+   AERIA Finance
+   Global Footer
+   Mobile first
+   ========================================================= */
+
+
+.aeria-footer {
+    position: relative;
+    z-index: 2;
+
+    width: 100%;
+
+    background: #050505;
+    color: #ffffff;
+
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+
+.aeria-footer__inner {
+    width: 100%;
+    max-width: 1180px;
+
+    margin: 0 auto;
+    padding: 42px 20px 24px;
+}
+
+
+/* =========================================================
+   MAIN - FOOTER PUBLICO
+   ========================================================= */
+
+.aeria-footer__main {
+    display: grid;
+    grid-template-columns: 1fr;
+
+    gap: 34px;
+
+    padding-bottom: 38px;
+}
+
+
+.aeria-footer__brand {
+    max-width: 310px;
+}
+
+
+.aeria-footer__logo {
+    display: inline-block;
+
+    margin-bottom: 13px;
+
+    color: #ffffff;
+
+    font-size: 19px;
+    font-weight: 700;
+    letter-spacing: -0.6px;
+
+    text-decoration: none;
+}
+
+
+.aeria-footer__logo span {
+    font-weight: 300;
+}
+
+
+.aeria-footer__brand p {
+    margin: 0;
+
+    color: #707070;
+
+    font-size: 12px;
+    line-height: 1.7;
+}
+
+
+/* =========================================================
+   COLUMNS - FOOTER PUBLICO
+   ========================================================= */
+
+.aeria-footer__column {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+
+    gap: 10px;
+}
+
+
+.aeria-footer__title {
+    margin-bottom: 4px;
+
+    color: #5f5f5f;
+
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+
+    text-transform: uppercase;
+}
+
+
+.aeria-footer__column a {
+    max-width: 100%;
+
+    color: #969696;
+
+    font-size: 12px;
+    line-height: 1.5;
+
+    text-decoration: none;
+
+    overflow-wrap: anywhere;
+
+    transition: color 0.2s ease;
+}
+
+
+.aeria-footer__column a:hover {
+    color: #ffffff;
+}
+
+
+/* =========================================================
+   BOTTOM - BASE
+   ========================================================= */
+
+.aeria-footer__bottom {
+    padding-top: 22px;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 16px;
+
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+
+.aeria-footer__legal-info {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+
+    gap: 5px;
+
+    color: #555555;
+
+    font-size: 10px;
+    line-height: 1.6;
+}
+
+
+.aeria-footer__separator {
+    color: #343434;
+}
+
+
+/* =========================================================
+   COMPACT - DASHBOARD
+   ========================================================= */
+
+.aeria-footer--compact {
+    background: transparent;
+
+    color: var(--company-text);
+
+    border-top: 0;
+}
+
+
+.aeria-footer--compact .aeria-footer__inner {
+    max-width: none;
+
+    padding: 18px 20px;
+}
+
+
+.aeria-footer--compact .aeria-footer__bottom {
+    padding-top: 0;
+
+    border-top: 0;
+}
+
+
+.aeria-footer--compact .aeria-footer__legal-info {
+    color: var(--company-muted);
+}
+
+
+.aeria-footer--compact .aeria-footer__separator {
+    color: var(--company-muted);
+}
+
+
+.aeria-footer__compact-links {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+
+    gap: 8px 16px;
+}
+
+
+.aeria-footer--compact .aeria-footer__compact-links a {
+    color: var(--company-muted);
+
+    font-size: 10px;
+
+    text-decoration: none;
+
+    border-radius: 5px;
+
+    transition: color 0.2s ease;
+}
+
+
+.aeria-footer--compact .aeria-footer__compact-links a:hover {
+    color: var(--company-text);
+}
+
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (min-width: 768px) {
+
+    /* Footer público */
+
+    .aeria-footer__inner {
+        padding: 50px 34px 26px;
+    }
+
+
+    .aeria-footer__main {
+        grid-template-columns:
+            minmax(240px, 1.5fr)
+            repeat(3, minmax(120px, 1fr));
+
+        gap: 30px;
+    }
+
+
+    .aeria-footer__bottom {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+
+    /* Footer compacto */
+
+    .aeria-footer--compact .aeria-footer__inner {
+        padding: 18px 34px;
+    }
+
+
+    .aeria-footer--compact .aeria-footer__bottom {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+
+        flex-wrap: nowrap;
+
+        gap: 24px;
+    }
+
+
+    .aeria-footer--compact .aeria-footer__legal-info {
+        flex-wrap: nowrap;
+
+        white-space: nowrap;
+    }
+
+
+    .aeria-footer--compact .aeria-footer__compact-links {
+        flex-wrap: nowrap;
+
+        margin-left: auto;
+
+        white-space: nowrap;
+    }
+
+}
+
+
+/* =========================================================
+   DESKTOP
+   ========================================================= */
+
+@media (min-width: 1024px) {
+
+    .aeria-footer__inner {
+        padding-left: 40px;
+        padding-right: 40px;
+    }
+
+
+    .aeria-footer__main {
+        gap: 48px;
+    }
+
+
+    .aeria-footer--compact .aeria-footer__inner {
+        padding-left: 40px;
+        padding-right: 40px;
+    }
+
+}

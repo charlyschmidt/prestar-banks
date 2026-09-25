@@ -11,7 +11,7 @@
 
     <title>AERIA Finance - Control financiero diario, multiempresa, simple y en tiempo real.</title>
 
-    @vite(['resources/css/welcome.css', 'resources/js/welcome.js'])
+    @vite(['resources/css/welcome.css', 'resources/css/footer.css', 'resources/js/welcome.js'])
 
     <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png') }}">
 
@@ -97,45 +97,109 @@
                 <div class="plan-card">
 
 
-                    {{-- PRECIO --}}
+                    {{-- PRECIOS --}}
                     <div class="plan-price">
 
                         <span class="plan-label">
                             AERIA Finance
                         </span>
 
-                        <div class="plan-price-value">
+                        <div class="plan-pricing-options">
 
-                            <span class="plan-currency">
-                                USD
-                            </span>
 
-                            <strong>
-                                99
-                            </strong>
+                            {{-- MENSUAL --}}
+                            <div class="plan-pricing-option">
 
-                            <span class="plan-period">
-                                / mes
-                            </span>
+                                <div class="plan-pricing-option-header">
+                                    <span class="plan-pricing-name">
+                                        Mensual
+                                    </span>
+                                </div>
+
+                                <div class="plan-price-value">
+
+                                    <span class="plan-currency">
+                                        USD
+                                    </span>
+
+                                    <strong>
+                                        99
+                                    </strong>
+
+                                    <span class="plan-period">
+                                        / mes
+                                    </span>
+
+                                </div>
+
+                                <p class="plan-pricing-detail">
+                                    Facturación mensual.
+                                </p>
+
+                            </div>
+
+
+                            {{-- ANUAL --}}
+                            <div class="plan-pricing-option plan-pricing-option-featured">
+
+                                <div class="plan-pricing-option-header">
+
+                                    <span class="plan-pricing-name">
+                                        Anual
+                                    </span>
+
+                                    <span class="plan-pricing-badge">
+                                        2 meses de ahorro
+                                    </span>
+
+                                </div>
+
+                                <div class="plan-price-value">
+
+                                    <span class="plan-currency">
+                                        USD
+                                    </span>
+
+                                    <strong>
+                                        990
+                                    </strong>
+
+                                    <span class="plan-period">
+                                        / año
+                                    </span>
+
+                                </div>
+
+                                <p class="plan-pricing-detail">
+                                    Equivale a USD 82,50 por mes.
+                                    Ahorrás USD 198 al año.
+                                </p>
+
+                            </div>
 
                         </div>
+
 
                         <p class="plan-description">
-                            Una plataforma para centralizar
-                            y controlar las finanzas de tu empresa
-                            desde un solo lugar.
+                            Una plataforma para centralizar,
+                            controlar y organizar las finanzas
+                            diarias de tu empresa desde un solo lugar.
                         </p>
 
+
                         <div class="plan-unlimited">
-                            Uso ilimitado
+                            Todas las funcionalidades incluidas
                         </div>
+
 
                         <a href="{{ route('register') }}" class="plan-button">
                             Probar gratis 7 días
                         </a>
 
+
                         <p class="plan-trial">
                             7 días de prueba gratuita.
+                            Elegí tu plan al contratar.
                         </p>
 
                     </div>
@@ -160,82 +224,166 @@
 
                         <div class="features-grid">
 
+
                             <div class="feature-item">
+
                                 <span class="feature-check">✓</span>
 
                                 <div>
-                                    <strong>Múltiples cuentas</strong>
+                                    <strong>Cuentas y saldos en tiempo real</strong>
+
                                     <p>
-                                        Bancos, billeteras y efectivo
-                                        centralizados.
+                                        Bancos, billeteras y efectivo centralizados
+                                        con el saldo actualizado de cada cuenta.
                                     </p>
                                 </div>
+
                             </div>
 
 
                             <div class="feature-item">
+
                                 <span class="feature-check">✓</span>
 
                                 <div>
                                     <strong>Ingresos y egresos</strong>
+
                                     <p>
-                                        Registrá todos tus movimientos
-                                        financieros.
+                                        Registrá movimientos y visualizá
+                                        su impacto inmediatamente.
                                     </p>
                                 </div>
+
                             </div>
 
 
                             <div class="feature-item">
+
                                 <span class="feature-check">✓</span>
 
                                 <div>
-                                    <strong>Saldos en tiempo real</strong>
+                                    <strong>Importación de extractos</strong>
+
                                     <p>
-                                        Visualizá el estado de cada cuenta
-                                        al instante.
+                                        Importá archivos CSV o XLSX
+                                        y adaptá sus columnas a cada cuenta.
                                     </p>
                                 </div>
+
                             </div>
 
 
                             <div class="feature-item">
+
                                 <span class="feature-check">✓</span>
 
                                 <div>
-                                    <strong>Historial completo</strong>
+                                    <strong>Control de movimientos</strong>
+
                                     <p>
-                                        Consultá movimientos y operaciones
-                                        de cada cuenta.
+                                        Compará extractos con los movimientos
+                                        registrados y detectá diferencias.
                                     </p>
                                 </div>
+
                             </div>
 
 
                             <div class="feature-item">
+
+                                <span class="feature-check">✓</span>
+
+                                <div>
+                                    <strong>Importación de saldos</strong>
+
+                                    <p>
+                                        Cargá saldos de múltiples cuentas
+                                        de forma rápida desde archivos.
+                                    </p>
+                                </div>
+
+                            </div>
+
+
+                            <div class="feature-item">
+
+                                <span class="feature-check">✓</span>
+
+                                <div>
+                                    <strong>Recordatorios</strong>
+
+                                    <p>
+                                        Programá pagos, transferencias
+                                        y tareas financieras importantes.
+                                    </p>
+                                </div>
+
+                            </div>
+
+
+                            <div class="feature-item">
+
+                                <span class="feature-check">✓</span>
+
+                                <div>
+                                    <strong>Alertas</strong>
+
+                                    <p>
+                                        Recibí avisos sobre eventos
+                                        importantes para el control diario.
+                                    </p>
+                                </div>
+
+                            </div>
+
+
+                            <div class="feature-item">
+
                                 <span class="feature-check">✓</span>
 
                                 <div>
                                     <strong>Gestión multiempresa</strong>
+
                                     <p>
                                         Administrá distintas empresas
                                         desde una misma plataforma.
                                     </p>
                                 </div>
+
                             </div>
 
 
                             <div class="feature-item">
+
                                 <span class="feature-check">✓</span>
 
                                 <div>
-                                    <strong>Actualización instantánea</strong>
+                                    <strong>Múltiples monedas</strong>
+
                                     <p>
-                                        Los movimientos se reflejan
-                                        automáticamente en el dashboard.
+                                        Gestioná saldos independientes
+                                        por moneda dentro de cada cuenta.
                                     </p>
                                 </div>
+
                             </div>
+
+
+                            <div class="feature-item">
+
+                                <span class="feature-check">✓</span>
+
+                                <div>
+                                    <strong>Historial completo</strong>
+
+                                    <p>
+                                        Consultá movimientos y operaciones
+                                        anteriores de cada cuenta.
+                                    </p>
+                                </div>
+
+                            </div>
+
 
                         </div>
 
@@ -245,14 +393,9 @@
 
             </section>
 
-
-            <footer class="welcome-footer">
-                AERIA Finance
-                <span>·</span>
-                Gestión financiera empresarial
-            </footer>
-
         </div>
+
+        @include('partials.public-footer')
 
     </main>
 

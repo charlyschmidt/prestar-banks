@@ -1,0 +1,664 @@
+/* =========================================================
+   AERIA Finance
+   Legal / Contact pages
+   Mobile first
+   ========================================================= */
+
+
+.legal-page {
+    position: relative;
+    min-height: 100vh;
+    overflow: hidden;
+    background: #050505;
+    color: #ffffff;
+}
+
+
+.legal-container {
+    position: relative;
+    z-index: 2;
+
+    width: 100%;
+    max-width: 1180px;
+    min-height: 100vh;
+
+    margin: 0 auto;
+    padding: 0 20px;
+
+    display: flex;
+    flex-direction: column;
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.legal-header {
+    min-height: 82px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+
+.legal-brand {
+    color: #ffffff;
+
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+
+    text-decoration: none;
+}
+
+
+.legal-brand span {
+    font-weight: 300;
+}
+
+
+.legal-back {
+    color: #8e8e8e;
+
+    font-size: 12px;
+    font-weight: 500;
+
+    text-decoration: none;
+
+    transition:
+        color 0.2s ease,
+        opacity 0.2s ease;
+}
+
+
+.legal-back:hover {
+    color: #ffffff;
+}
+
+
+/* =========================================================
+   CONTENT
+   ========================================================= */
+
+.legal-content {
+    width: 100%;
+
+    padding: 58px 0 70px;
+}
+
+
+.legal-eyebrow {
+    margin-bottom: 14px;
+
+    color: #777777;
+
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+
+    text-transform: uppercase;
+}
+
+
+.legal-content h1 {
+    max-width: 720px;
+
+    margin: 0 0 18px;
+
+    color: #ffffff;
+
+    font-size: clamp(32px, 9vw, 52px);
+    font-weight: 600;
+    line-height: 1.05;
+    letter-spacing: -1.8px;
+}
+
+
+.legal-intro {
+    max-width: 650px;
+
+    margin: 0;
+
+    color: #929292;
+
+    font-size: 14px;
+    line-height: 1.75;
+}
+
+
+/* =========================================================
+   CONTACT LAYOUT
+   ========================================================= */
+
+.contact-layout {
+    margin-top: 42px;
+
+    display: grid;
+    grid-template-columns: 1fr;
+
+    gap: 22px;
+}
+
+
+/* =========================================================
+   CONTACT CARD
+   ========================================================= */
+
+.contact-card {
+    width: 100%;
+
+    padding: 22px;
+
+    background: rgba(13, 13, 13, 0.82);
+
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 18px;
+
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+}
+
+
+/* =========================================================
+   FORM
+   ========================================================= */
+
+.contact-form {
+    display: flex;
+    flex-direction: column;
+
+    gap: 20px;
+}
+
+
+.contact-field {
+    display: flex;
+    flex-direction: column;
+
+    gap: 8px;
+}
+
+
+.contact-field label {
+    color: #a5a5a5;
+
+    font-size: 12px;
+    font-weight: 600;
+}
+
+
+.contact-field input,
+.contact-field textarea {
+    width: 100%;
+
+    padding: 13px 14px;
+
+    background: #0a0a0a;
+    color: #ffffff;
+
+    border: 1px solid #292929;
+    border-radius: 9px;
+
+    outline: none;
+
+    font-family: inherit;
+    font-size: 14px;
+
+    transition:
+        border-color 0.2s ease,
+        background 0.2s ease;
+}
+
+
+.contact-field input {
+    min-height: 46px;
+}
+
+
+.contact-field textarea {
+    min-height: 150px;
+
+    line-height: 1.6;
+
+    resize: vertical;
+}
+
+
+.contact-field input:focus,
+.contact-field textarea:focus {
+    background: #0d0d0d;
+    border-color: #686868;
+}
+
+
+.contact-submit {
+    width: 100%;
+
+    min-height: 48px;
+
+    margin-top: 2px;
+    padding: 12px 20px;
+
+    background: #ffffff;
+    color: #050505;
+
+    border: 1px solid #ffffff;
+    border-radius: 9px;
+
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        transform 0.2s ease,
+        opacity 0.2s ease;
+}
+
+
+.contact-submit:hover {
+    opacity: 0.9;
+}
+
+
+.contact-submit:active {
+    transform: scale(0.99);
+}
+
+
+/* =========================================================
+   SUCCESS / ERRORS
+   ========================================================= */
+
+.contact-success,
+.contact-errors {
+    margin-bottom: 20px;
+    padding: 14px 16px;
+
+    border-radius: 9px;
+
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+
+.contact-success {
+    color: #a8e6b5;
+
+    background: rgba(46, 160, 67, 0.08);
+
+    border: 1px solid rgba(80, 200, 110, 0.22);
+}
+
+
+.contact-errors {
+    color: #e8a0a0;
+
+    background: rgba(200, 60, 60, 0.08);
+
+    border: 1px solid rgba(220, 80, 80, 0.22);
+}
+
+
+.contact-errors strong {
+    display: block;
+
+    margin-bottom: 6px;
+}
+
+
+.contact-errors ul {
+    margin: 0;
+    padding-left: 18px;
+}
+
+
+/* =========================================================
+   CONTACT INFO
+   ========================================================= */
+
+.contact-info {
+    padding: 22px;
+
+    background: rgba(10, 10, 10, 0.55);
+
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 18px;
+}
+
+
+.contact-info-label {
+    margin-bottom: 9px;
+
+    color: #696969;
+
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+
+    text-transform: uppercase;
+}
+
+
+.contact-email {
+    display: inline-block;
+
+    max-width: 100%;
+
+    color: #ffffff;
+
+    font-size: 15px;
+    font-weight: 600;
+
+    text-decoration: none;
+
+    overflow-wrap: anywhere;
+}
+
+
+.contact-email:hover {
+    text-decoration: underline;
+}
+
+
+.contact-info > p {
+    margin: 16px 0 0;
+
+    color: #858585;
+
+    font-size: 13px;
+    line-height: 1.7;
+}
+
+
+.contact-legal {
+    margin-top: 32px;
+    padding-top: 25px;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 5px;
+
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+
+.contact-legal .contact-info-label {
+    margin-bottom: 8px;
+}
+
+
+.contact-legal strong {
+    color: #d8d8d8;
+
+    font-size: 13px;
+    font-weight: 600;
+}
+
+
+.contact-legal span {
+    color: #7d7d7d;
+
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+.legal-footer {
+    width: 100%;
+
+    margin-top: auto;
+    padding: 26px 0 30px;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 16px;
+
+    color: #606060;
+
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+
+    font-size: 11px;
+}
+
+
+.legal-footer nav {
+    display: flex;
+    flex-wrap: wrap;
+
+    gap: 10px 18px;
+}
+
+
+.legal-footer a {
+    color: #7c7c7c;
+
+    text-decoration: none;
+
+    transition: color 0.2s ease;
+}
+
+
+.legal-footer a:hover {
+    color: #ffffff;
+}
+
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (min-width: 768px) {
+
+    .legal-container {
+        padding: 0 34px;
+    }
+
+
+    .legal-header {
+        min-height: 92px;
+    }
+
+
+    .legal-brand {
+        font-size: 20px;
+    }
+
+
+    .legal-back {
+        font-size: 13px;
+    }
+
+
+    .legal-content {
+        padding: 80px 0 90px;
+    }
+
+
+    .legal-content h1 {
+        font-size: 50px;
+    }
+
+
+    .legal-intro {
+        font-size: 15px;
+    }
+
+
+    .contact-layout {
+        margin-top: 52px;
+    }
+
+
+    .contact-card,
+    .contact-info {
+        padding: 28px;
+    }
+
+
+    .contact-submit {
+        width: auto;
+        align-self: flex-start;
+
+        min-width: 170px;
+    }
+
+
+    .legal-footer {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+}
+
+
+/* =========================================================
+   DESKTOP
+   ========================================================= */
+
+@media (min-width: 1024px) {
+
+    .legal-container {
+        padding: 0 40px;
+    }
+
+
+    .legal-content {
+        padding: 92px 0 110px;
+    }
+
+
+    .legal-content h1 {
+        font-size: 56px;
+    }
+
+
+    .contact-layout {
+        grid-template-columns:
+            minmax(0, 1.45fr)
+            minmax(280px, 0.55fr);
+
+        gap: 28px;
+
+        align-items: start;
+    }
+
+
+    .contact-card {
+        padding: 32px;
+    }
+
+
+    .contact-info {
+        padding: 30px;
+    }
+
+}
+
+/* =========================================================
+   LEGAL DOCUMENT
+   ========================================================= */
+
+.legal-document {
+    max-width: 860px;
+}
+
+
+.legal-document-meta {
+    margin-top: 24px;
+
+    color: #5f5f5f;
+
+    font-size: 11px;
+}
+
+
+.legal-document-body {
+    margin-top: 48px;
+}
+
+
+.legal-document-body section {
+    padding: 28px 0;
+
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+
+.legal-document-body h2 {
+    margin: 0 0 16px;
+
+    color: #e8e8e8;
+
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1.35;
+    letter-spacing: -0.3px;
+}
+
+
+.legal-document-body p {
+    margin: 0 0 14px;
+
+    color: #929292;
+
+    font-size: 13px;
+    line-height: 1.8;
+}
+
+
+.legal-document-body p:last-child {
+    margin-bottom: 0;
+}
+
+
+.legal-document-body a {
+    color: #d8d8d8;
+
+    text-decoration: underline;
+    text-decoration-color: #555555;
+    text-underline-offset: 3px;
+}
+
+
+.legal-document-body a:hover {
+    color: #ffffff;
+}
+
+
+@media (min-width: 768px) {
+
+    .legal-document-body {
+        margin-top: 58px;
+    }
+
+
+    .legal-document-body section {
+        padding: 34px 0;
+    }
+
+
+    .legal-document-body h2 {
+        font-size: 20px;
+    }
+
+
+    .legal-document-body p {
+        font-size: 14px;
+    }
+
+}
