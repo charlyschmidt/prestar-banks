@@ -3,18 +3,35 @@ import Pusher from 'pusher-js';
 
 window.Pusher = Pusher;
 
+
+const forceTLS =
+    import.meta.env.VITE_REVERB_SCHEME === 'https';
+
+
 window.Echo = new Echo({
+
     broadcaster: 'reverb',
 
     key: import.meta.env.VITE_REVERB_APP_KEY,
 
-    wsHost: import.meta.env.VITE_REVERB_HOST,
+    wsHost:
+        import.meta.env.VITE_REVERB_HOST,
 
-    wsPort: Number(import.meta.env.VITE_REVERB_PORT),
+    wsPort:
+        Number(
+            import.meta.env.VITE_REVERB_PORT
+        ),
 
-    wssPort: Number(import.meta.env.VITE_REVERB_PORT),
+    wssPort:
+        Number(
+            import.meta.env.VITE_REVERB_PORT
+        ),
 
-    forceTLS: true,
+    forceTLS,
 
-    enabledTransports: ['wss'],
+    enabledTransports:
+        forceTLS
+            ? ['wss']
+            : ['ws'],
+
 });

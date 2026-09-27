@@ -263,6 +263,9 @@ body {
 ========================== */
 
 .plan-card {
+
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
     width: 100%;
     max-width: 1380px;
 
@@ -1076,6 +1079,7 @@ body {
             rgba(8, 0, 2, .15) 72%,
             transparent 84%);
 }
+
 @media (min-width: 1400px) {
 
     .welcome-plan {

@@ -74,7 +74,7 @@
 
     padding: 10px 12px;
 
-   background: var(--company-bg);
+    background: var(--company-bg);
 
     border: 0;
     border-radius: 8px;
@@ -536,7 +536,7 @@
     color: var(--success);
 }
 
-.transaction-detail-status > i {
+.transaction-detail-status>i {
     flex-shrink: 0;
 
     color: var(--success);
@@ -1063,4 +1063,33 @@
         flex-wrap: nowrap;
     }
 
+}
+
+/* ==========================
+   TRANSFER TAX SUMMARY
+========================== */
+
+.transfer-tax-summary {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 5px 8px;
+
+    margin-top: 8px;
+
+    color: var(--company-muted);
+
+    font-size: 11px;
+    line-height: 1.4;
+}
+
+.transfer-tax-summary strong {
+    color: var(--company-text);
+    font-weight: 600;
+}
+
+.tax-mov {
+    font-size: smaller;
+    margin-top: 3px;
+    font-weight: 400;
 }

@@ -423,8 +423,7 @@ document.addEventListener('click', async (event) => {
 
         if (badge) {
 
-            badge.style.display =
-                'inline-flex';
+            badge.hidden = false;
 
         }
 

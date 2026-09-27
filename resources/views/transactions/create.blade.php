@@ -46,10 +46,9 @@
 
                             @foreach ($accounts as $account)
                                 <option value="{{ $account->id }}"
+                                    data-transfer-tax-rate="{{ $account->transfer_tax_rate ?? 0 }}"
                                     {{ old('account_id') == $account->id ? 'selected' : '' }}>
-
                                     {{ $account->name }}
-
                                 </option>
                             @endforeach
 
@@ -150,18 +149,19 @@
                             Banco destino
                         </label>
 
-                        <div class="bank-search-select">
+                        <div class="bank-search-select searchable-select">
 
-                            <input type="text" id="destination-bank-search" class="dark-input"
+                            <input type="text" id="destination-bank-search" class="dark-input searchable-select-input"
                                 placeholder="Escribí para buscar un banco..." autocomplete="off">
 
                             <input type="hidden" name="destination_bank" id="destination-bank"
-                                value="{{ old('destination_bank') }}">
+                                class="searchable-select-value" value="{{ old('destination_bank') }}">
 
-                            <div id="destination-bank-options" class="bank-search-options" hidden>
+                            <div id="destination-bank-options" class="bank-search-options searchable-select-options" hidden>
 
                                 @foreach ($banks as $bank)
-                                    <button type="button" class="bank-search-option" data-value="{{ $bank }}">
+                                    <button type="button" class="bank-search-option searchable-select-option"
+                                        data-value="{{ $bank }}">
                                         {{ $bank }}
                                     </button>
                                 @endforeach
@@ -182,11 +182,24 @@
                             Monto
                         </label>
 
-                        <input type="text" name="amount" class="dark-input money-input" placeholder="0,00"
-                            inputmode="decimal" autocomplete="off" value="{{ old('amount') }}" required>
+                        <input type="text" name="amount" id="transaction-amount" class="dark-input money-input"
+                            placeholder="0,00" inputmode="decimal" autocomplete="off" value="{{ old('amount') }}" required>
+
+                        <div id="transfer-tax-summary" class="transfer-tax-summary" style="display:none;">
+                            <span>
+                                Impuesto
+                                <span id="transfer-tax-rate">0%</span>
+                                ·
+                                <span id="transfer-tax-amount">$ 0,00</span>
+                            </span>
+
+                            <span>
+                                Débito total
+                                <strong id="transfer-total-amount">$ 0,00</strong>
+                            </span>
+                        </div>
 
                     </div>
-
 
 
                     {{-- FECHA --}}
@@ -252,10 +265,10 @@
 
     <script>
         /*
-                |--------------------------------------------------------------------------
-                | Cuenta + moneda
-                |--------------------------------------------------------------------------
-                */
+            |--------------------------------------------------------------------------
+            | Cuenta + moneda
+            |--------------------------------------------------------------------------
+            */
 
         const accountSelect =
             document.getElementById(
@@ -270,6 +283,31 @@
         const balanceElement =
             document.getElementById(
                 'account-balance'
+            );
+
+        const amountInput =
+            document.getElementById(
+                'transaction-amount'
+            );
+
+        const transferTaxSummary =
+            document.getElementById(
+                'transfer-tax-summary'
+            );
+
+        const transferTaxRateElement =
+            document.getElementById(
+                'transfer-tax-rate'
+            );
+
+        const transferTaxAmountElement =
+            document.getElementById(
+                'transfer-tax-amount'
+            );
+
+        const transferTotalAmountElement =
+            document.getElementById(
+                'transfer-total-amount'
             );
 
 
@@ -341,6 +379,106 @@
 
             }
 
+        }
+
+
+        function parseMoney(value) {
+
+            if (!value) {
+                return 0;
+            }
+
+            const normalized =
+                String(value)
+                .trim()
+                .replace(/\./g, '')
+                .replace(',', '.')
+                .replace(/[^\d.-]/g, '');
+
+            const amount =
+                parseFloat(normalized);
+
+            return Number.isFinite(amount) ?
+                amount :
+                0;
+        }
+
+
+        function updateTransferTax() {
+
+            const selectedAccount =
+                accountSelect.options[
+                    accountSelect.selectedIndex
+                ];
+
+            const selectedCurrency =
+                currencySelect.options[
+                    currencySelect.selectedIndex
+                ];
+
+            const isTransfer =
+                transactionType.value === 'expense' &&
+                destinationBank.value !== '';
+
+            const taxRate =
+                Number(
+                    selectedAccount?.dataset
+                    .transferTaxRate || 0
+                );
+
+            const amount =
+                parseMoney(
+                    amountInput.value
+                );
+
+
+            if (
+                !isTransfer ||
+                taxRate <= 0
+            ) {
+
+                transferTaxSummary.style.display =
+                    'none';
+
+                return;
+            }
+
+
+            const taxAmount =
+                Math.round(
+                    amount * taxRate
+                ) / 100;
+
+            const totalAmount =
+                amount + taxAmount;
+
+            const currency =
+                selectedCurrency?.dataset.currency ||
+                'ARS';
+
+
+            transferTaxRateElement.textContent =
+                taxRate.toLocaleString(
+                    'es-AR'
+                ) + '%';
+
+
+            transferTaxAmountElement.textContent =
+                formatCurrency(
+                    taxAmount,
+                    currency
+                );
+
+
+            transferTotalAmountElement.textContent =
+                formatCurrency(
+                    totalAmount,
+                    currency
+                );
+
+
+            transferTaxSummary.style.display =
+                '';
         }
 
 
@@ -523,10 +661,10 @@
 
 
         /*
-    |--------------------------------------------------------------------------
-    | Banco destino
-    |--------------------------------------------------------------------------
-    */
+        |--------------------------------------------------------------------------
+        | Banco destino
+        |--------------------------------------------------------------------------
+        */
 
         const transactionType =
             document.getElementById('transaction-type');
@@ -543,152 +681,6 @@
         const destinationBankOptions =
             document.getElementById('destination-bank-options');
 
-        const bankOptions =
-            Array.from(
-                document.querySelectorAll('.bank-search-option')
-            );
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Normalizar texto para búsqueda
-        |--------------------------------------------------------------------------
-        */
-
-        function normalizeBankText(text) {
-            return text
-                .normalize('NFD')
-                .replace(/[\u0300-\u036f]/g, '')
-                .toLowerCase()
-                .trim();
-        }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Filtrar bancos
-        |--------------------------------------------------------------------------
-        */
-
-        function filterBanks() {
-            const search =
-                normalizeBankText(
-                    destinationBankSearch.value
-                );
-
-            let visibleCount = 0;
-
-            bankOptions.forEach(option => {
-
-                const bankName =
-                    normalizeBankText(
-                        option.dataset.value
-                    );
-
-                const visible =
-                    bankName.includes(search);
-
-                option.hidden = !visible;
-
-                if (visible) {
-                    visibleCount++;
-                }
-
-            });
-
-            destinationBankOptions.hidden =
-                visibleCount === 0;
-        }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Abrir listado
-        |--------------------------------------------------------------------------
-        */
-
-        destinationBankSearch.addEventListener(
-            'focus',
-            function() {
-
-                filterBanks();
-
-            }
-        );
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Buscar mientras escribe
-        |--------------------------------------------------------------------------
-        */
-
-        destinationBankSearch.addEventListener(
-            'input',
-            function() {
-
-                destinationBank.value = '';
-
-                filterBanks();
-
-            }
-        );
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Seleccionar banco
-        |--------------------------------------------------------------------------
-        */
-
-        bankOptions.forEach(option => {
-
-            option.addEventListener(
-                'click',
-                function() {
-
-                    const bank =
-                        this.dataset.value;
-
-                    destinationBank.value =
-                        bank;
-
-                    destinationBankSearch.value =
-                        bank;
-
-                    destinationBankOptions.hidden =
-                        true;
-
-                }
-            );
-
-        });
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Cerrar al hacer click afuera
-        |--------------------------------------------------------------------------
-        */
-
-        document.addEventListener(
-            'click',
-            function(event) {
-
-                if (
-                    !destinationBankGroup.contains(
-                        event.target
-                    )
-                ) {
-
-                    destinationBankOptions.hidden =
-                        true;
-
-                }
-
-            }
-        );
-
 
         /*
         |--------------------------------------------------------------------------
@@ -697,6 +689,7 @@
         */
 
         function updateDestinationBank() {
+
             if (
                 transactionType.value ===
                 'expense'
@@ -724,8 +717,9 @@
 
                 destinationBankOptions.hidden =
                     true;
-
             }
+
+            updateTransferTax();
         }
 
 
@@ -748,6 +742,25 @@
 
         }
 
+        amountInput.addEventListener(
+            'input',
+            updateTransferTax
+        );
+
+        accountSelect.addEventListener(
+            'change',
+            updateTransferTax
+        );
+
+        currencySelect.addEventListener(
+            'change',
+            updateTransferTax
+        );
+
+        destinationBank.addEventListener(
+            'change',
+            updateTransferTax
+        );
 
         updateDestinationBank();
     </script>

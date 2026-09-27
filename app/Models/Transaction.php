@@ -25,7 +25,9 @@ class Transaction extends Model
         'balance_after',
         'destination_bank',
         'executed_at',
-        'executed_by'
+        'executed_by',
+        'transfer_tax_rate',
+        'transfer_tax_amount',
 
     ];
 
@@ -33,6 +35,10 @@ class Transaction extends Model
     protected $casts = [
 
         'amount' => 'decimal:2',
+
+        'transfer_tax_rate' => 'decimal:4',
+
+        'transfer_tax_amount' => 'decimal:2',
 
         'balance_after' => 'decimal:2',
 

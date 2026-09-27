@@ -235,20 +235,30 @@
                             Banco destino
                         </label>
 
-                        <select name="destination_bank" class="dark-input">
+                        <div class="bank-search-select searchable-select">
 
-                            <option value="">
-                                Todos
-                            </option>
+                            <input type="text" class="dark-input searchable-select-input"
+                                placeholder="Todos los bancos..." autocomplete="off">
 
-                            @foreach ($destinationBanks as $bank)
-                                <option value="{{ $bank }}"
-                                    {{ request('destination_bank') === $bank ? 'selected' : '' }}>
-                                    {{ $bank }}
-                                </option>
-                            @endforeach
+                            <input type="hidden" name="destination_bank" class="searchable-select-value"
+                                value="{{ request('destination_bank') }}">
 
-                        </select>
+                            <div class="bank-search-options searchable-select-options" hidden>
+
+                                <button type="button" class="bank-search-option searchable-select-option" data-value="">
+                                    Todos
+                                </button>
+
+                                @foreach ($destinationBanks as $bank)
+                                    <button type="button" class="bank-search-option searchable-select-option"
+                                        data-value="{{ $bank }}">
+                                        {{ $bank }}
+                                    </button>
+                                @endforeach
+
+                            </div>
+
+                        </div>
 
                     </div>
 
@@ -1136,7 +1146,58 @@
         @if ($transactions->hasPages())
             <div class="history-pagination">
 
-                {{ $transactions->links() }}
+                {{-- ANTERIOR --}}
+
+                @if ($transactions->onFirstPage())
+                    <span class="history-page-arrow disabled">
+                        <i class="bi bi-chevron-left"></i>
+                    </span>
+                @else
+                    <a href="{{ $transactions->previousPageUrl() }}" class="history-page-arrow">
+                        <i class="bi bi-chevron-left"></i>
+                    </a>
+                @endif
+
+
+                {{-- PÁGINAS --}}
+
+                <div class="history-page-numbers">
+
+                    @foreach ($transactions->getUrlRange(max(1, $transactions->currentPage() - 2), min($transactions->lastPage(), $transactions->currentPage() + 2)) as $page => $url)
+                        @if ($page == $transactions->currentPage())
+                            <span class="history-page-number active">
+                                {{ $page }}
+                            </span>
+                        @else
+                            <a href="{{ $url }}" class="history-page-number">
+                                {{ $page }}
+                            </a>
+                        @endif
+                    @endforeach
+
+                </div>
+
+
+                {{-- INFORMACIÓN MOBILE --}}
+
+                <span class="history-page-info">
+                    {{ $transactions->currentPage() }}
+                    /
+                    {{ $transactions->lastPage() }}
+                </span>
+
+
+                {{-- SIGUIENTE --}}
+
+                @if ($transactions->hasMorePages())
+                    <a href="{{ $transactions->nextPageUrl() }}" class="history-page-arrow">
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                @else
+                    <span class="history-page-arrow disabled">
+                        <i class="bi bi-chevron-right"></i>
+                    </span>
+                @endif
 
             </div>
         @endif

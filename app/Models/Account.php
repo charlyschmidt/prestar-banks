@@ -12,9 +12,9 @@ class Account extends Model
     protected $fillable = [
         'name',
         'type',
-        'logo'
+        'logo',
+        'transfer_tax_rate',
     ];
-
 
 
     public function transactions()
@@ -27,6 +27,7 @@ class Account extends Model
     {
         return $this->hasMany(AccountDailyBalance::class);
     }
+
 
     public function balances()
     {

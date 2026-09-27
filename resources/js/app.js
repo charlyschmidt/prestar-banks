@@ -106,4 +106,6 @@ import './opening-balance-import';
 
 import './settings-danger-zone';
 
+import './searchable-select';
+
 

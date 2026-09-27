@@ -14,6 +14,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Support\ArgentineBanks;
 use Illuminate\Validation\Rule;
 use App\Models\AccountBalance;
+use App\Events\TransactionExecuted;
 
 class TransactionController extends Controller
 {
@@ -264,6 +265,42 @@ class TransactionController extends Controller
 
 
         /*
+|--------------------------------------------------------------------------
+| Impuesto de transferencia
+|--------------------------------------------------------------------------
+*/
+
+        $account = Account::findOrFail(
+            $accountBalance->account_id
+        );
+
+        $transferTaxRate = 0;
+        $transferTaxAmount = 0;
+
+        $isTransfer =
+            $data['type'] === 'expense' &&
+            !empty($data['destination_bank']);
+
+        if ($isTransfer) {
+
+            $transferTaxRate =
+                (float) $account->transfer_tax_rate;
+
+            $transferTaxAmount = round(
+                ((float) $data['amount'] * $transferTaxRate) / 100,
+                2
+            );
+        }
+
+        $data['transfer_tax_rate'] =
+            $transferTaxRate;
+
+        $data['transfer_tax_amount'] =
+            $transferTaxAmount;
+
+
+
+        /*
     |--------------------------------------------------------------------------
     | Banco destino
     |--------------------------------------------------------------------------
@@ -373,16 +410,20 @@ class TransactionController extends Controller
                             [
                                 'expense',
                                 'reserve',
-                                'transfer_out'
                             ],
                             true
                         );
 
 
+                    $amountToDebit =
+                        (float) $data['amount'] +
+                        (float) $data['transfer_tax_amount'];
+
+
                     if (
                         $isExpense &&
-                        $balance->current_balance <
-                        $data['amount']
+                        (float) $balance->current_balance <
+                        $amountToDebit
                     ) {
 
                         throw new \Exception(
@@ -461,9 +502,13 @@ class TransactionController extends Controller
                         );
                     } else {
 
+                        $amountToDebit =
+                            (float) $transaction->amount +
+                            (float) $transaction->transfer_tax_amount;
+
                         $balance->decrement(
                             'current_balance',
-                            $transaction->amount
+                            $amountToDebit
                         );
                     }
 
@@ -920,9 +965,13 @@ class TransactionController extends Controller
                         );
                     } else {
 
+                        $oldAmountToRestore =
+                            (float) $transaction->amount +
+                            (float) $transaction->transfer_tax_amount;
+
                         $oldBalance->increment(
                             'current_balance',
-                            $transaction->amount
+                            $oldAmountToRestore
                         );
                     }
 
@@ -988,6 +1037,40 @@ class TransactionController extends Controller
 
 
                     /*
+|--------------------------------------------------------------------------
+| Calcular impuesto de transferencia
+|--------------------------------------------------------------------------
+*/
+
+                    $newAccount = Account::findOrFail(
+                        $newAccountBalance->account_id
+                    );
+
+                    $transferTaxRate = 0;
+                    $transferTaxAmount = 0;
+
+                    $isTransfer =
+                        $data['type'] === 'expense' &&
+                        !empty($data['destination_bank']);
+
+                    if ($isTransfer) {
+
+                        $transferTaxRate =
+                            (float) $newAccount->transfer_tax_rate;
+
+                        $transferTaxAmount = round(
+                            ((float) $data['amount'] * $transferTaxRate) / 100,
+                            2
+                        );
+                    }
+
+                    $data['transfer_tax_rate'] =
+                        $transferTaxRate;
+
+                    $data['transfer_tax_amount'] =
+                        $transferTaxAmount;
+
+                    /*
                 |--------------------------------------------------------------------------
                 | 4. Validar saldo para el nuevo movimiento
                 |--------------------------------------------------------------------------
@@ -999,16 +1082,20 @@ class TransactionController extends Controller
                             [
                                 'expense',
                                 'reserve',
-                                'transfer_out'
                             ],
                             true
                         );
 
 
+                    $amountToDebit =
+                        (float) $data['amount'] +
+                        (float) $data['transfer_tax_amount'];
+
+
                     if (
                         $isExpense &&
-                        $newBalance->current_balance <
-                        $data['amount']
+                        (float) $newBalance->current_balance <
+                        $amountToDebit
                     ) {
 
                         throw new \Exception(
@@ -1047,9 +1134,13 @@ class TransactionController extends Controller
                         );
                     } else {
 
+                        $amountToDebit =
+                            (float) $data['amount'] +
+                            (float) $data['transfer_tax_amount'];
+
                         $newBalance->decrement(
                             'current_balance',
-                            $data['amount']
+                            $amountToDebit
                         );
                     }
 
@@ -1190,19 +1281,19 @@ class TransactionController extends Controller
 
 
                 /*
-            |--------------------------------------------------------------------------
-            | Revertir movimiento
-            |--------------------------------------------------------------------------
-            |
-            | income:
-            | El movimiento había sumado dinero.
-            | Al eliminarlo debemos restarlo.
-            |
-            | expense / reserve / transfer_out:
-            | El movimiento había descontado dinero.
-            | Al eliminarlo debemos devolverlo.
-            |
-            */
+                |--------------------------------------------------------------------------
+                | Revertir movimiento
+                |--------------------------------------------------------------------------
+                |
+                | income:
+                | El movimiento había sumado dinero.
+                | Al eliminarlo debemos restarlo.
+                |
+                | expense / reserve / transfer_out:
+                | El movimiento había descontado dinero.
+                | Al eliminarlo debemos devolverlo + impuesto
+                |
+                */
 
                 if (
                     $transaction->type === 'income'
@@ -1214,9 +1305,13 @@ class TransactionController extends Controller
                     );
                 } else {
 
+                    $amountToRestore =
+                        (float) $transaction->amount +
+                        (float) $transaction->transfer_tax_amount;
+
                     $balance->increment(
                         'current_balance',
-                        $transaction->amount
+                        $amountToRestore
                     );
                 }
 
@@ -1402,6 +1497,20 @@ class TransactionController extends Controller
             'executed_at' => now(),
             'executed_by' => $user->id,
         ]);
+
+        $transaction->update([
+            'executed_at' => now(),
+            'executed_by' => $user->id,
+        ]);
+
+        $transaction->refresh();
+
+
+        event(
+            new TransactionExecuted(
+                $transaction
+            )
+        );
 
 
         return response()->json([

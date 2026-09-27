@@ -657,12 +657,56 @@ class AccountController extends Controller
             ->get();
 
 
+        /*
+|--------------------------------------------------------------------------
+| Impuestos al débito por moneda
+|--------------------------------------------------------------------------
+|
+| Sumamos únicamente el impuesto efectivamente registrado
+| en cada movimiento de esta cuenta durante la jornada actual.
+|
+| La suma se mantiene separada por AccountBalance para
+| no mezclar monedas.
+|
+*/
+
+        /*
+|--------------------------------------------------------------------------
+| Resumen de movimientos por moneda
+|--------------------------------------------------------------------------
+*/
+
+        $movementSummary = $movements
+            ->groupBy('account_balance_id')
+            ->map(function ($items) {
+
+                return [
+
+                    'income' =>
+                    (float) $items
+                        ->where('type', 'income')
+                        ->sum('amount'),
+
+                    'expense' =>
+                    (float) $items
+                        ->where('type', 'expense')
+                        ->sum('amount'),
+
+                    'transfer_tax' =>
+                    (float) $items
+                        ->sum('transfer_tax_amount'),
+
+                ];
+            });
+
+
         return view(
             'accounts.movements',
             compact(
                 'account',
                 'balances',
-                'movements'
+                'movements',
+                'movementSummary'
             )
         );
     }
@@ -1209,8 +1253,21 @@ class AccountController extends Controller
                 'numeric',
                 'min:0',
             ],
+
+            'transfer_tax_rate' => [
+                'nullable',
+                'numeric',
+                'min:0',
+                'max:100',
+            ],
         ]);
 
+
+        /*
+    |--------------------------------------------------------------------------
+    | Alertas de saldo
+    |--------------------------------------------------------------------------
+    */
 
         $thresholds = $validated['thresholds'] ?? [];
 
@@ -1234,11 +1291,23 @@ class AccountController extends Controller
         }
 
 
+        /*
+    |--------------------------------------------------------------------------
+    | Impuesto sobre transferencias salientes
+    |--------------------------------------------------------------------------
+    */
+
+        $account->update([
+            'transfer_tax_rate' =>
+            $validated['transfer_tax_rate'] ?? 0,
+        ]);
+
+
         return redirect()
             ->route('accounts.alerts', $account->id)
             ->with(
                 'success',
-                'Las alertas fueron actualizadas correctamente.'
+                'La configuración fue actualizada correctamente.'
             );
     }
 }

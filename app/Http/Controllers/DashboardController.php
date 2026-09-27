@@ -178,6 +178,12 @@ class DashboardController extends Controller
                         'amount' =>
                         $movement->amount,
 
+                        'transfer_tax_rate' =>
+                        $movement->transfer_tax_rate ?? 0,
+
+                        'transfer_tax_amount' =>
+                        $movement->transfer_tax_amount ?? 0,
+
                         'description' =>
                         $movement->description,
 
@@ -189,6 +195,9 @@ class DashboardController extends Controller
 
                         'balance_after' =>
                         $movement->balance_after,
+
+                        'executed_at' =>
+                        $movement->executed_at,
 
 
                         /*

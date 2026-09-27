@@ -571,6 +571,87 @@ document.addEventListener('DOMContentLoaded', () => {
                 syncDashboard();
 
             }
+        )
+
+        .listen(
+            '.transaction.executed',
+            (event) => {
+
+                console.log(
+                    'TRANSFERENCIA EJECUTADA RECIBIDA:',
+                    event
+                );
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | Seguridad empresa
+                |--------------------------------------------------------------------------
+                */
+
+                if (
+                    String(event.companyId)
+                    !==
+                    String(companyId)
+                ) {
+                    return;
+                }
+
+
+                const transactionId =
+                    event.transaction_id;
+
+
+                if (!transactionId) {
+                    return;
+                }
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | Mostrar "Ejecutada"
+                |--------------------------------------------------------------------------
+                */
+
+                const badge =
+                    document.querySelector(
+                        `[data-execution-badge="${transactionId}"]`
+                    );
+
+
+                console.log(
+                    'BADGE EJECUTADA:',
+                    badge,
+                    'TRANSACTION:',
+                    transactionId
+                );
+
+                if (badge) {
+
+                    badge.hidden = false;
+
+                }
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | Quitar botón ejecutar si existe
+                |--------------------------------------------------------------------------
+                */
+
+                const executeButton =
+                    document.querySelector(
+                        `.execute-transaction-button[data-transaction-id="${transactionId}"]`
+                    );
+
+
+                if (executeButton) {
+
+                    executeButton.remove();
+
+                }
+
+            }
         );
 
 });
@@ -852,6 +933,24 @@ function addMovementToTable(event, animate = true) {
     const isReserve =
         movement.type === 'reserve';
 
+    const transferTaxAmount =
+        Number(
+            movement.transfer_tax_amount ?? 0
+        );
+
+    const transferTaxHtml =
+        transferTaxAmount > 0
+            ? `
+            <div class="text-muted tax-mov">
+                incl. imp. débito
+                -
+                ${formatMoney(
+                transferTaxAmount
+            )}
+            </div>
+        `
+            : '';
+
 
     let typeHtml;
 
@@ -967,19 +1066,35 @@ function addMovementToTable(event, animate = true) {
         </td>
 
 
-       <td>
+        <td>
 
-            ${event.account?.id
+            <div class="movement-bank">
+
+                ${event.account?.id
                     ? `
-                    <a
-                        href="/accounts/${event.account.id}/movements"
-                        class="account-cell-link"
-                    >
-                        ${escapeHtml(event.account.name || '')}
-                    </a>
-                `
+                        <a
+                            href="/accounts/${event.account.id}/movements"
+                            class="account-cell-link"
+                        >
+                            ${escapeHtml(event.account.name || '')}
+                        </a>
+                    `
                     : ''
                 }
+
+                <div
+                    class="execution-badge"
+                    data-execution-badge="${movement.id}"
+                    ${movement.executed_at ? '' : 'hidden'}
+                >
+                    <i class="bi bi-check-circle-fill"></i>
+
+                    <span>
+                        Ejecutada
+                    </span>
+                </div>
+
+            </div>
 
         </td>
 
@@ -1037,13 +1152,17 @@ function addMovementToTable(event, animate = true) {
         </td>
 
 
-        <td>
+       <td>
 
-            ${formatMoney(
-            movement.balance_after
-            ??
-            0
-        )}
+            <strong>
+                ${formatMoney(
+                    movement.balance_after
+                    ??
+                    0
+                )}
+            </strong>
+
+            ${transferTaxHtml}
 
         </td>
 
@@ -1470,6 +1589,12 @@ async function syncDashboard() {
                                         amount:
                                             movement.amount,
 
+                                        transfer_tax_rate:
+                                            movement.transfer_tax_rate ?? 0,
+
+                                        transfer_tax_amount:
+                                            movement.transfer_tax_amount ?? 0,
+
                                         description:
                                             movement.description,
 
@@ -1481,6 +1606,9 @@ async function syncDashboard() {
 
                                         balance_after:
                                             movement.balance_after,
+
+                                        executed_at:
+                                            movement.executed_at,
 
                                         user:
                                             movement.user

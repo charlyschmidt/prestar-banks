@@ -74,8 +74,8 @@
 
 
         {{-- =========================================================
-        RESUMEN POR MONEDA
-    ========================================================== --}}
+            RESUMEN POR MONEDA
+        ========================================================== --}}
 
         <div class="account-balance-summary">
 
@@ -83,6 +83,14 @@
                 @php
 
                     $currency = $balance->accountBalance?->currency ?? '---';
+
+                    $summary = $movementSummary->get($balance->account_balance_id, []);
+
+                    $totalIncome = $summary['income'] ?? 0;
+
+                    $totalExpense = $summary['expense'] ?? 0;
+
+                    $transferTax = $summary['transfer_tax'] ?? 0;
 
                 @endphp
 
@@ -104,6 +112,8 @@
 
                     <div class="account-balance-values">
 
+                        {{-- SALDO INICIAL --}}
+
                         <div class="account-balance-value">
 
                             <span>
@@ -120,6 +130,44 @@
                         <div class="account-balance-divider"></div>
 
 
+                        {{-- INGRESOS --}}
+
+                        <div class="account-balance-value">
+
+                            <span>
+                                Total ingresos
+                            </span>
+
+                            <strong class="green">
+                                {{ number_format($totalIncome, 2, ',', '.') }}
+                            </strong>
+
+                        </div>
+
+
+                        <div class="account-balance-divider"></div>
+
+
+                        {{-- EGRESOS --}}
+
+                        <div class="account-balance-value">
+
+                            <span>
+                                Total egresos
+                            </span>
+
+                            <strong class="red">
+                                {{ number_format($totalExpense, 2, ',', '.') }}
+                            </strong>
+
+                        </div>
+
+
+                        <div class="account-balance-divider"></div>
+
+
+                        {{-- SALDO ACTUAL --}}
+
                         <div class="account-balance-value account-balance-current">
 
                             <span>
@@ -129,6 +177,13 @@
                             <strong>
                                 {{ number_format($balance->current_balance ?? 0, 2, ',', '.') }}
                             </strong>
+
+                            @if ($transferTax > 0)
+                                <small class="text-muted">
+                                    incl. imp. débito
+                                    {{ number_format($transferTax, 2, ',', '.') }}
+                                </small>
+                            @endif
 
                         </div>
 
@@ -189,7 +244,7 @@
                     <thead>
 
                         <tr>
-                             <th>
+                            <th>
                                 #
                             </th>
 
@@ -387,26 +442,26 @@
 
 
 
-                                {{-- MONTO --}}
-
                                 <td class="amount">
 
                                     @if ($movement->type === 'income')
                                         <span class="green">
-
                                             +
-
                                             {{ number_format($movement->amount, 2, ',', '.') }}
-
                                         </span>
                                     @else
                                         <span class="red">
-
                                             -
-
                                             {{ number_format($movement->amount, 2, ',', '.') }}
-
                                         </span>
+
+                                        @if ((float) ($movement->transfer_tax_amount ?? 0) > 0)
+                                            <div class="text-muted tax-mov">
+                                                imp. débito
+                                                -
+                                                {{ number_format($movement->transfer_tax_amount, 2, ',', '.') }}
+                                            </div>
+                                        @endif
                                     @endif
 
                                 </td>
@@ -422,7 +477,7 @@
 
                                         {{-- EJECUTAR TRANSFERENCIA --}}
 
-                                        @if (!$canExecute && $movement->type === 'expense' && !$movement->executed_at)
+                                        @if ($canExecute && $movement->type === 'expense' && !$movement->executed_at)
                                             <button type="button" class="icon-button execute-transaction-button"
                                                 data-transaction-id="{{ $movement->id }}"
                                                 data-execute-url="{{ route('transactions.execute', $movement) }}"
@@ -467,7 +522,7 @@
 
                                         {{-- SIN ACCIONES --}}
 
-                                        @if (!(!$canExecute && $movement->type === 'expense' && !$movement->executed_at) && !$canManage)
+                                        @if (!($canExecute && $movement->type === 'expense' && !$movement->executed_at) && !$canManage)
                                             <span class="text-muted">
                                                 —
                                             </span>

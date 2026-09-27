@@ -396,12 +396,27 @@
 
                                 <td>
 
-                                    <a href="{{ route('accounts.movements', $movement->account) }}" class="account-cell-link">
+                                    <div class="movement-bank">
 
-                                        {{ $movement->account->name }}
+                                        <a href="{{ route('accounts.movements', $movement->account) }}"
+                                            class="account-cell-link">
 
-                                    </a>
+                                            {{ $movement->account->name }}
 
+                                        </a>
+
+                                        <div class="execution-badge" data-execution-badge="{{ $movement->id }}"
+                                            @if (!$movement->executed_at) hidden @endif>
+
+                                            <i class="bi bi-check-circle-fill"></i>
+
+                                            <span>
+                                                Ejecutada
+                                            </span>
+
+                                        </div>
+
+                                    </div>
                                 </td>
 
 
@@ -459,12 +474,10 @@
 
                                 <td class="amount">
 
-
                                     @if ($movement->type === 'income')
                                         <span class="amount-income">
 
                                             +
-
                                             {{ number_format($movement->amount, 2, ',', '.') }}
 
                                         </span>
@@ -472,12 +485,10 @@
                                         <span class="amount-expense">
 
                                             -
-
                                             {{ number_format($movement->amount, 2, ',', '.') }}
 
                                         </span>
                                     @endif
-
 
                                 </td>
 
@@ -497,7 +508,19 @@
 
                                 <td>
 
-                                    {{ number_format($movement->balance_after ?? 0, 2, ',', '.') }}
+                                    <strong>
+                                        {{ number_format($movement->balance_after ?? 0, 2, ',', '.') }}
+                                    </strong>
+
+                                    @if ((float) ($movement->transfer_tax_amount ?? 0) > 0)
+                                        <div class="text-muted tax-mov">
+
+                                            incl. imp. débito
+                                            -
+                                            {{ number_format($movement->transfer_tax_amount, 2, ',', '.') }}
+
+                                        </div>
+                                    @endif
 
                                 </td>
 

@@ -514,9 +514,128 @@
 ========================================================= */
 
 .history-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+
+    width: 100%;
     margin-top: 20px;
+}
+
+
+/* Flechas */
+
+.history-page-arrow {
+    width: 36px;
+    height: 36px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
 
     color: var(--company-text);
+    text-decoration: none;
+
+    background: var(--company-card);
+    border: 1px solid var(--company-border);
+    border-radius: 9px;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease;
+}
+
+.history-page-arrow:hover {
+    color: var(--company-text);
+    background: var(--company-hover);
+}
+
+.history-page-arrow.disabled {
+    color: var(--company-muted);
+    opacity: 0.45;
+    cursor: default;
+}
+
+
+/* Números */
+
+.history-page-numbers {
+    display: none;
+    align-items: center;
+    gap: 5px;
+}
+
+.history-page-number {
+    min-width: 36px;
+    height: 36px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0 10px;
+
+    color: var(--company-muted);
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+
+    background: var(--company-card);
+    border: 1px solid var(--company-border);
+    border-radius: 9px;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.history-page-number:hover {
+    color: var(--company-text);
+    background: var(--company-hover);
+}
+
+.history-page-number.active {
+    color: var(--company-button-text);
+    background: var(--company-button);
+    border-color: var(--company-button);
+}
+
+
+/* Página actual / total */
+
+.history-page-info {
+    min-width: 75px;
+
+    color: var(--company-muted);
+    font-size: 12px;
+    font-weight: 600;
+    text-align: center;
+}
+
+
+/* =========================================================
+   DESKTOP
+========================================================= */
+
+@media (min-width: 768px) {
+
+    .history-pagination {
+        gap: 8px;
+    }
+
+    .history-page-numbers {
+        display: flex;
+    }
+
+    .history-page-info {
+        display: none;
+    }
+
 }
 
 

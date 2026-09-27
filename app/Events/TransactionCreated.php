@@ -159,6 +159,12 @@ class TransactionCreated implements ShouldBroadcastNow
                 'amount' =>
                 $this->transaction->amount,
 
+                'transfer_tax_rate' =>
+                $this->transaction->transfer_tax_rate,
+
+                'transfer_tax_amount' =>
+                $this->transaction->transfer_tax_amount,
+
                 'type' =>
                 $this->transaction->type,
 
@@ -173,11 +179,11 @@ class TransactionCreated implements ShouldBroadcastNow
 
                 'initial_balance' =>
                 $dailyBalance?->initial_balance
-                ?? 0,
+                    ?? 0,
 
                 'balance_after' =>
                 $dailyBalance?->current_balance
-                ?? 0,
+                    ?? 0,
 
                 'executed_at' =>
                 $this->transaction->executed_at,
@@ -256,11 +262,11 @@ class TransactionCreated implements ShouldBroadcastNow
 
             'balance' =>
             $dailyBalance?->current_balance
-            ?? 0,
+                ?? 0,
 
             'initialBalance' =>
             $dailyBalance?->initial_balance
-            ?? 0,
+                ?? 0,
 
         ];
     }

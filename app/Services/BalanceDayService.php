@@ -31,7 +31,7 @@ class BalanceDayService
     {
         $day =
             $this->financialDayService
-                ->current();
+            ->current();
 
 
         if (!$day) {
@@ -74,10 +74,10 @@ class BalanceDayService
              */
 
             'balance_total' =>
-                $this->getTotalBalance($day),
+            $this->getTotalBalance($day),
 
             'ingresos_jornada' =>
-                $this->getDayIncome($day),
+            $this->getDayIncome($day),
 
             /*
              * Incluye egresos + reservas
@@ -85,19 +85,19 @@ class BalanceDayService
              */
 
             'egresos_jornada' =>
-                $this->getDayExpenses($day),
+            $this->getDayExpenses($day),
 
             'accounts' =>
-                $this->getAccountsBalance($day),
+            $this->getAccountsBalance($day),
 
             'movements' =>
-                $this->getLatestMovements($day),
+            $this->getLatestMovements($day),
 
             'movimiento_ultimo' =>
-                $this->getLastMovement($day),
+            $this->getLastMovement($day),
 
             'movimientos_total' =>
-                $this->getMovementsCount($day),
+            $this->getMovementsCount($day),
 
         ];
     }
@@ -140,16 +140,16 @@ class BalanceDayService
             )
             ->get()
             ->filter(
-                fn ($balance) =>
-                    $balance->accountBalance !== null
+                fn($balance) =>
+                $balance->accountBalance !== null
             )
             ->groupBy(
-                fn ($balance) =>
-                    $balance->accountBalance->currency
+                fn($balance) =>
+                $balance->accountBalance->currency
             )
             ->map(
-                fn ($balances) =>
-                    $balances->sum('current_balance')
+                fn($balances) =>
+                $balances->sum('current_balance')
             )
             ->sortKeys()
             ->toArray();
@@ -171,26 +171,25 @@ class BalanceDayService
                 'account',
                 'accountBalance',
             ])
-                ->where(
-                    'financial_day_id',
-                    $day->id
-                )
-                ->get()
-                ->filter(function ($balance) {
+            ->where(
+                'financial_day_id',
+                $day->id
+            )
+            ->get()
+            ->filter(function ($balance) {
 
-                    /*
+                /*
                      * Protección adicional:
                      * si la cuenta o el balance de moneda
                      * ya no existe / no pertenece al tenant,
                      * no lo exponemos.
                      */
 
-                    return
-                        $balance->account !== null
-                        &&
-                        $balance->accountBalance !== null;
-
-                });
+                return
+                    $balance->account !== null
+                    &&
+                    $balance->accountBalance !== null;
+            });
 
 
         /*
@@ -211,20 +210,20 @@ class BalanceDayService
                 return [
 
                     'id' =>
-                        $account->id,
+                    $account->id,
 
                     'name' =>
-                        $account->name,
+                    $account->name,
 
                     'type' =>
-                        $account->type,
+                    $account->type,
 
                     'logo' =>
-                        $account->logo
-                            ? Storage::url(
-                                $account->logo
-                            )
-                            : null,
+                    $account->logo
+                        ? Storage::url(
+                            $account->logo
+                        )
+                        : null,
 
 
                     /*
@@ -233,74 +232,72 @@ class BalanceDayService
                      */
 
                     'balances' =>
-                        $balances
-                            ->sortBy(
-                                fn ($balance) =>
+                    $balances
+                        ->sortBy(
+                            fn($balance) =>
+                            $balance
+                                ->accountBalance
+                                ->currency
+                        )
+                        ->map(function ($balance) {
+
+                            return [
+
+                                'account_balance_id' =>
+                                $balance
+                                    ->account_balance_id,
+
+                                'currency' =>
+                                $balance
+                                    ->accountBalance
+                                    ->currency,
+
+                                'initial_balance' =>
+                                $balance
+                                    ->initial_balance,
+
+                                'balance' =>
+                                $balance
+                                    ->current_balance,
+
+                                'income' =>
+                                $this->countIncome(
                                     $balance
-                                        ->accountBalance
-                                        ->currency
-                            )
-                            ->map(function ($balance) {
+                                        ->account_balance_id,
+                                    $balance
+                                        ->financial_day_id
+                                ),
 
-                                return [
+                                'expense' =>
+                                $this->countExpense(
+                                    $balance
+                                        ->account_balance_id,
+                                    $balance
+                                        ->financial_day_id
+                                ),
 
-                                    'account_balance_id' =>
-                                        $balance
-                                            ->account_balance_id,
+                                'reserve' =>
+                                $this->countReserve(
+                                    $balance
+                                        ->account_balance_id,
+                                    $balance
+                                        ->financial_day_id
+                                ),
 
-                                    'currency' =>
-                                        $balance
-                                            ->accountBalance
-                                            ->currency,
+                                'movements' =>
+                                $this->countMovements(
+                                    $balance
+                                        ->account_balance_id,
+                                    $balance
+                                        ->financial_day_id
+                                ),
 
-                                    'initial_balance' =>
-                                        $balance
-                                            ->initial_balance,
-
-                                    'balance' =>
-                                        $balance
-                                            ->current_balance,
-
-                                    'income' =>
-                                        $this->countIncome(
-                                            $balance
-                                                ->account_balance_id,
-                                            $balance
-                                                ->financial_day_id
-                                        ),
-
-                                    'expense' =>
-                                        $this->countExpense(
-                                            $balance
-                                                ->account_balance_id,
-                                            $balance
-                                                ->financial_day_id
-                                        ),
-
-                                    'reserve' =>
-                                        $this->countReserve(
-                                            $balance
-                                                ->account_balance_id,
-                                            $balance
-                                                ->financial_day_id
-                                        ),
-
-                                    'movements' =>
-                                        $this->countMovements(
-                                            $balance
-                                                ->account_balance_id,
-                                            $balance
-                                                ->financial_day_id
-                                        ),
-
-                                ];
-
-                            })
-                            ->values()
-                            ->toArray(),
+                            ];
+                        })
+                        ->values()
+                        ->toArray(),
 
                 ];
-
             })
             ->values();
     }
@@ -454,19 +451,19 @@ class BalanceDayService
                 'accountBalance',
                 'user',
             ])
-                ->where(
-                    'financial_day_id',
-                    $day->id
-                )
-                ->orderBy(
-                    'date',
-                    'asc'
-                )
-                ->orderBy(
-                    'id',
-                    'asc'
-                )
-                ->get();
+            ->where(
+                'financial_day_id',
+                $day->id
+            )
+            ->orderBy(
+                'date',
+                'asc'
+            )
+            ->orderBy(
+                'id',
+                'asc'
+            )
+            ->get();
 
 
         /*
@@ -484,11 +481,11 @@ class BalanceDayService
                 'financial_day_id',
                 $day->id
             )
-                ->pluck(
-                    'initial_balance',
-                    'account_balance_id'
-                )
-                ->toArray();
+            ->pluck(
+                'initial_balance',
+                'account_balance_id'
+            )
+            ->toArray();
 
 
         foreach (
@@ -515,15 +512,13 @@ class BalanceDayService
              */
 
             $movement->initial_balance =
-                $balances[
-                    $accountBalanceId
-                ];
+                $balances[$accountBalanceId];
 
 
             /*
              * Ingreso suma.
              *
-             * Egreso, reserva y transfer_out
+             * Egreso, reserva
              * descuentan.
              */
 
@@ -531,16 +526,14 @@ class BalanceDayService
                 $movement->type === 'income'
             ) {
 
-                $balances[
-                    $accountBalanceId
-                ] += $movement->amount;
-
+                $balances[$accountBalanceId] += (float) $movement->amount;
             } else {
 
-                $balances[
-                    $accountBalanceId
-                ] -= $movement->amount;
+                $amountToDebit =
+                    (float) $movement->amount +
+                    (float) ($movement->transfer_tax_amount ?? 0);
 
+                $balances[$accountBalanceId] -= $amountToDebit;
             }
 
 
@@ -549,9 +542,7 @@ class BalanceDayService
              */
 
             $movement->balance_after =
-                $balances[
-                    $accountBalanceId
-                ];
+                $balances[$accountBalanceId];
         }
 
 
@@ -560,7 +551,6 @@ class BalanceDayService
                 function ($movement) {
 
                     return $movement->date;
-
                 }
             )
             ->values();
@@ -591,18 +581,18 @@ class BalanceDayService
             )
             ->get()
             ->filter(
-                fn ($transaction) =>
-                    $transaction->accountBalance !== null
+                fn($transaction) =>
+                $transaction->accountBalance !== null
             )
             ->groupBy(
-                fn ($transaction) =>
-                    $transaction
-                        ->accountBalance
-                        ->currency
+                fn($transaction) =>
+                $transaction
+                    ->accountBalance
+                    ->currency
             )
             ->map(
-                fn ($transactions) =>
-                    $transactions->sum('amount')
+                fn($transactions) =>
+                $transactions->sum('amount')
             )
             ->sortKeys()
             ->toArray();
@@ -641,18 +631,18 @@ class BalanceDayService
             )
             ->get()
             ->filter(
-                fn ($transaction) =>
-                    $transaction->accountBalance !== null
+                fn($transaction) =>
+                $transaction->accountBalance !== null
             )
             ->groupBy(
-                fn ($transaction) =>
-                    $transaction
-                        ->accountBalance
-                        ->currency
+                fn($transaction) =>
+                $transaction
+                    ->accountBalance
+                    ->currency
             )
             ->map(
-                fn ($transactions) =>
-                    $transactions->sum('amount')
+                fn($transactions) =>
+                $transactions->sum('amount')
             )
             ->sortKeys()
             ->toArray();

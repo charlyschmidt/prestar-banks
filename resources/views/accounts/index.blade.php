@@ -114,7 +114,7 @@
 
 
                                     @forelse ($account->balances->sortBy('currency')
-                                            as $balance)
+                                                as $balance)
                                         <span class="account-currency-badge">
 
                                             {{ $balance->currency }}
@@ -145,12 +145,14 @@
 
                         <div class="account-card-footer">
                             <a href="{{ route('accounts.alerts', $account->id) }}"
-                                class="account-card-action account-card-alerts" title="Configurar alertas">
-                                <i class="bi bi-bell"></i>
+                                class="account-card-action account-card-alerts" title="Configurar cuenta">
+
+                                <i class="bi bi-gear"></i>
 
                                 <span>
-                                    Alertas
+                                    Configuración
                                 </span>
+
                             </a>
 
 
