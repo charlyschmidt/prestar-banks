@@ -675,12 +675,6 @@
         const destinationBank =
             document.getElementById('destination-bank');
 
-        const destinationBankSearch =
-            document.getElementById('destination-bank-search');
-
-        const destinationBankOptions =
-            document.getElementById('destination-bank-options');
-
 
         /*
         |--------------------------------------------------------------------------
@@ -711,12 +705,6 @@
 
                 destinationBank.value =
                     '';
-
-                destinationBankSearch.value =
-                    '';
-
-                destinationBankOptions.hidden =
-                    true;
             }
 
             updateTransferTax();
@@ -734,13 +722,6 @@
         | Restaurar valor anterior
         |--------------------------------------------------------------------------
         */
-
-        if (destinationBank.value) {
-
-            destinationBankSearch.value =
-                destinationBank.value;
-
-        }
 
         amountInput.addEventListener(
             'input',
