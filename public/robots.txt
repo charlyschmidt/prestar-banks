@@ -1,2 +1,14 @@
 User-agent: *
-Disallow:
+Allow: /
+
+Disallow: /dashboard
+Disallow: /accounts
+Disallow: /transactions
+Disallow: /history
+Disallow: /reminders
+Disallow: /settings
+Disallow: /company
+Disallow: /subscription
+Disallow: /aeria-admin
+
+Sitemap: https://www.aeriafinance.com.ar/sitemap.xml

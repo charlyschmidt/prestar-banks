@@ -7,12 +7,42 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta name="description" content="AERIA Finance - Dashboard financiero en tiempo real">
+    {{-- SEO --}}
+    <title>AERIA Finance | Control financiero y tesorería para empresas</title>
 
-    <title>AERIA Finance - Control financiero diario, multiempresa, simple y en tiempo real.</title>
+    <meta name="description"
+        content="Controlá saldos, cuentas, ingresos, egresos y transferencias de tu empresa desde un solo lugar. Gestión financiera diaria y en tiempo real.">
 
-    @vite(['resources/css/welcome.css', 'resources/css/footer.css', 'resources/js/welcome.js'])
+    <meta name="robots" content="index, follow">
 
+    <link rel="canonical" href="{{ url('/') }}">
+
+
+    {{-- Open Graph --}}
+    <meta property="og:type" content="website">
+
+    <meta property="og:locale" content="es_AR">
+
+    <meta property="og:site_name" content="AERIA Finance">
+
+    <meta property="og:title" content="AERIA Finance | Control financiero y tesorería para empresas">
+
+    <meta property="og:description"
+        content="Controlá saldos, cuentas, ingresos, egresos y transferencias de tu empresa desde un solo lugar. Gestión financiera diaria y en tiempo real.">
+
+    <meta property="og:url" content="{{ url('/') }}">
+
+
+    {{-- Twitter / X --}}
+    <meta name="twitter:card" content="summary_large_image">
+
+    <meta name="twitter:title" content="AERIA Finance | Control financiero y tesorería para empresas">
+
+    <meta name="twitter:description"
+        content="Controlá saldos, cuentas, ingresos, egresos y transferencias de tu empresa desde un solo lugar. Gestión financiera diaria y en tiempo real.">
+
+
+    {{-- Favicons --}}
     <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png') }}">
 
     <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon-32x32.png') }}">
@@ -20,6 +50,10 @@
     <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('favicon-16x16.png') }}">
 
     <link rel="manifest" href="{{ asset('site.webmanifest') }}">
+
+
+    {{-- Assets --}}
+    @vite(['resources/css/welcome.css', 'resources/css/footer.css', 'resources/js/welcome.js'])
 
 </head>
 
