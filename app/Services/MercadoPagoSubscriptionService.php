@@ -184,4 +184,32 @@ class MercadoPagoSubscriptionService
 
         return $response->json();
     }
+
+    /*
+|--------------------------------------------------------------------------
+| Obtener pago autorizado de una suscripción
+|--------------------------------------------------------------------------
+*/
+
+public function getAuthorizedPayment(
+    string $authorizedPaymentId
+): array {
+    $response = $this->client()
+        ->get(
+            self::BASE_URL
+                . '/authorized_payments/'
+                . $authorizedPaymentId
+        );
+
+    if (!$response->successful()) {
+        throw new RuntimeException(
+            'No se pudo consultar el pago autorizado en Mercado Pago. HTTP '
+                . $response->status()
+                . ' - '
+                . $response->body()
+        );
+    }
+
+    return $response->json();
+}
 }

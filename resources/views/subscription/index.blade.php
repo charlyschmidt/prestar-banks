@@ -2,6 +2,7 @@
 
 
 @section('content')
+
     <div class="page-container">
 
 
@@ -26,10 +27,19 @@
         </div>
 
 
-        @if ($company->isOnTrial())
-            @php
 
-                $trialDaysRemaining = max(1, (int) ceil(now()->diffInSeconds($company->trial_ends_at, false) / 86400));
+        @if ($company->isOnTrial())
+
+            @php
+                $trialDaysRemaining = max(
+                    1,
+                    (int) ceil(
+                        now()->diffInSeconds(
+                            $company->trial_ends_at,
+                            false
+                        ) / 86400
+                    )
+                );
             @endphp
 
 
@@ -107,7 +117,6 @@
 
 
                     @php
-
                         $trialProgressStatus = match (true) {
                             $trialDaysRemaining <= 1 => 'danger',
                             $trialDaysRemaining <= 3 => 'warning',
@@ -115,14 +124,19 @@
                             default => 'success',
                         };
 
-                        $trialProgressWidth = min(100, ($trialDaysRemaining / 7) * 100);
+                        $trialProgressWidth = min(
+                            100,
+                            ($trialDaysRemaining / 7) * 100
+                        );
                     @endphp
 
 
                     <div class="subscription-trial-progress-track">
 
-                        <div class="subscription-trial-progress-bar subscription-trial-progress-{{ $trialProgressStatus }}"
-                            style="width: {{ $trialProgressWidth }}%"></div>
+                        <div
+                            class="subscription-trial-progress-bar subscription-trial-progress-{{ $trialProgressStatus }}"
+                            style="width: {{ $trialProgressWidth }}%"
+                        ></div>
 
                     </div>
 
@@ -137,29 +151,110 @@
             </div>
 
 
-            @if (auth()->check() && strtolower(auth()->user()->email) === 'centralpadelar@gmail.com')
+
+            {{-- ==========================
+                 EMAIL DE PAGO
+            ========================== --}}
+
+            <section class="subscription-dashboard-section">
+
+                <div class="subscription-dashboard-heading">
+
+                    <h2>
+                        Datos de facturación
+                    </h2>
+
+                    <p>
+                        Indicá el email de la cuenta que utilizarás
+                        para pagar mediante Mercado Pago.
+                    </p>
+
+                </div>
+
+
+                <div class="form-card">
+
+                    <div class="form-group">
+
+                        <label for="subscription-payer-email">
+                            Email de Mercado Pago
+                        </label>
+
+                        <input
+                            type="email"
+                            id="subscription-payer-email"
+                            value="{{ old('payer_email', auth()->user()->email) }}"
+                            placeholder="ejemplo@empresa.com"
+                            autocomplete="email"
+                            required
+                        >
+
+                        <small>
+                            Puede ser distinto al email con el que ingresás a AERIA Finance.
+                        </small>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+
+            {{-- ==========================
+                 PRUEBA MERCADO PAGO
+            ========================== --}}
+
+            @if (
+                auth()->check()
+                && strtolower(auth()->user()->email) === 'centralpadelar@gmail.com'
+            )
+
                 <div class="subscription-test-box">
 
                     <div>
-                        <strong>Prueba de Mercado Pago</strong>
+
+                        <strong>
+                            Prueba de Mercado Pago
+                        </strong>
 
                         <p>
                             Genera una suscripción real de prueba por $50 ARS
                             con inicio inmediato.
                         </p>
+
                     </div>
 
-                    <form method="POST" action="{{ route('subscription.test') }}">
+
+                    <form
+                        method="POST"
+                        action="{{ route('subscription.test') }}"
+                        class="subscription-payer-form"
+                    >
+
                         @csrf
 
-                        <button type="submit" class="primary-button">
+                        <input
+                            type="hidden"
+                            name="payer_email"
+                            class="subscription-payer-email-hidden"
+                        >
+
+                        <button
+                            type="submit"
+                            class="primary-button"
+                        >
                             <i class="bi bi-credit-card"></i>
                             Probar suscripción $50
                         </button>
+
                     </form>
 
                 </div>
+
             @endif
+
+
 
             {{-- ==========================
                  PLANES
@@ -205,7 +300,6 @@
                             </div>
 
 
-
                             <div class="subscription-dashboard-price">
 
                                 <span class="subscription-price-currency">
@@ -223,13 +317,11 @@
                             </div>
 
 
-
                             <p class="subscription-plan-description">
                                 Facturación mensual con renovación automática.
                                 El cobro se realiza en pesos argentinos mediante
                                 Mercado Pago.
                             </p>
-
 
 
                             <div class="subscription-plan-features">
@@ -281,19 +373,33 @@
 
                             </div>
 
-
                         </div>
 
 
-
-                        <form method="POST" action="{{ route('subscription.subscribe') }}"
-                            class="subscription-plan-action">
+                        <form
+                            method="POST"
+                            action="{{ route('subscription.subscribe') }}"
+                            class="subscription-plan-action subscription-payer-form"
+                        >
 
                             @csrf
 
-                            <input type="hidden" name="plan" value="monthly">
+                            <input
+                                type="hidden"
+                                name="plan"
+                                value="monthly"
+                            >
 
-                            <button type="submit" class="primary-button">
+                            <input
+                                type="hidden"
+                                name="payer_email"
+                                class="subscription-payer-email-hidden"
+                            >
+
+                            <button
+                                type="submit"
+                                class="primary-button"
+                            >
                                 Elegir plan mensual
                             </button>
 
@@ -320,13 +426,11 @@
                                     Plan anual
                                 </span>
 
-
                                 <span class="subscription-dashboard-saving">
                                     Ahorrás 2 meses
                                 </span>
 
                             </div>
-
 
 
                             <div class="subscription-dashboard-price">
@@ -351,13 +455,11 @@
                             </span>
 
 
-
                             <p class="subscription-plan-description">
                                 Un único cobro anual con renovación automática.
                                 El importe se procesa en pesos argentinos
                                 mediante Mercado Pago.
                             </p>
-
 
 
                             <div class="subscription-plan-features">
@@ -409,19 +511,33 @@
 
                             </div>
 
-
                         </div>
 
 
-
-                        <form method="POST" action="{{ route('subscription.subscribe') }}"
-                            class="subscription-plan-action">
+                        <form
+                            method="POST"
+                            action="{{ route('subscription.subscribe') }}"
+                            class="subscription-plan-action subscription-payer-form"
+                        >
 
                             @csrf
 
-                            <input type="hidden" name="plan" value="annual">
+                            <input
+                                type="hidden"
+                                name="plan"
+                                value="annual"
+                            >
 
-                            <button type="submit" class="primary-button">
+                            <input
+                                type="hidden"
+                                name="payer_email"
+                                class="subscription-payer-email-hidden"
+                            >
+
+                            <button
+                                type="submit"
+                                class="primary-button"
+                            >
                                 Elegir plan anual
                             </button>
 
@@ -429,7 +545,6 @@
 
 
                     </article>
-
 
                 </div>
 
@@ -454,7 +569,11 @@
 
 
             </section>
+
+
         @elseif ($company->hasActiveSubscription())
+
+
             {{-- ==========================
                  SUSCRIPCIÓN ACTIVA
             ========================== --}}
@@ -481,7 +600,6 @@
             </div>
 
 
-
             {{-- Acá construiremos después:
                 - período actual
                 - próxima renovación
@@ -490,8 +608,11 @@
                 - historial de pagos
                 - cancelación
             --}}
+
+
         @endif
 
 
     </div>
+
 @endsection

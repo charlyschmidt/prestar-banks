@@ -6,6 +6,7 @@ use App\Models\Subscription;
 use App\Services\MercadoPagoSubscriptionService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use App\Models\SubscriptionPayment;
 
 class MercadoPagoWebhookController extends Controller
 {
@@ -56,8 +57,24 @@ class MercadoPagoWebhookController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        if ($type !== 'subscription_preapproval') {
+        /*
+|--------------------------------------------------------------------------
+| Pago recurrente de suscripción
+|--------------------------------------------------------------------------
+*/
 
+        if ($type === 'subscription_authorized_payment') {
+            return $this->handleAuthorizedPayment($request);
+        }
+
+
+        /*
+|--------------------------------------------------------------------------
+| Otros eventos que todavía no procesamos
+|--------------------------------------------------------------------------
+*/
+
+        if ($type !== 'subscription_preapproval') {
             return response()->json([
                 'received' => true,
             ]);
@@ -123,7 +140,6 @@ class MercadoPagoWebhookController extends Controller
                 ->getSubscription(
                     $subscription->provider_subscription_id
                 );
-
         } catch (\Throwable $e) {
 
             report($e);
@@ -176,13 +192,13 @@ class MercadoPagoWebhookController extends Controller
         $updateData = [
 
             'provider_status' =>
-                $providerStatus,
+            $providerStatus,
 
             'status' =>
-                $localStatus,
+            $localStatus,
 
             'next_billing_at' =>
-                $providerData['next_payment_date'] ?? null,
+            $providerData['next_payment_date'] ?? null,
 
         ];
 
@@ -392,5 +408,321 @@ class MercadoPagoWebhookController extends Controller
             $expectedSignature,
             $signature
         );
+    }
+
+    /*
+|--------------------------------------------------------------------------
+| Procesar pago recurrente
+|--------------------------------------------------------------------------
+*/
+
+    private function handleAuthorizedPayment(
+        Request $request
+    ): JsonResponse {
+
+        /*
+    |--------------------------------------------------------------------------
+    | ID de factura Mercado Pago
+    |--------------------------------------------------------------------------
+    */
+
+        $authorizedPaymentId =
+            $request->query('data.id')
+            ?? $request->input('data.id');
+
+
+        if (!$authorizedPaymentId) {
+            return response()->json([
+                'received' => true,
+            ]);
+        }
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Consultar factura real en Mercado Pago
+    |--------------------------------------------------------------------------
+    */
+
+        try {
+
+            $providerData = $this->mercadoPagoService
+                ->getAuthorizedPayment(
+                    (string) $authorizedPaymentId
+                );
+        } catch (\Throwable $e) {
+
+            report($e);
+
+            return response()->json(
+                [
+                    'received' => false,
+                ],
+                500
+            );
+        }
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Identificar suscripción
+    |--------------------------------------------------------------------------
+    */
+
+        $providerSubscriptionId =
+            $providerData['preapproval_id'] ?? null;
+
+
+        if (!$providerSubscriptionId) {
+            return response()->json([
+                'received' => true,
+            ]);
+        }
+
+
+        $subscription = Subscription::query()
+            ->where(
+                'provider_subscription_id',
+                $providerSubscriptionId
+            )
+            ->first();
+
+
+        if (!$subscription) {
+            return response()->json([
+                'received' => true,
+            ]);
+        }
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Datos del pago real
+    |--------------------------------------------------------------------------
+    */
+
+        $payment =
+            $providerData['payment'] ?? [];
+
+        $providerPaymentId =
+            $payment['id'] ?? null;
+
+        $providerStatus =
+            $payment['status']
+            ?? $providerData['status']
+            ?? null;
+
+        $statusDetail =
+            $payment['status_detail']
+            ?? null;
+
+        $amountArs =
+            (float) (
+                $providerData['transaction_amount']
+                ?? $subscription->amount_ars
+            );
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Estado local
+    |--------------------------------------------------------------------------
+    */
+
+        $localStatus = match ($providerStatus) {
+
+            'approved' => 'paid',
+
+            'rejected' => 'rejected',
+
+            'cancelled' => 'cancelled',
+
+            'refunded' => 'refunded',
+
+            'in_process',
+            'pending',
+            'authorized' => 'pending',
+
+            default => 'pending',
+        };
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Período correspondiente
+    |--------------------------------------------------------------------------
+    */
+
+        $periodStart = !empty($providerData['debit_date'])
+            ? \Carbon\Carbon::parse(
+                $providerData['debit_date']
+            )
+            : now();
+
+
+        $periodEnd = $subscription->plan === 'annual'
+            ? $periodStart->copy()->addYear()
+            : $periodStart->copy()->addMonth();
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Crear o actualizar pago
+    |--------------------------------------------------------------------------
+    |
+    | Usamos el ID de pago real de Mercado Pago para evitar duplicados
+    | cuando Mercado Pago notifique varias actualizaciones del mismo cobro.
+    |
+    */
+
+        if ($providerPaymentId) {
+
+            SubscriptionPayment::updateOrCreate(
+
+                [
+                    'provider_payment_id' =>
+                    (string) $providerPaymentId,
+                ],
+
+                [
+                    'subscription_id' =>
+                    $subscription->id,
+
+                    'company_id' =>
+                    $subscription->company_id,
+
+                    'price_usd' =>
+                    $subscription->price_usd,
+
+                    'exchange_rate' =>
+                    $subscription->exchange_rate,
+
+                    'amount_ars' =>
+                    $amountArs,
+
+                    'provider_status' =>
+                    $providerStatus,
+
+                    'status_detail' =>
+                    $statusDetail,
+
+                    'status' =>
+                    $localStatus,
+
+                    'period_start' =>
+                    $periodStart,
+
+                    'period_end' =>
+                    $periodEnd,
+
+                    'due_at' =>
+                    $periodStart,
+
+                    'paid_at' =>
+                    $providerStatus === 'approved'
+                        ? now()
+                        : null,
+                ]
+            );
+        }
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Pago aprobado
+    |--------------------------------------------------------------------------
+    */
+
+        if ($providerStatus === 'approved') {
+
+            $subscription->update([
+
+                'status' => 'active',
+
+                'provider_status' => 'authorized',
+
+                'started_at' =>
+                $subscription->started_at
+                    ?? now(),
+
+            ]);
+        }
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Volver a sincronizar la suscripción
+    |--------------------------------------------------------------------------
+    |
+    | Un rechazo puede hacer que Mercado Pago pause/cancele/cambie
+    | el estado del preapproval.
+    |
+    */
+
+        try {
+
+            $subscriptionData =
+                $this->mercadoPagoService
+                ->getSubscription(
+                    $providerSubscriptionId
+                );
+
+
+            $providerSubscriptionStatus =
+                $subscriptionData['status'] ?? null;
+
+
+            $subscriptionStatus = match ($providerSubscriptionStatus) {
+
+                'authorized' => 'active',
+
+                'pending' => 'pending',
+
+                'paused' => 'paused',
+
+                'cancelled' => 'cancelled',
+
+                default => $subscription->status,
+            };
+
+
+            $subscription->update([
+
+                'provider_status' =>
+                $providerSubscriptionStatus,
+
+                'status' =>
+                $subscriptionStatus,
+
+                'next_billing_at' =>
+                $subscriptionData['next_payment_date']
+                    ?? $subscription->next_billing_at,
+
+                'cancelled_at' =>
+                $providerSubscriptionStatus === 'cancelled'
+                    ? ($subscription->cancelled_at ?? now())
+                    : $subscription->cancelled_at,
+
+            ]);
+        } catch (\Throwable $e) {
+
+            /*
+        |--------------------------------------------------------------------------
+        | El pago ya fue registrado.
+        |--------------------------------------------------------------------------
+        |
+        | Si falla esta segunda consulta no devolvemos 500 porque no queremos
+        | que Mercado Pago reintente innecesariamente un evento que ya
+        | persistimos.
+        |
+        */
+
+            report($e);
+        }
+
+
+        return response()->json([
+            'received' => true,
+        ]);
     }
 }

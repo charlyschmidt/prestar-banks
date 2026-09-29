@@ -22,6 +22,7 @@ class Subscription extends Model
         'started_at',
         'next_billing_at',
         'cancelled_at',
+        'payer_email',
     ];
 
     protected $casts = [

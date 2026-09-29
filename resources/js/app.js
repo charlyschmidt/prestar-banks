@@ -111,4 +111,6 @@ import './settings-danger-zone';
 
 import './searchable-select';
 
+import './subscription';
+
 

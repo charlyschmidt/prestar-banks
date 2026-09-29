@@ -69,6 +69,7 @@ class SubscriptionService
             'company_id' => $company->id,
 
             'plan' => $plan,
+            'payer_email' => $payerEmail,
 
             'price_usd' => $priceUsd,
 
@@ -234,6 +235,8 @@ class SubscriptionService
         $subscription = Subscription::create([
 
             'company_id' => $company->id,
+
+             'payer_email' => $payerEmail,
 
             'plan' => $plan,
 

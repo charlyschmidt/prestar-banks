@@ -124,6 +124,12 @@ class SubscriptionController extends Controller
                 'string',
                 'in:monthly,annual',
             ],
+
+            'payer_email' => [
+                'required',
+                'email',
+                'max:255',
+            ],
         ]);
 
 
@@ -269,7 +275,7 @@ class SubscriptionController extends Controller
                 ->create(
                     $company,
                     $request->plan,
-                    $user->email
+                    strtolower(trim($request->payer_email))
                 );
         } catch (\Throwable $e) {
 
@@ -485,7 +491,13 @@ class SubscriptionController extends Controller
             abort(403);
         }
 
-
+        $request->validate([
+            'payer_email' => [
+                'required',
+                'email',
+                'max:255',
+            ],
+        ]);
         /*
     |--------------------------------------------------------------------------
     | Empresa actual
@@ -513,7 +525,7 @@ class SubscriptionController extends Controller
             $subscription = $this->subscriptionService
                 ->createTestSubscription(
                     $company,
-                    $user->email
+                    strtolower(trim($request->payer_email))
                 );
         } catch (\Throwable $e) {
 
