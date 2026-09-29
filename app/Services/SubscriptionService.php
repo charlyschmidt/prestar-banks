@@ -222,7 +222,7 @@ class SubscriptionService
 
         $exchangeRate = 1;
 
-        $amountArs = 50;
+        $amountArs = 150;
 
 
         /*
