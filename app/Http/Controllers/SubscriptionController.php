@@ -112,6 +112,12 @@ class SubscriptionController extends Controller
         Request $request
     ): RedirectResponse {
 
+        /*
+    |--------------------------------------------------------------------------
+    | Validar plan
+    |--------------------------------------------------------------------------
+    */
+
         $request->validate([
             'plan' => [
                 'required',
@@ -119,6 +125,13 @@ class SubscriptionController extends Controller
                 'in:monthly,annual',
             ],
         ]);
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Empresa actual
+    |--------------------------------------------------------------------------
+    */
 
         $company = $this->companyContextService->company();
 
@@ -129,22 +142,38 @@ class SubscriptionController extends Controller
             );
         }
 
+
         /*
-|--------------------------------------------------------------------------
-| La empresa debe estar aprobada
-|--------------------------------------------------------------------------
-*/
+    |--------------------------------------------------------------------------
+    | La empresa debe estar aprobada
+    |--------------------------------------------------------------------------
+    */
 
         if ($company->status !== 'active') {
             return redirect()
                 ->route('subscription.index');
         }
 
+
+        /*
+    |--------------------------------------------------------------------------
+    | Usuario actual
+    |--------------------------------------------------------------------------
+    */
+
         $user = $request->user();
 
         if (!$user) {
-            return redirect()->route('login');
+            return redirect()
+                ->route('login');
         }
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Validar que el plan exista
+    |--------------------------------------------------------------------------
+    */
 
         if (!$this->planService->exists($request->plan)) {
             return back()->with(
@@ -155,103 +184,113 @@ class SubscriptionController extends Controller
 
 
         /*
+    |--------------------------------------------------------------------------
+    | Buscar suscripción pendiente o activa
+    |--------------------------------------------------------------------------
+    */
+
+        $existingSubscription = $company
+            ->subscriptions()
+            ->whereIn('status', [
+                'pending',
+                'active',
+            ])
+            ->latest('id')
+            ->first();
+
+
+        if ($existingSubscription) {
+
+            /*
         |--------------------------------------------------------------------------
-        | Evitar duplicar una suscripción pendiente/activa
+        | Ya tiene una suscripción activa
         |--------------------------------------------------------------------------
         */
 
-       $existingSubscription = $company
-    ->subscriptions()
-    ->whereIn('status', ['pending', 'active'])
-    ->latest('id')
-    ->first();
-
-if ($existingSubscription) {
-
-    /*
-    |--------------------------------------------------------------------------
-    | Ya tiene una suscripción activa
-    |--------------------------------------------------------------------------
-    */
-
-    if ($existingSubscription->status === 'active') {
-        return back()->with(
-            'error',
-            'La empresa ya posee una suscripción activa.'
-        );
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Tiene el mismo plan pendiente
-    |--------------------------------------------------------------------------
-    |
-    | No creamos otra suscripción. Lo enviamos nuevamente
-    | al checkout que ya habíamos generado.
-    |
-    */
-
-    if (
-        $existingSubscription->status === 'pending'
-        && $existingSubscription->plan === $request->plan
-        && $existingSubscription->init_point
-    ) {
-        return redirect()->away(
-            $existingSubscription->init_point
-        );
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Cambió de plan
-    |--------------------------------------------------------------------------
-    |
-    | Cancelamos primero el preapproval anterior en Mercado Pago
-    | y luego dejamos que continúe el método para crear el nuevo.
-    |
-    */
-
-    if (
-        $existingSubscription->status === 'pending'
-        && $existingSubscription->plan !== $request->plan
-    ) {
-
-        try {
-
-            if ($existingSubscription->provider_subscription_id) {
-                $this->mercadoPagoService
-                    ->cancelSubscription(
-                        $existingSubscription->provider_subscription_id
-                    );
+            if ($existingSubscription->status === 'active') {
+                return back()->with(
+                    'error',
+                    'La empresa ya posee una suscripción activa.'
+                );
             }
 
-            $existingSubscription->update([
-                'status' => 'cancelled',
-                'provider_status' => 'cancelled',
-                'cancelled_at' => now(),
-            ]);
 
-        } catch (\Throwable $e) {
+            /*
+        |--------------------------------------------------------------------------
+        | Tiene el mismo plan pendiente
+        |--------------------------------------------------------------------------
+        |
+        | Reutilizamos el checkout que ya habíamos creado.
+        |
+        */
 
-            report($e);
+            if (
+                $existingSubscription->status === 'pending'
+                && $existingSubscription->plan === $request->plan
+                && $existingSubscription->init_point
+            ) {
+                return redirect()->away(
+                    $existingSubscription->init_point
+                );
+            }
 
-            return back()->with(
-                'error',
-                'No pudimos cambiar el plan. Intentá nuevamente.'
-            );
-        }
-    }
-}
+
+            /*
+        |--------------------------------------------------------------------------
+        | Cambió de plan
+        |--------------------------------------------------------------------------
+        |
+        | Cancelamos primero el preapproval anterior en Mercado Pago.
+        |
+        */
+
+            if (
+                $existingSubscription->status === 'pending'
+                && $existingSubscription->plan !== $request->plan
+            ) {
+
+                try {
+
+                    if (
+                        $existingSubscription->provider_subscription_id
+                    ) {
+                        $this->mercadoPagoService
+                            ->cancelSubscription(
+                                $existingSubscription
+                                    ->provider_subscription_id
+                            );
+                    }
+
+
+                    /*
+                |--------------------------------------------------------------------------
+                | Marcar anterior como cancelada localmente
+                |--------------------------------------------------------------------------
+                */
+
+                    $existingSubscription->update([
+                        'status' => 'cancelled',
+                        'provider_status' => 'cancelled',
+                        'cancelled_at' => now(),
+                    ]);
+                } catch (\Throwable $e) {
+
+                    report($e);
+
+                    return back()->with(
+                        'error',
+                        'No pudimos cambiar el plan. Intentá nuevamente.'
+                    );
+                }
+            }
         }
 
 
         /*
-        |--------------------------------------------------------------------------
-        | Crear suscripción
-        |--------------------------------------------------------------------------
-        */
+    |--------------------------------------------------------------------------
+    | Crear nueva suscripción
+    |--------------------------------------------------------------------------
+    */
 
         try {
 
@@ -273,13 +312,12 @@ if ($existingSubscription) {
 
 
         /*
-        |--------------------------------------------------------------------------
-        | Mercado Pago debe devolver URL de autorización
-        |--------------------------------------------------------------------------
-        */
+    |--------------------------------------------------------------------------
+    | Mercado Pago debe devolver URL de autorización
+    |--------------------------------------------------------------------------
+    */
 
         if (!$subscription->init_point) {
-
             return back()->with(
                 'error',
                 'Mercado Pago no devolvió la URL para autorizar la suscripción.'
@@ -288,170 +326,163 @@ if ($existingSubscription) {
 
 
         /*
-        |--------------------------------------------------------------------------
-        | Enviar usuario a Mercado Pago
-        |--------------------------------------------------------------------------
-        */
+    |--------------------------------------------------------------------------
+    | Enviar usuario a Mercado Pago
+    |--------------------------------------------------------------------------
+    */
 
         return redirect()->away(
             $subscription->init_point
         );
     }
 
-    /*
-|--------------------------------------------------------------------------
-| Retorno desde Mercado Pago
-|--------------------------------------------------------------------------
-*/
+    public function return(Request $request): RedirectResponse
+    {
+        $company = $this->companyContextService->company();
 
-public function return(Request $request): RedirectResponse
-{
-    $company = $this->companyContextService->company();
-
-    if (!$company) {
-        return redirect()
-            ->route('subscription.index')
-            ->with(
-                'error',
-                'No se pudo identificar la empresa.'
-            );
-    }
+        if (!$company) {
+            return redirect()
+                ->route('subscription.index')
+                ->with(
+                    'error',
+                    'No se pudo identificar la empresa.'
+                );
+        }
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | Buscar la última suscripción pendiente
-    |--------------------------------------------------------------------------
-    */
+        /*
+        |--------------------------------------------------------------------------
+        | Buscar la última suscripción pendiente
+        |--------------------------------------------------------------------------
+        */
 
-    $subscription = $company
-        ->subscriptions()
-        ->where('status', 'pending')
-        ->whereNotNull('provider_subscription_id')
-        ->latest('id')
-        ->first();
-
-
-    if (!$subscription) {
-        return redirect()
-            ->route('subscription.index')
-            ->with(
-                'error',
-                'No encontramos una suscripción pendiente para verificar.'
-            );
-    }
+        $subscription = $company
+            ->subscriptions()
+            ->where('status', 'pending')
+            ->whereNotNull('provider_subscription_id')
+            ->latest('id')
+            ->first();
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | Consultar estado real en Mercado Pago
-    |--------------------------------------------------------------------------
-    */
-
-    try {
-
-        $providerData = $this->mercadoPagoService
-            ->getSubscription(
-                $subscription->provider_subscription_id
-            );
-
-    } catch (\Throwable $e) {
-
-        report($e);
-
-        return redirect()
-            ->route('subscription.index')
-            ->with(
-                'error',
-                'No pudimos verificar la suscripción con Mercado Pago.'
-            );
-    }
+        if (!$subscription) {
+            return redirect()
+                ->route('subscription.index')
+                ->with(
+                    'error',
+                    'No encontramos una suscripción pendiente para verificar.'
+                );
+        }
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | Estado informado por Mercado Pago
-    |--------------------------------------------------------------------------
-    */
+        /*
+        |--------------------------------------------------------------------------
+        | Consultar estado real en Mercado Pago
+        |--------------------------------------------------------------------------
+        */
 
-    $providerStatus =
-        $providerData['status'] ?? null;
+        try {
 
+            $providerData = $this->mercadoPagoService
+                ->getSubscription(
+                    $subscription->provider_subscription_id
+                );
+        } catch (\Throwable $e) {
 
-    /*
-    |--------------------------------------------------------------------------
-    | Actualizar información local
-    |--------------------------------------------------------------------------
-    */
+            report($e);
 
-    $subscription->update([
-
-        'provider_status' =>
-            $providerStatus,
-
-        'next_billing_at' =>
-            $providerData['next_payment_date'] ?? null,
-
-    ]);
+            return redirect()
+                ->route('subscription.index')
+                ->with(
+                    'error',
+                    'No pudimos verificar la suscripción con Mercado Pago.'
+                );
+        }
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | Suscripción autorizada
-    |--------------------------------------------------------------------------
-    */
+        /*
+        |--------------------------------------------------------------------------
+        | Estado informado por Mercado Pago
+        |--------------------------------------------------------------------------
+        */
 
-    if ($providerStatus === 'authorized') {
+        $providerStatus =
+            $providerData['status'] ?? null;
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Actualizar información local
+        |--------------------------------------------------------------------------
+        */
 
         $subscription->update([
 
-            'status' => 'active',
+            'provider_status' =>
+            $providerStatus,
 
-            'started_at' =>
-                $subscription->started_at ?? now(),
+            'next_billing_at' =>
+            $providerData['next_payment_date'] ?? null,
 
         ]);
 
 
-        return redirect()
-            ->route('subscription.index')
-            ->with(
-                'success',
-                'Tu suscripción a AERIA Finance fue activada correctamente.'
-            );
-    }
+        /*
+        |--------------------------------------------------------------------------
+        | Suscripción autorizada
+        |--------------------------------------------------------------------------
+        */
+
+        if ($providerStatus === 'authorized') {
+
+            $subscription->update([
+
+                'status' => 'active',
+
+                'started_at' =>
+                $subscription->started_at ?? now(),
+
+            ]);
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | Todavía pendiente
-    |--------------------------------------------------------------------------
-    */
+            return redirect()
+                ->route('subscription.index')
+                ->with(
+                    'success',
+                    'Tu suscripción a AERIA Finance fue activada correctamente.'
+                );
+        }
 
-    if ($providerStatus === 'pending') {
+
+        /*
+        |--------------------------------------------------------------------------
+        | Todavía pendiente
+        |--------------------------------------------------------------------------
+        */
+
+        if ($providerStatus === 'pending') {
+
+            return redirect()
+                ->route('subscription.index')
+                ->with(
+                    'error',
+                    'La autorización de Mercado Pago todavía está pendiente.'
+                );
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Otro estado
+        |--------------------------------------------------------------------------
+        */
 
         return redirect()
             ->route('subscription.index')
             ->with(
                 'error',
-                'La autorización de Mercado Pago todavía está pendiente.'
+                'Mercado Pago informó el estado: '
+                    . ($providerStatus ?? 'desconocido')
+                    . '.'
             );
     }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Otro estado
-    |--------------------------------------------------------------------------
-    */
-
-    return redirect()
-        ->route('subscription.index')
-        ->with(
-            'error',
-            'Mercado Pago informó el estado: '
-                . ($providerStatus ?? 'desconocido')
-                . '.'
-        );
-}
 }
