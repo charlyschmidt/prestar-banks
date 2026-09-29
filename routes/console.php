@@ -5,9 +5,16 @@ use Illuminate\Support\Facades\Artisan;
 
 use Illuminate\Support\Facades\Schedule;
 
+
 use App\Events\ReminderDue;
 use App\Services\FinancialReminderService;
 
+
+Schedule::command('subscriptions:prepare-renewals')
+    ->hourly()
+    ->withoutOverlapping();
+
+    
 Schedule::command('aeria:send-expired-trial-emails')
     ->hourly()
     ->withoutOverlapping();

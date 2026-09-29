@@ -1018,9 +1018,14 @@
                     </div>
 
 
-                    <button type="button" class="subscription-cancel-button">
-                        Cancelar suscripción
-                    </button>
+                    <form method="POST" action="{{ route('subscription.cancel') }}" id="cancel-subscription-form">
+                        @csrf
+
+                        <button type="button" class="subscription-cancel-button" id="cancel-subscription-button">
+                            <i class="bi bi-x-circle"></i>
+                            Cancelar suscripción
+                        </button>
+                    </form>
 
                 </div>
 
@@ -1029,5 +1034,53 @@
 
 
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
 
+            const cancelButton = document.getElementById(
+                'cancel-subscription-button'
+            );
+
+            const cancelForm = document.getElementById(
+                'cancel-subscription-form'
+            );
+
+            if (!cancelButton || !cancelForm) {
+                return;
+            }
+
+            cancelButton.addEventListener('click', function() {
+
+                Swal.fire({
+                    title: '¿Cancelar suscripción?',
+                    text: 'Se detendrán las próximas renovaciones de AERIA Finance.',
+                    icon: 'warning',
+
+                    showCancelButton: true,
+
+                    confirmButtonText: 'Sí, cancelar',
+                    cancelButtonText: 'Volver',
+
+                    reverseButtons: true,
+
+                    customClass: {
+                        popup: 'aeria-swal',
+                        confirmButton: 'aeria-swal-danger',
+                        cancelButton: 'aeria-swal-secondary'
+                    },
+
+                    buttonsStyling: false
+
+                }).then((result) => {
+
+                    if (result.isConfirmed) {
+                        cancelForm.submit();
+                    }
+
+                });
+
+            });
+
+        });
+    </script>
 @endsection

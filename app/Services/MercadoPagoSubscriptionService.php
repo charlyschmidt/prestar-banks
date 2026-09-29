@@ -160,6 +160,46 @@ class MercadoPagoSubscriptionService
         return $response->json();
     }
 
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Actualizar importe de una suscripción
+    |--------------------------------------------------------------------------
+    */
+
+    public function updateSubscriptionAmount(
+        string $providerSubscriptionId,
+        float $amountArs
+    ): array {
+
+        $response = $this->client()
+            ->put(
+                self::BASE_URL
+                    . '/preapproval/'
+                    . $providerSubscriptionId,
+                [
+                    'auto_recurring' => [
+                        'transaction_amount' => round($amountArs, 2),
+                        'currency_id' => 'ARS',
+                    ],
+                ]
+            );
+
+        if (!$response->successful()) {
+            throw new RuntimeException(
+                'No se pudo actualizar el importe de la suscripción en Mercado Pago. HTTP '
+                    . $response->status()
+                    . ' - '
+                    . $response->body()
+            );
+        }
+
+        return $response->json();
+    }
+
+
+
     public function cancelSubscription(
         string $providerSubscriptionId
     ): array {
@@ -191,25 +231,25 @@ class MercadoPagoSubscriptionService
 |--------------------------------------------------------------------------
 */
 
-public function getAuthorizedPayment(
-    string $authorizedPaymentId
-): array {
-    $response = $this->client()
-        ->get(
-            self::BASE_URL
-                . '/authorized_payments/'
-                . $authorizedPaymentId
-        );
+    public function getAuthorizedPayment(
+        string $authorizedPaymentId
+    ): array {
+        $response = $this->client()
+            ->get(
+                self::BASE_URL
+                    . '/authorized_payments/'
+                    . $authorizedPaymentId
+            );
 
-    if (!$response->successful()) {
-        throw new RuntimeException(
-            'No se pudo consultar el pago autorizado en Mercado Pago. HTTP '
-                . $response->status()
-                . ' - '
-                . $response->body()
-        );
+        if (!$response->successful()) {
+            throw new RuntimeException(
+                'No se pudo consultar el pago autorizado en Mercado Pago. HTTP '
+                    . $response->status()
+                    . ' - '
+                    . $response->body()
+            );
+        }
+
+        return $response->json();
     }
-
-    return $response->json();
-}
 }

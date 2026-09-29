@@ -82,15 +82,7 @@ class Company extends Model
             return true;
         }
 
-        if (!$this->subscription_started_at) {
-            return false;
-        }
-
-        if (!$this->subscription_ends_at) {
-            return false;
-        }
-
-        return now()->lt($this->subscription_ends_at);
+        return $this->activeSubscription() !== null;
     }
 
 
@@ -130,5 +122,13 @@ class Company extends Model
         return $this->hasMany(
             SubscriptionPayment::class
         );
+    }
+
+    public function activeSubscription(): ?Subscription
+    {
+        return $this->subscriptions()
+            ->where('status', 'active')
+            ->latest('id')
+            ->first();
     }
 }

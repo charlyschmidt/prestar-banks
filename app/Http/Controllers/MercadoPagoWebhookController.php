@@ -169,18 +169,10 @@ class MercadoPagoWebhookController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        $localStatus = match ($providerStatus) {
-
-            'authorized' => 'active',
-
-            'pending' => 'pending',
-
-            'paused' => 'paused',
-
-            'cancelled' => 'cancelled',
-
-            default => $subscription->status,
-        };
+        $localStatus = $this->mapSubscriptionStatus(
+            $providerStatus,
+            $subscription->status
+        );
 
 
         /*
@@ -225,10 +217,13 @@ class MercadoPagoWebhookController extends Controller
         */
 
         if (
-            $providerStatus === 'cancelled'
+            in_array(
+                $providerStatus,
+                ['cancelled', 'canceled'],
+                true
+            )
             && !$subscription->cancelled_at
         ) {
-
             $updateData['cancelled_at'] = now();
         }
 
@@ -603,7 +598,7 @@ class MercadoPagoWebhookController extends Controller
                     'provider_status' =>
                     $providerStatus,
 
-                    'status_detail' =>
+                    'provider_status_detail' =>
                     $statusDetail,
 
                     'status' =>
@@ -672,18 +667,10 @@ class MercadoPagoWebhookController extends Controller
                 $subscriptionData['status'] ?? null;
 
 
-            $subscriptionStatus = match ($providerSubscriptionStatus) {
-
-                'authorized' => 'active',
-
-                'pending' => 'pending',
-
-                'paused' => 'paused',
-
-                'cancelled' => 'cancelled',
-
-                default => $subscription->status,
-            };
+            $subscriptionStatus = $this->mapSubscriptionStatus(
+                $providerSubscriptionStatus,
+                $subscription->status
+            );
 
 
             $subscription->update([
@@ -699,7 +686,11 @@ class MercadoPagoWebhookController extends Controller
                     ?? $subscription->next_billing_at,
 
                 'cancelled_at' =>
-                $providerSubscriptionStatus === 'cancelled'
+                in_array(
+                    $providerSubscriptionStatus,
+                    ['cancelled', 'canceled'],
+                    true
+                )
                     ? ($subscription->cancelled_at ?? now())
                     : $subscription->cancelled_at,
 
@@ -724,5 +715,21 @@ class MercadoPagoWebhookController extends Controller
         return response()->json([
             'received' => true,
         ]);
+    }
+
+    private function mapSubscriptionStatus(
+        ?string $providerStatus,
+        string $currentStatus
+    ): string {
+        return match ($providerStatus) {
+            'authorized' => 'active',
+            'pending' => 'pending',
+            'paused' => 'paused',
+
+            'cancelled',
+            'canceled' => 'cancelled',
+
+            default => $currentStatus,
+        };
     }
 }

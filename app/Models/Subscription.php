@@ -23,6 +23,7 @@ class Subscription extends Model
         'next_billing_at',
         'cancelled_at',
         'payer_email',
+        'renewal_prepared_at',
     ];
 
     protected $casts = [
@@ -33,6 +34,7 @@ class Subscription extends Model
         'started_at' => 'datetime',
         'next_billing_at' => 'datetime',
         'cancelled_at' => 'datetime',
+        'renewal_prepared_at' => 'datetime',
     ];
 
     /*

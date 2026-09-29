@@ -95,6 +95,11 @@ Route::middleware('auth')->group(function () {
         [SubscriptionController::class, 'subscribeTest']
     )->name('subscription.test');
 
+    Route::post(
+    '/subscription/cancel',
+    [SubscriptionController::class, 'cancel']
+)->name('subscription.cancel');
+
 
     /*
     |--------------------------------------------------------------------------

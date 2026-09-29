@@ -199,12 +199,18 @@ class SubscriptionController extends Controller
             );
         }
 
+        if ($company->subscription_lifetime) {
+            return back()->with(
+                'error',
+                'Esta empresa cuenta con acceso permanente a AERIA Finance.'
+            );
+        }
 
         /*
-    |--------------------------------------------------------------------------
-    | Buscar suscripción pendiente o activa
-    |--------------------------------------------------------------------------
-    */
+        |--------------------------------------------------------------------------
+        | Buscar suscripción pendiente o activa
+        |--------------------------------------------------------------------------
+        */
 
         $existingSubscription = $company
             ->subscriptions()
@@ -403,14 +409,17 @@ class SubscriptionController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        $subscription->update([
+        /*
+        |--------------------------------------------------------------------------
+        | Actualizar información informada por Mercado Pago
+        |--------------------------------------------------------------------------
+        */
 
-            'provider_status' =>
-            $providerStatus,
+        $subscription->update([
+            'provider_status' => $providerStatus,
 
             'next_billing_at' =>
-            $providerData['next_payment_date'] ?? null,
-
+            $providerData['next_payment_date'] ?? $subscription->next_billing_at,
         ]);
 
 
@@ -423,14 +432,11 @@ class SubscriptionController extends Controller
         if ($providerStatus === 'authorized') {
 
             $subscription->update([
-
                 'status' => 'active',
 
                 'started_at' =>
                 $subscription->started_at ?? now(),
-
             ]);
-
 
             return redirect()
                 ->route('subscription.index')
@@ -439,6 +445,10 @@ class SubscriptionController extends Controller
                     'Tu suscripción a AERIA Finance fue activada correctamente.'
                 );
         }
+
+
+
+
 
 
         /*
@@ -572,5 +582,111 @@ class SubscriptionController extends Controller
         return redirect()->away(
             $subscription->init_point
         );
+    }
+
+    public function cancel(Request $request): RedirectResponse
+    {
+        $company = $this->companyContextService->company();
+
+        if (!$company) {
+            return redirect()
+                ->route('subscription.index')
+                ->with('error', 'No se pudo identificar la empresa.');
+        }
+
+        /*
+    |--------------------------------------------------------------------------
+    | Lifetime no puede cancelarse
+    |--------------------------------------------------------------------------
+    */
+
+        if ($company->subscription_lifetime) {
+            return redirect()
+                ->route('subscription.index')
+                ->with(
+                    'error',
+                    'El acceso de por vida no requiere cancelación.'
+                );
+        }
+
+        /*
+    |--------------------------------------------------------------------------
+    | Suscripción activa
+    |--------------------------------------------------------------------------
+    */
+
+        $subscription = $company
+            ->subscriptions()
+            ->where('status', 'active')
+            ->latest('id')
+            ->first();
+
+        if (!$subscription) {
+            return redirect()
+                ->route('subscription.index')
+                ->with(
+                    'error',
+                    'No encontramos una suscripción activa.'
+                );
+        }
+
+        if (!$subscription->provider_subscription_id) {
+            return redirect()
+                ->route('subscription.index')
+                ->with(
+                    'error',
+                    'La suscripción no está vinculada correctamente con Mercado Pago.'
+                );
+        }
+
+        /*
+    |--------------------------------------------------------------------------
+    | Cancelar primero en Mercado Pago
+    |--------------------------------------------------------------------------
+    */
+
+        try {
+
+            $providerData = $this->mercadoPagoService
+                ->cancelSubscription(
+                    $subscription->provider_subscription_id
+                );
+        } catch (\Throwable $e) {
+
+            report($e);
+
+            return redirect()
+                ->route('subscription.index')
+                ->with(
+                    'error',
+                    'No pudimos cancelar la suscripción. Intentá nuevamente.'
+                );
+        }
+
+        /*
+    |--------------------------------------------------------------------------
+    | Actualizar estado local
+    |--------------------------------------------------------------------------
+    */
+
+        $subscription->update([
+            'provider_status' =>
+            $providerData['status'] ?? 'cancelled',
+
+            'status' => 'cancelled',
+
+            'cancelled_at' => now(),
+
+            'next_billing_at' => null,
+
+            'renewal_prepared_at' => null,
+        ]);
+
+        return redirect()
+            ->route('subscription.index')
+            ->with(
+                'success',
+                'La suscripción fue cancelada correctamente.'
+            );
     }
 }
