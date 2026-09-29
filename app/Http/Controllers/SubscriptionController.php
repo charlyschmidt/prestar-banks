@@ -53,13 +53,24 @@ class SubscriptionController extends Controller
 
         $subscription = $company
             ->subscriptions()
+            ->with([
+                'payments' => function ($query) {
+                    $query->latest('paid_at');
+                }
+            ])
             ->latest('id')
+            ->first();
+
+        $lastPayment = $subscription
+            ?->payments
+            ->where('status', 'paid')
             ->first();
 
 
         $data = [
             'company' => $company,
             'subscription' => $subscription,
+            'lastPayment' => $lastPayment,
             'plans' => $this->planService->all(),
         ];
 

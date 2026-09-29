@@ -268,14 +268,14 @@
 /* 6 - 7 días */
 
 .subscription-trial-progress-success {
-    background: #22c55e;
+    background: var(--success);
 }
 
 
 /* 4 - 5 días */
 
 .subscription-trial-progress-attention {
-    background: #eab308;
+    background: var(--warning);
 }
 
 
@@ -289,7 +289,7 @@
 /* 1 día */
 
 .subscription-trial-progress-danger {
-    background: #ef4444;
+    background: var(--danger);
 }
 
 
@@ -446,7 +446,7 @@
     border: 1px solid rgba(34, 197, 94, .28);
     border-radius: 7px;
 
-    color: #22c55e;
+    color: var(--success);
 
     font-size: 10px;
     font-weight: 700;
@@ -835,6 +835,556 @@
         justify-content: space-between;
 
         padding: 18px 20px;
+    }
+
+}
+/* ==========================================================
+   ACTIVE SUBSCRIPTION
+========================================================== */
+
+.subscription-active-status {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+
+    gap: 16px;
+}
+
+
+.subscription-active-main {
+    display: flex;
+    align-items: center;
+
+    gap: 14px;
+}
+
+
+.subscription-active-icon {
+    width: 48px;
+    height: 48px;
+
+    flex: 0 0 48px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: rgba(86, 173, 118, .10);
+
+    border: 1px solid rgba(86, 173, 118, .20);
+    border-radius: 12px;
+
+    color: var(--success);
+
+    font-size: 20px;
+}
+
+
+.subscription-active-status .subscription-dashboard-label {
+    margin-bottom: 4px;
+
+    color: var(--success);
+}
+
+
+.subscription-active-badge {
+    display: inline-flex;
+    align-items: center;
+
+    gap: 7px;
+
+    padding: 7px 10px;
+
+    background: rgba(86, 173, 118, .10);
+
+    border: 1px solid rgba(86, 173, 118, .20);
+    border-radius: 8px;
+
+    color: var(--success);
+
+    font-size: 10px;
+    font-weight: 700;
+
+    white-space: nowrap;
+}
+
+
+
+/* ==========================================================
+   ACTIVE DETAILS GRID
+========================================================== */
+
+.subscription-active-grid {
+    width: 100%;
+
+    display: grid;
+    grid-template-columns: 1fr;
+
+    gap: 14px;
+}
+
+
+.subscription-detail-card {
+    min-width: 0;
+
+    display: grid;
+    grid-template-columns: 1fr;
+
+    padding: 20px;
+
+    background: var(--company-card);
+
+    border: 1px solid var(--company-border);
+    border-radius: 16px;
+}
+
+
+.subscription-detail-block {
+    min-width: 0;
+}
+
+
+.subscription-detail-label {
+    display: block;
+
+    margin-bottom: 7px;
+
+    color: var(--company-muted);
+
+    font-size: 10px;
+    font-weight: 700;
+
+    letter-spacing: .5px;
+    text-transform: uppercase;
+}
+
+
+.subscription-detail-value {
+    display: block;
+
+    margin-bottom: 5px;
+
+    color: var(--company-text);
+
+    font-size: 18px;
+    font-weight: 700;
+
+    line-height: 1.25;
+}
+
+
+.subscription-detail-block small {
+    display: block;
+
+    color: var(--company-muted);
+
+    font-size: 11px;
+    line-height: 1.45;
+}
+
+
+.subscription-detail-divider {
+    width: 100%;
+    height: 1px;
+
+    margin: 17px 0;
+
+    background: var(--company-border);
+}
+
+
+
+/* ==========================================================
+   PAYMENT HISTORY
+========================================================== */
+
+.subscription-payments-table-wrapper {
+    width: 100%;
+
+    overflow: hidden;
+
+    background: var(--company-card);
+
+    border: 1px solid var(--company-border);
+    border-radius: 16px;
+}
+
+
+.subscription-payments-table-wrapper .table-responsive {
+    width: 100%;
+
+    overflow-x: auto;
+
+    -webkit-overflow-scrolling: touch;
+}
+
+
+.subscription-payments-table {
+    width: 100%;
+
+    border-collapse: collapse;
+
+    white-space: nowrap;
+}
+
+
+.subscription-payments-table th {
+    padding: 12px 16px;
+
+    background: var(--company-hover);
+
+    border-bottom: 1px solid var(--company-border);
+
+    color: var(--company-muted);
+
+    font-size: 9px;
+    font-weight: 700;
+
+    letter-spacing: .5px;
+    text-align: left;
+    text-transform: uppercase;
+}
+
+
+.subscription-payments-table td {
+    padding: 15px 16px;
+
+    border-bottom: 1px solid var(--company-border);
+
+    color: var(--company-text);
+
+    font-size: 11px;
+
+    vertical-align: middle;
+}
+
+
+.subscription-payments-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+
+.subscription-payment-amount {
+    font-weight: 700;
+}
+
+
+.subscription-period-arrow {
+    margin: 0 4px;
+
+    color: var(--company-muted);
+}
+
+
+
+/* ==========================================================
+   PAYMENT STATUS
+========================================================== */
+
+.subscription-payment-status {
+    display: inline-flex;
+    align-items: center;
+
+    gap: 5px;
+
+    padding: 5px 8px;
+
+    border-radius: 7px;
+
+    font-size: 9px;
+    font-weight: 700;
+}
+
+
+/* Aprobado */
+
+.subscription-payment-status.is-paid {
+    background: rgba(86, 173, 118, .10);
+
+    border: 1px solid rgba(86, 173, 118, .20);
+
+    color: var(--success);
+}
+
+
+/* Pendiente */
+
+.subscription-payment-status.is-pending {
+    background: rgba(214, 163, 41, .10);
+
+    border: 1px solid rgba(214, 163, 41, .20);
+
+    color: var(--warning);
+}
+
+
+/* Rechazado */
+
+.subscription-payment-status.is-failed {
+    background: rgba(161, 45, 45, .10);
+
+    border: 1px solid rgba(161, 45, 45, .20);
+
+    color: var(--danger);
+}
+
+
+.subscription-empty-payments {
+    padding: 30px !important;
+
+    color: var(--company-muted) !important;
+
+    text-align: center;
+}
+
+
+
+/* ==========================================================
+   AUTO RENEWAL
+========================================================== */
+
+.subscription-renewal-card {
+    width: 100%;
+
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+
+    gap: 16px;
+
+    padding: 18px;
+
+    background: var(--company-card);
+
+    border: 1px solid var(--company-border);
+    border-radius: 14px;
+}
+
+
+.subscription-renewal-info {
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+}
+
+
+.subscription-renewal-icon {
+    width: 38px;
+    height: 38px;
+
+    flex: 0 0 38px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: var(--company-hover);
+
+    border: 1px solid var(--company-border);
+    border-radius: 10px;
+
+    color: var(--company-text);
+
+    font-size: 16px;
+}
+
+
+.subscription-renewal-info strong {
+    display: block;
+
+    margin-bottom: 3px;
+
+    color: var(--company-text);
+
+    font-size: 12px;
+    font-weight: 700;
+}
+
+
+.subscription-renewal-info p {
+    margin: 0;
+
+    color: var(--company-muted);
+
+    font-size: 10px;
+    line-height: 1.45;
+}
+
+
+
+/* ==========================================================
+   CANCEL BUTTON
+========================================================== */
+
+.subscription-cancel-button {
+    width: 100%;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 6px;
+
+    padding: 9px 12px;
+
+    border: 1px solid rgba(239, 68, 68, .45);
+    border-radius: 9px;
+
+    background: rgba(239, 68, 68, .10);
+
+    color: #ef4444;
+
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 600;
+
+    line-height: 1;
+
+    cursor: pointer;
+
+    transition:
+        background .2s ease,
+        border-color .2s ease,
+        transform .2s ease;
+}
+
+
+@media (hover: hover) {
+
+    .subscription-cancel-button:hover {
+        background: rgba(239, 68, 68, .16);
+
+        border-color: rgba(239, 68, 68, .65);
+
+        transform: translateY(-1px);
+    }
+
+}
+
+
+
+/* ==========================================================
+   TABLET / DESKTOP
+========================================================== */
+
+@media (min-width: 769px) {
+
+    .subscription-active-status {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+
+    .subscription-active-main {
+        gap: 16px;
+    }
+
+
+    .subscription-active-icon {
+        width: 52px;
+        height: 52px;
+
+        flex-basis: 52px;
+
+        font-size: 21px;
+    }
+
+
+    .subscription-active-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+        gap: 16px;
+    }
+
+
+    .subscription-detail-card {
+        grid-template-columns:
+            minmax(0, 1fr)
+            1px
+            minmax(0, 1fr);
+
+        padding: 22px;
+    }
+
+
+    .subscription-detail-block:first-child {
+        padding-right: 20px;
+    }
+
+
+    .subscription-detail-block:last-child {
+        padding-left: 20px;
+    }
+
+
+    .subscription-detail-divider {
+        width: 1px;
+        height: 100%;
+
+        min-height: 65px;
+
+        margin: 0;
+    }
+
+
+    .subscription-renewal-card {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+
+        gap: 20px;
+
+        padding: 18px 20px;
+    }
+
+
+    .subscription-cancel-button {
+        width: auto;
+
+        flex-shrink: 0;
+    }
+
+}
+
+
+
+/* ==========================================================
+   HOVER DEVICES
+========================================================== */
+
+@media (hover: hover) {
+
+    .subscription-detail-card {
+        transition:
+            transform .18s ease,
+            border-color .18s ease;
+    }
+
+
+    .subscription-detail-card:hover {
+        transform: translateY(-2px);
+
+        border-color: var(--company-muted);
+    }
+
+
+    .subscription-payments-table tbody tr {
+        transition: background .15s ease;
+    }
+
+
+    .subscription-payments-table tbody tr:hover {
+        background: var(--company-hover);
+    }
+
+
+    .subscription-cancel-button:hover {
+        background: rgba(161, 45, 45, .08);
+
+        border-color: rgba(161, 45, 45, .40);
     }
 
 }

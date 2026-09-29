@@ -28,18 +28,182 @@
 
 
 
-        @if ($company->isOnTrial())
+        @if ($company->subscription_lifetime)
+            {{-- LIFETIME --}}
 
+            <div class="subscription-dashboard-status subscription-active-status">
+
+                <div class="subscription-active-main">
+
+                    <div class="subscription-active-icon">
+                        <i class="bi bi-infinity"></i>
+                    </div>
+
+                    <div>
+                        <span class="subscription-dashboard-label">
+                            Suscripción activa
+                        </span>
+
+                        <h2>
+                            Acceso de por vida
+                        </h2>
+
+                        <p>
+                            Esta empresa cuenta con acceso permanente a AERIA Finance.
+                        </p>
+                    </div>
+
+                </div>
+
+                <div class="subscription-active-badge">
+                    <i class="bi bi-check-circle-fill"></i>
+                    Lifetime
+                </div>
+
+            </div>
+
+
+            {{-- ==========================
+         DETALLES
+    ========================== --}}
+
+            <section class="subscription-dashboard-section">
+
+                <div class="subscription-dashboard-heading">
+
+                    <h2>
+                        Detalles de la suscripción
+                    </h2>
+
+                    <p>
+                        Información del acceso actual de tu empresa.
+                    </p>
+
+                </div>
+
+
+                <div class="subscription-active-grid">
+
+                    <div class="subscription-detail-card">
+
+                        <div class="subscription-detail-block">
+
+                            <span class="subscription-detail-label">
+                                Plan
+                            </span>
+
+                            <strong class="subscription-detail-value">
+                                Lifetime
+                            </strong>
+
+                            <small>
+                                Acceso completo a AERIA Finance
+                            </small>
+
+                        </div>
+
+
+                        <div class="subscription-detail-divider"></div>
+
+
+                        <div class="subscription-detail-block">
+
+                            <span class="subscription-detail-label">
+                                Vigencia
+                            </span>
+
+                            <strong class="subscription-detail-value">
+                                Sin vencimiento
+                            </strong>
+
+                            <small>
+                                Acceso permanente
+                            </small>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="subscription-detail-card">
+
+                        <div class="subscription-detail-block">
+
+                            <span class="subscription-detail-label">
+                                Renovación
+                            </span>
+
+                            <strong class="subscription-detail-value">
+                                No requerida
+                            </strong>
+
+                            <small>
+                                No existen renovaciones periódicas
+                            </small>
+
+                        </div>
+
+
+                        <div class="subscription-detail-divider"></div>
+
+
+                        <div class="subscription-detail-block">
+
+                            <span class="subscription-detail-label">
+                                Estado
+                            </span>
+
+                            <strong class="subscription-detail-value">
+                                Activa
+                            </strong>
+
+                            <small>
+                                Sin fecha de finalización
+                            </small>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            {{-- ==========================
+         ACCESO PERMANENTE
+    ========================== --}}
+
+            <section class="subscription-dashboard-section mt-3">
+
+                <div class="subscription-renewal-card">
+
+                    <div class="subscription-renewal-info">
+
+                        <div class="subscription-renewal-icon">
+                            <i class="bi bi-infinity"></i>
+                        </div>
+
+                        <div>
+
+                            <strong>
+                                No requiere renovación
+                            </strong>
+
+                            <p>
+                                Esta empresa cuenta con acceso permanente a AERIA Finance.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+        @elseif ($company->isOnTrial() && !$company->hasActiveSubscription())
             @php
-                $trialDaysRemaining = max(
-                    1,
-                    (int) ceil(
-                        now()->diffInSeconds(
-                            $company->trial_ends_at,
-                            false
-                        ) / 86400
-                    )
-                );
+                $trialDaysRemaining = max(1, (int) ceil(now()->diffInSeconds($company->trial_ends_at, false) / 86400));
             @endphp
 
 
@@ -124,19 +288,14 @@
                             default => 'success',
                         };
 
-                        $trialProgressWidth = min(
-                            100,
-                            ($trialDaysRemaining / 7) * 100
-                        );
+                        $trialProgressWidth = min(100, ($trialDaysRemaining / 7) * 100);
                     @endphp
 
 
                     <div class="subscription-trial-progress-track">
 
-                        <div
-                            class="subscription-trial-progress-bar subscription-trial-progress-{{ $trialProgressStatus }}"
-                            style="width: {{ $trialProgressWidth }}%"
-                        ></div>
+                        <div class="subscription-trial-progress-bar subscription-trial-progress-{{ $trialProgressStatus }}"
+                            style="width: {{ $trialProgressWidth }}%"></div>
 
                     </div>
 
@@ -180,14 +339,9 @@
                             Email de Mercado Pago
                         </label>
 
-                        <input
-                            type="email"
-                            id="subscription-payer-email"
-                            value="{{ old('payer_email', auth()->user()->email) }}"
-                            placeholder="ejemplo@empresa.com"
-                            autocomplete="email"
-                            required
-                        >
+                        <input type="email" id="subscription-payer-email"
+                            value="{{ old('payer_email', auth()->user()->email) }}" placeholder="ejemplo@empresa.com"
+                            autocomplete="email" required>
 
                         <small>
                             Puede ser distinto al email con el que ingresás a AERIA Finance.
@@ -205,11 +359,7 @@
                  PRUEBA MERCADO PAGO
             ========================== --}}
 
-            @if (
-                auth()->check()
-                && strtolower(auth()->user()->email) === 'centralpadelar@gmail.com'
-            )
-
+            @if (auth()->check() && strtolower(auth()->user()->email) === 'centralpadelar@gmail.com')
                 <div class="subscription-test-box">
 
                     <div>
@@ -226,24 +376,13 @@
                     </div>
 
 
-                    <form
-                        method="POST"
-                        action="{{ route('subscription.test') }}"
-                        class="subscription-payer-form"
-                    >
+                    <form method="POST" action="{{ route('subscription.test') }}" class="subscription-payer-form">
 
                         @csrf
 
-                        <input
-                            type="hidden"
-                            name="payer_email"
-                            class="subscription-payer-email-hidden"
-                        >
+                        <input type="hidden" name="payer_email" class="subscription-payer-email-hidden">
 
-                        <button
-                            type="submit"
-                            class="primary-button"
-                        >
+                        <button type="submit" class="primary-button">
                             <i class="bi bi-credit-card"></i>
                             Probar suscripción $50
                         </button>
@@ -251,7 +390,6 @@
                     </form>
 
                 </div>
-
             @endif
 
 
@@ -376,30 +514,16 @@
                         </div>
 
 
-                        <form
-                            method="POST"
-                            action="{{ route('subscription.subscribe') }}"
-                            class="subscription-plan-action subscription-payer-form"
-                        >
+                        <form method="POST" action="{{ route('subscription.subscribe') }}"
+                            class="subscription-plan-action subscription-payer-form">
 
                             @csrf
 
-                            <input
-                                type="hidden"
-                                name="plan"
-                                value="monthly"
-                            >
+                            <input type="hidden" name="plan" value="monthly">
 
-                            <input
-                                type="hidden"
-                                name="payer_email"
-                                class="subscription-payer-email-hidden"
-                            >
+                            <input type="hidden" name="payer_email" class="subscription-payer-email-hidden">
 
-                            <button
-                                type="submit"
-                                class="primary-button"
-                            >
+                            <button type="submit" class="primary-button">
                                 Elegir plan mensual
                             </button>
 
@@ -514,30 +638,16 @@
                         </div>
 
 
-                        <form
-                            method="POST"
-                            action="{{ route('subscription.subscribe') }}"
-                            class="subscription-plan-action subscription-payer-form"
-                        >
+                        <form method="POST" action="{{ route('subscription.subscribe') }}"
+                            class="subscription-plan-action subscription-payer-form">
 
                             @csrf
 
-                            <input
-                                type="hidden"
-                                name="plan"
-                                value="annual"
-                            >
+                            <input type="hidden" name="plan" value="annual">
 
-                            <input
-                                type="hidden"
-                                name="payer_email"
-                                class="subscription-payer-email-hidden"
-                            >
+                            <input type="hidden" name="payer_email" class="subscription-payer-email-hidden">
 
-                            <button
-                                type="submit"
-                                class="primary-button"
-                            >
+                            <button type="submit" class="primary-button">
                                 Elegir plan anual
                             </button>
 
@@ -569,47 +679,352 @@
 
 
             </section>
-
-
         @elseif ($company->hasActiveSubscription())
-
-
             {{-- ==========================
-                 SUSCRIPCIÓN ACTIVA
-            ========================== --}}
+         SUSCRIPCIÓN ACTIVA
+    ========================== --}}
 
-            <div class="subscription-dashboard-status">
+            <div class="subscription-dashboard-status subscription-active-status">
 
-                <div>
+                <div class="subscription-active-main">
 
-                    <span class="subscription-dashboard-label">
-                        Suscripción activa
-                    </span>
+                    <div class="subscription-active-icon">
+                        <i class="bi bi-check-lg"></i>
+                    </div>
 
-                    <h2>
-                        {{ $subscription?->plan === 'annual' ? 'Plan anual' : 'Plan mensual' }}
-                    </h2>
+                    <div>
+                        <span class="subscription-dashboard-label">
+                            Suscripción activa
+                        </span>
 
-                    <p>
-                        Tu suscripción a AERIA Finance
-                        se encuentra activa.
-                    </p>
+                        <h2>
+                            {{ $subscription?->plan === 'annual' ? 'Plan anual' : 'Plan mensual' }}
+                        </h2>
 
+                        <p>
+                            Tu suscripción a AERIA Finance se encuentra activa
+                            y se renovará automáticamente.
+                        </p>
+                    </div>
+
+                </div>
+
+                <div class="subscription-active-badge">
+                    <i class="bi bi-arrow-repeat"></i>
+                    Renovación automática
                 </div>
 
             </div>
 
 
-            {{-- Acá construiremos después:
-                - período actual
-                - próxima renovación
-                - importe abonado
-                - cotización aplicada
-                - historial de pagos
-                - cancelación
-            --}}
+            {{-- ==========================
+         RESUMEN
+    ========================== --}}
+
+            <section class="subscription-dashboard-section">
+
+                <div class="subscription-dashboard-heading">
+                    <h2>Detalles de la suscripción</h2>
+
+                    <p>
+                        Información del período actual y de tu último pago.
+                    </p>
+                </div>
 
 
+                <div class="subscription-active-grid">
+
+                    {{-- PLAN Y PERÍODO --}}
+                    <div class="subscription-detail-card">
+
+                        <div class="subscription-detail-block">
+
+                            <span class="subscription-detail-label">
+                                Plan actual
+                            </span>
+
+                            <strong class="subscription-detail-value">
+                                {{ $subscription?->plan === 'annual' ? 'Plan anual' : 'Plan mensual' }}
+                            </strong>
+
+                            <small>
+                                USD {{ number_format((float) ($subscription?->price_usd ?? 0), 2, ',', '.') }}
+                                /
+                                {{ $subscription?->plan === 'annual' ? 'año' : 'mes' }}
+                            </small>
+
+                        </div>
+
+
+                        <div class="subscription-detail-divider"></div>
+
+
+                        <div class="subscription-detail-block">
+
+                            <span class="subscription-detail-label">
+                                Período actual
+                            </span>
+
+                            @if ($lastPayment?->period_start && $lastPayment?->period_end)
+                                <strong class="subscription-detail-value">
+                                    {{ $lastPayment->period_start->format('d/m/Y') }}
+                                    —
+                                    {{ $lastPayment->period_end->format('d/m/Y') }}
+                                </strong>
+                            @else
+                                <strong class="subscription-detail-value">
+                                    —
+                                </strong>
+                            @endif
+
+                            <small>
+                                Período cubierto por el último pago
+                            </small>
+
+                        </div>
+
+                    </div>
+
+
+                    {{-- RENOVACIÓN Y ÚLTIMO PAGO --}}
+                    <div class="subscription-detail-card">
+
+                        <div class="subscription-detail-block">
+
+                            <span class="subscription-detail-label">
+                                Próxima renovación
+                            </span>
+
+                            <strong class="subscription-detail-value">
+
+                                @if ($subscription?->next_billing_at)
+                                    {{ $subscription->next_billing_at->format('d/m/Y') }}
+                                @else
+                                    —
+                                @endif
+
+                            </strong>
+
+                            <small>
+                                El importe se actualizará según la cotización
+                                correspondiente.
+                            </small>
+
+                        </div>
+
+
+                        <div class="subscription-detail-divider"></div>
+
+
+                        <div class="subscription-detail-block">
+
+                            <span class="subscription-detail-label">
+                                Último pago
+                            </span>
+
+                            @if ($lastPayment)
+                                <strong class="subscription-detail-value">
+                                    $
+                                    {{ number_format((float) $lastPayment->amount_ars, 2, ',', '.') }}
+                                    ARS
+                                </strong>
+
+                                <small>
+                                    USD
+                                    {{ number_format((float) $lastPayment->price_usd, 2, ',', '.') }}
+
+                                    · Cotización $
+                                    {{ number_format((float) $lastPayment->exchange_rate, 2, ',', '.') }}
+                                    / USD
+                                </small>
+                            @else
+                                <strong class="subscription-detail-value">
+                                    —
+                                </strong>
+
+                                <small>
+                                    Todavía no hay pagos registrados.
+                                </small>
+                            @endif
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            {{-- ==========================
+         HISTORIAL DE PAGOS
+    ========================== --}}
+
+            <section class="subscription-dashboard-section mt-3">
+
+                <div class="subscription-dashboard-heading">
+
+                    <h2>
+                        Historial de pagos
+                    </h2>
+
+                    <p>
+                        Detalle de los cobros realizados por tu suscripción.
+                    </p>
+
+                </div>
+
+
+                <div class="table-card subscription-payments-table-wrapper">
+
+                    <div class="table-responsive">
+
+                        <table class="subscription-payments-table">
+
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Período</th>
+                                    <th>Plan</th>
+                                    <th>Cotización</th>
+                                    <th>Importe</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+
+                                @forelse ($subscription->payments as $payment)
+                                    <tr>
+
+                                        <td>
+                                            @if ($payment->paid_at)
+                                                {{ $payment->paid_at->format('d/m/Y') }}
+                                            @elseif ($payment->due_at)
+                                                {{ $payment->due_at->format('d/m/Y') }}
+                                            @else
+                                                —
+                                            @endif
+                                        </td>
+
+
+                                        <td>
+
+                                            @if ($payment->period_start && $payment->period_end)
+                                                {{ $payment->period_start->format('d/m/Y') }}
+                                                <span class="subscription-period-arrow">
+                                                    →
+                                                </span>
+                                                {{ $payment->period_end->format('d/m/Y') }}
+                                            @else
+                                                —
+                                            @endif
+
+                                        </td>
+
+
+                                        <td>
+                                            USD
+                                            {{ number_format((float) $payment->price_usd, 2, ',', '.') }}
+                                        </td>
+
+
+                                        <td>
+                                            $
+                                            {{ number_format((float) $payment->exchange_rate, 2, ',', '.') }}
+                                        </td>
+
+
+                                        <td class="subscription-payment-amount">
+                                            $
+                                            {{ number_format((float) $payment->amount_ars, 2, ',', '.') }}
+                                        </td>
+
+
+                                        <td>
+
+                                            @if ($payment->status === 'paid')
+                                                <span class="subscription-payment-status is-paid">
+                                                    <i class="bi bi-check-circle"></i>
+                                                    Aprobado
+                                                </span>
+                                            @elseif ($payment->status === 'pending')
+                                                <span class="subscription-payment-status is-pending">
+                                                    <i class="bi bi-clock"></i>
+                                                    Pendiente
+                                                </span>
+                                            @else
+                                                <span class="subscription-payment-status is-failed">
+                                                    <i class="bi bi-x-circle"></i>
+                                                    Rechazado
+                                                </span>
+                                            @endif
+
+                                        </td>
+
+                                    </tr>
+
+                                @empty
+
+                                    <tr>
+                                        <td colspan="6" class="subscription-empty-payments">
+                                            Todavía no hay pagos registrados.
+                                        </td>
+                                    </tr>
+                                @endforelse
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            {{-- ==========================
+                RENOVACIÓN / CANCELACIÓN
+            ========================== --}}
+
+            <section class="subscription-dashboard-section">
+
+                <div class="subscription-renewal-card">
+
+                    <div class="subscription-renewal-info">
+
+                        <div class="subscription-renewal-icon">
+                            <i class="bi bi-arrow-repeat"></i>
+                        </div>
+
+                        <div>
+
+                            <strong>
+                                Renovación automática activa
+                            </strong>
+
+                            <p>
+                                @if ($subscription?->next_billing_at)
+                                    Tu plan se renovará automáticamente el
+                                    {{ $subscription->next_billing_at->format('d/m/Y') }}.
+                                @else
+                                    Tu plan tiene habilitada la renovación automática.
+                                @endif
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <button type="button" class="subscription-cancel-button">
+                        Cancelar suscripción
+                    </button>
+
+                </div>
+
+            </section>
         @endif
 
 
