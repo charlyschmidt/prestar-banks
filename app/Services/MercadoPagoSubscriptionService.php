@@ -159,4 +159,29 @@ class MercadoPagoSubscriptionService
 
         return $response->json();
     }
+
+    public function cancelSubscription(
+        string $providerSubscriptionId
+    ): array {
+        $response = $this->client()
+            ->put(
+                self::BASE_URL
+                    . '/preapproval/'
+                    . $providerSubscriptionId,
+                [
+                    'status' => 'canceled',
+                ]
+            );
+
+        if (!$response->successful()) {
+            throw new RuntimeException(
+                'No se pudo cancelar la suscripción en Mercado Pago. HTTP '
+                    . $response->status()
+                    . ' - '
+                    . $response->body()
+            );
+        }
+
+        return $response->json();
+    }
 }

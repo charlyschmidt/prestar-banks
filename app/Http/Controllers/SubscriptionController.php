@@ -160,36 +160,90 @@ class SubscriptionController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        $existingSubscription = $company
-            ->subscriptions()
-            ->whereIn('status', [
-                'pending',
-                'active',
-            ])
-            ->latest('id')
-            ->first();
+       $existingSubscription = $company
+    ->subscriptions()
+    ->whereIn('status', ['pending', 'active'])
+    ->latest('id')
+    ->first();
 
-        if ($existingSubscription) {
+if ($existingSubscription) {
 
-            /*
-            |--------------------------------------------------------------------------
-            | Si ya existe una pendiente con URL de Mercado Pago
-            |--------------------------------------------------------------------------
-            */
+    /*
+    |--------------------------------------------------------------------------
+    | Ya tiene una suscripción activa
+    |--------------------------------------------------------------------------
+    */
 
-            if (
-                $existingSubscription->status === 'pending'
-                && $existingSubscription->init_point
-            ) {
-                return redirect()->away(
-                    $existingSubscription->init_point
-                );
+    if ($existingSubscription->status === 'active') {
+        return back()->with(
+            'error',
+            'La empresa ya posee una suscripción activa.'
+        );
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Tiene el mismo plan pendiente
+    |--------------------------------------------------------------------------
+    |
+    | No creamos otra suscripción. Lo enviamos nuevamente
+    | al checkout que ya habíamos generado.
+    |
+    */
+
+    if (
+        $existingSubscription->status === 'pending'
+        && $existingSubscription->plan === $request->plan
+        && $existingSubscription->init_point
+    ) {
+        return redirect()->away(
+            $existingSubscription->init_point
+        );
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Cambió de plan
+    |--------------------------------------------------------------------------
+    |
+    | Cancelamos primero el preapproval anterior en Mercado Pago
+    | y luego dejamos que continúe el método para crear el nuevo.
+    |
+    */
+
+    if (
+        $existingSubscription->status === 'pending'
+        && $existingSubscription->plan !== $request->plan
+    ) {
+
+        try {
+
+            if ($existingSubscription->provider_subscription_id) {
+                $this->mercadoPagoService
+                    ->cancelSubscription(
+                        $existingSubscription->provider_subscription_id
+                    );
             }
+
+            $existingSubscription->update([
+                'status' => 'cancelled',
+                'provider_status' => 'cancelled',
+                'cancelled_at' => now(),
+            ]);
+
+        } catch (\Throwable $e) {
+
+            report($e);
 
             return back()->with(
                 'error',
-                'La empresa ya posee una suscripción activa o pendiente.'
+                'No pudimos cambiar el plan. Intentá nuevamente.'
             );
+        }
+    }
+}
         }
 
 
