@@ -249,39 +249,10 @@ class SubscriptionController extends Controller
                 && $existingSubscription->plan !== $request->plan
             ) {
 
-                try {
-
-                    if (
-                        $existingSubscription->provider_subscription_id
-                    ) {
-                        $this->mercadoPagoService
-                            ->cancelSubscription(
-                                $existingSubscription
-                                    ->provider_subscription_id
-                            );
-                    }
-
-
-                    /*
-                |--------------------------------------------------------------------------
-                | Marcar anterior como cancelada localmente
-                |--------------------------------------------------------------------------
-                */
-
-                    $existingSubscription->update([
-                        'status' => 'cancelled',
-                        'provider_status' => 'cancelled',
-                        'cancelled_at' => now(),
-                    ]);
-                } catch (\Throwable $e) {
-
-                    report($e);
-
-                    return back()->with(
-                        'error',
-                        'No pudimos cambiar el plan. Intentá nuevamente.'
-                    );
-                }
+                $existingSubscription->update([
+                    'status' => 'cancelled',
+                    'cancelled_at' => now(),
+                ]);
             }
         }
 
