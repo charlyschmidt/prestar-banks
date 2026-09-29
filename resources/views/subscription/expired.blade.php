@@ -7,45 +7,21 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta
-        name="description"
-        content="AERIA Finance - Activar suscripción"
-    >
+    <meta name="description" content="AERIA Finance - Activar suscripción">
 
     <title>
         Período de prueba finalizado | AERIA Finance
     </title>
 
-    @vite([
-        'resources/css/welcome.css',
-        'resources/css/subscription.css',
-        'resources/js/welcome.js'
-    ])
+    @vite(['resources/css/welcome.css', 'resources/css/subscription.css', 'resources/js/welcome.js'])
 
-    <link
-        rel="apple-touch-icon"
-        sizes="180x180"
-        href="{{ asset('apple-touch-icon.png') }}"
-    >
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png') }}">
 
-    <link
-        rel="icon"
-        type="image/png"
-        sizes="32x32"
-        href="{{ asset('favicon-32x32.png') }}"
-    >
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon-32x32.png') }}">
 
-    <link
-        rel="icon"
-        type="image/png"
-        sizes="16x16"
-        href="{{ asset('favicon-16x16.png') }}"
-    >
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('favicon-16x16.png') }}">
 
-    <link
-        rel="manifest"
-        href="{{ asset('site.webmanifest') }}"
-    >
+    <link rel="manifest" href="{{ asset('site.webmanifest') }}">
 
 </head>
 
@@ -57,11 +33,7 @@
 
         {{-- FONDO AERIA --}}
 
-        <div
-            class="welcome-nebula"
-            id="welcome-nebula"
-            aria-hidden="true"
-        >
+        <div class="welcome-nebula" id="welcome-nebula" aria-hidden="true">
 
             <div class="welcome-nebula-cloud welcome-nebula-cloud-1"></div>
 
@@ -72,11 +44,7 @@
         </div>
 
 
-        <canvas
-            id="welcome-particles"
-            class="welcome-particles"
-            aria-hidden="true"
-        ></canvas>
+        <canvas id="welcome-particles" class="welcome-particles" aria-hidden="true"></canvas>
 
 
 
@@ -141,68 +109,119 @@
 
 
 
-                <div class="subscription-plan">
+                <div class="subscription-plans">
 
-                    <div class="subscription-plan-info">
+                    {{-- PLAN MENSUAL --}}
 
-                        <span>
-                            AERIA Finance
-                        </span>
+                    <div class="subscription-plan">
 
-                        <strong>
-                            Plan completo
-                        </strong>
+                        <div class="subscription-plan-info">
+
+                            <span>
+                                AERIA Finance
+                            </span>
+
+                            <strong>
+                                Plan mensual
+                            </strong>
+
+                        </div>
+
+
+                        <div class="subscription-price">
+
+                            <span>
+                                USD
+                            </span>
+
+                            <strong>
+                                99
+                            </strong>
+
+                            <small>
+                                / mes
+                            </small>
+
+                        </div>
 
                     </div>
 
 
-                    <div class="subscription-price">
+                    <form method="POST" action="{{ route('subscription.subscribe') }}">
 
-                        <span>
-                            USD
-                        </span>
+                        @csrf
 
-                        <strong>
-                            99
-                        </strong>
+                        <input type="hidden" name="plan" value="monthly">
 
-                        <small>
-                            / mes
-                        </small>
+                        <button type="submit" class="subscription-button">
+                            Activar plan mensual
+                        </button>
+
+                    </form>
+
+
+
+                    {{-- PLAN ANUAL --}}
+
+                    <div class="subscription-plan">
+
+                        <div class="subscription-plan-info">
+
+                            <span>
+                                AERIA Finance
+                            </span>
+
+                            <strong>
+                                Plan anual
+                            </strong>
+
+                            <small>
+                                Ahorrás 2 meses
+                            </small>
+
+                        </div>
+
+
+                        <div class="subscription-price">
+
+                            <span>
+                                USD
+                            </span>
+
+                            <strong>
+                                990
+                            </strong>
+
+                            <small>
+                                / año
+                            </small>
+
+                        </div>
 
                     </div>
+
+
+                    <form method="POST" action="{{ route('subscription.subscribe') }}">
+
+                        @csrf
+
+                        <input type="hidden" name="plan" value="annual">
+
+                        <button type="submit" class="subscription-button">
+                            Activar plan anual
+                        </button>
+
+                    </form>
 
                 </div>
 
 
 
-                <button
-                    type="button"
-                    class="subscription-button"
-                    disabled
-                >
-                    Activar suscripción
-                </button>
-
-
-                <span class="subscription-coming-soon">
-                    Activación online disponible próximamente
-                </span>
-
-
-
-                <form
-                    method="POST"
-                    action="{{ route('logout') }}"
-                    class="subscription-logout-form"
-                >
+                <form method="POST" action="{{ route('logout') }}" class="subscription-logout-form">
 
                     @csrf
 
-                    <button
-                        type="submit"
-                        class="subscription-logout"
-                    >
+                    <button type="submit" class="subscription-logout">
                         Cerrar sesión
                     </button>
 

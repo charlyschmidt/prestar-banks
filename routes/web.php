@@ -14,6 +14,8 @@ use App\Http\Controllers\PlatformAdminController;
 use App\Http\Controllers\FinancialReminderController;
 use App\Http\Controllers\OpeningBalanceImportController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\SubscriptionController;
+use App\Http\Controllers\MercadoPagoWebhookController;
 
 
 /*
@@ -58,6 +60,13 @@ Route::view(
     'legal.privacy'
 )->name('privacy');
 
+
+Route::post(
+    '/webhooks/mercadopago',
+    [MercadoPagoWebhookController::class, 'handle']
+)->name('webhooks.mercadopago');
+
+
 /*
 |--------------------------------------------------------------------------
 | Authenticated User
@@ -66,6 +75,20 @@ Route::view(
 
 Route::middleware('auth')->group(function () {
 
+    Route::get(
+        '/subscription',
+        [SubscriptionController::class, 'index']
+    )->name('subscription.index');
+
+    Route::post(
+        '/subscription/subscribe',
+        [SubscriptionController::class, 'subscribe']
+    )->name('subscription.subscribe');
+
+    Route::get(
+        '/subscription/return',
+        [SubscriptionController::class, 'return']
+    )->name('subscription.return');
 
     /*
     |--------------------------------------------------------------------------
@@ -91,14 +114,14 @@ Route::middleware('auth')->group(function () {
 
 
     /*
-|--------------------------------------------------------------------------
-| Subscription
-|--------------------------------------------------------------------------
-|
-| Esta pantalla debe quedar fuera de company.access,
-| porque justamente se utiliza cuando la empresa ya no tiene acceso.
-|
-*/
+    |--------------------------------------------------------------------------
+    | Subscription
+    |--------------------------------------------------------------------------
+    |
+    | Esta pantalla debe quedar fuera de company.access,
+    | porque justamente se utiliza cuando la empresa ya no tiene acceso.
+    |
+    */
 
     Route::get(
         '/subscription/expired',
@@ -245,6 +268,21 @@ Route::middleware('auth')->group(function () {
             [FinancialReminderController::class, 'destroy']
         )->name('reminders.destroy');
 
+        /*
+        |--------------------------------------------------------------------------
+        | Accounts
+        |--------------------------------------------------------------------------
+        |
+        | Las cuentas pertenecen a la configuración de la empresa
+        | y deben poder administrarse aunque todavía no exista
+        | una jornada financiera abierta.
+        |
+        */
+
+        Route::resource(
+            'accounts',
+            AccountController::class
+        );
 
         /*
         |--------------------------------------------------------------------------
@@ -360,12 +398,6 @@ Route::middleware('auth')->group(function () {
                     'updateAlerts'
                 ]
             )->name('accounts.alerts.update');
-
-
-            Route::resource(
-                'accounts',
-                AccountController::class
-            );
 
 
             /*

@@ -21,13 +21,15 @@
             </div>
 
 
-            <a href="{{ route('accounts.create') }}" class="primary-action-button">
+            @if ($accounts->isNotEmpty())
+                <a href="{{ route('accounts.create') }}" class="primary-action-button">
 
-                <i class="bi bi-plus-lg"></i>
+                    <i class="bi bi-plus-lg"></i>
 
-                Nueva cuenta
+                    Nueva cuenta
 
-            </a>
+                </a>
+            @endif
 
         </div>
 
@@ -114,7 +116,7 @@
 
 
                                     @forelse ($account->balances->sortBy('currency')
-                                                as $balance)
+                                                            as $balance)
                                         <span class="account-currency-badge">
 
                                             {{ $balance->currency }}
@@ -193,7 +195,6 @@
 
             @empty
 
-
                 <div class="col-12">
 
                     <div class="account-empty-state">
@@ -201,19 +202,17 @@
                         <i class="bi bi-bank"></i>
 
                         <h3>
-                            Todavía no hay cuentas
+                            Creá tu primera cuenta
                         </h3>
 
                         <p>
-                            Creá tu primera cuenta para comenzar a operar.
+                            Agregá un banco, billetera o efectivo para comenzar.
                         </p>
 
                         <a href="{{ route('accounts.create') }}" class="primary-action-button">
-
                             <i class="bi bi-plus-lg"></i>
 
                             Nueva cuenta
-
                         </a>
 
                     </div>

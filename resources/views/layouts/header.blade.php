@@ -275,6 +275,18 @@
 
                     </div>
 
+                    <div class="user-dropdown-divider"></div>
+
+                    @if (auth()->user()->isSuperAdmin() || auth()->user()->isAdministration())
+                        <a href="{{ route('subscription.index') }}"
+                            class="user-dropdown-link user-dropdown-subscription {{ request()->routeIs('subscription.*') ? 'active' : '' }}">
+                            <i class="bi bi-award-fill subscription-crown"></i>
+                            Suscripción
+                        </a>
+
+                        <div class="user-dropdown-divider"></div>
+                    @endif
+
 
                     <div class="user-dropdown-divider"></div>
 
@@ -748,8 +760,18 @@
 
                     </div>
 
-
                     <div class="user-dropdown-divider"></div>
+
+                    @if (auth()->user()->isSuperAdmin() || auth()->user()->isAdministration())
+                        <a href="{{ route('subscription.index') }}"
+                            class="user-dropdown-link user-dropdown-subscription {{ request()->routeIs('subscription.*') ? 'active' : '' }}">
+                            <i class="bi bi-award-fill subscription-crown"></i>
+                            Suscripción
+                        </a>
+
+                        <div class="user-dropdown-divider"></div>
+                    @endif
+
 
 
                     <a href="{{ route('dashboard') }}"

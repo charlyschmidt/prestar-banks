@@ -273,18 +273,6 @@
 }
 
 
-.sidebar-subscription-dot {
-    width: 5px;
-    height: 5px;
-
-    flex-shrink: 0;
-
-    border-radius: 50%;
-
-    background: currentColor;
-}
-
-
 .sidebar-subscription-days {
     padding-left: 6px;
 
@@ -307,6 +295,20 @@
 
 .sidebar-subscription-badge.is-active {
     color: #07ff88;
+}
+
+
+/* SUBSCRIPTION MENU */
+
+.user-dropdown-link.user-dropdown-subscription {
+    background: var(--company-button);
+    color: var(--company-button-text);
+    font-weight: 700;
+}
+
+.user-dropdown-link.user-dropdown-subscription .subscription-crown {
+    color: #f59e0b;
+    font-size: 14px;
 }
 
 /* ==========================

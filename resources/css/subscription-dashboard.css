@@ -1,0 +1,795 @@
+/* ==========================================================
+   SUBSCRIPTION DASHBOARD
+   MOBILE FIRST
+========================================================== */
+
+
+/* ==========================
+   STATUS / TRIAL
+========================== */
+
+.subscription-dashboard-status {
+    width: 100%;
+
+    margin-bottom: 28px;
+    padding: 18px;
+
+    background: var(--company-card);
+
+    border: 1px solid var(--company-border);
+    border-radius: 16px;
+}
+
+
+.subscription-dashboard-label {
+    display: inline-flex;
+
+    margin-bottom: 7px;
+
+    color: var(--company-muted);
+
+    font-size: 11px;
+    font-weight: 700;
+
+    letter-spacing: .5px;
+    text-transform: uppercase;
+}
+
+
+.subscription-dashboard-status h2 {
+    margin: 0;
+
+    color: var(--company-text);
+
+    font-size: 19px;
+    font-weight: 700;
+
+    line-height: 1.2;
+}
+
+
+.subscription-dashboard-status p {
+    max-width: 650px;
+
+    margin: 6px 0 0;
+
+    color: var(--company-muted);
+
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+
+/* ==========================
+   TRIAL STATUS
+========================== */
+
+.subscription-trial-status {
+    position: relative;
+
+    overflow: hidden;
+
+    padding: 20px;
+}
+
+
+.subscription-trial-status::before {
+    content: "";
+
+    position: absolute;
+
+    top: 0;
+    bottom: 0;
+    left: 0;
+
+    width: 3px;
+
+    background: var(--company-button);
+}
+
+
+/* ==========================
+   TRIAL MAIN
+========================== */
+
+.subscription-trial-main {
+    display: flex;
+    align-items: center;
+
+    gap: 14px;
+}
+
+
+.subscription-trial-icon {
+    width: 48px;
+    height: 48px;
+
+    flex: 0 0 48px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: var(--company-hover);
+
+    border: 1px solid var(--company-border);
+    border-radius: 12px;
+
+    color: var(--company-text);
+
+    font-size: 19px;
+}
+
+
+.subscription-trial-info {
+    min-width: 0;
+}
+
+
+.subscription-trial-info .subscription-dashboard-label {
+    margin-bottom: 5px;
+
+    font-size: 11px;
+}
+
+
+/* ==========================
+   TRIAL DAYS
+========================== */
+
+.subscription-trial-days {
+    display: flex;
+    align-items: center;
+
+    gap: 11px;
+}
+
+
+.subscription-trial-days>strong {
+    color: var(--company-text);
+
+    font-size: 40px;
+    font-weight: 700;
+
+    line-height: 1;
+
+    letter-spacing: -1px;
+}
+
+
+.subscription-trial-days>div {
+    display: flex;
+    flex-direction: column;
+
+    gap: 2px;
+}
+
+
+.subscription-trial-days span {
+    color: var(--company-text);
+
+    font-size: 15px;
+    font-weight: 700;
+
+    line-height: 1.2;
+}
+
+
+.subscription-trial-days small {
+    color: var(--company-muted);
+
+    font-size: 12px;
+
+    line-height: 1.3;
+}
+
+
+/* ==========================
+   TRIAL EXPIRATION
+========================== */
+
+.subscription-trial-expiration {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 12px;
+
+    margin-top: 19px;
+    padding-top: 16px;
+
+    border-top: 1px solid var(--company-border);
+}
+
+
+.subscription-trial-expiration span {
+    color: var(--company-muted);
+
+    font-size: 13px;
+}
+
+
+.subscription-trial-expiration strong {
+    color: var(--company-text);
+
+    font-size: 14px;
+    font-weight: 700;
+}
+
+
+/* ==========================
+   TRIAL PROGRESS
+========================== */
+
+.subscription-trial-progress {
+    margin-top: 16px;
+}
+
+
+.subscription-trial-progress-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 12px;
+
+    margin-bottom: 8px;
+
+    color: var(--company-muted);
+
+    font-size: 11px;
+    font-weight: 600;
+}
+
+
+.subscription-trial-progress-track {
+    width: 100%;
+    height: 6px;
+
+    overflow: hidden;
+
+    background: var(--company-hover);
+
+    border-radius: 20px;
+}
+
+
+.subscription-trial-progress-bar {
+    height: 100%;
+
+    border-radius: inherit;
+
+    transition:
+        width .3s ease,
+        background-color .25s ease;
+}
+
+
+/* 6 - 7 días */
+
+.subscription-trial-progress-success {
+    background: #22c55e;
+}
+
+
+/* 4 - 5 días */
+
+.subscription-trial-progress-attention {
+    background: #eab308;
+}
+
+
+/* 2 - 3 días */
+
+.subscription-trial-progress-warning {
+    background: #f97316;
+}
+
+
+/* 1 día */
+
+.subscription-trial-progress-danger {
+    background: #ef4444;
+}
+
+
+/* ==========================
+   TRIAL MESSAGE
+========================== */
+
+.subscription-trial-message {
+    max-width: 720px !important;
+
+    margin: 15px 0 0 !important;
+
+    color: var(--company-muted);
+
+    font-size: 12px !important;
+    line-height: 1.5 !important;
+}
+
+
+/* ==========================
+   SECTION
+========================== */
+
+.subscription-dashboard-section {
+    width: 100%;
+}
+
+
+.subscription-dashboard-heading {
+    margin-bottom: 16px;
+}
+
+
+.subscription-dashboard-heading h2 {
+    margin: 0;
+
+    color: var(--company-text);
+
+    font-size: 18px;
+    font-weight: 700;
+}
+
+
+.subscription-dashboard-heading p {
+    margin: 4px 0 0;
+
+    color: var(--company-muted);
+
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+
+/* ==========================
+   PLANS GRID
+========================== */
+
+.subscription-dashboard-plans {
+    width: 100%;
+
+    display: grid;
+    grid-template-columns: 1fr;
+
+    gap: 14px;
+}
+
+
+/* ==========================
+   PLAN CARD
+========================== */
+
+.subscription-dashboard-plan {
+    position: relative;
+
+    min-width: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    padding: 20px;
+
+    background: var(--company-card);
+
+    border: 1px solid var(--company-border);
+    border-radius: 16px;
+}
+
+
+/* ==========================
+   FEATURED PLAN
+========================== */
+
+.subscription-dashboard-plan-featured {
+    border-color: var(--company-muted);
+}
+
+
+/* ==========================
+   PLAN CONTENT
+========================== */
+
+.subscription-plan-content {
+    width: 100%;
+
+    display: flex;
+    flex-direction: column;
+
+    flex: 1;
+}
+
+
+/* ==========================
+   PLAN HEADER
+========================== */
+
+.subscription-plan-header {
+    min-height: 24px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 12px;
+
+    margin-bottom: 14px;
+}
+
+
+.subscription-dashboard-plan-name {
+    color: var(--company-muted);
+
+    font-size: 10px;
+    font-weight: 700;
+
+    letter-spacing: .55px;
+    text-transform: uppercase;
+}
+
+
+/* ==========================
+   SAVING BADGE
+========================== */
+
+.subscription-dashboard-saving {
+    display: inline-flex;
+    align-items: center;
+
+    min-height: 24px;
+
+    padding: 5px 10px;
+
+    background: rgba(34, 197, 94, .12);
+
+    border: 1px solid rgba(34, 197, 94, .28);
+    border-radius: 7px;
+
+    color: #22c55e;
+
+    font-size: 10px;
+    font-weight: 700;
+
+    line-height: 1;
+
+    white-space: nowrap;
+}
+
+
+/* ==========================
+   PRICE
+========================== */
+
+.subscription-dashboard-price {
+    display: flex;
+    align-items: baseline;
+
+    gap: 5px;
+}
+
+
+.subscription-price-currency {
+    color: var(--company-muted);
+
+    font-size: 11px;
+    font-weight: 700;
+}
+
+
+.subscription-dashboard-price strong {
+    color: var(--company-text);
+
+    font-size: 32px;
+    font-weight: 700;
+
+    line-height: 1;
+
+    letter-spacing: -.7px;
+}
+
+
+.subscription-price-period {
+    color: var(--company-muted);
+
+    font-size: 11px;
+}
+
+
+/* ==========================
+   ANNUAL EQUIVALENT
+========================== */
+
+.subscription-dashboard-equivalent {
+    display: block;
+
+    margin-top: 7px;
+
+    color: var(--company-muted);
+
+    font-size: 10px;
+    font-weight: 600;
+}
+
+
+/* ==========================
+   PLAN DESCRIPTION
+========================== */
+
+.subscription-plan-description {
+    margin: 18px 0 0;
+
+    color: var(--company-muted);
+
+    font-size: 11px;
+    line-height: 1.55;
+}
+
+
+/* ==========================
+   PLAN FEATURES
+========================== */
+
+.subscription-plan-features {
+    width: 100%;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 9px;
+
+    margin-top: 18px;
+    padding-top: 16px;
+
+    border-top: 1px solid var(--company-border);
+}
+
+
+.subscription-plan-features>div {
+    display: flex;
+    align-items: flex-start;
+
+    gap: 8px;
+}
+
+
+.subscription-plan-features i {
+    flex: 0 0 16px;
+
+    margin-top: 1px;
+
+    color: var(--company-text);
+
+    font-size: 12px;
+
+    text-align: center;
+}
+
+
+.subscription-plan-features span {
+    color: var(--company-muted);
+
+    font-size: 11px;
+    line-height: 1.4;
+}
+
+
+/* ==========================
+   PLAN ACTION
+========================== */
+
+.subscription-plan-action {
+    width: 100%;
+
+    margin: 22px 0 0;
+    padding-top: 18px;
+
+    border-top: 1px solid var(--company-border);
+}
+
+
+.subscription-plan-action .primary-button {
+    width: 100%;
+
+    justify-content: center;
+
+    padding: 10px 14px;
+
+    border-radius: 9px;
+
+    font-size: 14px;
+}
+
+
+/* ==========================
+   INFO NOTE
+========================== */
+
+.subscription-dashboard-note {
+    width: 100%;
+
+    display: flex;
+    align-items: flex-start;
+
+    gap: 9px;
+
+    margin-top: 14px;
+    padding: 13px 15px;
+
+    background: var(--company-card);
+
+    border: 1px solid var(--company-border);
+    border-radius: 12px;
+}
+
+
+.subscription-dashboard-note i {
+    flex-shrink: 0;
+
+    margin-top: 1px;
+
+    color: var(--company-muted);
+
+    font-size: 13px;
+}
+
+
+.subscription-dashboard-note p {
+    margin: 0;
+
+    color: var(--company-muted);
+
+    font-size: 10px;
+    line-height: 1.5;
+}
+
+
+/* ==========================================================
+   TABLET
+========================================================== */
+
+@media (min-width: 601px) {
+
+    .subscription-dashboard-status {
+        padding: 20px;
+    }
+
+
+    .subscription-dashboard-plan {
+        padding: 22px;
+    }
+
+
+    .subscription-dashboard-price strong {
+        font-size: 35px;
+    }
+
+
+    .subscription-dashboard-note {
+        padding: 14px 16px;
+    }
+
+}
+
+
+/* ==========================================================
+   DESKTOP
+========================================================== */
+
+@media (min-width: 769px) {
+
+    .subscription-trial-status {
+        padding: 22px 24px;
+    }
+
+
+    .subscription-trial-main {
+        gap: 16px;
+    }
+
+
+    .subscription-trial-icon {
+        width: 52px;
+        height: 52px;
+
+        flex-basis: 52px;
+
+        font-size: 21px;
+    }
+
+
+    .subscription-trial-days>strong {
+        font-size: 44px;
+    }
+
+
+    .subscription-trial-days span {
+        font-size: 16px;
+    }
+
+
+    .subscription-trial-days small {
+        font-size: 12px;
+    }
+
+
+    .subscription-trial-expiration span {
+        font-size: 13px;
+    }
+
+
+    .subscription-trial-expiration strong {
+        font-size: 14px;
+    }
+
+
+    .subscription-trial-message {
+        font-size: 13px !important;
+    }
+
+
+    .subscription-dashboard-plans {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+        align-items: stretch;
+
+        gap: 16px;
+    }
+
+
+    .subscription-dashboard-plan {
+        min-height: 390px;
+    }
+
+
+    .subscription-dashboard-heading {
+        margin-bottom: 18px;
+    }
+
+}
+
+
+/* ==========================================================
+   LARGE DESKTOP
+========================================================== */
+
+@media (min-width: 1200px) {
+
+    .subscription-dashboard-plans {
+        gap: 18px;
+    }
+
+
+    .subscription-dashboard-plan {
+        padding: 24px;
+    }
+
+
+    .subscription-dashboard-price strong {
+        font-size: 38px;
+    }
+
+}
+
+
+/* ==========================================================
+   HOVER
+========================================================== */
+
+@media (hover: hover) {
+
+    .subscription-dashboard-plan {
+        transition:
+            transform .18s ease,
+            border-color .18s ease;
+    }
+
+
+    .subscription-dashboard-plan:hover {
+        transform: translateY(-2px);
+
+        border-color: var(--company-muted);
+    }
+
+}

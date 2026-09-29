@@ -47,14 +47,18 @@
                         );
                     @endphp
 
-                    <div class="sidebar-subscription-badge is-trial">
+                    <div class="sidebar-subscription-trial">
 
-                        Período de prueba
+                        <div class="sidebar-subscription-badge is-trial">
 
-                        <span class="sidebar-subscription-days">
-                            {{ $trialDaysRemaining }}
-                            {{ $trialDaysRemaining === 1 ? 'día' : 'días' }}
-                        </span>
+                            Período de prueba
+
+                            <span class="sidebar-subscription-days">
+                                {{ $trialDaysRemaining }}
+                                {{ $trialDaysRemaining === 1 ? 'día' : 'días' }}
+                            </span>
+
+                        </div>
 
                     </div>
 
@@ -215,14 +219,19 @@
                     );
                 @endphp
 
-                <div class="sidebar-subscription-badge is-trial">
+                <div class="sidebar-subscription-trial">
 
-                    Período de prueba
+                    <div class="sidebar-subscription-badge is-trial">
 
-                    <span class="sidebar-subscription-days">
-                        {{ $trialDaysRemaining }}
-                        {{ $trialDaysRemaining === 1 ? 'día' : 'días' }}
-                    </span>
+                        Período de prueba
+
+                        <span class="sidebar-subscription-days">
+                            {{ $trialDaysRemaining }}
+                            {{ $trialDaysRemaining === 1 ? 'día' : 'días' }}
+                        </span>
+
+                    </div>
+
 
                 </div>
 

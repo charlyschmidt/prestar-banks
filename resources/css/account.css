@@ -479,7 +479,76 @@
 }
 
 
+/* ==========================
+   EMPTY STATE
+========================== */
 
+.account-empty-state {
+    width: 100%;
+    max-width: 520px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    gap: 6px;
+
+    margin: 20px auto 0;
+    padding: 32px 24px;
+
+    background: var(--company-card);
+
+    border: 1px solid var(--company-border);
+    border-radius: 16px;
+
+    text-align: center;
+}
+
+
+.account-empty-state > i {
+    width: 42px;
+    height: 42px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin-bottom: 6px;
+
+    background: var(--company-hover);
+
+    border: 1px solid var(--company-border);
+    border-radius: 11px;
+
+    color: var(--company-text);
+
+    font-size: 17px;
+}
+
+
+.account-empty-state h3 {
+    margin: 0;
+
+    color: var(--company-text);
+
+    font-size: 16px;
+    font-weight: 700;
+}
+
+
+.account-empty-state p {
+    margin: 0;
+
+    color: var(--company-muted);
+
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+
+.account-empty-state .primary-action-button {
+    margin-top: 14px;
+}
 
 /* ==========================================================
    ACCOUNT EDIT FORM
