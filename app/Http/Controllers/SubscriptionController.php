@@ -456,4 +456,98 @@ class SubscriptionController extends Controller
                     . '.'
             );
     }
+
+    /*
+|--------------------------------------------------------------------------
+| Suscripción de prueba Mercado Pago
+|--------------------------------------------------------------------------
+|
+| Disponible únicamente para la cuenta autorizada de pruebas.
+|
+*/
+
+    public function subscribeTest(
+        Request $request
+    ): RedirectResponse {
+
+        /*
+    |--------------------------------------------------------------------------
+    | Restringir cuenta
+    |--------------------------------------------------------------------------
+    */
+
+        $user = $request->user();
+
+        if (
+            !$user
+            || strtolower($user->email) !== 'centralpadelar@gmail.com'
+        ) {
+            abort(403);
+        }
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Empresa actual
+    |--------------------------------------------------------------------------
+    */
+
+        $company = $this->companyContextService->company();
+
+        if (!$company) {
+            return back()->with(
+                'error',
+                'No se pudo identificar la empresa activa.'
+            );
+        }
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Crear suscripción de prueba
+    |--------------------------------------------------------------------------
+    */
+
+        try {
+
+            $subscription = $this->subscriptionService
+                ->createTestSubscription(
+                    $company,
+                    $user->email
+                );
+        } catch (\Throwable $e) {
+
+            report($e);
+
+            return back()->with(
+                'error',
+                'No pudimos iniciar la suscripción de prueba.'
+            );
+        }
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Validar checkout
+    |--------------------------------------------------------------------------
+    */
+
+        if (!$subscription->init_point) {
+            return back()->with(
+                'error',
+                'Mercado Pago no devolvió la URL de autorización.'
+            );
+        }
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Ir a Mercado Pago
+    |--------------------------------------------------------------------------
+    */
+
+        return redirect()->away(
+            $subscription->init_point
+        );
+    }
 }

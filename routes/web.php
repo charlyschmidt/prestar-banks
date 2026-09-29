@@ -90,6 +90,12 @@ Route::middleware('auth')->group(function () {
         [SubscriptionController::class, 'return']
     )->name('subscription.return');
 
+    Route::post(
+        '/subscription/test',
+        [SubscriptionController::class, 'subscribeTest']
+    )->name('subscription.test');
+
+
     /*
     |--------------------------------------------------------------------------
     | Company Selection

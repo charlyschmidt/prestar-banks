@@ -137,6 +137,29 @@
             </div>
 
 
+            @if (auth()->check() && strtolower(auth()->user()->email) === 'centralpadelar@gmail.com')
+                <div class="subscription-test-box">
+
+                    <div>
+                        <strong>Prueba de Mercado Pago</strong>
+
+                        <p>
+                            Genera una suscripción real de prueba por $50 ARS
+                            con inicio inmediato.
+                        </p>
+                    </div>
+
+                    <form method="POST" action="{{ route('subscription.test') }}">
+                        @csrf
+
+                        <button type="submit" class="primary-button">
+                            <i class="bi bi-credit-card"></i>
+                            Probar suscripción $50
+                        </button>
+                    </form>
+
+                </div>
+            @endif
 
             {{-- ==========================
                  PLANES
