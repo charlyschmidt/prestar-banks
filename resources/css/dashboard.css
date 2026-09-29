@@ -680,3 +680,503 @@
     }
 
 }
+
+/* ==========================
+   ONBOARDING
+========================== */
+
+.onboarding-page {
+    width: 100%;
+}
+
+
+/* ==========================
+   HERO
+========================== */
+
+.onboarding-hero {
+    width: 100%;
+
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 28px;
+
+    padding: 24px;
+
+    background: var(--company-card);
+
+    border: 1px solid var(--company-border);
+    border-radius: 18px;
+}
+
+
+.onboarding-eyebrow {
+    width: fit-content;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+
+    margin-bottom: 16px;
+    padding: 6px 10px;
+
+    background: var(--company-hover);
+
+    border: 1px solid var(--company-border);
+    border-radius: 999px;
+
+    color: var(--company-muted);
+
+    font-size: 11px;
+    font-weight: 600;
+
+    text-transform: uppercase;
+    letter-spacing: .6px;
+}
+
+
+.onboarding-hero h1 {
+    margin: 0;
+
+    color: var(--company-text);
+
+    font-size: 32px;
+    font-weight: 700;
+
+    line-height: 1.1;
+    letter-spacing: -1px;
+}
+
+
+.onboarding-hero h1 span {
+    font-weight: 400;
+}
+
+
+.onboarding-hero p {
+    max-width: 720px;
+
+    margin: 14px 0 0;
+
+    color: var(--company-muted);
+
+    font-size: 14px;
+    line-height: 1.65;
+}
+
+
+/* ==========================
+   PROGRESS
+========================== */
+
+.onboarding-progress {
+    width: 100%;
+
+    padding: 18px;
+
+    background: var(--company-hover);
+
+    border: 1px solid var(--company-border);
+    border-radius: 14px;
+}
+
+
+.onboarding-progress-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 15px;
+
+    margin-bottom: 12px;
+
+    color: var(--company-muted);
+
+    font-size: 12px;
+}
+
+
+.onboarding-progress-info strong {
+    color: var(--company-text);
+
+    font-weight: 600;
+}
+
+
+.onboarding-progress-bar {
+    width: 100%;
+    height: 6px;
+
+    overflow: hidden;
+
+    background: var(--company-bg);
+
+    border-radius: 999px;
+}
+
+
+.onboarding-progress-bar span {
+    display: block;
+
+    height: 100%;
+
+    background: var(--company-button);
+
+    border-radius: inherit;
+
+    transition: width .3s ease;
+}
+
+
+/* ==========================
+   STEPS
+========================== */
+
+.onboarding-steps {
+    width: 100%;
+
+    display: grid;
+    grid-template-columns: 1fr;
+
+    gap: 16px;
+
+    margin-top: 16px;
+}
+
+
+.onboarding-step {
+    position: relative;
+
+    min-height: 310px;
+
+    display: flex;
+    flex-direction: column;
+
+    padding: 22px;
+
+    background: var(--company-card);
+
+    border: 1px solid var(--company-border);
+    border-radius: 18px;
+
+    overflow: hidden;
+}
+
+
+.onboarding-step.is-active {
+    border-color: var(--company-text);
+}
+
+
+.onboarding-step.is-locked {
+    opacity: .55;
+}
+
+
+/* ==========================
+   STEP HEADER
+========================== */
+
+.onboarding-step-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 15px;
+}
+
+
+.onboarding-step-number {
+    width: 38px;
+    height: 38px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: var(--company-hover);
+
+    border: 1px solid var(--company-border);
+    border-radius: 11px;
+
+    color: var(--company-muted);
+
+    font-size: 12px;
+    font-weight: 700;
+}
+
+
+.onboarding-step.is-active .onboarding-step-number {
+    background: var(--company-button);
+    color: var(--company-button-text);
+
+    border-color: var(--company-button);
+}
+
+
+.onboarding-step.is-completed .onboarding-step-number {
+    color: var(--green);
+}
+
+
+.onboarding-step-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    color: var(--company-muted);
+
+    font-size: 11px;
+    font-weight: 600;
+}
+
+
+.onboarding-step.is-completed .onboarding-step-status {
+    color: var(--green);
+}
+
+
+/* ==========================
+   STEP ICON
+========================== */
+
+.onboarding-step-icon {
+    width: 52px;
+    height: 52px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin-top: 28px;
+
+    background: var(--company-hover);
+
+    border: 1px solid var(--company-border);
+    border-radius: 14px;
+
+    color: var(--company-text);
+
+    font-size: 22px;
+}
+
+
+/* ==========================
+   STEP CONTENT
+========================== */
+
+.onboarding-step-content {
+    margin-top: 20px;
+}
+
+
+.onboarding-step-content h2 {
+    margin: 0;
+
+    color: var(--company-text);
+
+    font-size: 20px;
+    font-weight: 700;
+}
+
+
+.onboarding-step-content p {
+    max-width: 600px;
+
+    margin: 9px 0 0;
+
+    color: var(--company-muted);
+
+    font-size: 13px;
+    line-height: 1.65;
+}
+
+
+.onboarding-step-content strong {
+    color: var(--company-text);
+}
+
+
+/* ==========================
+   STEP ACTION
+========================== */
+
+.onboarding-step-action {
+    margin-top: auto;
+
+    padding-top: 24px;
+}
+
+
+.onboarding-button {
+    min-height: 42px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 9px;
+
+    padding: 0 16px;
+
+    border-radius: 11px;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    text-decoration: none;
+
+    transition:
+        opacity .2s ease,
+        transform .2s ease;
+}
+
+
+.onboarding-button-primary {
+    background: var(--company-button);
+    color: var(--company-button-text);
+}
+
+
+.onboarding-button-secondary {
+    background: transparent;
+
+    border: 1px solid var(--company-border);
+
+    color: var(--company-text);
+}
+
+
+.onboarding-locked-message {
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+
+    color: var(--company-muted);
+
+    font-size: 12px;
+}
+
+
+/* ==========================
+   FOOTER
+========================== */
+
+.onboarding-footer {
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    margin-top: 16px;
+    padding: 15px 18px;
+
+    background: var(--company-card);
+
+    border: 1px solid var(--company-border);
+    border-radius: 12px;
+
+    color: var(--company-muted);
+
+    font-size: 12px;
+}
+
+
+.onboarding-footer i {
+    flex-shrink: 0;
+
+    color: var(--company-text);
+
+    font-size: 16px;
+}
+
+
+/* ==========================
+   TABLET
+========================== */
+
+@media (min-width: 769px) {
+
+    .onboarding-hero {
+        grid-template-columns:
+            minmax(0, 1fr)
+            320px;
+
+        align-items: center;
+
+        gap: 50px;
+
+        padding: 34px;
+    }
+
+
+    .onboarding-hero h1 {
+        font-size: 40px;
+    }
+
+
+    .onboarding-steps {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+        gap: 18px;
+    }
+
+
+    .onboarding-step {
+        min-height: 330px;
+
+        padding: 26px;
+    }
+
+}
+
+
+/* ==========================
+   DESKTOP
+========================== */
+
+@media (min-width: 1200px) {
+
+    .onboarding-hero {
+        padding: 38px 42px;
+    }
+
+
+    .onboarding-hero h1 {
+        font-size: 46px;
+    }
+
+
+    .onboarding-step {
+        padding: 30px;
+    }
+
+}
+
+
+/* ==========================
+   HOVER
+========================== */
+
+@media (hover: hover) {
+
+    .onboarding-button-primary:hover {
+        color: var(--company-button-text);
+
+        opacity: .85;
+
+        transform: translateY(-1px);
+    }
+
+
+    .onboarding-button-secondary:hover {
+        background: var(--company-hover);
+
+        color: var(--company-text);
+    }
+
+}

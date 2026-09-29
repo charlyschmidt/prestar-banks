@@ -6,6 +6,7 @@ use App\Models\Account;
 use App\Models\AccountBalance;
 use App\Services\FinancialDayService;
 use Illuminate\Http\Request;
+use App\Services\CompanyContextService;
 
 
 class FinancialDayController extends Controller
@@ -70,7 +71,8 @@ class FinancialDayController extends Controller
 
     public function store(
         Request $request,
-        FinancialDayService $financialDayService
+        FinancialDayService $financialDayService,
+        CompanyContextService $companyContextService
     ) {
 
         /*
@@ -143,7 +145,26 @@ class FinancialDayController extends Controller
         $financialDayService->open(
             $data['balances']
         );
+        /*
+        |--------------------------------------------------------------------------
+        | Completar onboarding
+        |--------------------------------------------------------------------------
+        |
+        | La primera jornada abierta correctamente marca
+        | el final de la configuración inicial de la empresa.
+        |
+        */
 
+        $company = $companyContextService->company();
+
+        if (
+            $company
+            && !$company->hasCompletedOnboarding()
+        ) {
+            $company->update([
+                'onboarding_completed_at' => now(),
+            ]);
+        }
 
         return redirect()
             ->route('dashboard');

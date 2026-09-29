@@ -23,6 +23,7 @@ class Company extends Model
         'subscription_ends_at',
         'subscription_lifetime',
         'trial_expired_email_sent_at',
+        'onboarding_completed_at',
     ];
 
     protected function casts(): array
@@ -37,6 +38,7 @@ class Company extends Model
             'subscription_lifetime' => 'boolean',
 
             'trial_expired_email_sent_at' => 'datetime',
+            'onboarding_completed_at' => 'datetime',
         ];
     }
 
@@ -130,5 +132,10 @@ class Company extends Model
             ->where('status', 'active')
             ->latest('id')
             ->first();
+    }
+
+    public function hasCompletedOnboarding(): bool
+    {
+        return $this->onboarding_completed_at !== null;
     }
 }

@@ -395,12 +395,7 @@ class PlatformAdminController extends Controller
 
         $company->update([
             'status' => 'active',
-
-            'trial_started_at' => now(),
-
-            'trial_ends_at' => now()->addDays(7),
         ]);
-
 
         /*
     |--------------------------------------------------------------------------

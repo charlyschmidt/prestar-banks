@@ -3,20 +3,63 @@
 namespace App\Http\Controllers;
 
 use App\Services\BalanceDayService;
+use App\Services\CompanyContextService;
+use App\Models\Account;
 
 
 class DashboardController extends Controller
 {
 
     public function index(
-        BalanceDayService $balanceDayService
+        BalanceDayService $balanceDayService,
+        CompanyContextService $companyContextService
     ) {
 
         $summary =
             $balanceDayService->getDashboardSummary();
 
+        $company =
+            $companyContextService->company();
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Sin jornada abierta
+    |--------------------------------------------------------------------------
+    */
 
         if (!$summary['has_day']) {
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Onboarding inicial
+        |--------------------------------------------------------------------------
+        */
+
+            if (
+                $company
+                && !$company->hasCompletedOnboarding()
+            ) {
+
+                $accountsCount = Account::count();
+
+                return view(
+                    'dashboard.onboarding',
+                    [
+                        'summary' => $summary,
+                        'company' => $company,
+                        'accountsCount' => $accountsCount,
+                    ]
+                );
+            }
+
+
+            /*
+        |--------------------------------------------------------------------------
+        | Funcionamiento habitual
+        |--------------------------------------------------------------------------
+        */
 
             return view(
                 'dashboard.no-day',
