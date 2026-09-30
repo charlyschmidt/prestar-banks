@@ -47,6 +47,15 @@
     "src": "resources/css/register-pending.css",
     "isEntry": true
   },
+  "resources/css/software-tesoreria.css": {
+    "file": "assets/software-tesoreria-BQuIO6Dy.css",
+    "name": "software-tesoreria",
+    "names": [
+      "software-tesoreria.css"
+    ],
+    "src": "resources/css/software-tesoreria.css",
+    "isEntry": true
+  },
   "resources/css/welcome.css": {
     "file": "assets/welcome-DjStwIfC.css",
     "name": "welcome",

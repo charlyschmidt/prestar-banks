@@ -16,6 +16,7 @@ export default defineConfig({
                 'resources/css/legal.css',
                 'resources/css/footer.css',
                 'resources/js/welcome.js',
+                'resources/css/software-tesoreria.css',
             ],
 
             refresh: true,
