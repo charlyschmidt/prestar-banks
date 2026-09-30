@@ -13,6 +13,14 @@
 
     @vite(['resources/js/app.js'])
 
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-32MQLSS6RJ');
+    </script>    
+
 </head>
 
 <body class="login-page">

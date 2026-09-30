@@ -92,7 +92,14 @@
 
 
     @vite(['resources/css/software-tesoreria.css', 'resources/css/footer.css', 'resources/js/welcome.js'])
+    
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
 
+        gtag('config', 'G-32MQLSS6RJ');
+    </script>
 </head>
 
 <body>

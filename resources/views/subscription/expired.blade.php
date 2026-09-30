@@ -23,6 +23,14 @@
 
     <link rel="manifest" href="{{ asset('site.webmanifest') }}">
 
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-32MQLSS6RJ');
+    </script>
+
 </head>
 
 
