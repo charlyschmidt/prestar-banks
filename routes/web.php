@@ -67,6 +67,13 @@ Route::post(
 )->name('webhooks.mercadopago');
 
 
+
+Route::view(
+    '/software-de-tesoreria',
+    'seo.software-tesoreria'
+)->name('seo.software-tesoreria');
+
+
 /*
 |--------------------------------------------------------------------------
 | Authenticated User
@@ -96,9 +103,9 @@ Route::middleware('auth')->group(function () {
     )->name('subscription.test');
 
     Route::post(
-    '/subscription/cancel',
-    [SubscriptionController::class, 'cancel']
-)->name('subscription.cancel');
+        '/subscription/cancel',
+        [SubscriptionController::class, 'cancel']
+    )->name('subscription.cancel');
 
 
     /*

@@ -51,6 +51,39 @@
 
     <link rel="manifest" href="{{ asset('site.webmanifest') }}">
 
+    {{-- Structured Data / Schema.org --}}
+    @php
+        $schema = [
+            '@context' => 'https://schema.org',
+            '@type' => 'SoftwareApplication',
+            'name' => 'AERIA Finance',
+            'url' => url('/'),
+            'applicationCategory' => 'BusinessApplication',
+            'operatingSystem' => 'Web',
+            'description' =>
+                'Software de control financiero y tesorería para empresas. Centralizá cuentas, saldos, ingresos, egresos, transferencias y movimientos en tiempo real.',
+            'offers' => [
+                [
+                    '@type' => 'Offer',
+                    'name' => 'Plan mensual',
+                    'price' => '99',
+                    'priceCurrency' => 'USD',
+                    'category' => 'subscription',
+                ],
+                [
+                    '@type' => 'Offer',
+                    'name' => 'Plan anual',
+                    'price' => '990',
+                    'priceCurrency' => 'USD',
+                    'category' => 'subscription',
+                ],
+            ],
+        ];
+    @endphp
+
+    <script type="application/ld+json">
+    {!! json_encode($schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
+</script>
 
     {{-- Assets --}}
     @vite(['resources/css/welcome.css', 'resources/css/footer.css', 'resources/js/welcome.js'])

@@ -41,6 +41,10 @@
                         AERIA Finance
                     </a>
 
+                    <a href="{{ route('seo.software-tesoreria') }}">
+                        Software de tesorería
+                    </a>
+
                     <a href="{{ route('home') }}#welcome-pricing">
                         Plan
                     </a>
