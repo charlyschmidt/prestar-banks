@@ -22,4 +22,10 @@
         <loc>https://www.aeriafinance.com.ar/software-de-tesoreria</loc>
     </url>
 
+    <url>
+    <loc>https://www.aeriafinance.com.ar/guia-de-uso</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+</url>
+
 </urlset>

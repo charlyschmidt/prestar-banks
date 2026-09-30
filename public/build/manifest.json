@@ -29,6 +29,15 @@
     "src": "resources/css/footer.css",
     "isEntry": true
   },
+  "resources/css/guia-de-uso.css": {
+    "file": "assets/guia-de-uso-crwEF9XY.css",
+    "name": "guia-de-uso",
+    "names": [
+      "guia-de-uso.css"
+    ],
+    "src": "resources/css/guia-de-uso.css",
+    "isEntry": true
+  },
   "resources/css/legal.css": {
     "file": "assets/legal-Db6mz76z.css",
     "name": "legal",
@@ -66,12 +75,12 @@
     "isEntry": true
   },
   "resources/js/app.js": {
-    "file": "assets/app-BeqfqTd1.js",
+    "file": "assets/app-BROMPz87.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
     "css": [
-      "assets/app-DilfSpy4.css",
+      "assets/app-BfvglPZu.css",
       "assets/welcome-DHSmhUo-.css",
       "assets/register-pending-LXepLUu1.css"
     ],
@@ -79,6 +88,12 @@
       "assets/bootstrap-icons-mSm7cUeB.woff2",
       "assets/bootstrap-icons-BeopsB42.woff"
     ]
+  },
+  "resources/js/guia-de-uso.js": {
+    "file": "assets/guia-de-uso-C560VtAc.js",
+    "name": "guia-de-uso",
+    "src": "resources/js/guia-de-uso.js",
+    "isEntry": true
   },
   "resources/js/welcome.js": {
     "file": "assets/welcome-BmW93YJc.js",

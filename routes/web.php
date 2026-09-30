@@ -73,6 +73,10 @@ Route::view(
     'seo.software-tesoreria'
 )->name('seo.software-tesoreria');
 
+Route::view(
+    '/guia-de-uso',
+    'guia-de-uso'
+)->name('guia-de-uso');
 
 /*
 |--------------------------------------------------------------------------

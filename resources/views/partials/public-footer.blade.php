@@ -9,6 +9,7 @@
 
 
         @if (!$compact)
+
             <div class="aeria-footer__main">
 
 
@@ -73,6 +74,10 @@
                         Soporte
                     </div>
 
+                    <a href="{{ route('guia-de-uso') }}">
+                        Guía de uso
+                    </a>
+
                     <a href="{{ route('contact') }}">
                         Contacto
                     </a>
@@ -105,6 +110,7 @@
 
 
             </div>
+
         @endif
 
 
@@ -149,7 +155,12 @@
 
 
             @if ($compact)
+
                 <nav class="aeria-footer__compact-links">
+
+                    <a href="{{ route('guia-de-uso') }}" target="_blank" rel="noopener noreferrer">
+                        Guía de uso
+                    </a>
 
                     <a href="{{ route('contact') }}" target="_blank" rel="noopener noreferrer">
                         Contacto
@@ -164,6 +175,7 @@
                     </a>
 
                 </nav>
+
             @endif
 
 
