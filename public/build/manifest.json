@@ -57,7 +57,7 @@
     "isEntry": true
   },
   "resources/css/welcome.css": {
-    "file": "assets/welcome-DjStwIfC.css",
+    "file": "assets/welcome-DHSmhUo-.css",
     "name": "welcome",
     "names": [
       "welcome.css"
@@ -66,13 +66,13 @@
     "isEntry": true
   },
   "resources/js/app.js": {
-    "file": "assets/app-BMrJctA5.js",
+    "file": "assets/app-BeqfqTd1.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
     "css": [
       "assets/app-DilfSpy4.css",
-      "assets/welcome-DjStwIfC.css",
+      "assets/welcome-DHSmhUo-.css",
       "assets/register-pending-LXepLUu1.css"
     ],
     "assets": [

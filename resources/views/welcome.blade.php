@@ -87,10 +87,13 @@
 
     {{-- Assets --}}
     @vite(['resources/css/welcome.css', 'resources/css/footer.css', 'resources/js/welcome.js'])
-    
+
     <script>
         window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
         gtag('js', new Date());
 
         gtag('config', 'G-32MQLSS6RJ');
@@ -458,6 +461,18 @@
 
                             </div>
 
+
+                        </div>
+
+                        <div class="features-more">
+
+                            <a href="{{ route('seo.software-tesoreria') }}" class="plan-button plan-button-more">
+
+                                Quiero saber más
+
+                                <span>→</span>
+
+                            </a>
 
                         </div>
 

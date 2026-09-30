@@ -265,7 +265,7 @@ body {
 .plan-card {
 
     backdrop-filter: blur(4px);
-    
+
     -webkit-backdrop-filter: blur(4px);
 
     width: 100%;
@@ -538,6 +538,24 @@ body {
     transform: scale(.98);
 }
 
+.plan-button-more {
+    width: fit-content;
+    min-height: 42px;
+    padding: 0 30px;
+    margin-top: 30px;
+
+    gap: 10px;
+
+    font-size: 16px;
+}
+
+.plan-button-more span {
+    transition: transform .2s ease;
+}
+
+.plan-button-more:hover span {
+    transform: translateX(4px);
+}
 
 /* ==========================
    FEATURES
@@ -1105,4 +1123,10 @@ body {
         column-gap: 56px;
     }
 
+}
+
+.features-more {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 15px;
 }
