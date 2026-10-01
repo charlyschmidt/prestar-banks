@@ -22,7 +22,7 @@
     <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('favicon-16x16.png') }}">
 
     <link rel="manifest" href="{{ asset('site.webmanifest') }}">
-
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-32MQLSS6RJ"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
