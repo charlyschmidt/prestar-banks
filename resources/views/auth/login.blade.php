@@ -12,6 +12,7 @@
     <title>Ingresar | AERIA Finance</title>
 
     @vite(['resources/js/app.js'])
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-32MQLSS6RJ"></script>
     
     <script>
         window.dataLayer = window.dataLayer || [];

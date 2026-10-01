@@ -5,26 +5,28 @@
 
     <meta charset="UTF-8">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta
-        name="description"
-        content="Solicitud de registro recibida en AERIA Finance"
-    >
+    <meta name="description" content="Solicitud de registro recibida en AERIA Finance">
 
     <title>Solicitud recibida | AERIA Finance</title>
 
     @vite(['resources/css/register-pending.css'])
-    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-32MQLSS6RJ"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
         gtag('js', new Date());
 
         gtag('config', 'G-32MQLSS6RJ');
+        @if (session('registration_completed'))
+            gtag('event', 'sign_up', {
+                method: 'AERIA Finance'
+            });
+        @endif
     </script>
 
 </head>
@@ -35,10 +37,7 @@
 
         <div class="pending-container">
 
-            <a
-                href="{{ route('home') }}"
-                class="pending-brand"
-            >
+            <a href="{{ route('home') }}" class="pending-brand">
                 AERIA <span>Finance</span>
             </a>
 
@@ -46,18 +45,9 @@
             <div class="pending-content">
 
                 <div class="pending-icon">
-                    <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                    >
-                        <path
-                            d="M20 6L9 17L4 12"
-                            stroke="currentColor"
-                            stroke-width="1.8"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                        />
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                            stroke-linejoin="round" />
                     </svg>
                 </div>
 
@@ -91,10 +81,7 @@
                 </p>
 
 
-                <a
-                    href="{{ route('home') }}"
-                    class="pending-button"
-                >
+                <a href="{{ route('home') }}" class="pending-button">
                     Volver a AERIA Finance
                 </a>
 

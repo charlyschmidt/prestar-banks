@@ -25,7 +25,7 @@
     <link rel="manifest" href="{{ asset('site.webmanifest') }}">
 
     @vite(['resources/css/guia-de-uso.css', 'resources/css/footer.css', 'resources/js/welcome.js', 'resources/js/guia-de-uso.js'])
-
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-32MQLSS6RJ"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
 

@@ -13,7 +13,7 @@
     <title>Contacto | AERIA Finance</title>
 
     @vite(['resources/css/welcome.css', 'resources/css/legal.css', 'resources/css/footer.css', 'resources/js/welcome.js'])
-    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-32MQLSS6RJ"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}

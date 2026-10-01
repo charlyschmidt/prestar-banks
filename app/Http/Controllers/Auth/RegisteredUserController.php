@@ -165,7 +165,8 @@ class RegisteredUserController extends Controller
         */
 
         return redirect()
-            ->route('register.pending');
+            ->route('register.pending')
+            ->with('registration_completed', true);
     }
 
 
