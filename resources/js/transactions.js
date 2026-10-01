@@ -37,7 +37,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
-    Echo.channel('dashboard')
+    const companyId =
+        document.body.dataset.companyId;
+
+    if (!companyId) {
+        console.error(
+            'No se encontró la empresa activa en movimientos'
+        );
+        return;
+    }
+
+    const channelName =
+        `dashboard.${companyId}`;
+
+    console.log(
+        'Movimientos conectado al canal:',
+        channelName
+    );
+
+    Echo.private(channelName)
 
         .listen('.transaction.created', (event) => {
 
@@ -67,229 +85,229 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const row = `
 
-<tr>
-<tr data-transaction-id="${transaction.id}">
+            <tr>
+            <tr data-transaction-id="${transaction.id}">
 
-    <!-- CONTADOR -->
-    <td data-movement-counter>
-        0
-    </td>
-
-
-    <!-- FECHA -->
-    <td>
-        Hoy
-    </td>
+                <!-- CONTADOR -->
+                <td data-movement-counter>
+                    0
+                </td>
 
 
-    <!-- CUENTA -->
-    <td>
-
-        <div class="account-cell">
-
-            ${account.logo
-                    ? `<img src="/storage/${account.logo}" alt="${account.name}">`
-                    : `
-                        <div class="mini-logo">
-                            <i class="bi bi-bank"></i>
-                        </div>
-                    `
-                }
-
-            <span>
-                ${account.name}
-            </span>
-
-        </div>
-
-    </td>
+                <!-- FECHA -->
+                <td>
+                    Hoy
+                </td>
 
 
-    <!-- BANCO DESTINO -->
-    <td>
+                <!-- CUENTA -->
+                <td>
 
-        ${transaction.type === 'expense' &&
-                    transaction.destination_bank
+                    <div class="account-cell">
 
-                    ? `
-                    <div class="destination-bank">
-
-                        <i class="bi bi-bank"></i>
+                        ${account.logo
+                                ? `<img src="/storage/${account.logo}" alt="${account.name}">`
+                                : `
+                                    <div class="mini-logo">
+                                        <i class="bi bi-bank"></i>
+                                    </div>
+                                `
+                            }
 
                         <span>
-                            ${transaction.destination_bank}
+                            ${account.name}
                         </span>
 
                     </div>
 
-                    <div
-                        class="execution-badge"
-                        data-execution-badge="${transaction.id}"
-                        style="display: none;"
-                    >
+                </td>
 
-                        <i class="bi bi-check-circle-fill"></i>
+
+                <!-- BANCO DESTINO -->
+                <td>
+
+                    ${transaction.type === 'expense' &&
+                                transaction.destination_bank
+
+                                ? `
+                                <div class="destination-bank">
+
+                                    <i class="bi bi-bank"></i>
+
+                                    <span>
+                                        ${transaction.destination_bank}
+                                    </span>
+
+                                </div>
+
+                                <div
+                                    class="execution-badge"
+                                    data-execution-badge="${transaction.id}"
+                                    style="display: none;"
+                                >
+
+                                    <i class="bi bi-check-circle-fill"></i>
+
+                                    <span>
+                                        Ejecutada
+                                    </span>
+
+                                </div>
+                            `
+
+                                : `
+                                <span class="text-muted">
+                                    —
+                                </span>
+                            `
+                            }
+
+                </td>
+
+
+                <!-- USUARIO -->
+                <td>
+
+                    <div class="movement-user">
+
+                        <i class="bi bi-person-circle"></i>
 
                         <span>
-                            Ejecutada
+                            ${transaction.user?.email
+                                ? transaction.user.email.split('@')[0]
+                                : 'Sin registro'
+                            }
                         </span>
 
                     </div>
-                `
 
-                    : `
-                    <span class="text-muted">
-                        —
-                    </span>
-                `
-                }
-
-    </td>
+                </td>
 
 
-    <!-- USUARIO -->
-    <td>
+                <!-- TIPO -->
+                <td>
 
-        <div class="movement-user">
+                    ${isIncome
 
-            <i class="bi bi-person-circle"></i>
+                                ? `
+                                <span class="movement-income">
 
-            <span>
-                ${transaction.user?.email
-                    ? transaction.user.email.split('@')[0]
-                    : 'Sin registro'
-                }
-            </span>
+                                    <i class="bi bi-arrow-up"></i>
 
-        </div>
+                                    Ingreso
 
-    </td>
+                                </span>
+                            `
 
+                                : `
+                                <span class="movement-expense">
 
-    <!-- TIPO -->
-    <td>
+                                    <i class="bi bi-arrow-down"></i>
 
-        ${isIncome
+                                    Egreso
 
-                    ? `
-                    <span class="movement-income">
+                                </span>
+                            `
+                            }
 
-                        <i class="bi bi-arrow-up"></i>
-
-                        Ingreso
-
-                    </span>
-                `
-
-                    : `
-                    <span class="movement-expense">
-
-                        <i class="bi bi-arrow-down"></i>
-
-                        Egreso
-
-                    </span>
-                `
-                }
-
-    </td>
+                </td>
 
 
-    <!-- DESCRIPCIÓN -->
-    <td>
+                <!-- DESCRIPCIÓN -->
+                <td>
 
-        ${transaction.description ?? 'Sin descripción'}
+                    ${transaction.description ?? 'Sin descripción'}
 
-    </td>
-
-
-    <!-- MONTO -->
-    <td class="text-end">
-
-        ${isIncome
-
-                    ? `
-                    <span class="amount-income">
-
-                        +
-                        $${Number(transaction.amount).toLocaleString(
-                        'es-AR',
-                        {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2
-                        }
-                    )}
-
-                    </span>
-                `
-
-                    : `
-                    <span class="amount-expense">
-
-                        -
-                        $${Number(transaction.amount).toLocaleString(
-                        'es-AR',
-                        {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2
-                        }
-                    )}
-
-                    </span>
-                `
-                }
-
-    </td>
+                </td>
 
 
-    <!-- ACCIONES -->
-    <td>
+                <!-- MONTO -->
+                <td class="text-end">
 
-        <div class="table-actions">
+                    ${isIncome
 
-            ${transaction.can_execute
+                                ? `
+                                <span class="amount-income">
 
-                    ? `
-                        <button
-                            type="button"
-                            class="icon-button execute-transaction-button"
-                            data-transaction-id="${transaction.id}"
-                            data-execute-url="/transactions/${transaction.id}/execute"
-                            title="Ejecutar transferencia"
-                        >
+                                    +
+                                    $${Number(transaction.amount).toLocaleString(
+                                    'es-AR',
+                                    {
+                                        minimumFractionDigits: 2,
+                                        maximumFractionDigits: 2
+                                    }
+                                )}
 
-                            <i class="bi bi-send-check"></i>
+                                </span>
+                            `
 
-                        </button>
-                    `
+                                : `
+                                <span class="amount-expense">
 
-                    : ''
-                }
+                                    -
+                                    $${Number(transaction.amount).toLocaleString(
+                                    'es-AR',
+                                    {
+                                        minimumFractionDigits: 2,
+                                        maximumFractionDigits: 2
+                                    }
+                                )}
 
-            ${transaction.can_manage
+                                </span>
+                            `
+                            }
 
-                    ? `
-                        <a
-                            href="/transactions/${transaction.id}/edit"
-                            class="icon-button"
-                            title="Editar movimiento"
-                        >
+                </td>
 
-                            <i class="bi bi-pencil"></i>
 
-                        </a>
-                    `
+                <!-- ACCIONES -->
+                <td>
 
-                    : ''
-                }
+                    <div class="table-actions">
 
-        </div>
+                        ${transaction.can_execute
 
-    </td>
+                                ? `
+                                    <button
+                                        type="button"
+                                        class="icon-button execute-transaction-button"
+                                        data-transaction-id="${transaction.id}"
+                                        data-execute-url="/transactions/${transaction.id}/execute"
+                                        title="Ejecutar transferencia"
+                                    >
 
-</tr>
+                                        <i class="bi bi-send-check"></i>
 
-`;
+                                    </button>
+                                `
+
+                                : ''
+                            }
+
+                        ${transaction.can_manage
+
+                                ? `
+                                    <a
+                                        href="/transactions/${transaction.id}/edit"
+                                        class="icon-button"
+                                        title="Editar movimiento"
+                                    >
+
+                                        <i class="bi bi-pencil"></i>
+
+                                    </a>
+                                `
+
+                                : ''
+                            }
+
+                    </div>
+
+                </td>
+
+            </tr>
+
+            `;
 
 
 
@@ -298,6 +316,62 @@ document.addEventListener('DOMContentLoaded', () => {
                 row
             );
             renumberTransactions();
+
+        })
+
+        .listen('.transaction.executed', (event) => {
+
+            console.log(
+                'TRANSFERENCIA EJECUTADA RECIBIDA:',
+                event
+            );
+
+            if (
+                String(event.companyId) !==
+                String(companyId)
+            ) {
+                return;
+            }
+
+            const transactionId =
+                event.transaction_id;
+
+            if (!transactionId) {
+                return;
+            }
+
+            /*
+            |--------------------------------------------------------------
+            | Mostrar badge Ejecutada
+            |--------------------------------------------------------------
+            */
+
+            const badge =
+                document.querySelector(
+                    `[data-execution-badge="${transactionId}"]`
+                );
+
+            if (badge) {
+
+                badge.hidden = false;
+                badge.style.display = '';
+
+            }
+
+            /*
+            |--------------------------------------------------------------
+            | Quitar botón Ejecutar
+            |--------------------------------------------------------------
+            */
+
+            const executeButton =
+                document.querySelector(
+                    `.execute-transaction-button[data-transaction-id="${transactionId}"]`
+                );
+
+            if (executeButton) {
+                executeButton.remove();
+            }
 
         });
 
@@ -424,6 +498,7 @@ document.addEventListener('click', async (event) => {
         if (badge) {
 
             badge.hidden = false;
+            badge.style.display = '';
 
         }
 

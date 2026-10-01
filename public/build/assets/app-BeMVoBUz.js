@@ -82,7 +82,7 @@ https://sweetalert2.github.io/#ajax-request`),Qr(e),typeof e.title==`string`&&(e
                         ·
                         ${P(t.account?.name||``)}
                         ${i?` · ${P(i)}`:``}
-                    `}A(k(t)),ae(),j()}).listen(`.transaction.executed`,t=>{if(console.log(`TRANSFERENCIA EJECUTADA RECIBIDA:`,t),String(t.companyId)!==String(e))return;let n=t.transaction_id;if(!n)return;let r=document.querySelector(`[data-execution-badge="${n}"]`);console.log(`BADGE EJECUTADA:`,r,`TRANSACTION:`,n),r&&(r.hidden=!1);let i=document.querySelector(`.execute-transaction-button[data-transaction-id="${n}"]`);i&&i.remove()})});function k(e){let t=e.accountBalance?.currency??e.currency??e.transaction?.currency??``,n=e.accountBalance?.id??e.account_balance_id??e.transaction?.account_balance_id??null;return{transaction:{...e.transaction,account_balance_id:n,currency:t,user:e.transaction?.user??e.user??null},account:e.account??null,account_balance:{id:n,currency:t},currency:t,initialBalance:e.initialBalance??e.transaction?.initial_balance??0}}function re(){let e=document.querySelector(`#movements-body`);if(!e)return;let t=e.querySelectorAll(`tr[data-transaction-id]`),n=t.length;t.forEach((e,t)=>{let r=e.querySelector(`[data-movement-counter]`);r&&(r.textContent=n-t)})}function A(e,t=!0){let n=document.querySelector(`#movements-body`);if(!n)return;let r=e.transaction;if(!r||n.querySelector(`tr[data-transaction-id="${r.id}"]`))return;let i=n.querySelector(`tr[data-empty-row]`);i&&i.remove();let a=r.currency??e.account_balance?.currency??e.currency??`---`,o=r.account_balance_id??e.account_balance?.id??``,s=new Date(r.date),c=String(s.getDate()).padStart(2,`0`),l=String(s.getMonth()+1).padStart(2,`0`),u=String(s.getHours()).padStart(2,`0`),d=String(s.getMinutes()).padStart(2,`0`),f=`${c}/${l}`,p=`${u}:${d}`,m=r.type===`income`,h=r.type===`reserve`,g=Number(r.transfer_tax_amount??0),_=g>0?`
+                    `}A(k(t)),ae(),j()}).listen(`.transaction.executed`,t=>{if(console.log(`TRANSFERENCIA EJECUTADA RECIBIDA:`,t),String(t.companyId)!==String(e))return;let n=t.transaction_id;if(!n)return;let r=document.querySelector(`[data-execution-badge="${n}"]`);console.log(`BADGE EJECUTADA:`,r,`TRANSACTION:`,n),r&&(r.hidden=!1,r.style.display=``);let i=document.querySelector(`.execute-transaction-button[data-transaction-id="${n}"]`);i&&i.remove()})});function k(e){let t=e.accountBalance?.currency??e.currency??e.transaction?.currency??``,n=e.accountBalance?.id??e.account_balance_id??e.transaction?.account_balance_id??null;return{transaction:{...e.transaction,account_balance_id:n,currency:t,user:e.transaction?.user??e.user??null},account:e.account??null,account_balance:{id:n,currency:t},currency:t,initialBalance:e.initialBalance??e.transaction?.initial_balance??0}}function re(){let e=document.querySelector(`#movements-body`);if(!e)return;let t=e.querySelectorAll(`tr[data-transaction-id]`),n=t.length;t.forEach((e,t)=>{let r=e.querySelector(`[data-movement-counter]`);r&&(r.textContent=n-t)})}function A(e,t=!0){let n=document.querySelector(`#movements-body`);if(!n)return;let r=e.transaction;if(!r||n.querySelector(`tr[data-transaction-id="${r.id}"]`))return;let i=n.querySelector(`tr[data-empty-row]`);i&&i.remove();let a=r.currency??e.account_balance?.currency??e.currency??`---`,o=r.account_balance_id??e.account_balance?.id??``,s=new Date(r.date),c=String(s.getDate()).padStart(2,`0`),l=String(s.getMonth()+1).padStart(2,`0`),u=String(s.getHours()).padStart(2,`0`),d=String(s.getMinutes()).padStart(2,`0`),f=`${c}/${l}`,p=`${u}:${d}`,m=r.type===`income`,h=r.type===`reserve`,g=Number(r.transfer_tax_amount??0),_=g>0?`
             <div class="text-muted tax-mov">
                 incl. imp. débito
                 -
@@ -265,187 +265,187 @@ https://sweetalert2.github.io/#ajax-request`),Qr(e),typeof e.title==`string`&&(e
                         ${P(e)}
                         ${N(t)}
                     </span>
-                `).join(``)}function ie(e,t){return`${e||``} ${N(t)}`.trim()}function N(e){let t=Number(e);return Number.isNaN(t)?`0,00`:t.toLocaleString(`es-AR`,{minimumFractionDigits:2,maximumFractionDigits:2})}function P(e){let t=document.createElement(`div`);return t.textContent=e??``,t.innerHTML}function ae(){try{let e=document.querySelector(`#realtime-sound`);e&&typeof e.play==`function`&&(e.currentTime=0,e.play().catch(()=>{}))}catch{}}function F(){let e=document.getElementById(`transactions-body`);if(!e)return;let t=e.querySelectorAll(`tr[data-transaction-id]`),n=t.length;t.forEach((e,t)=>{let r=e.querySelector(`[data-movement-counter]`);r&&(r.textContent=n-t)})}document.addEventListener(`DOMContentLoaded`,()=>{document.getElementById(`transactions-body`)&&Echo.channel(`dashboard`).listen(`.transaction.created`,e=>{console.log(`Nuevo movimiento:`,e);let t=e.transaction,n=e.account,r=document.getElementById(`transactions-body`),i=[`income`].includes(t.type),a=`
+                `).join(``)}function ie(e,t){return`${e||``} ${N(t)}`.trim()}function N(e){let t=Number(e);return Number.isNaN(t)?`0,00`:t.toLocaleString(`es-AR`,{minimumFractionDigits:2,maximumFractionDigits:2})}function P(e){let t=document.createElement(`div`);return t.textContent=e??``,t.innerHTML}function ae(){try{let e=document.querySelector(`#realtime-sound`);e&&typeof e.play==`function`&&(e.currentTime=0,e.play().catch(()=>{}))}catch{}}function F(){let e=document.getElementById(`transactions-body`);if(!e)return;let t=e.querySelectorAll(`tr[data-transaction-id]`),n=t.length;t.forEach((e,t)=>{let r=e.querySelector(`[data-movement-counter]`);r&&(r.textContent=n-t)})}document.addEventListener(`DOMContentLoaded`,()=>{if(!document.getElementById(`transactions-body`))return;let e=document.body.dataset.companyId;if(!e){console.error(`No se encontró la empresa activa en movimientos`);return}let t=`dashboard.${e}`;console.log(`Movimientos conectado al canal:`,t),Echo.private(t).listen(`.transaction.created`,e=>{console.log(`Nuevo movimiento:`,e);let t=e.transaction,n=e.account,r=document.getElementById(`transactions-body`),i=[`income`].includes(t.type),a=`
 
-<tr>
-<tr data-transaction-id="${t.id}">
+            <tr>
+            <tr data-transaction-id="${t.id}">
 
-    <!-- CONTADOR -->
-    <td data-movement-counter>
-        0
-    </td>
-
-
-    <!-- FECHA -->
-    <td>
-        Hoy
-    </td>
+                <!-- CONTADOR -->
+                <td data-movement-counter>
+                    0
+                </td>
 
 
-    <!-- CUENTA -->
-    <td>
-
-        <div class="account-cell">
-
-            ${n.logo?`<img src="/storage/${n.logo}" alt="${n.name}">`:`
-                        <div class="mini-logo">
-                            <i class="bi bi-bank"></i>
-                        </div>
-                    `}
-
-            <span>
-                ${n.name}
-            </span>
-
-        </div>
-
-    </td>
+                <!-- FECHA -->
+                <td>
+                    Hoy
+                </td>
 
 
-    <!-- BANCO DESTINO -->
-    <td>
+                <!-- CUENTA -->
+                <td>
 
-        ${t.type===`expense`&&t.destination_bank?`
-                    <div class="destination-bank">
+                    <div class="account-cell">
 
-                        <i class="bi bi-bank"></i>
+                        ${n.logo?`<img src="/storage/${n.logo}" alt="${n.name}">`:`
+                                    <div class="mini-logo">
+                                        <i class="bi bi-bank"></i>
+                                    </div>
+                                `}
 
                         <span>
-                            ${t.destination_bank}
+                            ${n.name}
                         </span>
 
                     </div>
 
-                    <div
-                        class="execution-badge"
-                        data-execution-badge="${t.id}"
-                        style="display: none;"
-                    >
+                </td>
 
-                        <i class="bi bi-check-circle-fill"></i>
+
+                <!-- BANCO DESTINO -->
+                <td>
+
+                    ${t.type===`expense`&&t.destination_bank?`
+                                <div class="destination-bank">
+
+                                    <i class="bi bi-bank"></i>
+
+                                    <span>
+                                        ${t.destination_bank}
+                                    </span>
+
+                                </div>
+
+                                <div
+                                    class="execution-badge"
+                                    data-execution-badge="${t.id}"
+                                    style="display: none;"
+                                >
+
+                                    <i class="bi bi-check-circle-fill"></i>
+
+                                    <span>
+                                        Ejecutada
+                                    </span>
+
+                                </div>
+                            `:`
+                                <span class="text-muted">
+                                    —
+                                </span>
+                            `}
+
+                </td>
+
+
+                <!-- USUARIO -->
+                <td>
+
+                    <div class="movement-user">
+
+                        <i class="bi bi-person-circle"></i>
 
                         <span>
-                            Ejecutada
+                            ${t.user?.email?t.user.email.split(`@`)[0]:`Sin registro`}
                         </span>
 
                     </div>
-                `:`
-                    <span class="text-muted">
-                        —
-                    </span>
-                `}
 
-    </td>
+                </td>
 
 
-    <!-- USUARIO -->
-    <td>
+                <!-- TIPO -->
+                <td>
 
-        <div class="movement-user">
+                    ${i?`
+                                <span class="movement-income">
 
-            <i class="bi bi-person-circle"></i>
+                                    <i class="bi bi-arrow-up"></i>
 
-            <span>
-                ${t.user?.email?t.user.email.split(`@`)[0]:`Sin registro`}
-            </span>
+                                    Ingreso
 
-        </div>
+                                </span>
+                            `:`
+                                <span class="movement-expense">
 
-    </td>
+                                    <i class="bi bi-arrow-down"></i>
 
+                                    Egreso
 
-    <!-- TIPO -->
-    <td>
+                                </span>
+                            `}
 
-        ${i?`
-                    <span class="movement-income">
-
-                        <i class="bi bi-arrow-up"></i>
-
-                        Ingreso
-
-                    </span>
-                `:`
-                    <span class="movement-expense">
-
-                        <i class="bi bi-arrow-down"></i>
-
-                        Egreso
-
-                    </span>
-                `}
-
-    </td>
+                </td>
 
 
-    <!-- DESCRIPCIÓN -->
-    <td>
+                <!-- DESCRIPCIÓN -->
+                <td>
 
-        ${t.description??`Sin descripción`}
+                    ${t.description??`Sin descripción`}
 
-    </td>
-
-
-    <!-- MONTO -->
-    <td class="text-end">
-
-        ${i?`
-                    <span class="amount-income">
-
-                        +
-                        $${Number(t.amount).toLocaleString(`es-AR`,{minimumFractionDigits:2,maximumFractionDigits:2})}
-
-                    </span>
-                `:`
-                    <span class="amount-expense">
-
-                        -
-                        $${Number(t.amount).toLocaleString(`es-AR`,{minimumFractionDigits:2,maximumFractionDigits:2})}
-
-                    </span>
-                `}
-
-    </td>
+                </td>
 
 
-    <!-- ACCIONES -->
-    <td>
+                <!-- MONTO -->
+                <td class="text-end">
 
-        <div class="table-actions">
+                    ${i?`
+                                <span class="amount-income">
 
-            ${t.can_execute?`
-                        <button
-                            type="button"
-                            class="icon-button execute-transaction-button"
-                            data-transaction-id="${t.id}"
-                            data-execute-url="/transactions/${t.id}/execute"
-                            title="Ejecutar transferencia"
-                        >
+                                    +
+                                    $${Number(t.amount).toLocaleString(`es-AR`,{minimumFractionDigits:2,maximumFractionDigits:2})}
 
-                            <i class="bi bi-send-check"></i>
+                                </span>
+                            `:`
+                                <span class="amount-expense">
 
-                        </button>
-                    `:``}
+                                    -
+                                    $${Number(t.amount).toLocaleString(`es-AR`,{minimumFractionDigits:2,maximumFractionDigits:2})}
 
-            ${t.can_manage?`
-                        <a
-                            href="/transactions/${t.id}/edit"
-                            class="icon-button"
-                            title="Editar movimiento"
-                        >
+                                </span>
+                            `}
 
-                            <i class="bi bi-pencil"></i>
+                </td>
 
-                        </a>
-                    `:``}
 
-        </div>
+                <!-- ACCIONES -->
+                <td>
 
-    </td>
+                    <div class="table-actions">
 
-</tr>
+                        ${t.can_execute?`
+                                    <button
+                                        type="button"
+                                        class="icon-button execute-transaction-button"
+                                        data-transaction-id="${t.id}"
+                                        data-execute-url="/transactions/${t.id}/execute"
+                                        title="Ejecutar transferencia"
+                                    >
 
-`;r.insertAdjacentHTML(`afterbegin`,a),F()})}),document.addEventListener(`click`,async e=>{let t=e.target.closest(`.execute-transaction-button`);if(!t||!(await Swal.fire({icon:`question`,title:`Confirmar transferencia`,text:`¿Confirmás que esta transferencia fue realizada?`,showCancelButton:!0,confirmButtonText:`Sí, confirmar`,cancelButtonText:`Cancelar`,buttonsStyling:!1,customClass:{popup:`aeria-swal`,title:`aeria-swal-title`,htmlContainer:`aeria-swal-text`,actions:`aeria-swal-actions`,confirmButton:`aeria-swal-confirm`,cancelButton:`aeria-swal-cancel`}})).isConfirmed)return;let n=t.dataset.transactionId,r=t.dataset.executeUrl;t.disabled=!0;try{let e=document.querySelector(`meta[name="csrf-token"]`);if(!e)throw Error(`No se encontró el token CSRF.`);let i=await fetch(r,{method:`PATCH`,headers:{Accept:`application/json`,"X-Requested-With":`XMLHttpRequest`,"X-CSRF-TOKEN":e.content}}),a=await i.json();if(!i.ok)throw Error(a.message??`No se pudo ejecutar la transferencia.`);let o=document.querySelector(`[data-execution-badge="${n}"]`);o&&(o.hidden=!1),t.remove()}catch(e){t.disabled=!1,alert(e.message)}}),document.addEventListener(`DOMContentLoaded`,()=>{document.querySelectorAll(`.money-input`).forEach(e=>{e.value&&=I(e.value),e.addEventListener(`input`,function(){let e=this.value;e=e.replace(/\./g,``),e=e.replace(/[^\d,]/g,``);let t=e.indexOf(`,`);t!==-1&&(e=e.substring(0,t+1)+e.substring(t+1).replace(/,/g,``));let n=e.split(`,`),r=n[0]||``,i=n[1]===void 0?null:n[1].substring(0,2);r=r.replace(/^0+(?=\d)/,``),r===``&&(r=`0`),r=Number(r).toLocaleString(`es-AR`),this.value=i===null?r:`${r},${i}`}),e.addEventListener(`blur`,function(){this.value&&=L(this.value)})}),document.querySelectorAll(`form`).forEach(e=>{e.addEventListener(`submit`,()=>{e.querySelectorAll(`.money-input`).forEach(e=>{e.value&&=oe(e.value)})})})});function I(e){if(e==null||e===``)return``;let t=String(e).trim();if(t.includes(`,`))return L(t);let n=Number(t);return Number.isNaN(n)?``:n.toLocaleString(`es-AR`,{minimumFractionDigits:2,maximumFractionDigits:2})}function L(e){if(!e)return``;let t=String(e).replace(/\./g,``).replace(`,`,`.`),n=Number(t);return Number.isNaN(n)?``:n.toLocaleString(`es-AR`,{minimumFractionDigits:2,maximumFractionDigits:2})}function oe(e){return String(e).replace(/\./g,``).replace(`,`,`.`)}var se=`prestar_realtime_sound`;function ce(){let e=localStorage.getItem(se);return e===null||e===`true`}function le(e){localStorage.setItem(se,e?`true`:`false`)}function R(e=!1){if(e||ce())try{let e=window.AudioContext||window.webkitAudioContext;if(!e)return;let t=new e,n=t.createOscillator(),r=t.createGain();n.connect(r),r.connect(t.destination),n.type=`sine`,n.frequency.setValueAtTime(650,t.currentTime),n.frequency.exponentialRampToValueAtTime(320,t.currentTime+.16),r.gain.setValueAtTime(1e-4,t.currentTime),r.gain.exponentialRampToValueAtTime(.045,t.currentTime+.015),r.gain.exponentialRampToValueAtTime(1e-4,t.currentTime+.22),n.start(),n.stop(t.currentTime+.23),n.addEventListener(`ended`,()=>{t.close()})}catch(e){console.warn(`No se pudo reproducir el sonido del movimiento.`,e)}}document.addEventListener(`DOMContentLoaded`,()=>{let e=document.getElementById(`realtimeSound`),t=document.getElementById(`testRealtimeSound`);e&&(e.checked=ce(),e.addEventListener(`change`,()=>{le(e.checked),e.checked&&R()})),t&&t.addEventListener(`click`,()=>{R()})}),document.addEventListener(`keydown`,e=>{let t=e.target;if(!(t.tagName===`INPUT`||t.tagName===`TEXTAREA`||t.tagName===`SELECT`||t.isContentEditable)&&e.shiftKey&&e.key.toLowerCase()===`m`){e.preventDefault();let t=document.body.dataset.createTransactionUrl;t&&(window.location.href=t)}}),document.addEventListener(`DOMContentLoaded`,()=>{let e=document.getElementById(`statement`),t=document.getElementById(`statement-file-name`),n=document.getElementById(`statement-file-detail`);e&&t&&n&&e.addEventListener(`change`,()=>{let r=e.files?.[0];if(!r){t.textContent=`Seleccionar extracto`,n.textContent=`CSV, XLSX o XLS · Máximo 10 MB`;return}t.textContent=r.name;let i=r.size/1048576;if(i<1){let e=Math.max(1,Math.round(r.size/1024));n.textContent=`${e} KB · Archivo listo para procesar`}else n.textContent=`${i.toFixed(2)} MB · Archivo listo para procesar`}),[{formId:`movement-control-form`,buttonId:`movement-control-submit`},{formId:`movement-control-mapping-form`,buttonId:`movement-control-compare`}].forEach(({formId:e,buttonId:t})=>{let n=document.getElementById(e),r=document.getElementById(t);n&&r&&n.addEventListener(`submit`,()=>{r.disabled||(r.disabled=!0,r.setAttribute(`aria-disabled`,`true`),r.innerHTML=`
+                                        <i class="bi bi-send-check"></i>
+
+                                    </button>
+                                `:``}
+
+                        ${t.can_manage?`
+                                    <a
+                                        href="/transactions/${t.id}/edit"
+                                        class="icon-button"
+                                        title="Editar movimiento"
+                                    >
+
+                                        <i class="bi bi-pencil"></i>
+
+                                    </a>
+                                `:``}
+
+                    </div>
+
+                </td>
+
+            </tr>
+
+            `;r.insertAdjacentHTML(`afterbegin`,a),F()}).listen(`.transaction.executed`,t=>{if(console.log(`TRANSFERENCIA EJECUTADA RECIBIDA:`,t),String(t.companyId)!==String(e))return;let n=t.transaction_id;if(!n)return;let r=document.querySelector(`[data-execution-badge="${n}"]`);r&&(r.hidden=!1,r.style.display=``);let i=document.querySelector(`.execute-transaction-button[data-transaction-id="${n}"]`);i&&i.remove()})}),document.addEventListener(`click`,async e=>{let t=e.target.closest(`.execute-transaction-button`);if(!t||!(await Swal.fire({icon:`question`,title:`Confirmar transferencia`,text:`¿Confirmás que esta transferencia fue realizada?`,showCancelButton:!0,confirmButtonText:`Sí, confirmar`,cancelButtonText:`Cancelar`,buttonsStyling:!1,customClass:{popup:`aeria-swal`,title:`aeria-swal-title`,htmlContainer:`aeria-swal-text`,actions:`aeria-swal-actions`,confirmButton:`aeria-swal-confirm`,cancelButton:`aeria-swal-cancel`}})).isConfirmed)return;let n=t.dataset.transactionId,r=t.dataset.executeUrl;t.disabled=!0;try{let e=document.querySelector(`meta[name="csrf-token"]`);if(!e)throw Error(`No se encontró el token CSRF.`);let i=await fetch(r,{method:`PATCH`,headers:{Accept:`application/json`,"X-Requested-With":`XMLHttpRequest`,"X-CSRF-TOKEN":e.content}}),a=await i.json();if(!i.ok)throw Error(a.message??`No se pudo ejecutar la transferencia.`);let o=document.querySelector(`[data-execution-badge="${n}"]`);o&&(o.hidden=!1,o.style.display=``),t.remove()}catch(e){t.disabled=!1,alert(e.message)}}),document.addEventListener(`DOMContentLoaded`,()=>{document.querySelectorAll(`.money-input`).forEach(e=>{e.value&&=I(e.value),e.addEventListener(`input`,function(){let e=this.value;e=e.replace(/\./g,``),e=e.replace(/[^\d,]/g,``);let t=e.indexOf(`,`);t!==-1&&(e=e.substring(0,t+1)+e.substring(t+1).replace(/,/g,``));let n=e.split(`,`),r=n[0]||``,i=n[1]===void 0?null:n[1].substring(0,2);r=r.replace(/^0+(?=\d)/,``),r===``&&(r=`0`),r=Number(r).toLocaleString(`es-AR`),this.value=i===null?r:`${r},${i}`}),e.addEventListener(`blur`,function(){this.value&&=L(this.value)})}),document.querySelectorAll(`form`).forEach(e=>{e.addEventListener(`submit`,()=>{e.querySelectorAll(`.money-input`).forEach(e=>{e.value&&=oe(e.value)})})})});function I(e){if(e==null||e===``)return``;let t=String(e).trim();if(t.includes(`,`))return L(t);let n=Number(t);return Number.isNaN(n)?``:n.toLocaleString(`es-AR`,{minimumFractionDigits:2,maximumFractionDigits:2})}function L(e){if(!e)return``;let t=String(e).replace(/\./g,``).replace(`,`,`.`),n=Number(t);return Number.isNaN(n)?``:n.toLocaleString(`es-AR`,{minimumFractionDigits:2,maximumFractionDigits:2})}function oe(e){return String(e).replace(/\./g,``).replace(`,`,`.`)}var se=`prestar_realtime_sound`;function ce(){let e=localStorage.getItem(se);return e===null||e===`true`}function le(e){localStorage.setItem(se,e?`true`:`false`)}function R(e=!1){if(e||ce())try{let e=window.AudioContext||window.webkitAudioContext;if(!e)return;let t=new e,n=t.createOscillator(),r=t.createGain();n.connect(r),r.connect(t.destination),n.type=`sine`,n.frequency.setValueAtTime(650,t.currentTime),n.frequency.exponentialRampToValueAtTime(320,t.currentTime+.16),r.gain.setValueAtTime(1e-4,t.currentTime),r.gain.exponentialRampToValueAtTime(.045,t.currentTime+.015),r.gain.exponentialRampToValueAtTime(1e-4,t.currentTime+.22),n.start(),n.stop(t.currentTime+.23),n.addEventListener(`ended`,()=>{t.close()})}catch(e){console.warn(`No se pudo reproducir el sonido del movimiento.`,e)}}document.addEventListener(`DOMContentLoaded`,()=>{let e=document.getElementById(`realtimeSound`),t=document.getElementById(`testRealtimeSound`);e&&(e.checked=ce(),e.addEventListener(`change`,()=>{le(e.checked),e.checked&&R()})),t&&t.addEventListener(`click`,()=>{R()})}),document.addEventListener(`keydown`,e=>{let t=e.target;if(!(t.tagName===`INPUT`||t.tagName===`TEXTAREA`||t.tagName===`SELECT`||t.isContentEditable)&&e.shiftKey&&e.key.toLowerCase()===`m`){e.preventDefault();let t=document.body.dataset.createTransactionUrl;t&&(window.location.href=t)}}),document.addEventListener(`DOMContentLoaded`,()=>{let e=document.getElementById(`statement`),t=document.getElementById(`statement-file-name`),n=document.getElementById(`statement-file-detail`);e&&t&&n&&e.addEventListener(`change`,()=>{let r=e.files?.[0];if(!r){t.textContent=`Seleccionar extracto`,n.textContent=`CSV, XLSX o XLS · Máximo 10 MB`;return}t.textContent=r.name;let i=r.size/1048576;if(i<1){let e=Math.max(1,Math.round(r.size/1024));n.textContent=`${e} KB · Archivo listo para procesar`}else n.textContent=`${i.toFixed(2)} MB · Archivo listo para procesar`}),[{formId:`movement-control-form`,buttonId:`movement-control-submit`},{formId:`movement-control-mapping-form`,buttonId:`movement-control-compare`}].forEach(({formId:e,buttonId:t})=>{let n=document.getElementById(e),r=document.getElementById(t);n&&r&&n.addEventListener(`submit`,()=>{r.disabled||(r.disabled=!0,r.setAttribute(`aria-disabled`,`true`),r.innerHTML=`
                 <span
                     class="spinner-border spinner-border-sm"
                     aria-hidden="true">

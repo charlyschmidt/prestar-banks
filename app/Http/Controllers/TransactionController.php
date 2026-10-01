@@ -1498,11 +1498,6 @@ class TransactionController extends Controller
             'executed_by' => $user->id,
         ]);
 
-        $transaction->update([
-            'executed_at' => now(),
-            'executed_by' => $user->id,
-        ]);
-
         $transaction->refresh();
 
 

@@ -629,6 +629,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (badge) {
 
                     badge.hidden = false;
+                    badge.style.display = '';
 
                 }
 
@@ -1071,7 +1072,7 @@ function addMovementToTable(event, animate = true) {
             <div class="movement-bank">
 
                 ${event.account?.id
-                    ? `
+            ? `
                         <a
                             href="/accounts/${event.account.id}/movements"
                             class="account-cell-link"
@@ -1079,8 +1080,8 @@ function addMovementToTable(event, animate = true) {
                             ${escapeHtml(event.account.name || '')}
                         </a>
                     `
-                    : ''
-                }
+            : ''
+        }
 
                 <div
                     class="execution-badge"
@@ -1156,10 +1157,10 @@ function addMovementToTable(event, animate = true) {
 
             <strong>
                 ${formatMoney(
-                    movement.balance_after
-                    ??
-                    0
-                )}
+            movement.balance_after
+            ??
+            0
+        )}
             </strong>
 
             ${transferTaxHtml}
