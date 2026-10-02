@@ -1395,6 +1395,10 @@ body {
 
 }
 
+/* =========================================================
+   ELIMINAR EMPRESA
+========================================================= */
+
 .admin-delete-company {
     flex-shrink: 0;
 
@@ -1404,7 +1408,6 @@ body {
     gap: 8px;
 
     margin-top: 4px;
-
     padding: 10px 14px;
 
     border: 1px solid rgba(239, 68, 68, .45);
@@ -1434,10 +1437,44 @@ body {
 }
 
 
-.aeria-swal-confirm-danger {
-    padding: 10px 18px;
+/* =========================================================
+   SWEETALERT ADMIN
+========================================================= */
 
-    border: 0;
+.aeria-swal {
+    background: #0a0a0a !important;
+    border: 1px solid rgba(255, 255, 255, .12) !important;
+    border-radius: 18px !important;
+
+    color: #fff !important;
+
+    box-shadow:
+        0 25px 70px rgba(0, 0, 0, .75) !important;
+}
+
+.aeria-swal-title {
+    color: #fff !important;
+}
+
+.aeria-swal-text {
+    color: rgba(255, 255, 255, .75) !important;
+}
+
+.aeria-swal-text strong {
+    color: #fff;
+}
+
+.aeria-swal-actions {
+    gap: 10px;
+}
+
+
+/* Confirmar eliminación */
+
+.aeria-swal-confirm-danger {
+    padding: 11px 18px;
+
+    border: 1px solid #ef4444;
     border-radius: 10px;
 
     background: #dc2626;
@@ -1445,21 +1482,56 @@ body {
 
     font-weight: 600;
     cursor: pointer;
+
+    transition:
+        background .2s ease,
+        border-color .2s ease;
 }
 
 .aeria-swal-confirm-danger:hover {
-    background: #b91c1c;
+    background: #ef4444;
+    border-color: #ef4444;
 }
 
+
+/* Cancelar */
+
+.aeria-swal-cancel {
+    padding: 11px 18px;
+
+    border: 1px solid rgba(255, 255, 255, .14);
+    border-radius: 10px;
+
+    background: rgba(255, 255, 255, .06);
+    color: #fff;
+
+    font-weight: 600;
+    cursor: pointer;
+
+    transition:
+        background .2s ease,
+        border-color .2s ease;
+}
+
+.aeria-swal-cancel:hover {
+    background: rgba(255, 255, 255, .10);
+    border-color: rgba(255, 255, 255, .20);
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
 
 @media (max-width: 768px) {
 
     .company-detail-header {
+        flex-direction: column;
         gap: 16px;
     }
 
     .admin-delete-company {
         width: 100%;
+        margin-top: 0;
     }
-
 }
