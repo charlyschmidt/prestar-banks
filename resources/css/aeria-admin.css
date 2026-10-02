@@ -299,7 +299,7 @@ body {
     border-radius: 12px;
 }
 
-.platform-flow-item > div {
+.platform-flow-item>div {
     min-width: 0;
 }
 
@@ -330,19 +330,19 @@ body {
     white-space: nowrap;
 }
 
-.platform-flow-item > i {
+.platform-flow-item>i {
     flex-shrink: 0;
 
     font-size: 15px;
 }
 
 .platform-flow-income strong,
-.platform-flow-income > i {
+.platform-flow-income>i {
     color: #22c55e;
 }
 
 .platform-flow-expense strong,
-.platform-flow-expense > i {
+.platform-flow-expense>i {
     color: #ef4444;
 }
 
@@ -429,7 +429,7 @@ body {
     border-bottom: 1px solid rgba(255, 255, 255, .06);
 }
 
-.company-status-summary > div {
+.company-status-summary>div {
     min-width: 0;
 
     display: flex;
@@ -442,7 +442,7 @@ body {
     border-right: 1px solid rgba(255, 255, 255, .05);
 }
 
-.company-status-summary > div:last-child {
+.company-status-summary>div:last-child {
     border-right: 0;
 }
 
@@ -742,6 +742,10 @@ body {
 
 .company-detail-header {
     margin-bottom: 24px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
 }
 
 .company-detail-title {
@@ -907,7 +911,7 @@ body {
     margin-bottom: 18px;
 }
 
-.activity-day-header > div {
+.activity-day-header>div {
     display: flex;
     flex-direction: column;
 
@@ -921,7 +925,7 @@ body {
     font-weight: 600;
 }
 
-.activity-day-header > div > span {
+.activity-day-header>div>span {
     color: rgba(255, 255, 255, .38);
 
     font-size: 12px;
@@ -969,9 +973,7 @@ body {
     display: grid;
 
     grid-template-columns:
-        minmax(0, 1fr)
-        auto
-        minmax(0, 1fr);
+        minmax(0, 1fr) auto minmax(0, 1fr);
 
     align-items: center;
 
@@ -985,11 +987,11 @@ body {
     border-radius: 11px;
 }
 
-.activity-day-balances > div {
+.activity-day-balances>div {
     min-width: 0;
 }
 
-.activity-day-balances > div:last-child {
+.activity-day-balances>div:last-child {
     text-align: right;
 }
 
@@ -1019,7 +1021,7 @@ body {
     white-space: nowrap;
 }
 
-.activity-day-balances > i {
+.activity-day-balances>i {
     color: rgba(255, 255, 255, .2);
 
     font-size: 12px;
@@ -1041,7 +1043,7 @@ body {
     margin-top: 10px;
 }
 
-.activity-day-movements > div {
+.activity-day-movements>div {
     min-width: 0;
 
     padding: 12px 14px;
@@ -1188,7 +1190,7 @@ body {
         padding: 0 20px;
     }
 
-    .company-status-summary > div {
+    .company-status-summary>div {
         padding: 11px 22px 11px 0;
 
         margin-right: 22px;
@@ -1200,11 +1202,7 @@ body {
         display: grid;
 
         grid-template-columns:
-            minmax(190px, 1.35fr)
-            80px
-            minmax(190px, 1.25fr)
-            130px
-            minmax(100px, .7fr);
+            minmax(190px, 1.35fr) 80px minmax(190px, 1.25fr) 130px minmax(100px, .7fr);
 
         align-items: center;
 
@@ -1253,7 +1251,7 @@ body {
         gap: 16px;
     }
 
-    .company-detail-info span + span::before {
+    .company-detail-info span+span::before {
         content: "·";
 
         margin-right: 16px;
@@ -1306,12 +1304,7 @@ body {
         display: grid;
 
         grid-template-columns:
-            130px
-            minmax(140px, 1fr)
-            minmax(140px, 1fr)
-            minmax(140px, 1fr)
-            minmax(140px, 1fr)
-            110px;
+            130px minmax(140px, 1fr) minmax(140px, 1fr) minmax(140px, 1fr) minmax(140px, 1fr) 110px;
 
         align-items: center;
 
@@ -1403,10 +1396,14 @@ body {
 }
 
 .admin-delete-company {
+    flex-shrink: 0;
+
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
+
+    margin-top: 4px;
 
     padding: 10px 14px;
 
