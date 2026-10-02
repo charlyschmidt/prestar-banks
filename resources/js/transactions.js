@@ -183,6 +183,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 </td>
 
+               <!-- MONEDA -->
+                <td>
+                    <span class="movement-currency">
+                        ${transaction.currency ?? '---'}
+                    </span>
+                </td>
+
 
                 <!-- TIPO -->
                 <td>

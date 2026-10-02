@@ -353,6 +353,13 @@ https://sweetalert2.github.io/#ajax-request`),Qr(e),typeof e.title==`string`&&(e
 
                 </td>
 
+               <!-- MONEDA -->
+                <td>
+                    <span class="movement-currency">
+                        ${t.currency??`---`}
+                    </span>
+                </td>
+
 
                 <!-- TIPO -->
                 <td>
