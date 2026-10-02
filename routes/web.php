@@ -510,4 +510,9 @@ Route::middleware([
             '/companies/{company}',
             [PlatformAdminController::class, 'show']
         )->name('companies.show');
+
+        Route::delete(
+            '/companies/{company}',
+            [PlatformAdminController::class, 'destroy']
+        )->name('companies.destroy');
     });

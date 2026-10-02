@@ -9,6 +9,13 @@ use App\Models\Transaction;
 use Illuminate\Http\RedirectResponse;
 use App\Services\AeriaMailService;
 
+use App\Models\Account;
+use App\Models\AccountBalance;
+use App\Models\FinancialReminder;
+use App\Models\Subscription;
+use App\Models\SubscriptionPayment;
+use Illuminate\Support\Facades\DB;
+
 class PlatformAdminController extends Controller
 {
     /*
@@ -454,4 +461,127 @@ class PlatformAdminController extends Controller
                 ' fue suspendida.'
         );
     }
+
+    public function destroy(Company $company): RedirectResponse
+{
+    DB::transaction(function () use ($company) {
+
+        /*
+        |--------------------------------------------------------------------------
+        | Movimientos
+        |--------------------------------------------------------------------------
+        */
+
+        Transaction::withoutGlobalScopes()
+            ->where('company_id', $company->id)
+            ->delete();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Saldos diarios
+        |--------------------------------------------------------------------------
+        */
+
+        AccountDailyBalance::withoutGlobalScopes()
+            ->where('company_id', $company->id)
+            ->delete();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Jornadas financieras
+        |--------------------------------------------------------------------------
+        */
+
+        FinancialDay::withoutGlobalScopes()
+            ->where('company_id', $company->id)
+            ->delete();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Recordatorios
+        |--------------------------------------------------------------------------
+        */
+
+        FinancialReminder::withoutGlobalScopes()
+            ->where('company_id', $company->id)
+            ->delete();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Saldos / monedas de cuentas
+        |--------------------------------------------------------------------------
+        */
+
+        AccountBalance::withoutGlobalScopes()
+            ->where('company_id', $company->id)
+            ->delete();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Cuentas
+        |--------------------------------------------------------------------------
+        */
+
+        Account::withoutGlobalScopes()
+            ->where('company_id', $company->id)
+            ->delete();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Pagos de suscripción
+        |--------------------------------------------------------------------------
+        */
+
+        SubscriptionPayment::query()
+            ->where('company_id', $company->id)
+            ->delete();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Suscripciones
+        |--------------------------------------------------------------------------
+        */
+
+        Subscription::query()
+            ->where('company_id', $company->id)
+            ->delete();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Usuarios
+        |--------------------------------------------------------------------------
+        |
+        | NO eliminamos users.
+        | Eliminamos solamente su pertenencia a esta empresa.
+        |
+        */
+
+        $company->users()->detach();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Empresa
+        |--------------------------------------------------------------------------
+        */
+
+        $company->delete();
+    });
+
+
+    return redirect()
+        ->route('aeria-admin.index')
+        ->with(
+            'success',
+            'La empresa y todos sus datos fueron eliminados correctamente.'
+        );
+}
 }

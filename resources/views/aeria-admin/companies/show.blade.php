@@ -5,10 +5,7 @@
 
     <meta charset="UTF-8">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>{{ $company->name }} · AERIA Finance</title>
 
@@ -20,596 +17,489 @@
 <body>
 
 
-<header class="admin-header">
+    <header class="admin-header">
 
-    <div class="admin-brand">
+        <div class="admin-brand">
 
-        <strong>
-            AERIA Finance
-        </strong>
+            <strong>
+                AERIA Finance
+            </strong>
 
-        <span>
-            Platform Admin
-        </span>
+            <span>
+                Platform Admin
+            </span>
 
-    </div>
+        </div>
 
 
-    <div class="admin-user">
+        <div class="admin-user">
 
-        <span class="admin-user-name">
-            {{ auth()->user()->name }}
-        </span>
+            <span class="admin-user-name">
+                {{ auth()->user()->name }}
+            </span>
 
-        <form
-            method="POST"
-            action="{{ route('logout') }}"
-            class="admin-logout-form"
-        >
-            @csrf
+            <form method="POST" action="{{ route('logout') }}" class="admin-logout-form">
+                @csrf
 
-            <button
-                type="submit"
-                class="admin-logout-button"
-                title="Cerrar sesión"
-                aria-label="Cerrar sesión"
-            >
-                <i class="bi bi-box-arrow-right"></i>
+                <button type="submit" class="admin-logout-button" title="Cerrar sesión" aria-label="Cerrar sesión">
+                    <i class="bi bi-box-arrow-right"></i>
 
-                <span>
-                    Salir
-                </span>
+                    <span>
+                        Salir
+                    </span>
 
-            </button>
+                </button>
 
-        </form>
+            </form>
 
-    </div>
+        </div>
 
-</header>
+    </header>
 
 
 
-<main class="admin-container">
+    <main class="admin-container">
 
 
-    {{-- ==========================
+        {{-- ==========================
          VOLVER
-    ========================== --}}
+        ========================== --}}
 
-    <div class="admin-back">
+        <div class="admin-back">
 
-        <a href="{{ route('aeria-admin.index') }}">
+            <a href="{{ route('aeria-admin.index') }}">
 
-            <i class="bi bi-arrow-left"></i>
+                <i class="bi bi-arrow-left"></i>
 
-            Empresas
+                Empresas
 
-        </a>
+            </a>
 
-    </div>
+        </div>
 
 
 
-    {{-- ==========================
+        {{-- ==========================
          EMPRESA
-    ========================== --}}
-
-    <div class="company-detail-header">
-
-
-        <div>
-
-            <div class="company-detail-title">
-
-                <h1>
-                    {{ $company->name }}
-                </h1>
-
-                <span class="status status-{{ $company->status }}">
-                    {{ $company->status }}
-                </span>
-
-            </div>
-
-
-            <div class="company-detail-info">
-
-                @if ($company->tax_id)
-
-                    <span>
-                        CUIT {{ $company->tax_id }}
-                    </span>
-
-                @endif
-
-
-                @if ($company->email)
-
-                    <span>
-                        {{ $company->email }}
-                    </span>
-
-                @endif
-
-
-                <span>
-                    Registrada {{ $company->created_at->format('d/m/Y') }}
-                </span>
-
-            </div>
-
-        </div>
-
-
-    </div>
-
-
-
-    {{-- ==========================
-         RESUMEN
-    ========================== --}}
-
-    <div class="company-summary-grid">
-
-
-        <div class="company-summary-card">
-
-            <span>
-                Saldo actual
-            </span>
-
-            <strong>
-                ${{ number_format(
-                    $summary['current_balance'],
-                    2,
-                    ',',
-                    '.'
-                ) }}
-            </strong>
-
-        </div>
-
-
-
-        <div class="company-summary-card">
-
-            <span>
-                Usuarios
-            </span>
-
-            <strong>
-                {{ number_format(
-                    $summary['users'],
-                    0,
-                    ',',
-                    '.'
-                ) }}
-            </strong>
-
-        </div>
-
-
-
-        <div class="company-summary-card">
-
-            <span>
-                Movimientos
-            </span>
-
-            <strong>
-                {{ number_format(
-                    $summary['movements'],
-                    0,
-                    ',',
-                    '.'
-                ) }}
-            </strong>
-
-        </div>
-
-
-
-        <div class="company-summary-card">
-
-            <span>
-                Jornadas
-            </span>
-
-            <strong>
-                {{ number_format(
-                    $summary['financial_days'],
-                    0,
-                    ',',
-                    '.'
-                ) }}
-            </strong>
-
-        </div>
-
-
-
-        <div class="company-summary-card company-summary-income">
-
-            <span>
-                Ingresos totales
-            </span>
-
-            <strong>
-                ${{ number_format(
-                    $summary['income'],
-                    2,
-                    ',',
-                    '.'
-                ) }}
-            </strong>
-
-        </div>
-
-
-
-        <div class="company-summary-card company-summary-expense">
-
-            <span>
-                Egresos totales
-            </span>
-
-            <strong>
-                ${{ number_format(
-                    $summary['expense'],
-                    2,
-                    ',',
-                    '.'
-                ) }}
-            </strong>
-
-        </div>
-
-
-    </div>
-
-
-
-    {{-- ==========================
-         ACTIVIDAD
-    ========================== --}}
-
-    <section class="company-activity-card">
-
-
-        <div class="company-activity-header">
+        ========================== --}}
+
+        <div class="company-detail-header">
+            <form id="delete-company-form" method="POST"
+                action="{{ route('aeria-admin.companies.destroy', $company) }}" style="display: none;">
+                @csrf
+                @method('DELETE')
+            </form>
 
             <div>
 
-                <h2>
-                    Actividad diaria
-                </h2>
+                <div class="company-detail-title">
 
-                <p>
-                    Resumen financiero por jornada
-                </p>
+                    <h1>
+                        {{ $company->name }}
+                    </h1>
+
+                    <span class="status status-{{ $company->status }}">
+                        {{ $company->status }}
+                    </span>
+
+                </div>
+
+
+                <div class="company-detail-info">
+
+                    @if ($company->tax_id)
+                        <span>
+                            CUIT {{ $company->tax_id }}
+                        </span>
+                    @endif
+
+
+                    @if ($company->email)
+                        <span>
+                            {{ $company->email }}
+                        </span>
+                    @endif
+
+
+                    <span>
+                        Registrada {{ $company->created_at->format('d/m/Y') }}
+                    </span>
+
+                </div>
 
             </div>
+
+            <button type="button" class="admin-delete-company" id="delete-company-button"
+                data-company-name="{{ $company->name }}">
+                <i class="bi bi-trash3"></i>
+                Eliminar empresa
+            </button>
+
 
         </div>
 
 
 
-        @if ($days->isEmpty())
+        {{-- ==========================
+         RESUMEN
+    ========================== --}}
+
+        <div class="company-summary-grid">
 
 
-            <div class="empty-state">
+            <div class="company-summary-card">
 
-                Esta empresa todavía no tiene jornadas registradas.
+                <span>
+                    Saldo actual
+                </span>
+
+                <strong>
+                    ${{ number_format($summary['current_balance'], 2, ',', '.') }}
+                </strong>
 
             </div>
 
 
-        @else
+
+            <div class="company-summary-card">
+
+                <span>
+                    Usuarios
+                </span>
+
+                <strong>
+                    {{ number_format($summary['users'], 0, ',', '.') }}
+                </strong>
+
+            </div>
 
 
-            {{-- ==========================
+
+            <div class="company-summary-card">
+
+                <span>
+                    Movimientos
+                </span>
+
+                <strong>
+                    {{ number_format($summary['movements'], 0, ',', '.') }}
+                </strong>
+
+            </div>
+
+
+
+            <div class="company-summary-card">
+
+                <span>
+                    Jornadas
+                </span>
+
+                <strong>
+                    {{ number_format($summary['financial_days'], 0, ',', '.') }}
+                </strong>
+
+            </div>
+
+
+
+            <div class="company-summary-card company-summary-income">
+
+                <span>
+                    Ingresos totales
+                </span>
+
+                <strong>
+                    ${{ number_format($summary['income'], 2, ',', '.') }}
+                </strong>
+
+            </div>
+
+
+
+            <div class="company-summary-card company-summary-expense">
+
+                <span>
+                    Egresos totales
+                </span>
+
+                <strong>
+                    ${{ number_format($summary['expense'], 2, ',', '.') }}
+                </strong>
+
+            </div>
+
+
+        </div>
+
+
+
+        {{-- ==========================
+         ACTIVIDAD
+    ========================== --}}
+
+        <section class="company-activity-card">
+
+
+            <div class="company-activity-header">
+
+                <div>
+
+                    <h2>
+                        Actividad diaria
+                    </h2>
+
+                    <p>
+                        Resumen financiero por jornada
+                    </p>
+
+                </div>
+
+            </div>
+
+
+
+            @if ($days->isEmpty())
+
+
+                <div class="empty-state">
+
+                    Esta empresa todavía no tiene jornadas registradas.
+
+                </div>
+            @else
+                {{-- ==========================
                  MOBILE
             ========================== --}}
 
-            <div class="activity-mobile">
-
-
-                @foreach ($days as $day)
-
-
-                    <article class="activity-day">
-
-
-                        <div class="activity-day-header">
-
-                            <div>
-
-                                <strong>
-                                    {{ \Carbon\Carbon::parse($day['date'])->format('d/m/Y') }}
-                                </strong>
-
-                                <span>
-                                    {{ $day['movements'] }}
-                                    {{ $day['movements'] === 1 ? 'movimiento' : 'movimientos' }}
-                                </span>
-
-                            </div>
-
-
-                            <span class="day-status day-status-{{ $day['status'] }}">
-                                {{ $day['status'] }}
-                            </span>
-
-                        </div>
-
-
-
-                        <div class="activity-day-balances">
-
-
-                            <div>
-
-                                <span>
-                                    Saldo inicial
-                                </span>
-
-                                <strong>
-                                    ${{ number_format(
-                                        $day['initial_balance'],
-                                        2,
-                                        ',',
-                                        '.'
-                                    ) }}
-                                </strong>
-
-                            </div>
-
-
-                            <i class="bi bi-arrow-right"></i>
-
-
-                            <div>
-
-                                <span>
-                                    Saldo final
-                                </span>
-
-                                <strong>
-                                    ${{ number_format(
-                                        $day['final_balance'],
-                                        2,
-                                        ',',
-                                        '.'
-                                    ) }}
-                                </strong>
-
-                            </div>
-
-
-                        </div>
-
-
-
-                        <div class="activity-day-movements">
-
-
-                            <div class="activity-income">
-
-                                <span>
-                                    Ingresos
-                                </span>
-
-                                <strong>
-                                    +${{ number_format(
-                                        $day['income'],
-                                        2,
-                                        ',',
-                                        '.'
-                                    ) }}
-                                </strong>
-
-                            </div>
-
-
-                            <div class="activity-expense">
-
-                                <span>
-                                    Egresos
-                                </span>
-
-                                <strong>
-                                    -${{ number_format(
-                                        $day['expense'],
-                                        2,
-                                        ',',
-                                        '.'
-                                    ) }}
-                                </strong>
-
-                            </div>
-
-
-                        </div>
-
-
-                    </article>
-
-
-                @endforeach
-
-
-            </div>
-
-
-
-            {{-- ==========================
-                 DESKTOP
-            ========================== --}}
-
-            <div class="activity-desktop">
-
-
-                <div class="activity-table">
-
-
-                    <div class="activity-table-row activity-table-head">
-
-                        <div>
-                            Fecha
-                        </div>
-
-                        <div>
-                            Saldo inicial
-                        </div>
-
-                        <div>
-                            Ingresos
-                        </div>
-
-                        <div>
-                            Egresos
-                        </div>
-
-                        <div>
-                            Saldo final
-                        </div>
-
-                        <div>
-                            Movimientos
-                        </div>
-
-                    </div>
-
+                <div class="activity-mobile">
 
 
                     @foreach ($days as $day)
+                        <article class="activity-day">
 
 
-                        <div class="activity-table-row">
+                            <div class="activity-day-header">
 
-                            <div class="activity-date">
+                                <div>
 
-                                <strong>
-                                    {{ \Carbon\Carbon::parse($day['date'])->format('d/m/Y') }}
-                                </strong>
+                                    <strong>
+                                        {{ \Carbon\Carbon::parse($day['date'])->format('d/m/Y') }}
+                                    </strong>
 
-                                <span>
+                                    <span>
+                                        {{ $day['movements'] }}
+                                        {{ $day['movements'] === 1 ? 'movimiento' : 'movimientos' }}
+                                    </span>
+
+                                </div>
+
+
+                                <span class="day-status day-status-{{ $day['status'] }}">
                                     {{ $day['status'] }}
                                 </span>
 
                             </div>
 
 
+
+                            <div class="activity-day-balances">
+
+
+                                <div>
+
+                                    <span>
+                                        Saldo inicial
+                                    </span>
+
+                                    <strong>
+                                        ${{ number_format($day['initial_balance'], 2, ',', '.') }}
+                                    </strong>
+
+                                </div>
+
+
+                                <i class="bi bi-arrow-right"></i>
+
+
+                                <div>
+
+                                    <span>
+                                        Saldo final
+                                    </span>
+
+                                    <strong>
+                                        ${{ number_format($day['final_balance'], 2, ',', '.') }}
+                                    </strong>
+
+                                </div>
+
+
+                            </div>
+
+
+
+                            <div class="activity-day-movements">
+
+
+                                <div class="activity-income">
+
+                                    <span>
+                                        Ingresos
+                                    </span>
+
+                                    <strong>
+                                        +${{ number_format($day['income'], 2, ',', '.') }}
+                                    </strong>
+
+                                </div>
+
+
+                                <div class="activity-expense">
+
+                                    <span>
+                                        Egresos
+                                    </span>
+
+                                    <strong>
+                                        -${{ number_format($day['expense'], 2, ',', '.') }}
+                                    </strong>
+
+                                </div>
+
+
+                            </div>
+
+
+                        </article>
+                    @endforeach
+
+
+                </div>
+
+
+
+                {{-- ==========================
+                 DESKTOP
+            ========================== --}}
+
+                <div class="activity-desktop">
+
+
+                    <div class="activity-table">
+
+
+                        <div class="activity-table-row activity-table-head">
+
                             <div>
-                                ${{ number_format(
-                                    $day['initial_balance'],
-                                    2,
-                                    ',',
-                                    '.'
-                                ) }}
+                                Fecha
+                            </div>
+
+                            <div>
+                                Saldo inicial
+                            </div>
+
+                            <div>
+                                Ingresos
+                            </div>
+
+                            <div>
+                                Egresos
+                            </div>
+
+                            <div>
+                                Saldo final
+                            </div>
+
+                            <div>
+                                Movimientos
+                            </div>
+
+                        </div>
+
+
+
+                        @foreach ($days as $day)
+                            <div class="activity-table-row">
+
+                                <div class="activity-date">
+
+                                    <strong>
+                                        {{ \Carbon\Carbon::parse($day['date'])->format('d/m/Y') }}
+                                    </strong>
+
+                                    <span>
+                                        {{ $day['status'] }}
+                                    </span>
+
+                                </div>
+
+
+                                <div>
+                                    ${{ number_format($day['initial_balance'], 2, ',', '.') }}
+                                </div>
+
+
+                                <div class="activity-income">
+                                    +${{ number_format($day['income'], 2, ',', '.') }}
+                                </div>
+
+
+                                <div class="activity-expense">
+                                    -${{ number_format($day['expense'], 2, ',', '.') }}
+                                </div>
+
+
+                                <div>
+                                    ${{ number_format($day['final_balance'], 2, ',', '.') }}
+                                </div>
+
+
+                                <div>
+                                    {{ number_format($day['movements'], 0, ',', '.') }}
+                                </div>
+
+
+                            </div>
+                        @endforeach
+
+
+
+                        {{-- TOTAL GENERAL --}}
+
+                        <div class="activity-table-row activity-table-total">
+
+                            <div>
+                                Total general
+                            </div>
+
+
+                            <div>
+                                —
                             </div>
 
 
                             <div class="activity-income">
-                                +${{ number_format(
-                                    $day['income'],
-                                    2,
-                                    ',',
-                                    '.'
-                                ) }}
+                                +${{ number_format($summary['income'], 2, ',', '.') }}
                             </div>
 
 
                             <div class="activity-expense">
-                                -${{ number_format(
-                                    $day['expense'],
-                                    2,
-                                    ',',
-                                    '.'
-                                ) }}
+                                -${{ number_format($summary['expense'], 2, ',', '.') }}
                             </div>
 
 
                             <div>
-                                ${{ number_format(
-                                    $day['final_balance'],
-                                    2,
-                                    ',',
-                                    '.'
-                                ) }}
+                                ${{ number_format($summary['current_balance'], 2, ',', '.') }}
                             </div>
 
 
                             <div>
-                                {{ number_format(
-                                    $day['movements'],
-                                    0,
-                                    ',',
-                                    '.'
-                                ) }}
+                                {{ number_format($summary['movements'], 0, ',', '.') }}
                             </div>
 
-
                         </div>
 
-
-                    @endforeach
-
-
-
-                    {{-- TOTAL GENERAL --}}
-
-                    <div class="activity-table-row activity-table-total">
-
-                        <div>
-                            Total general
-                        </div>
-
-
-                        <div>
-                            —
-                        </div>
-
-
-                        <div class="activity-income">
-                            +${{ number_format(
-                                $summary['income'],
-                                2,
-                                ',',
-                                '.'
-                            ) }}
-                        </div>
-
-
-                        <div class="activity-expense">
-                            -${{ number_format(
-                                $summary['expense'],
-                                2,
-                                ',',
-                                '.'
-                            ) }}
-                        </div>
-
-
-                        <div>
-                            ${{ number_format(
-                                $summary['current_balance'],
-                                2,
-                                ',',
-                                '.'
-                            ) }}
-                        </div>
-
-
-                        <div>
-                            {{ number_format(
-                                $summary['movements'],
-                                0,
-                                ',',
-                                '.'
-                            ) }}
-                        </div>
 
                     </div>
 
@@ -617,17 +507,76 @@
                 </div>
 
 
-            </div>
+            @endif
 
 
-        @endif
+        </section>
 
 
-    </section>
+    </main>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
 
+            const button =
+                document.getElementById('delete-company-button');
 
-</main>
+            const form =
+                document.getElementById('delete-company-form');
 
+            if (!button || !form) {
+                return;
+            }
+
+            button.addEventListener('click', async () => {
+
+                const companyName =
+                    button.dataset.companyName;
+
+                const result = await Swal.fire({
+                    icon: 'warning',
+
+                    title: 'Eliminar empresa',
+
+                    html: `
+                    ¿Seguro que querés eliminar
+                    <strong>${companyName}</strong>?
+                    <br><br>
+                    Se eliminarán permanentemente todos sus
+                    movimientos, cuentas, jornadas, saldos,
+                    recordatorios, suscripciones y pagos.
+                    <br><br>
+                    <strong>Esta acción no se puede deshacer.</strong>
+                `,
+
+                    showCancelButton: true,
+
+                    confirmButtonText: 'Sí, eliminar empresa',
+
+                    cancelButtonText: 'Cancelar',
+
+                    buttonsStyling: false,
+
+                    customClass: {
+                        popup: 'aeria-swal',
+                        title: 'aeria-swal-title',
+                        htmlContainer: 'aeria-swal-text',
+                        actions: 'aeria-swal-actions',
+                        confirmButton: 'aeria-swal-confirm-danger',
+                        cancelButton: 'aeria-swal-cancel'
+                    }
+                });
+
+                if (!result.isConfirmed) {
+                    return;
+                }
+
+                button.disabled = true;
+
+                form.submit();
+            });
+
+        });
+    </script>
 
 </body>
 
