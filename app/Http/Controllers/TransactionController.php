@@ -16,6 +16,7 @@ use Illuminate\Validation\Rule;
 use App\Models\AccountBalance;
 use App\Events\TransactionExecuted;
 use App\Events\TransactionUpdated;
+use Illuminate\Support\Facades\Storage;
 
 class TransactionController extends Controller
 {
@@ -1534,6 +1535,85 @@ class TransactionController extends Controller
 
             'executed_by' =>
             $user->name,
+
+        ]);
+    }
+
+    public function detail(Transaction $transaction)
+    {
+        /*
+    |--------------------------------------------------------------------------
+    | Seguridad
+    |--------------------------------------------------------------------------
+    */
+
+        abort_unless(
+            $transaction->company_id === auth()->user()->company_id,
+            403
+        );
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Relaciones
+    |--------------------------------------------------------------------------
+    */
+
+        $transaction->loadMissing([
+            'account',
+            'accountBalance',
+        ]);
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Solo transferencias ejecutadas
+    |--------------------------------------------------------------------------
+    */
+
+        abort_unless(
+            $transaction->type === 'expense'
+                && $transaction->executed_at,
+            404
+        );
+
+
+        return response()->json([
+
+            'id' =>
+            $transaction->id,
+
+            'amount' =>
+            $transaction->amount,
+
+            'currency' =>
+            $transaction->accountBalance?->currency
+                ?? '---',
+
+            'description' =>
+            $transaction->description
+                ?? 'Sin descripción',
+
+            'destination_bank' =>
+            $transaction->destination_bank,
+
+            'date' =>
+            $transaction->date?->format('d/m/Y H:i'),
+
+            'executed_at' =>
+            $transaction->executed_at?->format('d/m/Y H:i'),
+
+            'account' => [
+
+                'name' =>
+                $transaction->account?->name
+                    ?? 'Cuenta eliminada',
+
+                'logo' =>
+                $transaction->account?->logo
+                    ? Storage::url($transaction->account->logo)
+                    : null,
+            ],
 
         ]);
     }

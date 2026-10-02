@@ -28,6 +28,275 @@ function renumberTransactions() {
 
 }
 
+function markTransactionAsExecuted(transactionId) {
+
+    const row =
+        document.querySelector(
+            `tr[data-transaction-id="${transactionId}"]`
+        );
+
+    if (!row) {
+        return;
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Badge Ejecutada
+    |--------------------------------------------------------------------------
+    */
+
+    const badge =
+        row.querySelector(
+            `[data-execution-badge="${transactionId}"]`
+        );
+
+    if (badge) {
+        badge.hidden = false;
+        badge.style.display = '';
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Acciones
+    |--------------------------------------------------------------------------
+    */
+
+    const actions =
+        row.querySelector(
+            '.table-actions'
+        );
+
+    if (!actions) {
+        return;
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Eliminamos ejecutar / editar / eliminar
+    |--------------------------------------------------------------------------
+    */
+
+    actions
+        .querySelectorAll(
+            '.execute-transaction-button, a[href*="/edit"], form'
+        )
+        .forEach(element => {
+            element.remove();
+        });
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Agregamos ojo
+    |--------------------------------------------------------------------------
+    */
+
+    if (
+        !actions.querySelector(
+            '.view-transaction-button'
+        )
+    ) {
+
+        actions.insertAdjacentHTML(
+            'afterbegin',
+            `
+                <button
+                    type="button"
+                    class="icon-button view-transaction-button"
+                    data-transaction-id="${transactionId}"
+                    title="Ver detalle de transferencia"
+                >
+                    <i class="bi bi-eye"></i>
+                </button>
+            `
+        );
+
+    }
+
+}
+
+
+document.addEventListener('click', (event) => {
+
+    const button =
+        event.target.closest(
+            '.view-transaction-button'
+        );
+
+    if (!button) {
+        return;
+    }
+
+    openTransactionDetail(
+        button.dataset.transactionId
+    );
+
+});
+
+async function openTransactionDetail(transactionId) {
+
+    try {
+
+        const response = await fetch(
+            `/transactions/${transactionId}/detail`,
+            {
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                }
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error(
+                'No se pudo cargar el detalle de la transferencia.'
+            );
+        }
+
+        const transaction = await response.json();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Datos principales
+        |--------------------------------------------------------------------------
+        */
+
+        document.getElementById(
+            'transaction-detail-amount'
+        ).textContent =
+            `${transaction.currency} ${Number(transaction.amount).toLocaleString(
+                'es-AR',
+                {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                }
+            )}`;
+
+
+        document.getElementById(
+            'transaction-detail-executed-at'
+        ).textContent =
+            transaction.executed_at ?? '—';
+
+
+        document.getElementById(
+            'transaction-detail-origin'
+        ).textContent =
+            transaction.account?.name ?? 'Cuenta eliminada';
+
+
+        document.getElementById(
+            'transaction-detail-origin-currency'
+        ).textContent =
+            `Cuenta de origen · ${transaction.currency}`;
+
+
+        document.getElementById(
+            'transaction-detail-destination'
+        ).textContent =
+            transaction.destination_bank ?? '—';
+
+
+        document.getElementById(
+            'transaction-detail-date'
+        ).textContent =
+            transaction.date ?? '—';
+
+
+        document.getElementById(
+            'transaction-detail-currency'
+        ).textContent =
+            transaction.currency ?? '---';
+
+
+        document.getElementById(
+            'transaction-detail-description'
+        ).textContent =
+            transaction.description ?? 'Sin descripción';
+
+
+        document.getElementById(
+            'transaction-detail-execution-date'
+        ).textContent =
+            transaction.executed_at ?? '—';
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Logo origen
+        |--------------------------------------------------------------------------
+        */
+
+        const logo =
+            document.getElementById(
+                'transaction-detail-origin-logo'
+            );
+
+        const placeholder =
+            document.getElementById(
+                'transaction-detail-origin-placeholder'
+            );
+
+
+        if (transaction.account?.logo) {
+
+            logo.src =
+                transaction.account.logo;
+
+            logo.alt =
+                transaction.account.name ?? '';
+
+            logo.style.display = '';
+
+            placeholder.style.display = 'none';
+
+        } else {
+
+            logo.src = '';
+
+            logo.style.display = 'none';
+
+            placeholder.style.display = '';
+
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Abrir modal
+        |--------------------------------------------------------------------------
+        */
+
+        const modalElement =
+            document.getElementById(
+                'transactionDetailModal'
+            );
+
+        const modal =
+            bootstrap.Modal.getOrCreateInstance(
+                modalElement
+            );
+
+        modal.show();
+
+    } catch (error) {
+
+        console.error(error);
+
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: error.message,
+        });
+
+    }
+
+}
+
 document.addEventListener('DOMContentLoaded', () => {
 
 
@@ -41,7 +310,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.dataset.companyId;
 
     const transactionsPage =
-    document.querySelector('.transactions-page');
+        document.querySelector('.transactions-page');
 
     const currentUserId =
         Number(transactionsPage?.dataset.userId);
@@ -108,7 +377,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     minute: '2-digit',
                     hour12: false,
                 });
-            
+
             const canExecute =
                 canExecuteTransactions
                 && transaction.type === 'expense'
@@ -386,49 +655,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            const transactionId =
-                event.transaction_id;
-
-            if (!transactionId) {
+            if (!event.transaction_id) {
                 return;
             }
 
-            /*
-            |--------------------------------------------------------------
-            | Mostrar badge Ejecutada
-            |--------------------------------------------------------------
-            */
+            markTransactionAsExecuted(
+                event.transaction_id
+            );
 
-            const badge =
-                document.querySelector(
-                    `[data-execution-badge="${transactionId}"]`
-                );
-
-            if (badge) {
-
-                badge.hidden = false;
-                badge.style.display = '';
-
-            }
-
-            /*
-            |--------------------------------------------------------------
-            | Quitar botón Ejecutar
-            |--------------------------------------------------------------
-            */
-
-            const executeButton =
-                document.querySelector(
-                    `.execute-transaction-button[data-transaction-id="${transactionId}"]`
-                );
-
-            if (executeButton) {
-                executeButton.remove();
-            }
 
         });
-
-
 });
 
 /*
@@ -537,32 +773,9 @@ document.addEventListener('click', async (event) => {
         }
 
 
-        /*
-        |--------------------------------------------------------------------------
-        | Mostrar badge "Ejecutada"
-        |--------------------------------------------------------------------------
-        */
-
-        const badge = document.querySelector(
-            `[data-execution-badge="${transactionId}"]`
+        markTransactionAsExecuted(
+            transactionId
         );
-
-
-        if (badge) {
-
-            badge.hidden = false;
-            badge.style.display = '';
-
-        }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Quitar botón Ejecutar
-        |--------------------------------------------------------------------------
-        */
-
-        button.remove();
 
 
     } catch (error) {

@@ -432,6 +432,10 @@ Route::middleware('auth')->group(function () {
             | ANTES del resource.
             |
             */
+            Route::get(
+                '/transactions/{transaction}/detail',
+                [TransactionController::class, 'detail']
+            )->name('transactions.detail');
 
             Route::get(
                 '/transactions/export',
