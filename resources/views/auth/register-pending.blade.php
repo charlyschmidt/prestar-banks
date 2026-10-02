@@ -24,7 +24,7 @@
         gtag('config', 'G-32MQLSS6RJ');
         @if (session('registration_completed'))
 
-            console.log('AERIA: registration_completed OK');
+            //console.log('AERIA: registration_completed OK');
 
             gtag('event', 'sign_up', {
                 method: 'AERIA Finance'

@@ -1,4 +1,4 @@
-console.log('OPENING BALANCE IMPORT JS CARGADO');
+//console.log('OPENING BALANCE IMPORT JS CARGADO');
 document.addEventListener('DOMContentLoaded', function () {
 
     const importer =
