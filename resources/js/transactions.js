@@ -40,6 +40,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const companyId =
         document.body.dataset.companyId;
 
+    const transactionsPage =
+    document.querySelector('.transactions-page');
+
+    const currentUserId =
+        Number(transactionsPage?.dataset.userId);
+
+    const canExecuteTransactions =
+        transactionsPage?.dataset.canExecute === '1';
+
+    const isSuperAdmin =
+        transactionsPage?.dataset.isSuperAdmin === '1';
+
     if (!companyId) {
         console.error(
             'No se encontró la empresa activa en movimientos'
@@ -81,7 +93,33 @@ document.addEventListener('DOMContentLoaded', () => {
                     'income'
                 ].includes(transaction.type);
 
+            const transactionDate =
+                new Date(transaction.date);
 
+            const formattedDate =
+                transactionDate.toLocaleDateString('es-AR', {
+                    day: '2-digit',
+                    month: '2-digit',
+                });
+
+            const formattedTime =
+                transactionDate.toLocaleTimeString('es-AR', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false,
+                });
+            
+            const canExecute =
+                canExecuteTransactions
+                && transaction.type === 'expense'
+                && !transaction.executed_at;
+
+            const canManage =
+                !transaction.executed_at
+                && (
+                    isSuperAdmin
+                    || Number(transaction.user?.id) === currentUserId
+                );
 
             const row = `
 
@@ -94,9 +132,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 </td>
 
 
-                <!-- FECHA -->
+               <!-- FECHA -->
                 <td>
-                    Hoy
+                    <div class="movement-date">
+                        <strong>
+                            ${formattedDate}
+                        </strong>
+
+                        <small>
+                            ${formattedTime}
+                        </small>
+                    </div>
                 </td>
 
 
@@ -106,13 +152,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="account-cell">
 
                         ${account.logo
-                                ? `<img src="/storage/${account.logo}" alt="${account.name}">`
-                                : `
+                    ? `<img src="/storage/${account.logo}" alt="${account.name}">`
+                    : `
                                     <div class="mini-logo">
                                         <i class="bi bi-bank"></i>
                                     </div>
                                 `
-                            }
+                }
 
                         <span>
                             ${account.name}
@@ -127,9 +173,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td>
 
                     ${transaction.type === 'expense' &&
-                                transaction.destination_bank
+                    transaction.destination_bank
 
-                                ? `
+                    ? `
                                 <div class="destination-bank">
 
                                     <i class="bi bi-bank"></i>
@@ -155,12 +201,12 @@ document.addEventListener('DOMContentLoaded', () => {
                                 </div>
                             `
 
-                                : `
+                    : `
                                 <span class="text-muted">
                                     —
                                 </span>
                             `
-                            }
+                }
 
                 </td>
 
@@ -174,9 +220,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
                         <span>
                             ${transaction.user?.email
-                                ? transaction.user.email.split('@')[0]
-                                : 'Sin registro'
-                            }
+                    ? transaction.user.email.split('@')[0]
+                    : 'Sin registro'
+                }
                         </span>
 
                     </div>
@@ -196,7 +242,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     ${isIncome
 
-                                ? `
+                    ? `
                                 <span class="movement-income">
 
                                     <i class="bi bi-arrow-up"></i>
@@ -206,7 +252,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 </span>
                             `
 
-                                : `
+                    : `
                                 <span class="movement-expense">
 
                                     <i class="bi bi-arrow-down"></i>
@@ -215,7 +261,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                                 </span>
                             `
-                            }
+                }
 
                 </td>
 
@@ -233,36 +279,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     ${isIncome
 
-                                ? `
+                    ? `
                                 <span class="amount-income">
 
                                     +
                                     $${Number(transaction.amount).toLocaleString(
-                                    'es-AR',
-                                    {
-                                        minimumFractionDigits: 2,
-                                        maximumFractionDigits: 2
-                                    }
-                                )}
+                        'es-AR',
+                        {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                        }
+                    )}
 
                                 </span>
                             `
 
-                                : `
+                    : `
                                 <span class="amount-expense">
 
                                     -
                                     $${Number(transaction.amount).toLocaleString(
-                                    'es-AR',
-                                    {
-                                        minimumFractionDigits: 2,
-                                        maximumFractionDigits: 2
-                                    }
-                                )}
+                        'es-AR',
+                        {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                        }
+                    )}
 
                                 </span>
                             `
-                            }
+                }
 
                 </td>
 
@@ -272,9 +318,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     <div class="table-actions">
 
-                        ${transaction.can_execute
+                        ${canExecute
 
-                                ? `
+                    ? `
                                     <button
                                         type="button"
                                         class="icon-button execute-transaction-button"
@@ -288,12 +334,12 @@ document.addEventListener('DOMContentLoaded', () => {
                                     </button>
                                 `
 
-                                : ''
-                            }
+                    : ''
+                }
 
-                        ${transaction.can_manage
+                        ${canManage
 
-                                ? `
+                    ? `
                                     <a
                                         href="/transactions/${transaction.id}/edit"
                                         class="icon-button"
@@ -305,8 +351,8 @@ document.addEventListener('DOMContentLoaded', () => {
                                     </a>
                                 `
 
-                                : ''
-                            }
+                    : ''
+                }
 
                     </div>
 

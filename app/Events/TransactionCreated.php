@@ -206,6 +206,10 @@ class TransactionCreated implements ShouldBroadcastNow
                         ->user?->name
                         ?? 'Sin registro',
 
+                    'email' =>
+                    $this->transaction
+                        ->user?->email,
+
                 ],
 
             ],

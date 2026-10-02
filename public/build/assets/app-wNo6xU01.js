@@ -265,7 +265,7 @@ https://sweetalert2.github.io/#ajax-request`),Qr(e),typeof e.title==`string`&&(e
                         ${P(e)}
                         ${N(t)}
                     </span>
-                `).join(``)}function ie(e,t){return`${e||``} ${N(t)}`.trim()}function N(e){let t=Number(e);return Number.isNaN(t)?`0,00`:t.toLocaleString(`es-AR`,{minimumFractionDigits:2,maximumFractionDigits:2})}function P(e){let t=document.createElement(`div`);return t.textContent=e??``,t.innerHTML}function ae(){try{let e=document.querySelector(`#realtime-sound`);e&&typeof e.play==`function`&&(e.currentTime=0,e.play().catch(()=>{}))}catch{}}function F(){let e=document.getElementById(`transactions-body`);if(!e)return;let t=e.querySelectorAll(`tr[data-transaction-id]`),n=t.length;t.forEach((e,t)=>{let r=e.querySelector(`[data-movement-counter]`);r&&(r.textContent=n-t)})}document.addEventListener(`DOMContentLoaded`,()=>{if(!document.getElementById(`transactions-body`))return;let e=document.body.dataset.companyId;if(!e){console.error(`No se encontró la empresa activa en movimientos`);return}let t=`dashboard.${e}`;console.log(`Movimientos conectado al canal:`,t),Echo.private(t).listen(`.transaction.created`,e=>{console.log(`Nuevo movimiento:`,e);let t=e.transaction,n=e.account,r=document.getElementById(`transactions-body`),i=[`income`].includes(t.type),a=`
+                `).join(``)}function ie(e,t){return`${e||``} ${N(t)}`.trim()}function N(e){let t=Number(e);return Number.isNaN(t)?`0,00`:t.toLocaleString(`es-AR`,{minimumFractionDigits:2,maximumFractionDigits:2})}function P(e){let t=document.createElement(`div`);return t.textContent=e??``,t.innerHTML}function ae(){try{let e=document.querySelector(`#realtime-sound`);e&&typeof e.play==`function`&&(e.currentTime=0,e.play().catch(()=>{}))}catch{}}function F(){let e=document.getElementById(`transactions-body`);if(!e)return;let t=e.querySelectorAll(`tr[data-transaction-id]`),n=t.length;t.forEach((e,t)=>{let r=e.querySelector(`[data-movement-counter]`);r&&(r.textContent=n-t)})}document.addEventListener(`DOMContentLoaded`,()=>{if(!document.getElementById(`transactions-body`))return;let e=document.body.dataset.companyId,t=document.querySelector(`.transactions-page`),n=Number(t?.dataset.userId),r=t?.dataset.canExecute===`1`,i=t?.dataset.isSuperAdmin===`1`;if(!e){console.error(`No se encontró la empresa activa en movimientos`);return}let a=`dashboard.${e}`;console.log(`Movimientos conectado al canal:`,a),Echo.private(a).listen(`.transaction.created`,e=>{console.log(`Nuevo movimiento:`,e);let t=e.transaction,a=e.account,o=document.getElementById(`transactions-body`),s=[`income`].includes(t.type),c=new Date(t.date),l=c.toLocaleDateString(`es-AR`,{day:`2-digit`,month:`2-digit`}),u=c.toLocaleTimeString(`es-AR`,{hour:`2-digit`,minute:`2-digit`,hour12:!1}),d=r&&t.type===`expense`&&!t.executed_at,f=!t.executed_at&&(i||Number(t.user?.id)===n),p=`
 
             <tr>
             <tr data-transaction-id="${t.id}">
@@ -276,9 +276,17 @@ https://sweetalert2.github.io/#ajax-request`),Qr(e),typeof e.title==`string`&&(e
                 </td>
 
 
-                <!-- FECHA -->
+               <!-- FECHA -->
                 <td>
-                    Hoy
+                    <div class="movement-date">
+                        <strong>
+                            ${l}
+                        </strong>
+
+                        <small>
+                            ${u}
+                        </small>
+                    </div>
                 </td>
 
 
@@ -287,14 +295,14 @@ https://sweetalert2.github.io/#ajax-request`),Qr(e),typeof e.title==`string`&&(e
 
                     <div class="account-cell">
 
-                        ${n.logo?`<img src="/storage/${n.logo}" alt="${n.name}">`:`
+                        ${a.logo?`<img src="/storage/${a.logo}" alt="${a.name}">`:`
                                     <div class="mini-logo">
                                         <i class="bi bi-bank"></i>
                                     </div>
                                 `}
 
                         <span>
-                            ${n.name}
+                            ${a.name}
                         </span>
 
                     </div>
@@ -364,7 +372,7 @@ https://sweetalert2.github.io/#ajax-request`),Qr(e),typeof e.title==`string`&&(e
                 <!-- TIPO -->
                 <td>
 
-                    ${i?`
+                    ${s?`
                                 <span class="movement-income">
 
                                     <i class="bi bi-arrow-up"></i>
@@ -396,7 +404,7 @@ https://sweetalert2.github.io/#ajax-request`),Qr(e),typeof e.title==`string`&&(e
                 <!-- MONTO -->
                 <td class="text-end">
 
-                    ${i?`
+                    ${s?`
                                 <span class="amount-income">
 
                                     +
@@ -420,7 +428,7 @@ https://sweetalert2.github.io/#ajax-request`),Qr(e),typeof e.title==`string`&&(e
 
                     <div class="table-actions">
 
-                        ${t.can_execute?`
+                        ${d?`
                                     <button
                                         type="button"
                                         class="icon-button execute-transaction-button"
@@ -434,7 +442,7 @@ https://sweetalert2.github.io/#ajax-request`),Qr(e),typeof e.title==`string`&&(e
                                     </button>
                                 `:``}
 
-                        ${t.can_manage?`
+                        ${f?`
                                     <a
                                         href="/transactions/${t.id}/edit"
                                         class="icon-button"
@@ -452,7 +460,7 @@ https://sweetalert2.github.io/#ajax-request`),Qr(e),typeof e.title==`string`&&(e
 
             </tr>
 
-            `;r.insertAdjacentHTML(`afterbegin`,a),F()}).listen(`.transaction.executed`,t=>{if(console.log(`TRANSFERENCIA EJECUTADA RECIBIDA:`,t),String(t.companyId)!==String(e))return;let n=t.transaction_id;if(!n)return;let r=document.querySelector(`[data-execution-badge="${n}"]`);r&&(r.hidden=!1,r.style.display=``);let i=document.querySelector(`.execute-transaction-button[data-transaction-id="${n}"]`);i&&i.remove()})}),document.addEventListener(`click`,async e=>{let t=e.target.closest(`.execute-transaction-button`);if(!t||!(await Swal.fire({icon:`question`,title:`Confirmar transferencia`,text:`¿Confirmás que esta transferencia fue realizada?`,showCancelButton:!0,confirmButtonText:`Sí, confirmar`,cancelButtonText:`Cancelar`,buttonsStyling:!1,customClass:{popup:`aeria-swal`,title:`aeria-swal-title`,htmlContainer:`aeria-swal-text`,actions:`aeria-swal-actions`,confirmButton:`aeria-swal-confirm`,cancelButton:`aeria-swal-cancel`}})).isConfirmed)return;let n=t.dataset.transactionId,r=t.dataset.executeUrl;t.disabled=!0;try{let e=document.querySelector(`meta[name="csrf-token"]`);if(!e)throw Error(`No se encontró el token CSRF.`);let i=await fetch(r,{method:`PATCH`,headers:{Accept:`application/json`,"X-Requested-With":`XMLHttpRequest`,"X-CSRF-TOKEN":e.content}}),a=await i.json();if(!i.ok)throw Error(a.message??`No se pudo ejecutar la transferencia.`);let o=document.querySelector(`[data-execution-badge="${n}"]`);o&&(o.hidden=!1,o.style.display=``),t.remove()}catch(e){t.disabled=!1,alert(e.message)}}),document.addEventListener(`DOMContentLoaded`,()=>{document.querySelectorAll(`.money-input`).forEach(e=>{e.value&&=I(e.value),e.addEventListener(`input`,function(){let e=this.value;e=e.replace(/\./g,``),e=e.replace(/[^\d,]/g,``);let t=e.indexOf(`,`);t!==-1&&(e=e.substring(0,t+1)+e.substring(t+1).replace(/,/g,``));let n=e.split(`,`),r=n[0]||``,i=n[1]===void 0?null:n[1].substring(0,2);r=r.replace(/^0+(?=\d)/,``),r===``&&(r=`0`),r=Number(r).toLocaleString(`es-AR`),this.value=i===null?r:`${r},${i}`}),e.addEventListener(`blur`,function(){this.value&&=L(this.value)})}),document.querySelectorAll(`form`).forEach(e=>{e.addEventListener(`submit`,()=>{e.querySelectorAll(`.money-input`).forEach(e=>{e.value&&=oe(e.value)})})})});function I(e){if(e==null||e===``)return``;let t=String(e).trim();if(t.includes(`,`))return L(t);let n=Number(t);return Number.isNaN(n)?``:n.toLocaleString(`es-AR`,{minimumFractionDigits:2,maximumFractionDigits:2})}function L(e){if(!e)return``;let t=String(e).replace(/\./g,``).replace(`,`,`.`),n=Number(t);return Number.isNaN(n)?``:n.toLocaleString(`es-AR`,{minimumFractionDigits:2,maximumFractionDigits:2})}function oe(e){return String(e).replace(/\./g,``).replace(`,`,`.`)}var se=`prestar_realtime_sound`;function ce(){let e=localStorage.getItem(se);return e===null||e===`true`}function le(e){localStorage.setItem(se,e?`true`:`false`)}function R(e=!1){if(e||ce())try{let e=window.AudioContext||window.webkitAudioContext;if(!e)return;let t=new e,n=t.createOscillator(),r=t.createGain();n.connect(r),r.connect(t.destination),n.type=`sine`,n.frequency.setValueAtTime(650,t.currentTime),n.frequency.exponentialRampToValueAtTime(320,t.currentTime+.16),r.gain.setValueAtTime(1e-4,t.currentTime),r.gain.exponentialRampToValueAtTime(.045,t.currentTime+.015),r.gain.exponentialRampToValueAtTime(1e-4,t.currentTime+.22),n.start(),n.stop(t.currentTime+.23),n.addEventListener(`ended`,()=>{t.close()})}catch(e){console.warn(`No se pudo reproducir el sonido del movimiento.`,e)}}document.addEventListener(`DOMContentLoaded`,()=>{let e=document.getElementById(`realtimeSound`),t=document.getElementById(`testRealtimeSound`);e&&(e.checked=ce(),e.addEventListener(`change`,()=>{le(e.checked),e.checked&&R()})),t&&t.addEventListener(`click`,()=>{R()})}),document.addEventListener(`keydown`,e=>{let t=e.target;if(!(t.tagName===`INPUT`||t.tagName===`TEXTAREA`||t.tagName===`SELECT`||t.isContentEditable)&&e.shiftKey&&e.key.toLowerCase()===`m`){e.preventDefault();let t=document.body.dataset.createTransactionUrl;t&&(window.location.href=t)}}),document.addEventListener(`DOMContentLoaded`,()=>{let e=document.getElementById(`statement`),t=document.getElementById(`statement-file-name`),n=document.getElementById(`statement-file-detail`);e&&t&&n&&e.addEventListener(`change`,()=>{let r=e.files?.[0];if(!r){t.textContent=`Seleccionar extracto`,n.textContent=`CSV, XLSX o XLS · Máximo 10 MB`;return}t.textContent=r.name;let i=r.size/1048576;if(i<1){let e=Math.max(1,Math.round(r.size/1024));n.textContent=`${e} KB · Archivo listo para procesar`}else n.textContent=`${i.toFixed(2)} MB · Archivo listo para procesar`}),[{formId:`movement-control-form`,buttonId:`movement-control-submit`},{formId:`movement-control-mapping-form`,buttonId:`movement-control-compare`}].forEach(({formId:e,buttonId:t})=>{let n=document.getElementById(e),r=document.getElementById(t);n&&r&&n.addEventListener(`submit`,()=>{r.disabled||(r.disabled=!0,r.setAttribute(`aria-disabled`,`true`),r.innerHTML=`
+            `;o.insertAdjacentHTML(`afterbegin`,p),F()}).listen(`.transaction.executed`,t=>{if(console.log(`TRANSFERENCIA EJECUTADA RECIBIDA:`,t),String(t.companyId)!==String(e))return;let n=t.transaction_id;if(!n)return;let r=document.querySelector(`[data-execution-badge="${n}"]`);r&&(r.hidden=!1,r.style.display=``);let i=document.querySelector(`.execute-transaction-button[data-transaction-id="${n}"]`);i&&i.remove()})}),document.addEventListener(`click`,async e=>{let t=e.target.closest(`.execute-transaction-button`);if(!t||!(await Swal.fire({icon:`question`,title:`Confirmar transferencia`,text:`¿Confirmás que esta transferencia fue realizada?`,showCancelButton:!0,confirmButtonText:`Sí, confirmar`,cancelButtonText:`Cancelar`,buttonsStyling:!1,customClass:{popup:`aeria-swal`,title:`aeria-swal-title`,htmlContainer:`aeria-swal-text`,actions:`aeria-swal-actions`,confirmButton:`aeria-swal-confirm`,cancelButton:`aeria-swal-cancel`}})).isConfirmed)return;let n=t.dataset.transactionId,r=t.dataset.executeUrl;t.disabled=!0;try{let e=document.querySelector(`meta[name="csrf-token"]`);if(!e)throw Error(`No se encontró el token CSRF.`);let i=await fetch(r,{method:`PATCH`,headers:{Accept:`application/json`,"X-Requested-With":`XMLHttpRequest`,"X-CSRF-TOKEN":e.content}}),a=await i.json();if(!i.ok)throw Error(a.message??`No se pudo ejecutar la transferencia.`);let o=document.querySelector(`[data-execution-badge="${n}"]`);o&&(o.hidden=!1,o.style.display=``),t.remove()}catch(e){t.disabled=!1,alert(e.message)}}),document.addEventListener(`DOMContentLoaded`,()=>{document.querySelectorAll(`.money-input`).forEach(e=>{e.value&&=I(e.value),e.addEventListener(`input`,function(){let e=this.value;e=e.replace(/\./g,``),e=e.replace(/[^\d,]/g,``);let t=e.indexOf(`,`);t!==-1&&(e=e.substring(0,t+1)+e.substring(t+1).replace(/,/g,``));let n=e.split(`,`),r=n[0]||``,i=n[1]===void 0?null:n[1].substring(0,2);r=r.replace(/^0+(?=\d)/,``),r===``&&(r=`0`),r=Number(r).toLocaleString(`es-AR`),this.value=i===null?r:`${r},${i}`}),e.addEventListener(`blur`,function(){this.value&&=L(this.value)})}),document.querySelectorAll(`form`).forEach(e=>{e.addEventListener(`submit`,()=>{e.querySelectorAll(`.money-input`).forEach(e=>{e.value&&=oe(e.value)})})})});function I(e){if(e==null||e===``)return``;let t=String(e).trim();if(t.includes(`,`))return L(t);let n=Number(t);return Number.isNaN(n)?``:n.toLocaleString(`es-AR`,{minimumFractionDigits:2,maximumFractionDigits:2})}function L(e){if(!e)return``;let t=String(e).replace(/\./g,``).replace(`,`,`.`),n=Number(t);return Number.isNaN(n)?``:n.toLocaleString(`es-AR`,{minimumFractionDigits:2,maximumFractionDigits:2})}function oe(e){return String(e).replace(/\./g,``).replace(`,`,`.`)}var se=`prestar_realtime_sound`;function ce(){let e=localStorage.getItem(se);return e===null||e===`true`}function le(e){localStorage.setItem(se,e?`true`:`false`)}function R(e=!1){if(e||ce())try{let e=window.AudioContext||window.webkitAudioContext;if(!e)return;let t=new e,n=t.createOscillator(),r=t.createGain();n.connect(r),r.connect(t.destination),n.type=`sine`,n.frequency.setValueAtTime(650,t.currentTime),n.frequency.exponentialRampToValueAtTime(320,t.currentTime+.16),r.gain.setValueAtTime(1e-4,t.currentTime),r.gain.exponentialRampToValueAtTime(.045,t.currentTime+.015),r.gain.exponentialRampToValueAtTime(1e-4,t.currentTime+.22),n.start(),n.stop(t.currentTime+.23),n.addEventListener(`ended`,()=>{t.close()})}catch(e){console.warn(`No se pudo reproducir el sonido del movimiento.`,e)}}document.addEventListener(`DOMContentLoaded`,()=>{let e=document.getElementById(`realtimeSound`),t=document.getElementById(`testRealtimeSound`);e&&(e.checked=ce(),e.addEventListener(`change`,()=>{le(e.checked),e.checked&&R()})),t&&t.addEventListener(`click`,()=>{R()})}),document.addEventListener(`keydown`,e=>{let t=e.target;if(!(t.tagName===`INPUT`||t.tagName===`TEXTAREA`||t.tagName===`SELECT`||t.isContentEditable)&&e.shiftKey&&e.key.toLowerCase()===`m`){e.preventDefault();let t=document.body.dataset.createTransactionUrl;t&&(window.location.href=t)}}),document.addEventListener(`DOMContentLoaded`,()=>{let e=document.getElementById(`statement`),t=document.getElementById(`statement-file-name`),n=document.getElementById(`statement-file-detail`);e&&t&&n&&e.addEventListener(`change`,()=>{let r=e.files?.[0];if(!r){t.textContent=`Seleccionar extracto`,n.textContent=`CSV, XLSX o XLS · Máximo 10 MB`;return}t.textContent=r.name;let i=r.size/1048576;if(i<1){let e=Math.max(1,Math.round(r.size/1024));n.textContent=`${e} KB · Archivo listo para procesar`}else n.textContent=`${i.toFixed(2)} MB · Archivo listo para procesar`}),[{formId:`movement-control-form`,buttonId:`movement-control-submit`},{formId:`movement-control-mapping-form`,buttonId:`movement-control-compare`}].forEach(({formId:e,buttonId:t})=>{let n=document.getElementById(e),r=document.getElementById(t);n&&r&&n.addEventListener(`submit`,()=>{r.disabled||(r.disabled=!0,r.setAttribute(`aria-disabled`,`true`),r.innerHTML=`
                 <span
                     class="spinner-border spinner-border-sm"
                     aria-hidden="true">

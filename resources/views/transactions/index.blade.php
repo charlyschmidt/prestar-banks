@@ -2,7 +2,10 @@
 
 
 @section('content')
-    <div class="page-container transactions-page">
+    <div class="page-container transactions-page"
+    data-user-id="{{ auth()->id() }}"
+    data-can-execute="{{ auth()->user()->canExecuteTransactions() ? '1' : '0' }}"
+    data-is-super-admin="{{ auth()->user()->isSuperAdmin() ? '1' : '0' }}">
 
 
         {{-- =========================================================
