@@ -653,7 +653,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
             }
-        );
+        )
+
+        .listen('.transaction.updated', async (e) => {
+
+            console.log('Movimiento actualizado en tiempo real:', e);
+
+            await syncDashboard();
+
+        });
+
+
 
 });
 

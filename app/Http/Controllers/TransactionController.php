@@ -15,6 +15,7 @@ use App\Support\ArgentineBanks;
 use Illuminate\Validation\Rule;
 use App\Models\AccountBalance;
 use App\Events\TransactionExecuted;
+use App\Events\TransactionUpdated;
 
 class TransactionController extends Controller
 {
@@ -1037,10 +1038,10 @@ class TransactionController extends Controller
 
 
                     /*
-|--------------------------------------------------------------------------
-| Calcular impuesto de transferencia
-|--------------------------------------------------------------------------
-*/
+                    |--------------------------------------------------------------------------
+                    | Calcular impuesto de transferencia
+                    |--------------------------------------------------------------------------
+                    */
 
                     $newAccount = Account::findOrFail(
                         $newAccountBalance->account_id
@@ -1185,6 +1186,9 @@ class TransactionController extends Controller
                 );
         }
 
+        $transaction->refresh();
+
+        event(new TransactionUpdated($transaction));
 
         return redirect()
             ->route('transactions.index')
