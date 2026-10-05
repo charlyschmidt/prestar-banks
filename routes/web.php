@@ -232,11 +232,15 @@ Route::middleware('auth')->group(function () {
             [SettingsController::class, 'index']
         )->name('settings.index');
 
-
         Route::patch(
             '/settings/branding',
             [SettingsController::class, 'updateBranding']
         )->name('settings.branding.update');
+
+        Route::patch(
+            '/settings/company',
+            [SettingsController::class, 'updateCompany']
+        )->name('settings.company.update');        
 
 
         /*

@@ -9,10 +9,18 @@ class Company extends Model
 {
     protected $fillable = [
         'name',
+        'billing_name',
         'slug',
         'tax_id',
         'email',
         'phone',
+
+        'billing_address',
+        'billing_city',
+        'billing_province',
+        'billing_postal_code',
+        'billing_tax_status',
+
         'status',
         'background_color',
         'logo',
@@ -22,8 +30,10 @@ class Company extends Model
         'subscription_started_at',
         'subscription_ends_at',
         'subscription_lifetime',
+
         'trial_expired_email_sent_at',
         'onboarding_completed_at',
+        'requires_invoice',
     ];
 
     protected function casts(): array
@@ -39,6 +49,7 @@ class Company extends Model
 
             'trial_expired_email_sent_at' => 'datetime',
             'onboarding_completed_at' => 'datetime',
+            'requires_invoice' => 'boolean',
         ];
     }
 

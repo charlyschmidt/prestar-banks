@@ -2,11 +2,6 @@
    SETTINGS — MOBILE FIRST
 ========================== */
 
-.settings-card {
-    margin-bottom: 18px;
-}
-
-
 /* ==========================
    SECTION HEADER
 ========================== */
@@ -390,41 +385,6 @@
 }
 
 /* ==========================
-   SETTINGS LAYOUT
-========================== */
-
-.settings-layout {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 20px;
-}
-
-.settings-main-column,
-.settings-side-column {
-    min-width: 0;
-}
-
-.settings-main-column {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-
-
-/* ==========================
-   DESKTOP
-========================== */
-@media (min-width: 992px) {
-
-    .settings-layout {
-        grid-template-columns: minmax(0, 1.55fr) minmax(360px, 1fr);
-        align-items: start;
-        gap: 16px;
-    }
-
-}
-
-/* ==========================
    DANGER BUTTON
 ========================== */
 
@@ -689,6 +649,228 @@
 
     .reset-day-confirmation strong {
         font-size: 24px;
+    }
+
+}
+
+/* =========================================================
+   DATOS DE EMPRESA
+========================================================= */
+
+.settings-fields-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.settings-fields-grid .settings-field {
+    min-width: 0;
+}
+
+.settings-field-full {
+    margin-top: 18px;
+}
+
+
+/* Select con la misma apariencia que los inputs */
+
+select.settings-input {
+    width: 100%;
+    cursor: pointer;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 768px) {
+
+    .settings-fields-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .settings-field-full {
+        margin-top: 16px;
+    }
+
+}
+
+
+/* =========================================================
+   SETTINGS GRID
+========================================================= */
+
+.settings-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+}
+
+.settings-card {
+    min-width: 0;
+    margin-bottom: 0;
+}
+
+
+/* Formularios de las cards superiores */
+
+.company-data-form,
+.branding-form {
+    width: 100%;
+}
+
+
+/* =========================================================
+   DATOS DE EMPRESA
+========================================================= */
+
+.settings-fields-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 18px;
+}
+
+.settings-fields-grid .settings-field {
+    min-width: 0;
+}
+
+.settings-field-full {
+    margin-top: 18px;
+}
+
+select.settings-input {
+    width: 100%;
+    cursor: pointer;
+
+    background-color: var(--company-card);
+    color: var(--company-text);
+}
+
+select.settings-input option {
+    background-color: var(--company-bg);
+    color: var(--company-text);
+}
+
+select.settings-input option:checked {
+    background-color: var(--company-bg);
+    color: var(--company-text);
+}
+
+.settings-label  {
+    font-size: small;
+    margin-bottom: 7px;
+}
+
+/* =========================================================
+   DESKTOP
+========================================================= */
+
+@media (min-width: 992px) {
+
+    .settings-layout {
+        grid-template-columns:
+            minmax(0, 1fr)
+            minmax(0, 1fr);
+
+        align-items: stretch;
+
+        gap: 20px;
+    }
+
+
+    /*
+     * Primera fila:
+     * Datos empresa + Identidad visual
+     */
+
+    .settings-company-card,
+    .settings-branding-card {
+        height: 100%;
+    }
+
+
+    /*
+     * Dos columnas dentro de Datos de empresa
+     */
+
+    .settings-fields-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+
+    /*
+     * Segunda fila:
+     * Sonido + Reiniciar jornada
+     */
+
+    .settings-sound-card,
+    .settings-danger-card {
+        height: 100%;
+    }
+
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 991px) {
+
+    .settings-fields-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .settings-field-full {
+        margin-top: 16px;
+    }
+
+}
+
+.company-data-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+
+    padding-top: 22px;
+}
+
+.invoice-checkbox {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+
+    margin: 0;
+
+    color: var(--company-text);
+
+    font-size: 13px;
+    font-weight: 500;
+
+    cursor: pointer;
+}
+
+.invoice-checkbox input {
+    width: 17px;
+    height: 17px;
+
+    margin: 0;
+
+    accent-color: var(--company-button);
+
+    cursor: pointer;
+}
+
+@media (max-width: 575px) {
+
+    .company-data-actions {
+        align-items: flex-start;
+        flex-direction: column;
     }
 
 }

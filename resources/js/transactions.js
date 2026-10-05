@@ -392,7 +392,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const row = `
 
-            <tr>
+            
             <tr data-transaction-id="${transaction.id}">
 
                 <!-- CONTADOR -->
