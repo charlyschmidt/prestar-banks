@@ -16,6 +16,7 @@ use App\Http\Controllers\OpeningBalanceImportController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\MercadoPagoWebhookController;
+use App\Http\Controllers\CompanyApiKeyController;
 
 
 /*
@@ -240,8 +241,33 @@ Route::middleware('auth')->group(function () {
         Route::patch(
             '/settings/company',
             [SettingsController::class, 'updateCompany']
-        )->name('settings.company.update');        
+        )->name('settings.company.update');
 
+
+        Route::post(
+            '/settings/api-keys',
+            [CompanyApiKeyController::class, 'store']
+        )->name('settings.api-keys.store');
+
+        Route::delete(
+            '/settings/api-keys/{apiKey}',
+            [CompanyApiKeyController::class, 'destroy']
+        )->name('settings.api-keys.destroy');
+
+        Route::get(
+            '/settings/api',
+            [SettingsController::class, 'api']
+        )->name('settings.api');
+
+        Route::get(
+            '/settings/api/documentation',
+            [SettingsController::class, 'apiDocumentation']
+        )->name('settings.api.documentation');
+
+        Route::delete(
+            '/settings/api-keys/{apiKey}/delete',
+            [CompanyApiKeyController::class, 'delete']
+        )->name('settings.api-keys.delete');
 
         /*
         |--------------------------------------------------------------------------

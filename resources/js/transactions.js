@@ -441,58 +441,74 @@ document.addEventListener('DOMContentLoaded', () => {
                 <!-- BANCO DESTINO -->
                 <td>
 
-                    ${transaction.type === 'expense' &&
-                    transaction.destination_bank
+                    ${transaction.type === 'expense'
 
-                    ? `
-                                <div class="destination-bank">
+                        ? `
+                            <div class="destination-bank">
 
-                                    <i class="bi bi-bank"></i>
+                                <i class="bi bi-bank"></i>
 
-                                    <span>
-                                        ${transaction.destination_bank}
-                                    </span>
-
-                                </div>
-
-                                <div
-                                    class="execution-badge"
-                                    data-execution-badge="${transaction.id}"
-                                    style="display: none;"
-                                >
-
-                                    <i class="bi bi-check-circle-fill"></i>
-
-                                    <span>
-                                        Ejecutada
-                                    </span>
-
-                                </div>
-                            `
-
-                    : `
-                                <span class="text-muted">
-                                    —
+                                <span>
+                                    ${transaction.destination_bank ?? 'No informado'}
                                 </span>
-                            `
-                }
+
+                            </div>
+
+                            <div
+                                class="execution-badge"
+                                data-execution-badge="${transaction.id}"
+                                style="display: none;"
+                            >
+                                <i class="bi bi-check-circle-fill"></i>
+
+                                <span>
+                                    Ejecutada
+                                </span>
+                            </div>
+                        `
+
+                        : `
+                            <span class="text-muted">
+                                —
+                            </span>
+                        `
+                    }
 
                 </td>
 
 
-                <!-- USUARIO -->
+               <!-- USUARIO / ORIGEN -->
                 <td>
 
                     <div class="movement-user">
 
-                        <i class="bi bi-person-circle"></i>
+                        ${transaction.source === 'api'
+                                    ? `
+                                <i class="bi bi-plug"></i>
 
-                        <span>
-                            ${transaction.user?.email
-                    ? transaction.user.email.split('@')[0]
-                    : 'Sin registro'
-                }
-                        </span>
+                                <span>
+                                    ${transaction.api_key?.name ?? 'Integración API'}
+                                </span>
+                                `
+                                : transaction.source === 'import'
+                                    ? `
+                                <i class="bi bi-file-earmark-arrow-up"></i>
+
+                                <span>
+                                    Importación
+                                </span>
+                                `
+                                    : `
+                                <i class="bi bi-person-circle"></i>
+
+                                <span>
+                                    ${transaction.user?.email
+                                        ? transaction.user.email.split('@')[0]
+                                        : 'Sin registro'
+                                    }
+                                </span>
+                            `
+                            }
 
                     </div>
 

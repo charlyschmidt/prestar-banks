@@ -7,9 +7,7 @@
 
     <div class="offcanvas-header">
 
-
         {{-- BRAND --}}
-
         <div class="sidebar-brand">
 
             <a href="{{ route('dashboard') }}">
@@ -25,14 +23,11 @@
 
             </a>
 
-
             @if ($activeCompany)
+
                 <div class="sidebar-company-name" id="mobileSidebarLabel">
                     {{ $activeCompany->name }}
                 </div>
-            @endif
-
-            @if ($activeCompany)
 
                 @if ($activeCompany->hasActiveSubscription())
 
@@ -69,7 +64,8 @@
         </div>
 
 
-        <button type="button" class="btn-close sidebar-close" data-bs-dismiss="offcanvas" aria-label="Cerrar"></button>
+        <button type="button" class="btn-close sidebar-close" data-bs-dismiss="offcanvas" aria-label="Cerrar">
+        </button>
 
     </div>
 
@@ -78,7 +74,6 @@
     <div class="offcanvas-body p-0">
 
         <nav class="sidebar-nav">
-
 
             <a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard') ? 'active' : '' }}">
 
@@ -107,6 +102,7 @@
 
             </a>
 
+
             <a href="{{ route('reminders.index') }}" class="{{ request()->routeIs('reminders.*') ? 'active' : '' }}">
 
                 <i class="bi bi-calendar2-check"></i>
@@ -124,10 +120,8 @@
                     Historial
 
                 </a>
-            @endif
 
 
-            @if (auth()->user()->isSuperAdmin())
                 <a href="{{ route('users.index') }}" class="{{ request()->routeIs('usuarios.*') ? 'active' : '' }}">
 
                     <i class="bi bi-people"></i>
@@ -135,18 +129,56 @@
                     Usuarios
 
                 </a>
-            @endif
 
 
-            @if (auth()->user()->isSuperAdmin())
-                <a href="{{ route('settings.index') }}"
-                    class="{{ request()->routeIs('settings.*') ? 'active' : '' }}">
+                {{-- CONFIGURACIÓN --}}
+                <details class="sidebar-menu-group" {{ request()->routeIs('settings.*') ? 'open' : '' }}>
 
-                    <i class="bi bi-gear"></i>
+                    <summary class="sidebar-menu-parent {{ request()->routeIs('settings.*') ? 'active' : '' }}">
 
-                    Configuración
+                        <span class="sidebar-menu-parent-content">
+                            <i class="bi bi-gear"></i>
+                            Configuración
+                        </span>
 
-                </a>
+                        <i class="bi bi-chevron-down sidebar-menu-chevron"></i>
+
+                    </summary>
+
+
+                    <div class="sidebar-submenu">
+
+                        <a href="{{ route('settings.index') }}"
+                            class="{{ request()->routeIs('settings.index') ? 'active' : '' }}">
+
+                            <i class="bi bi-sliders"></i>
+
+                            General
+
+                        </a>
+
+
+                        <a href="{{ route('settings.api') }}"
+                            class="{{ request()->routeIs('settings.api') ? 'active' : '' }}">
+
+                            <i class="bi bi-plug"></i>
+
+                            Integraciones API
+
+                        </a>
+
+                        <a href="{{ route('settings.api.documentation') }}"
+                            class="{{ request()->routeIs('settings.api.documentation') ? 'active' : '' }}">
+
+                            <i class="bi bi-book"></i>
+
+                            Documentación API
+
+                        </a>
+
+                    </div>
+
+                </details>
             @endif
 
 
@@ -164,7 +196,6 @@
 
             </form>
 
-
         </nav>
 
     </div>
@@ -179,9 +210,7 @@
 
 <aside class="sidebar desktop-sidebar">
 
-
     {{-- BRAND --}}
-
     <div class="sidebar-brand">
 
         <a href="{{ route('dashboard') }}">
@@ -199,12 +228,11 @@
 
 
         @if ($activeCompany)
+
             <div class="sidebar-company-name">
                 {{ $activeCompany->name }}
             </div>
-        @endif
 
-        @if ($activeCompany)
 
             @if ($activeCompany->hasActiveSubscription())
 
@@ -232,7 +260,6 @@
 
                     </div>
 
-
                 </div>
 
             @endif
@@ -244,9 +271,7 @@
 
 
     {{-- NAV --}}
-
     <nav>
-
 
         <a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard') ? 'active' : '' }}">
 
@@ -275,6 +300,7 @@
 
         </a>
 
+
         <a href="{{ route('reminders.index') }}" class="{{ request()->routeIs('reminders.*') ? 'active' : '' }}">
 
             <i class="bi bi-calendar2-check"></i>
@@ -292,10 +318,8 @@
                 Historial
 
             </a>
-        @endif
 
 
-        @if (auth()->user()->isSuperAdmin())
             <a href="{{ route('users.index') }}" class="{{ request()->routeIs('usuarios.*') ? 'active' : '' }}">
 
                 <i class="bi bi-people"></i>
@@ -303,17 +327,56 @@
                 Usuarios
 
             </a>
-        @endif
 
 
-        @if (auth()->user()->isSuperAdmin())
-            <a href="{{ route('settings.index') }}" class="{{ request()->routeIs('settings.*') ? 'active' : '' }}">
+            {{-- CONFIGURACIÓN --}}
+            <details class="sidebar-menu-group" {{ request()->routeIs('settings.*') ? 'open' : '' }}>
 
-                <i class="bi bi-gear"></i>
+                <summary class="sidebar-menu-parent {{ request()->routeIs('settings.*') ? 'active' : '' }}">
 
-                Configuración
+                    <span class="sidebar-menu-parent-content">
+                        <i class="bi bi-gear"></i>
+                        Configuración
+                    </span>
 
-            </a>
+                    <i class="bi bi-chevron-down sidebar-menu-chevron"></i>
+
+                </summary>
+
+
+                <div class="sidebar-submenu">
+
+                    <a href="{{ route('settings.index') }}"
+                        class="{{ request()->routeIs('settings.index') ? 'active' : '' }}">
+
+                        <i class="bi bi-sliders"></i>
+
+                        General
+
+                    </a>
+
+
+                    <a href="{{ route('settings.api') }}"
+                        class="{{ request()->routeIs('settings.api') ? 'active' : '' }}">
+
+                        <i class="bi bi-plug"></i>
+
+                        Integraciones API
+
+                    </a>
+
+                    <a href="{{ route('settings.api.documentation') }}"
+                        class="{{ request()->routeIs('settings.api.documentation') ? 'active' : '' }}">
+
+                        <i class="bi bi-book"></i>
+
+                        Documentación API
+
+                    </a>
+
+                </div>
+
+            </details>
         @endif
 
 
@@ -331,8 +394,6 @@
 
         </form>
 
-
     </nav>
-
 
 </aside>

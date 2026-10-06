@@ -95,7 +95,10 @@
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-32MQLSS6RJ"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
         gtag('js', new Date());
 
         gtag('config', 'G-32MQLSS6RJ');
@@ -784,6 +787,24 @@
                         <p>
                             Recibí avisos ante movimientos importantes,
                             saldos bajos y situaciones que requieren atención.
+                        </p>
+
+                    </article>
+
+                    <article>
+
+                        <span>
+                            05
+                        </span>
+
+                        <h3>
+                            Integración con ERP
+                        </h3>
+
+                        <p>
+                            Conectá AERIA con tu ERP o sistema de gestión
+                            mediante API y sincronizá movimientos financieros
+                            automáticamente.
                         </p>
 
                     </article>

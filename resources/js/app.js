@@ -83,6 +83,8 @@ import '../css/subscription.css';
 
 import '../css/subscription-dashboard.css';
 
+import '../css/settings-api.css';
+
 /*
 |--------------------------------------------------------------------------
 | Javascript propio
@@ -114,5 +116,7 @@ import './settings-danger-zone';
 import './searchable-select';
 
 import './subscription';
+
+import './settings-api';
 
 

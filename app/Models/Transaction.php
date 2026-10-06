@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\Concerns\BelongsToCompany;
+use App\Models\CompanyApiKey;
 
 class Transaction extends Model
 {
@@ -28,6 +29,10 @@ class Transaction extends Model
         'executed_by',
         'transfer_tax_rate',
         'transfer_tax_amount',
+        'source',
+        'external_id',
+        'company_id',
+        'api_key_id',
 
     ];
 
@@ -119,5 +124,13 @@ class Transaction extends Model
             User::class,
             'executed_by'
         )->withTrashed();
+    }
+
+    public function apiKey()
+    {
+        return $this->belongsTo(
+            CompanyApiKey::class,
+            'api_key_id'
+        );
     }
 }

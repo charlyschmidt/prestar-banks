@@ -34,9 +34,17 @@ class SettingsController extends Controller
             ->orderBy('name')
             ->get();
 
+        $apiKeys = $company->apiKeys()
+            ->latest()
+            ->get();
+
         return view(
             'settings.index',
-            compact('company', 'provinces')
+            compact(
+                'company',
+                'provinces',
+                'apiKeys'
+            )
         );
     }
 
@@ -336,5 +344,45 @@ class SettingsController extends Controller
                 'success',
                 'Datos de la empresa actualizados correctamente.'
             );
+    }
+
+    public function api()
+    {
+        if (!auth()->user()->isSuperAdmin()) {
+            abort(403);
+        }
+
+        $company = app(CompanyContextService::class)->company();
+
+        if (!$company) {
+            abort(404);
+        }
+
+        $apiKeys = $company->apiKeys()
+            ->latest()
+            ->get();
+
+        return view(
+            'settings.api',
+            compact(
+                'company',
+                'apiKeys'
+            )
+        );
+    }
+
+    public function apiDocumentation()
+    {
+        if (!auth()->user()->isSuperAdmin()) {
+            abort(403);
+        }
+
+        $company = app(CompanyContextService::class)->company();
+
+        if (!$company) {
+            abort(404);
+        }
+
+        return view('settings.api-documentation', compact('company'));
     }
 }

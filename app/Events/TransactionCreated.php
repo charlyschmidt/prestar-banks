@@ -70,6 +70,7 @@ class TransactionCreated implements ShouldBroadcastNow
             'accountBalance',
             'user',
             'financialDay',
+            'apiKey',
         ]);
 
 
@@ -188,6 +189,27 @@ class TransactionCreated implements ShouldBroadcastNow
                 'executed_at' =>
                 $this->transaction->executed_at,
 
+                /*
+                |--------------------------------------------------------------------------
+                | Origen
+                |--------------------------------------------------------------------------
+                */
+
+                'source' =>
+                $this->transaction->source,
+
+                'external_id' =>
+                $this->transaction->external_id,
+
+                'api_key' => $this->transaction->apiKey
+                    ? [
+                        'id' =>
+                        $this->transaction->apiKey->id,
+
+                        'name' =>
+                        $this->transaction->apiKey->name,
+                    ]
+                    : null,
 
                 /*
                 |--------------------------------------------------------------------------

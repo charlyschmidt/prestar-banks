@@ -360,17 +360,31 @@
 
 
 
-                                {{-- USUARIO --}}
+                                {{-- USUARIO / ORIGEN --}}
 
                                 <td>
 
                                     <div class="movement-user">
 
-                                        <i class="bi bi-person-circle"></i>
+                                        @if ($movement->source === 'api')
+                                            <i class="bi bi-plug"></i>
 
-                                        <span>
-                                            {{ $movement->user?->email ? \Illuminate\Support\Str::before($movement->user->email, '@') : 'Sin registro' }}
-                                        </span>
+                                            <span>
+                                                {{ $movement->apiKey?->name ?? 'Integración API' }}
+                                            </span>
+                                        @elseif ($movement->source === 'import')
+                                            <i class="bi bi-file-earmark-arrow-up"></i>
+
+                                            <span>
+                                                Importación
+                                            </span>
+                                        @else
+                                            <i class="bi bi-person-circle"></i>
+
+                                            <span>
+                                                {{ $movement->user?->email ? \Illuminate\Support\Str::before($movement->user->email, '@') : 'Sin registro' }}
+                                            </span>
+                                        @endif
 
                                     </div>
 

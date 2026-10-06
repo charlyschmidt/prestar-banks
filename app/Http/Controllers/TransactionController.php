@@ -17,6 +17,7 @@ use App\Models\AccountBalance;
 use App\Events\TransactionExecuted;
 use App\Events\TransactionUpdated;
 use Illuminate\Support\Facades\Storage;
+use App\Services\TransactionService;
 
 class TransactionController extends Controller
 {
@@ -38,10 +39,11 @@ class TransactionController extends Controller
         }
 
 
-        $transactions = Transaction::with([
-            'account',
-            'user'
-        ])
+            $transactions = Transaction::with([
+                'account',
+                'user',
+                'apiKey'
+            ])
             ->where(
                 'financial_day_id',
                 $day->id
@@ -127,457 +129,122 @@ class TransactionController extends Controller
         );
     }
 
+public function store(
+    Request $request,
+    TransactionService $transactionService
+) {
 
-
-
-
-
-
-    public function store(
-        Request $request,
-        FinancialDayService $financialDayService
-    ) {
-
-        /*
+    /*
     |--------------------------------------------------------------------------
     | Validación
     |--------------------------------------------------------------------------
     */
 
-        $data = $request->validate([
+    $data = $request->validate([
 
-            'account_id' => [
-                'required',
-                'integer',
+        'account_id' => [
+            'required',
+            'integer',
 
-                Rule::exists(
-                    'accounts',
-                    'id'
-                )->where(
-                    fn($query) =>
-                    $query->where(
-                        'company_id',
-                        session('company_id')
-                    )
-                ),
-            ],
+            Rule::exists(
+                'accounts',
+                'id'
+            )->where(
+                fn($query) =>
+                $query->where(
+                    'company_id',
+                    session('company_id')
+                )
+            ),
+        ],
 
-            'account_balance_id' => [
-                'required',
-                'integer',
+        'account_balance_id' => [
+            'required',
+            'integer',
 
-                Rule::exists(
-                    'account_balances',
-                    'id'
-                )->where(
-                    fn($query) =>
-                    $query->where(
-                        'company_id',
-                        session('company_id')
-                    )
-                ),
-            ],
+            Rule::exists(
+                'account_balances',
+                'id'
+            )->where(
+                fn($query) =>
+                $query->where(
+                    'company_id',
+                    session('company_id')
+                )
+            ),
+        ],
 
-            'type' => [
-                'required',
-                'in:income,expense,reserve,transfer_in,transfer_out'
-            ],
+        'type' => [
+            'required',
+            'in:income,expense,reserve,transfer_in,transfer_out',
+        ],
 
-            'amount' => [
-                'required',
-                'numeric',
-                'min:0.01'
-            ],
+        'amount' => [
+            'required',
+            'numeric',
+            'min:0.01',
+        ],
 
-            'description' => [
-                'nullable',
-                'string'
-            ],
+        'description' => [
+            'nullable',
+            'string',
+            'max:255',
+        ],
 
-            'date' => [
-                'required',
-                'date'
-            ],
+        'date' => [
+            'required',
+            'date',
+        ],
 
-            'destination_bank' => [
-                'required_if:type,expense',
-                'nullable',
-                'string',
-                'max:150',
-            ],
+        'destination_bank' => [
+            'required_if:type,expense',
+            'nullable',
+            'string',
+            'max:150',
+        ],
 
-        ]);
-
-
-        /*
-    |--------------------------------------------------------------------------
-    | Jornada actual
-    |--------------------------------------------------------------------------
-    */
-
-        $day =
-            $financialDayService->current();
+    ]);
 
 
-        if (!$day) {
-
-            return back()
-                ->withInput()
-                ->with(
-                    'error',
-                    'No hay una jornada abierta. Primero iniciá el día.'
-                );
-        }
-
-
-        /*
-    |--------------------------------------------------------------------------
-    | Validar cuenta + moneda
-    |--------------------------------------------------------------------------
-    |
-    | No alcanza con validar que ambos IDs existan.
-    |
-    | Debemos comprobar que el AccountBalance
-    | seleccionado realmente pertenece a la
-    | Account seleccionada.
-    |
-    */
-
-        $accountBalance =
-            AccountBalance::where(
-                'id',
-                $data['account_balance_id']
-            )
-            ->where(
-                'account_id',
-                $data['account_id']
-            )
-            ->first();
-
-
-        if (!$accountBalance) {
-
-            return back()
-                ->withInput()
-                ->with(
-                    'error',
-                    'La moneda seleccionada no pertenece a la cuenta.'
-                );
-        }
-
-
-        /*
-|--------------------------------------------------------------------------
-| Impuesto de transferencia
-|--------------------------------------------------------------------------
-*/
-
-        $account = Account::findOrFail(
-            $accountBalance->account_id
-        );
-
-        $transferTaxRate = 0;
-        $transferTaxAmount = 0;
-
-        $isTransfer =
-            $data['type'] === 'expense' &&
-            !empty($data['destination_bank']);
-
-        if ($isTransfer) {
-
-            $transferTaxRate =
-                (float) $account->transfer_tax_rate;
-
-            $transferTaxAmount = round(
-                ((float) $data['amount'] * $transferTaxRate) / 100,
-                2
-            );
-        }
-
-        $data['transfer_tax_rate'] =
-            $transferTaxRate;
-
-        $data['transfer_tax_amount'] =
-            $transferTaxAmount;
-
-
-
-        /*
-    |--------------------------------------------------------------------------
-    | Banco destino
-    |--------------------------------------------------------------------------
-    */
-
-        if (
-            $data['type'] !== 'expense'
-        ) {
-
-            $data['destination_bank'] =
-                null;
-        }
-
-
-        /*
-    |--------------------------------------------------------------------------
-    | Usuario creador
-    |--------------------------------------------------------------------------
-    */
-
-        $data['user_id'] =
-            auth()->id();
-
-
-        /*
+    /*
     |--------------------------------------------------------------------------
     | Crear movimiento
     |--------------------------------------------------------------------------
     */
 
-        try {
+    try {
 
-            DB::transaction(
-                function () use (
-                    $data,
-                    $day,
-                    $accountBalance,
-                    &$transaction
-                ) {
-
-                    /*
-                |--------------------------------------------------------------------------
-                | Bloquear saldo diario
-                |--------------------------------------------------------------------------
-                |
-                | Ahora buscamos por account_balance_id.
-                |
-                | Esto identifica exactamente:
-                |
-                | Santander / ARS
-                | Santander / USD
-                | Santander / EUR
-                |
-                | lockForUpdate evita que dos movimientos
-                | concurrentes modifiquen el mismo saldo
-                | al mismo tiempo.
-                |
-                */
-
-                    $balance =
-                        AccountDailyBalance::where(
-                            'financial_day_id',
-                            $day->id
-                        )
-                        ->where(
-                            'account_balance_id',
-                            $accountBalance->id
-                        )
-                        ->lockForUpdate()
-                        ->first();
-
-
-                    if (!$balance) {
-
-                        throw new \Exception(
-                            'La moneda seleccionada no pertenece a la jornada actual.'
-                        );
-                    }
-
-
-                    /*
-                |--------------------------------------------------------------------------
-                | Validar consistencia
-                |--------------------------------------------------------------------------
-                */
-
-                    if (
-                        (int) $balance->account_id !==
-                        (int) $data['account_id']
-                    ) {
-
-                        throw new \Exception(
-                            'El saldo seleccionado no pertenece a la cuenta.'
-                        );
-                    }
-
-
-                    /*
-                |--------------------------------------------------------------------------
-                | Validar saldo disponible
-                |--------------------------------------------------------------------------
-                */
-
-                    $isExpense =
-                        in_array(
-                            $data['type'],
-                            [
-                                'expense',
-                                'reserve',
-                            ],
-                            true
-                        );
-
-
-                    $amountToDebit =
-                        (float) $data['amount'] +
-                        (float) $data['transfer_tax_amount'];
-
-
-                    if (
-                        $isExpense &&
-                        (float) $balance->current_balance <
-                        $amountToDebit
-                    ) {
-
-                        throw new \Exception(
-
-                            'Saldo insuficiente. Disponible: ' .
-
-                                $accountBalance->currency .
-
-                                ' ' .
-
-                                number_format(
-                                    $balance->current_balance,
-                                    2,
-                                    ',',
-                                    '.'
-                                )
-
-                        );
-                    }
-
-
-                    /*
-                |--------------------------------------------------------------------------
-                | Preparar movimiento
-                |--------------------------------------------------------------------------
-                */
-
-                    $data['financial_day_id'] =
-                        $day->id;
-
-
-                    /*
-                 * Guardamos ambos.
-                 *
-                 * account_id:
-                 * banco/cuenta
-                 *
-                 * account_balance_id:
-                 * moneda concreta dentro del banco
-                 */
-
-                    $data['account_id'] =
-                        $accountBalance->account_id;
-
-
-                    $data['account_balance_id'] =
-                        $accountBalance->id;
-
-
-                    /*
-                |--------------------------------------------------------------------------
-                | Crear movimiento
-                |--------------------------------------------------------------------------
-                */
-
-                    $transaction =
-                        Transaction::create(
-                            $data
-                        );
-
-
-                    /*
-                |--------------------------------------------------------------------------
-                | Actualizar saldo
-                |--------------------------------------------------------------------------
-                */
-
-                    if (
-                        $transaction->type ===
-                        'income'
-                    ) {
-
-                        $balance->increment(
-                            'current_balance',
-                            $transaction->amount
-                        );
-                    } else {
-
-                        $amountToDebit =
-                            (float) $transaction->amount +
-                            (float) $transaction->transfer_tax_amount;
-
-                        $balance->decrement(
-                            'current_balance',
-                            $amountToDebit
-                        );
-                    }
-
-
-                    /*
-                |--------------------------------------------------------------------------
-                | Saldo resultante
-                |--------------------------------------------------------------------------
-                */
-
-                    $balance->refresh();
-
-
-                    $transaction->update([
-
-                        'balance_after' =>
-                        $balance->current_balance
-
-                    ]);
-                }
-            );
-        } catch (\Exception $e) {
-
-            return back()
-                ->withInput()
-                ->with(
-                    'error',
-                    $e->getMessage()
-                );
-        }
-
-
-        /*
-    |--------------------------------------------------------------------------
-    | Realtime
-    |--------------------------------------------------------------------------
-    */
-
-        $transaction->refresh();
-
-
-        $transaction->load([
-            'account',
-            'accountBalance',
-            'user',
-            'financialDay'
-        ]);
-
-
-        event(
-            new TransactionCreated(
-                $transaction
-            )
+        $transactionService->create(
+            data: $data,
+            companyId: (int) session('company_id'),
+            userId: auth()->id(),
+            source: 'manual',
+            externalId: null
         );
 
+    } catch (\Throwable $e) {
 
-        return redirect()
-            ->route('transactions.index')
+        return back()
+            ->withInput()
             ->with(
-                'success',
-                'Movimiento creado correctamente.'
+                'error',
+                $e->getMessage()
             );
     }
 
 
+    return redirect()
+        ->route('transactions.index')
+        ->with(
+            'success',
+            'Movimiento creado correctamente.'
+        );
+}
 
-    public function edit(Transaction $transaction)
+
+
+
+   public function edit(Transaction $transaction)
     {
 
         /*

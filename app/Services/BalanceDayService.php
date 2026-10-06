@@ -424,6 +424,7 @@ class BalanceDayService
             'account',
             'accountBalance',
             'user',
+            'apiKey',
         ])
             ->where(
                 'financial_day_id',
@@ -450,6 +451,7 @@ class BalanceDayService
                 'account',
                 'accountBalance',
                 'user',
+                'apiKey',
             ])
             ->where(
                 'financial_day_id',
@@ -547,12 +549,17 @@ class BalanceDayService
 
 
         return $movements
-            ->sortByDesc(
-                function ($movement) {
+            ->sort(function ($a, $b) {
 
-                    return $movement->date;
+                $dateComparison =
+                    $b->date <=> $a->date;
+
+                if ($dateComparison !== 0) {
+                    return $dateComparison;
                 }
-            )
+
+                return $b->id <=> $a->id;
+            })
             ->values();
     }
 

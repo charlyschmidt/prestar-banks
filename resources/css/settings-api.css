@@ -1,0 +1,407 @@
+/* =========================================================
+   SETTINGS API
+========================================================= */
+
+.api-settings-page {
+    width: 100%;
+    max-width: none;
+}
+
+
+/* =========================================================
+   CARDS
+========================================================= */
+
+/* =========================================================
+   CARDS
+========================================================= */
+
+.api-card {
+    margin-bottom: 20px;
+}
+
+/* Nueva API Key */
+.api-create-card {
+    width: 100%;
+    max-width: 875px;
+}
+
+/* Claves de acceso */
+.api-keys-card {
+    width: 100%;
+    max-width: none;
+}
+
+
+/* =========================================================
+   TIPOGRAFÍA
+========================================================= */
+
+.api-card .settings-section-header h3 {
+    font-size: 16px;
+}
+
+.api-card .settings-section-header p {
+    font-size: 13px;
+}
+
+.api-card .settings-label {
+    font-size: 13px;
+}
+
+.api-card .settings-help {
+    margin-top: 7px;
+    font-size: 12px;
+}
+
+/* =========================================================
+   CREAR API KEY
+========================================================= */
+
+.api-create-row {
+    width: 100%;
+}
+
+.api-name-field {
+    width: 100%;
+}
+
+.api-input-row {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.api-input-row .settings-input {
+    flex: 1;
+    min-width: 0;
+}
+
+.api-generate-button {
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+.api-card .settings-help {
+    margin-top: 8px;
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   TABLA
+========================================================= */
+
+.api-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.api-table {
+    width: 100%;
+    table-layout: auto;
+    border-collapse: collapse;
+    color: var(--company-text);
+    font-size: 13px;
+}
+
+.api-table th {
+    padding: 12px 14px;
+
+    border-bottom:
+        1px solid var(--company-border);
+
+    color: var(--company-muted);
+
+    font-size: 11px;
+    font-weight: 600;
+
+    text-align: left;
+    text-transform: uppercase;
+
+    letter-spacing: .04em;
+
+    white-space: nowrap;
+}
+
+.api-table td {
+    padding: 14px;
+
+    border-bottom:
+        1px solid var(--company-border);
+
+    color: var(--company-text);
+
+    vertical-align: middle;
+}
+
+.api-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.api-table tbody tr {
+    transition: background .15s ease;
+}
+
+.api-table tbody tr:hover {
+    background: var(--company-hover);
+}
+
+.api-table-action {
+    text-align: right !important;
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   INTEGRACIÓN
+========================================================= */
+
+.api-integration-name {
+    display: flex;
+    align-items: center;
+
+    gap: 9px;
+
+    white-space: nowrap;
+}
+
+.api-integration-name i {
+    color: var(--company-muted);
+}
+
+.api-integration-name strong {
+    color: var(--company-text);
+
+    font-size: 13px;
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   API KEY
+========================================================= */
+
+.api-key-prefix {
+    display: inline-block;
+
+    padding: 5px 8px;
+
+    border:
+        1px solid var(--company-border);
+
+    border-radius: 6px;
+
+    background:
+        var(--company-bg);
+
+    color:
+        var(--company-text);
+
+    font-size: 12px;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   ESTADOS
+========================================================= */
+
+.api-status {
+    display: inline-flex;
+
+    align-items: center;
+
+    padding: 4px 8px;
+
+    border-radius: 999px;
+
+    font-size: 11px;
+    font-weight: 600;
+
+    white-space: nowrap;
+}
+
+.api-status-active {
+    background:
+        rgba(34, 197, 94, .12);
+
+    color:
+        #22c55e;
+}
+
+.api-status-revoked {
+    background:
+        rgba(239, 68, 68, .10);
+
+    color:
+        #ef4444;
+}
+
+.api-muted {
+    color:
+        var(--company-muted);
+}
+
+
+/* =========================================================
+   REVOCAR
+========================================================= */
+
+.api-revoke-form {
+    display: inline-block;
+
+    margin: 0;
+}
+
+.api-revoke-button {
+    padding: 7px 10px;
+
+    font-size: 12px;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   SIN API KEYS
+========================================================= */
+
+.api-empty {
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    padding: 18px;
+
+    border:
+        1px dashed var(--company-border);
+
+    border-radius: 10px;
+}
+
+.api-empty>i {
+    color:
+        var(--company-muted);
+
+    font-size: 20px;
+}
+
+.api-empty strong,
+.api-empty span {
+    display: block;
+}
+
+.api-empty strong {
+    color:
+        var(--company-text);
+
+    font-size: 13px;
+}
+
+.api-empty span {
+    margin-top: 3px;
+
+    color:
+        var(--company-muted);
+
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   API KEY GENERADA
+========================================================= */
+
+.api-generated-content {
+    text-align: left;
+}
+
+.api-generated-content p {
+    margin-bottom: 12px;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 768px) {
+
+    /*
+     * En mobile ambas cards ocupan
+     * todo el ancho.
+     */
+
+    .api-card:first-of-type,
+    .api-card:last-of-type {
+        width: 100%;
+        max-width: none;
+    }
+
+
+    .api-create-row {
+        flex-direction: column;
+
+        align-items: stretch;
+    }
+
+    .api-name-field {
+        width: 100%;
+    }
+
+    .api-input-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    .api-generate-button {
+        width: 100%;
+    }
+
+    .api-table {
+        min-width: 760px;
+    }
+
+}
+
+/* =========================================================
+   NOTA DE SEGURIDAD
+========================================================= */
+
+.api-security-note {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    margin-top: 14px;
+
+    color: var(--company-muted);
+
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+.api-security-note i {
+    flex-shrink: 0;
+
+    color: var(--company-muted);
+
+    font-size: 13px;
+}
+
+.api-flow-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: larger;
+}
+
+.api-flow-steps span {
+    display: block;
+    line-height: 1.45;
+}

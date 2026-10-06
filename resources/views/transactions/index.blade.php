@@ -209,19 +209,21 @@
 
                                 <td>
 
-                                    @if ($transaction->type === 'expense' && $transaction->destination_bank)
+                                    @if ($transaction->type === 'expense')
+
                                         <div class="destination-bank">
 
                                             <i class="bi bi-bank"></i>
 
                                             <span>
-                                                {{ $transaction->destination_bank }}
+                                                {{ $transaction->destination_bank ?? 'No informado' }}
                                             </span>
 
                                         </div>
 
 
-                                        <div class="execution-badge" data-execution-badge="{{ $transaction->id }}"
+                                        <div class="execution-badge"
+                                            data-execution-badge="{{ $transaction->id }}"
                                             @if (!$transaction->executed_at) style="display: none;" @endif>
 
                                             <i class="bi bi-check-circle-fill"></i>
@@ -231,29 +233,44 @@
                                             </span>
 
                                         </div>
+
                                     @else
+
                                         <span class="text-muted">
                                             —
                                         </span>
+
                                     @endif
 
                                 </td>
 
-
-
-                                {{-- USUARIO --}}
+                                {{-- USUARIO / ORIGEN --}}
 
                                 <td>
 
                                     <div class="movement-user">
 
-                                        <i class="bi bi-person-circle"></i>
+                                        @if ($transaction->source === 'api')
+                                            <i class="bi bi-plug"></i>
 
-                                        <span>
-                                            {{ $transaction->user?->email
-                                                ? \Illuminate\Support\Str::before($transaction->user->email, '@')
-                                                : 'Sin registro' }}
-                                        </span>
+                                            <span>
+                                                {{ $transaction->apiKey?->name ?? 'Integración API' }}
+                                            </span>
+                                        @elseif ($transaction->source === 'import')
+                                            <i class="bi bi-file-earmark-arrow-up"></i>
+
+                                            <span>
+                                                Importación
+                                            </span>
+                                        @else
+                                            <i class="bi bi-person-circle"></i>
+
+                                            <span>
+                                                {{ $transaction->user?->email
+                                                    ? \Illuminate\Support\Str::before($transaction->user->email, '@')
+                                                    : 'Sin registro' }}
+                                            </span>
+                                        @endif
 
                                     </div>
 

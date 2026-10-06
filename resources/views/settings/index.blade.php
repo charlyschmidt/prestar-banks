@@ -19,6 +19,13 @@
 
             </div>
 
+
+            <a href="{{ route('settings.api') }}" class="primary-action-button">
+                <i class="bi bi-plug"></i>
+
+                Integraciones API
+            </a>
+
         </div>
 
 

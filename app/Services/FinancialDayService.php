@@ -16,16 +16,33 @@ class FinancialDayService
     |--------------------------------------------------------------------------
     */
 
-    public function current()
+    public function current(?int $companyId = null)
     {
-        return FinancialDay::whereDate(
-            'date',
-            today()
-        )
-            ->where(
-                'status',
-                'open'
-            )
+        $query = FinancialDay::query();
+
+        /*
+    |--------------------------------------------------------------------------
+    | Contexto explícito
+    |--------------------------------------------------------------------------
+    |
+    | API:
+    | Recibe company_id desde la API Key.
+    |
+    | Web:
+    | Si no se pasa company_id, continúa funcionando con
+    | BelongsToCompany como hasta ahora.
+    |
+    */
+
+        if ($companyId !== null) {
+
+            $query = FinancialDay::withoutGlobalScopes()
+                ->where('company_id', $companyId);
+        }
+
+        return $query
+            ->whereDate('date', today())
+            ->where('status', 'open')
             ->first();
     }
 

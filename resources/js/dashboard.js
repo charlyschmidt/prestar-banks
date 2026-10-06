@@ -185,9 +185,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (!accountId) {
 
-                    console.error(
-                        'El evento no contiene account.id'
+                    console.warn(
+                        'El evento no contiene account.id. Se sincronizará el dashboard completo.'
                     );
+
+                    syncDashboard();
 
                     return;
                 }
@@ -1045,19 +1047,40 @@ function addMovementToTable(event, animate = true) {
         </td>
 
 
-        <td>
+       <td>
 
-            <div class="movement-user">
+        <div class="movement-user">
 
-                <i class="bi bi-person-circle"></i>
+        ${movement.source === 'api'
+            ? `
+                <i class="bi bi-plug"></i>
 
                 <span>
                     ${escapeHtml(
-        movement.user?.email
-            ? movement.user.email.split('@')[0]
-            : 'Sin registro'
-    )}
+                movement.api_key?.name ?? 'Integración API'
+            )}
                 </span>
+            `
+            : movement.source === 'import'
+                ? `
+                    <i class="bi bi-file-earmark-arrow-up"></i>
+
+                    <span>
+                        Importación
+                    </span>
+                `
+                : `
+                    <i class="bi bi-person-circle"></i>
+
+                    <span>
+                        ${escapeHtml(
+                    movement.user?.email
+                        ? movement.user.email.split('@')[0]
+                        : 'Sin registro'
+                )}
+                    </span>
+                `
+        }
 
             </div>
 
@@ -1068,10 +1091,10 @@ function addMovementToTable(event, animate = true) {
 
             <strong>
                 ${escapeHtml(
-        movement.description
-        ||
-        'Sin descripción'
-    )}
+            movement.description
+            ||
+            'Sin descripción'
+        )}
             </strong>
 
         </td>
@@ -1620,6 +1643,15 @@ async function syncDashboard() {
 
                                         executed_at:
                                             movement.executed_at,
+
+                                        source:
+                                            movement.source,
+
+                                        external_id:
+                                            movement.external_id,
+
+                                        api_key:
+                                            movement.api_key,
 
                                         user:
                                             movement.user

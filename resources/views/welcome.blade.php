@@ -333,6 +333,22 @@
 
                             </div>
 
+                            <div class="feature-item">
+
+                                <span class="feature-check">✓</span>
+
+                                <div>
+
+                                    <strong>Integración con ERP y sistemas externos</strong>
+
+                                    <p>
+                                        Conectá tu ERP o sistema de gestión mediante API
+                                        y sincronizá movimientos automáticamente.
+                                    </p>
+
+                                </div>
+
+                            </div>
 
                             <div class="feature-item">
 
