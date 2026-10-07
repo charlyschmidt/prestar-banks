@@ -419,6 +419,7 @@
 
                             <p>
                                 Se mostrará en el sidebar y al seleccionar una empresa.
+                                Debe ser una imagen cuadrada, entre 200x200 y 500x500 px.
                             </p>
 
                         </div>

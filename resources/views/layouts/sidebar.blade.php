@@ -229,7 +229,7 @@
 
         @if ($activeCompany)
 
-            <div class="sidebar-company-name">
+            <div class="sidebar-company-name mt-1">
                 {{ $activeCompany->name }}
             </div>
 

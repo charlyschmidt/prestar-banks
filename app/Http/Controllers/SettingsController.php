@@ -87,6 +87,7 @@ class SettingsController extends Controller
                     'image',
                     'mimes:png,jpg,jpeg,webp',
                     'max:2048',
+                    'dimensions:min_width=200,min_height=200,max_width=500,max_height=500,ratio=1/1',
                 ],
             ],
             [
@@ -99,6 +100,7 @@ class SettingsController extends Controller
                 'logo.image' => 'El archivo seleccionado debe ser una imagen.',
                 'logo.mimes' => 'El logo debe ser PNG, JPG, JPEG o WEBP.',
                 'logo.max' => 'El logo no puede superar los 2 MB.',
+                'logo.dimensions' => 'El logo debe ser cuadrado y tener entre 200x200 y 500x500 píxeles.',
             ]
         );
 
