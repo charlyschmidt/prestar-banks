@@ -257,11 +257,9 @@
 
 .reminder-item.is-due {
     background:
-        linear-gradient(
-            90deg,
+        linear-gradient(90deg,
             rgba(255, 255, 255, .025),
-            transparent 35%
-        ),
+            transparent 35%),
         var(--company-card);
 }
 
@@ -524,7 +522,7 @@
 }
 
 
-.reminder-modal-footer > * {
+.reminder-modal-footer>* {
     width: 100%;
 }
 
@@ -609,8 +607,7 @@
 }
 
 
-body[data-theme="light"]
-.reminder-form-group input[type="datetime-local"] {
+body[data-theme="light"] .reminder-form-group input[type="datetime-local"] {
     color-scheme: light;
 }
 
@@ -628,9 +625,7 @@ body[data-theme="light"]
 
     .reminder-item {
         grid-template-columns:
-            50px
-            minmax(0, 1fr)
-            auto;
+            50px minmax(0, 1fr) auto;
 
         align-items: center;
 
@@ -679,9 +674,7 @@ body[data-theme="light"]
 
     .reminder-item.is-completed {
         grid-template-columns:
-            38px
-            minmax(0, 1fr)
-            auto;
+            38px minmax(0, 1fr) auto;
     }
 
 
@@ -703,7 +696,7 @@ body[data-theme="light"]
     }
 
 
-    .reminder-modal-footer > * {
+    .reminder-modal-footer>* {
         width: auto;
     }
 
@@ -771,11 +764,9 @@ body[data-theme="light"]
     padding: 14px;
 
     background:
-        linear-gradient(
-            135deg,
+        linear-gradient(135deg,
             rgba(196, 145, 62, .13),
-            rgba(196, 145, 62, .045)
-        ),
+            rgba(196, 145, 62, .045)),
         var(--company-card);
 
     border: 1px solid rgba(196, 145, 62, .38);
@@ -1003,4 +994,127 @@ body[data-theme="light"]
         border-color: rgba(196, 145, 62, .48);
     }
 
+}
+
+/* =========================================================
+   RECURRENCIA RECORDATORIOS
+========================================================= */
+
+.reminder-recurrence {
+    margin-top: 14px;
+}
+
+.reminder-recurrence-title {
+    margin-bottom: 10px;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    color: var(--company-muted);
+}
+
+.reminder-recurrence-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 16px;
+
+    padding: 11px 0;
+
+    cursor: pointer;
+
+    font-size: 14px;
+}
+
+
+/* Ocultamos el radio real */
+
+.reminder-recurrence-option input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+
+/* Texto */
+
+.reminder-recurrence-option span {
+    flex: 1;
+}
+
+
+/* Toggle */
+
+.reminder-recurrence-option::after {
+    content: "";
+
+    width: 44px;
+    height: 24px;
+
+    flex-shrink: 0;
+
+    border-radius: 999px;
+
+    background:
+        radial-gradient(circle at 12px 50%,
+            #ffffff 0 8px,
+            transparent 9px),
+        #64748b;
+
+    transition: all .2s ease;
+}
+
+.reminder-recurrence-switch {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding-left: 0;
+    margin: 14px 0;
+}
+
+.reminder-recurrence-switch .form-check-label {
+    margin: 0;
+    cursor: pointer;
+}
+
+.reminder-recurrence-switch .form-check-input {
+    float: none;
+    margin: 0;
+    width: 42px;
+    height: 22px;
+    cursor: pointer;
+}
+
+.reminder-recurrence-switch .form-check-input:not(:checked) {
+    background-color: #64748b;
+    border-color: #64748b;
+}
+
+.reminder-recurrence-switch .form-check-input:checked {
+    background-color: #22c55e;
+    border-color: #22c55e;
+}
+
+
+/* No repetir */
+
+.reminder-recurrence-clear {
+    margin-top: 8px;
+
+    padding: 0;
+
+    border: 0;
+    background: transparent;
+
+    color: var(--company-muted);
+
+    font-size: 12px;
+
+    cursor: pointer;
+}
+
+.reminder-recurrence-clear:hover {
+    color: var(--company-text);
 }

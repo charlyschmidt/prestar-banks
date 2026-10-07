@@ -34,6 +34,8 @@ class FinancialReminder extends Model
         'completed_at',
         
         'notified_at',
+        
+        'recurrence_type'
 
     ];
 

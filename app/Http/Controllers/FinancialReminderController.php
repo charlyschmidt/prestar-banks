@@ -86,6 +86,11 @@ class FinancialReminderController extends Controller
                 'date',
             ],
 
+            'recurrence_type' => [
+                'nullable',
+                'in:weekly,monthly',
+            ],
+
             'account_id' => [
                 'nullable',
                 'integer',
@@ -161,6 +166,7 @@ class FinancialReminderController extends Controller
             'title' => $data['title'],
             'scheduled_at' => $data['scheduled_at'],
             'status' => 'pending',
+            'recurrence_type' => $data['recurrence_type'] ?? null,
         ]);
 
 
@@ -177,6 +183,12 @@ class FinancialReminderController extends Controller
     |--------------------------------------------------------------------------
     */
 
+    /*
+|--------------------------------------------------------------------------
+| Marcar como realizado
+|--------------------------------------------------------------------------
+*/
+
     public function complete(
         FinancialReminder $reminder
     ) {
@@ -186,6 +198,47 @@ class FinancialReminderController extends Controller
         );
 
 
+        /*
+    |--------------------------------------------------------------------------
+    | GUARDAMOS DATOS ANTES DE COMPLETAR
+    |--------------------------------------------------------------------------
+    */
+
+        $recurrenceType = $reminder->recurrence_type;
+
+        $nextScheduledAt = null;
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | CALCULAR PRÓXIMA FECHA
+    |--------------------------------------------------------------------------
+    */
+
+        if ($recurrenceType === 'weekly') {
+
+            $nextScheduledAt = $reminder
+                ->scheduled_at
+                ->copy()
+                ->addWeek();
+        }
+
+
+        if ($recurrenceType === 'monthly') {
+
+            $nextScheduledAt = $reminder
+                ->scheduled_at
+                ->copy()
+                ->addMonthNoOverflow();
+        }
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | COMPLETAR ACTUAL
+    |--------------------------------------------------------------------------
+    */
+
         $reminder->update([
 
             'status' => 'completed',
@@ -194,6 +247,36 @@ class FinancialReminderController extends Controller
 
         ]);
 
+        $nextReminder = null;
+        /*
+    |--------------------------------------------------------------------------
+    | CREAR SIGUIENTE RECORDATORIO
+    |--------------------------------------------------------------------------
+    */
+
+        if ($nextScheduledAt) {
+
+            $nextReminder = FinancialReminder::create([
+
+                'company_id' => $reminder->company_id,
+                'user_id' => $reminder->user_id,
+                'account_id' => $reminder->account_id,
+                'account_balance_id' => $reminder->account_balance_id,
+                'title' => $reminder->title,
+                'amount' => $reminder->amount,
+                'scheduled_at' => $nextScheduledAt,
+                'recurrence_type' => $recurrenceType,
+                'status' => 'pending',
+
+            ]);
+        }
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | RESPUESTA
+    |--------------------------------------------------------------------------
+    */
 
         if (request()->expectsJson()) {
 
@@ -203,7 +286,23 @@ class FinancialReminderController extends Controller
 
                 'reminder_id' => $reminder->id,
 
-                'message' => 'Recordatorio marcado como realizado.',
+                'recurring' => $nextScheduledAt !== null,
+
+                'next_reminder' => $nextReminder
+                    ? [
+                        'id' => $nextReminder->id,
+                        'title' => $nextReminder->title,
+                        'scheduled_at' => $nextReminder->scheduled_at->toIso8601String(),
+                    ]
+                    : null,
+
+                'next_scheduled_at' => $nextScheduledAt
+                    ? $nextScheduledAt->toIso8601String()
+                    : null,
+
+                'message' => $nextScheduledAt
+                    ? 'Recordatorio realizado. Se creó el próximo recordatorio.'
+                    : 'Recordatorio marcado como realizado.',
 
             ]);
         }
@@ -211,7 +310,9 @@ class FinancialReminderController extends Controller
 
         return back()->with(
             'success',
-            'Recordatorio marcado como realizado.'
+            $nextScheduledAt
+                ? 'Recordatorio realizado. Se creó el próximo recordatorio.'
+                : 'Recordatorio marcado como realizado.'
         );
     }
 

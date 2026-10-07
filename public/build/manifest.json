@@ -75,12 +75,12 @@
     "isEntry": true
   },
   "resources/js/app.js": {
-    "file": "assets/app-CzN3rgJG.js",
+    "file": "assets/app--uuMKTuG.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
     "css": [
-      "assets/app-sdJ3HiRS.css",
+      "assets/app-ay-1tmdw.css",
       "assets/welcome-Vd3gmU33.css",
       "assets/register-pending-LXepLUu1.css"
     ],

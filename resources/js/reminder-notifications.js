@@ -581,11 +581,238 @@ document.addEventListener('DOMContentLoaded', function () {
         );
     }
 
+    function escapeReminderHtml(value) {
+
+        const div =
+            document.createElement('div');
+
+        div.textContent =
+            value ?? '';
+
+        return div.innerHTML;
+    }
+
+    function addRecurringReminderToPending(reminder) {
+
+        if (!reminder) {
+            return;
+        }
+
+        const pendingList = document.querySelector(
+            '[data-reminders-pending-list]'
+        );
+
+        if (!pendingList) {
+            return;
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | EVITAR DUPLICADOS
+        |--------------------------------------------------------------------------
+        */
+
+        if (
+            pendingList.querySelector(
+                `[data-reminder-item="${reminder.id}"]`
+            )
+        ) {
+            return;
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | SACAR ESTADO VACÍO
+        |--------------------------------------------------------------------------
+        */
+
+        const empty = pendingList.querySelector(
+            '.reminders-empty'
+        );
+
+        if (empty) {
+            empty.remove();
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | FECHA
+        |--------------------------------------------------------------------------
+        */
+
+        const scheduled = new Date(
+            reminder.scheduled_at
+        );
+
+        const day = scheduled
+            .toLocaleDateString(
+                'es-AR',
+                {
+                    day: '2-digit'
+                }
+            );
+
+        const month = scheduled
+            .toLocaleDateString(
+                'es-AR',
+                {
+                    month: 'short'
+                }
+            )
+            .replace('.', '')
+            .toUpperCase();
+
+        const time = scheduled
+            .toLocaleTimeString(
+                'es-AR',
+                {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false
+                }
+            );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | ELEMENTO
+        |--------------------------------------------------------------------------
+        */
+
+        const item = document.createElement('div');
+
+        item.className =
+            'reminder-item';
+
+        item.dataset.reminderItem =
+            reminder.id;
+
+        item.dataset.reminderTitle =
+            reminder.title;
+
+        item.dataset.reminderScheduled =
+            reminder.scheduled_at;
+
+
+        item.innerHTML = `
+
+        <div class="reminder-date">
+
+            <span class="reminder-date-day">
+                ${day}
+            </span>
+
+            <span class="reminder-date-month">
+                ${month}
+            </span>
+
+        </div>
+
+
+        <div class="reminder-content">
+
+            <div class="reminder-title-row">
+
+                <strong>
+                    ${escapeReminderHtml(reminder.title)}
+                </strong>
+
+            </div>
+
+            <div class="reminder-meta">
+
+                <span>
+                    <i class="bi bi-clock"></i>
+                    ${time}
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="reminder-actions">
+
+            <form
+                method="POST"
+                action="/reminders/${reminder.id}/complete"
+                data-reminder-complete-form
+                data-reminder-id="${reminder.id}"
+            >
+
+                <input
+                    type="hidden"
+                    name="_token"
+                    value="${getCsrfToken()}"
+                >
+
+                <input
+                    type="hidden"
+                    name="_method"
+                    value="PATCH"
+                >
+
+                <button
+                    type="submit"
+                    class="reminder-complete-button"
+                    title="Marcar como realizado"
+                >
+                    <i class="bi bi-check-lg"></i>
+
+                    <span>
+                        Realizado
+                    </span>
+                </button>
+
+            </form>
+
+
+            <form
+                method="POST"
+                action="/reminders/${reminder.id}"
+            >
+
+                <input
+                    type="hidden"
+                    name="_token"
+                    value="${getCsrfToken()}"
+                >
+
+                <input
+                    type="hidden"
+                    name="_method"
+                    value="DELETE"
+                >
+
+                <button
+                    type="submit"
+                    class="reminder-delete-button"
+                    title="Eliminar recordatorio"
+                >
+                    <i class="bi bi-trash3"></i>
+                </button>
+
+            </form>
+
+        </div>
+    `;
+
+
+        pendingList.prepend(
+            item
+        );
+
+
+        updateReminderViewCounters();
+    }
+
     /*
-|--------------------------------------------------------------------------
-| Actualizar vista de recordatorios
-|--------------------------------------------------------------------------
-*/
+    |--------------------------------------------------------------------------
+    | Actualizar vista de recordatorios
+    |--------------------------------------------------------------------------
+    */
 
     function moveReminderToCompleted(reminderId) {
 
@@ -1039,6 +1266,24 @@ document.addEventListener('DOMContentLoaded', function () {
             moveReminderToCompleted(
                 reminderId
             );
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | MOSTRAR PRÓXIMO RECURRENTE
+            |--------------------------------------------------------------------------
+            */
+
+            if (
+                data.recurring &&
+                data.next_reminder
+            ) {
+
+                addRecurringReminderToPending(
+                    data.next_reminder
+                );
+
+            }
 
 
             /*

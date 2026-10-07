@@ -64,7 +64,7 @@
 
 
                 @forelse ($reminders->where('status', 'pending')
-                                        as $reminder)
+                                                            as $reminder)
                     <div class="reminder-item {{ $reminder->isDue() ? 'is-due' : '' }}"
                         data-reminder-item="{{ $reminder->id }}" data-reminder-title="{{ $reminder->title }}"
                         data-reminder-scheduled="{{ $reminder->scheduled_at->toIso8601String() }}">
@@ -423,79 +423,111 @@ MODAL NUEVO RECORDATORIO
 
                         </div>
 
+                        <div class="reminder-recurrence" id="reminder-recurrence" style="display:none;">
 
+                            <div class="reminder-recurrence-title">
+                                Repetir recordatorio
+                            </div>
+
+                            <div class="form-check form-switch reminder-recurrence-switch">
+
+                                <label class="form-check-label" for="recurrence_weekly" id="reminder-weekly-label">
+                                    Todas las semanas
+                                </label>
+
+                                <input class="form-check-input" type="checkbox" id="recurrence_weekly"
+                                    name="recurrence_weekly" value="1">
+
+                            </div>
+
+
+                            <div class="form-check form-switch reminder-recurrence-switch">
+
+                                <label class="form-check-label" for="recurrence_monthly" id="reminder-monthly-label">
+                                    Todos los meses
+                                </label>
+
+                                <input class="form-check-input" type="checkbox" id="recurrence_monthly"
+                                    name="recurrence_monthly" value="1">
+
+                            </div>
+
+                            <input type="hidden" name="recurrence_type" id="recurrence_type"
+                                value="{{ old('recurrence_type') }}">
+
+                        </div>
 
                         {{-- DATOS OPCIONALES --}}
 
                         <!--<div class="reminder-optional">
 
 
-                                            <div class="reminder-optional-title">
+                                                                <div class="reminder-optional-title">
 
-                                                <span>
-                                                    Información adicional
-                                                </span>
+                                                                    <span>
+                                                                        Información adicional
+                                                                    </span>
 
-                                                <small>
-                                                    Opcional
-                                                </small>
+                                                                    <small>
+                                                                        Opcional
+                                                                    </small>
 
-                                            </div>
-
-
-
-                                            {{-- CUENTA --}}
-
-                                            <div class="reminder-form-group">
-
-                                                <label for="reminder_account">
-                                                    Cuenta
-                                                </label>
-
-
-                                                <select id="reminder_account" name="account_id" class="dark-input">
-
-                                            </div>
+                                                                </div>
 
 
 
-                                            {{-- MONEDA --}}
+                                                                {{-- CUENTA --}}
 
-                                            <div class="reminder-form-group">
+                                                                <div class="reminder-form-group">
 
-                                                <label for="reminder_balance">
-                                                    Moneda
-                                                </label>
+                                                                    <label for="reminder_account">
+                                                                        Cuenta
+                                                                    </label>
 
 
-                                                <select id="reminder_balance" name="account_balance_id" class="dark-input" disabled>
+                                                                    <select id="reminder_account" name="account_id" class="dark-input">
 
-                                                    <option value="">
-                                                        Seleccioná una cuenta primero
-                                                    </option>
-
-                                                </select>
-
-                                            </div>
+                                                                </div>
 
 
 
-                                            {{-- IMPORTE --}}
+                                                                {{-- MONEDA --}}
 
-                                            <div class="reminder-form-group">
+                                                                <div class="reminder-form-group">
 
-                                                <label for="reminder_amount">
-                                                    Importe
-                                                </label>
-
-
-                                                <input type="text" inputmode="decimal" id="reminder_amount" name="amount"
-                                                    value="{{ old('amount') }}" class="dark-input money-input" placeholder="0">
-
-                                            </div>
+                                                                    <label for="reminder_balance">
+                                                                        Moneda
+                                                                    </label>
 
 
-                                        </div>-->
+                                                                    <select id="reminder_balance" name="account_balance_id" class="dark-input" disabled>
+
+                                                                        <option value="">
+                                                                            Seleccioná una cuenta primero
+                                                                        </option>
+
+                                                                    </select>
+
+                                                                </div>
+
+
+
+                                                                {{-- IMPORTE --}}
+
+                                                                <div class="reminder-form-group">
+
+                                                                    <label for="reminder_amount">
+                                                                        Importe
+                                                                    </label>
+
+
+                                                                    <input type="text" inputmode="decimal" id="reminder_amount" name="amount"
+                                                                        value="{{ old('amount') }}" class="dark-input money-input" placeholder="0">
+
+                                                                </div>
+
+
+                                                            </div>-->
 
 
                     </div>
@@ -532,5 +564,202 @@ MODAL NUEVO RECORDATORIO
     </div>
 
 
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
 
+            /*
+            |--------------------------------------------------------------------------
+            | ELEMENTOS
+            |--------------------------------------------------------------------------
+            */
+
+            const dateInput = document.getElementById(
+                'reminder_scheduled_at'
+            );
+
+            const recurrenceBox = document.getElementById(
+                'reminder-recurrence'
+            );
+
+            const weeklyLabel = document.getElementById(
+                'reminder-weekly-label'
+            );
+
+            const monthlyLabel = document.getElementById(
+                'reminder-monthly-label'
+            );
+
+            const weeklySwitch = document.getElementById(
+                'recurrence_weekly'
+            );
+
+            const monthlySwitch = document.getElementById(
+                'recurrence_monthly'
+            );
+
+            const recurrenceType = document.getElementById(
+                'recurrence_type'
+            );
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | DÍAS
+            |--------------------------------------------------------------------------
+            */
+
+            const days = [
+                'domingos',
+                'lunes',
+                'martes',
+                'miércoles',
+                'jueves',
+                'viernes',
+                'sábados'
+            ];
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | ACTUALIZAR OPCIONES SEGÚN FECHA
+            |--------------------------------------------------------------------------
+            */
+
+            function updateRecurrenceOptions() {
+
+                if (!dateInput.value) {
+
+                    recurrenceBox.style.display = 'none';
+
+                    return;
+                }
+
+
+                const dateParts = dateInput.value
+                    .split('T')[0]
+                    .split('-');
+
+
+                const year = parseInt(dateParts[0]);
+
+                const month = parseInt(dateParts[1]) - 1;
+
+                const day = parseInt(dateParts[2]);
+
+
+                const date = new Date(
+                    year,
+                    month,
+                    day
+                );
+
+
+                const dayName = days[
+                    date.getDay()
+                ];
+
+
+                weeklyLabel.textContent =
+                    'Todos los ' + dayName;
+
+
+                monthlyLabel.textContent =
+                    'Todos los ' + day + ' de cada mes';
+
+
+                recurrenceBox.style.display = 'block';
+            }
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | RECURRENCIA SEMANAL
+            |--------------------------------------------------------------------------
+            */
+
+            weeklySwitch.addEventListener('change', function() {
+
+                if (this.checked) {
+
+                    monthlySwitch.checked = false;
+
+                    recurrenceType.value = 'weekly';
+
+                } else {
+
+                    recurrenceType.value = '';
+
+                }
+
+            });
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | RECURRENCIA MENSUAL
+            |--------------------------------------------------------------------------
+            */
+
+            monthlySwitch.addEventListener('change', function() {
+
+                if (this.checked) {
+
+                    weeklySwitch.checked = false;
+
+                    recurrenceType.value = 'monthly';
+
+                } else {
+
+                    recurrenceType.value = '';
+
+                }
+
+            });
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | CAMBIO DE FECHA
+            |--------------------------------------------------------------------------
+            */
+
+            dateInput.addEventListener(
+                'change',
+                updateRecurrenceOptions
+            );
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | RESTAURAR VALOR ANTERIOR
+            |--------------------------------------------------------------------------
+            */
+
+            if (recurrenceType.value === 'weekly') {
+
+                weeklySwitch.checked = true;
+
+                monthlySwitch.checked = false;
+
+            }
+
+            if (recurrenceType.value === 'monthly') {
+
+                monthlySwitch.checked = true;
+
+                weeklySwitch.checked = false;
+
+            }
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | INICIALIZAR
+            |--------------------------------------------------------------------------
+            */
+
+            updateRecurrenceOptions();
+
+        });
+    </script>
 @endsection
