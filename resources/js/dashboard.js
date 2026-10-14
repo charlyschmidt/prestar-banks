@@ -657,13 +657,61 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         )
 
+
         .listen('.transaction.updated', async (e) => {
 
-            console.log('Movimiento actualizado en tiempo real:', e);
+            console.log(
+                'Movimiento actualizado en tiempo real:',
+                e
+            );
+
+            await syncDashboard();
+
+        })
+
+        /*
+        |--------------------------------------------------------------------------
+        | Nueva cuenta creada
+        |--------------------------------------------------------------------------
+        |
+        | Si una cuenta se incorpora durante una jornada abierta,
+        | actualizamos las tarjetas y los totales del dashboard.
+        |
+        */
+
+        .listen('.account.created', async (event) => {
+
+            /*
+            |--------------------------------------------------------------------------
+            | Verificar empresa
+            |--------------------------------------------------------------------------
+            */
+
+            if (
+                String(event.companyId) !== String(companyId)
+            ) {
+                console.warn(
+                    'Evento de cuenta descartado: empresa diferente'
+                );
+
+                return;
+            }
+
+            console.log(
+                'NUEVA CUENTA RECIBIDA:',
+                event
+            );
+
+            /*
+            |--------------------------------------------------------------------------
+            | Sincronizar dashboard
+            |--------------------------------------------------------------------------
+            */
 
             await syncDashboard();
 
         });
+
 
 
 
@@ -1352,6 +1400,142 @@ async function syncDashboard() {
         |--------------------------------------------------------------------------
         */
 
+
+        /*
+        |--------------------------------------------------------------------------
+        | Sincronización dinámica de tarjetas
+        |--------------------------------------------------------------------------
+        |
+        | Laravel genera las tarjetas utilizando el mismo
+        | parcial Blade que utiliza el dashboard inicial.
+        |
+        | Solamente agregamos tarjetas nuevas o bloques
+        | de monedas que todavía no existen.
+        |
+        */
+
+        const banksGrid = document.querySelector('.banks-grid');
+
+        if (
+            banksGrid &&
+            typeof data.accounts_html === 'string'
+        ) {
+
+            const template = document.createElement('template');
+
+            template.innerHTML = data.accounts_html.trim();
+
+            const incomingCards = template.content.querySelectorAll(
+                '.bank-card-link'
+            );
+
+            incomingCards.forEach(incomingLink => {
+
+                const incomingCard = incomingLink.querySelector(
+                    '.bank-card[data-account-id]'
+                );
+
+                if (!incomingCard) {
+                    return;
+                }
+
+                const accountId = incomingCard.dataset.accountId;
+
+                const existingCard = Array.from(
+                    banksGrid.querySelectorAll(
+                        '.bank-card[data-account-id]'
+                    )
+                ).find(card => card.dataset.accountId === accountId);
+
+                /*
+                |--------------------------------------------------------------------------
+                | Cuenta nueva
+                |--------------------------------------------------------------------------
+                */
+
+                if (!existingCard) {
+
+                    banksGrid.appendChild(
+                        incomingLink.cloneNode(true)
+                    );
+
+                    console.log(
+                        'Nueva tarjeta incorporada:',
+                        accountId
+                    );
+
+                    return;
+                }
+
+                /*
+                |--------------------------------------------------------------------------
+                | Monedas nuevas de una cuenta existente
+                |--------------------------------------------------------------------------
+                */
+
+                const existingBalances = existingCard.querySelector(
+                    '.bank-currency-balances'
+                );
+
+                const incomingBalances = incomingCard.querySelector(
+                    '.bank-currency-balances'
+                );
+
+                if (!existingBalances || !incomingBalances) {
+                    return;
+                }
+
+                incomingBalances.querySelectorAll(
+                    '[data-account-balance-id]'
+                ).forEach(incomingBalance => {
+
+                    const balanceId =
+                        incomingBalance.dataset.accountBalanceId;
+
+                    const exists = Array.from(
+                        existingBalances.querySelectorAll(
+                            '[data-account-balance-id]'
+                        )
+                    ).some(
+                        balance => balance.dataset.accountBalanceId === balanceId
+                    );
+
+                    if (!exists) {
+
+                        existingBalances.appendChild(
+                            incomingBalance.cloneNode(true)
+                        );
+
+                        console.log(
+                            'Nueva moneda incorporada:',
+                            balanceId
+                        );
+                    }
+
+                });
+
+                /*
+                |--------------------------------------------------------------------------
+                | Quitar mensaje de saldo vacío
+                |--------------------------------------------------------------------------
+                */
+
+                if (
+                    existingBalances.querySelector(
+                        '[data-account-balance-id]'
+                    )
+                ) {
+
+                    existingBalances.querySelectorAll(
+                        '.bank-currency-empty'
+                    ).forEach(element => element.remove());
+
+                }
+
+            });
+        }
+
+
         if (
             Array.isArray(
                 data.accounts
@@ -1368,9 +1552,7 @@ async function syncDashboard() {
 
 
                     if (!card) {
-
                         return;
-
                     }
 
 

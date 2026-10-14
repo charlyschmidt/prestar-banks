@@ -196,6 +196,37 @@ class FinancialDayService
 
     /*
 |--------------------------------------------------------------------------
+| Incorporar saldo de una cuenta a la jornada actual
+|--------------------------------------------------------------------------
+*/
+
+    public function addAccountBalanceToCurrentDay(
+        AccountBalance $accountBalance,
+        string $initialBalance = '0'
+    ): void {
+
+        $day = $this->current();
+
+        if (!$day) {
+            return;
+        }
+
+        AccountDailyBalance::firstOrCreate(
+            [
+                'financial_day_id' => $day->id,
+                'account_balance_id' => $accountBalance->id,
+            ],
+            [
+                'account_id' => $accountBalance->account_id,
+                'initial_balance' => $initialBalance,
+                'current_balance' => $initialBalance,
+            ]
+        );
+    }
+
+
+    /*
+|--------------------------------------------------------------------------
 | Reiniciar jornada actual
 |--------------------------------------------------------------------------
 */

@@ -13,6 +13,7 @@ use App\Exports\AccountTransactionsExport;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\FinancialDay;
 use App\Services\MovementControlService;
+use App\Events\AccountCreated;
 
 
 class AccountController extends Controller
@@ -59,22 +60,35 @@ class AccountController extends Controller
     }
 
 
+
     /*
+|--------------------------------------------------------------------------
+| Crear cuenta
+|--------------------------------------------------------------------------
+*/
+
+    public function create(
+        \App\Services\FinancialDayService $financialDayService
+    ) {
+        $currencies = $this->currencies();
+
+        /*
     |--------------------------------------------------------------------------
-    | Crear cuenta
+    | Detectar jornada abierta
     |--------------------------------------------------------------------------
     */
 
-    public function create()
-    {
-        $currencies = $this->currencies();
-
+        $hasOpenDay = $financialDayService->current() !== null;
 
         return view(
             'accounts.create',
-            compact('currencies')
+            compact(
+                'currencies',
+                'hasOpenDay'
+            )
         );
     }
+
 
 
     /*
@@ -83,36 +97,37 @@ class AccountController extends Controller
     |--------------------------------------------------------------------------
     */
 
-    public function store(Request $request)
-    {
+
+    public function store(
+        Request $request,
+        \App\Services\FinancialDayService $financialDayService
+    ) {
+        $currencies = $this->currencies();
+
         $data = $request->validate([
+            'name' => 'required|string|max:100',
+            'type' => 'required|string',
 
-            'name' =>
-            'required|string|max:100',
+            'logo' => 'nullable|image|max:2048',
 
-            'type' =>
-            'required|string',
-
-            'logo' =>
-            'nullable|image|max:2048',
-
-            'currencies' =>
-            'required|array|min:1',
+            'currencies' => 'required|array|min:1',
 
             'currencies.*' => [
                 'required',
                 'string',
                 'size:3',
-                'in:' . implode(
-                    ',',
-                    array_keys(
-                        $this->currencies()
-                    )
-                ),
+                'in:' . implode(',', array_keys($currencies)),
             ],
 
-        ], [
+            'initial_balances' => 'nullable|array',
 
+            'initial_balances.*' => [
+                'nullable',
+                'numeric',
+                'min:0',
+                'decimal:0,2',
+            ],
+        ], [
             'currencies.required' =>
             'Seleccioná al menos una moneda.',
 
@@ -122,66 +137,77 @@ class AccountController extends Controller
             'currencies.*.in' =>
             'Una de las monedas seleccionadas no es válida.',
 
+            'initial_balances.*.numeric' =>
+            'El saldo inicial debe ser un número válido.',
+
+            'initial_balances.*.min' =>
+            'El saldo inicial no puede ser negativo.',
         ]);
 
+        /*
+    |--------------------------------------------------------------------------
+    | Verificar jornada abierta
+    |--------------------------------------------------------------------------
+    */
 
-        if ($request->hasFile('logo')) {
+        $hasOpenDay = $financialDayService->current() !== null;
 
-            $data['logo'] =
-                $request->file('logo')
-                ->store(
-                    'banks',
-                    'public'
-                );
-        }
+        $initialBalances = $hasOpenDay
+            ? ($data['initial_balances'] ?? [])
+            : [];
 
+        $selectedCurrencies = $data['currencies'];
 
-        DB::transaction(function () use ($data) {
+        unset(
+            $data['currencies'],
+            $data['initial_balances']
+        );
 
-            /*
-            |--------------------------------------------------------------------------
-            | Monedas
-            |--------------------------------------------------------------------------
-            */
+        /*
+    |--------------------------------------------------------------------------
+    | Crear cuenta y saldos en una transacción
+    |--------------------------------------------------------------------------
+    */
 
-            $currencies = $data['currencies'];
+        $account = DB::transaction(function () use (
+            $data,
+            $selectedCurrencies,
+            $initialBalances,
+            $hasOpenDay,
+            $financialDayService
+        ) {
+            $account = Account::create($data);
 
-            unset(
-                $data['currencies']
-            );
+            foreach ($selectedCurrencies as $currency) {
 
+                $currency = strtoupper($currency);
 
-            /*
-            |--------------------------------------------------------------------------
-            | Crear cuenta
-            |--------------------------------------------------------------------------
-            */
-
-            $account = Account::create(
-                $data
-            );
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | Crear saldos por moneda
-            |--------------------------------------------------------------------------
-            */
-
-            foreach ($currencies as $currency) {
-
-                AccountBalance::create([
-
-                    'account_id' =>
-                    $account->id,
-
-                    'currency' =>
-                    strtoupper($currency),
-
+                $accountBalance = AccountBalance::create([
+                    'account_id' => $account->id,
+                    'currency' => $currency,
                 ]);
+
+                if ($hasOpenDay) {
+                    $financialDayService
+                        ->addAccountBalanceToCurrentDay(
+                            $accountBalance,
+                            (string) ($initialBalances[$currency] ?? '0')
+                        );
+                }
             }
+
+            return $account;
         });
 
+        /*
+|--------------------------------------------------------------------------
+| Notificar después de confirmar la transacción
+|--------------------------------------------------------------------------
+*/
+
+        if ($hasOpenDay) {
+            AccountCreated::dispatch($account);
+        }
 
         return redirect()
             ->route('accounts.index')
@@ -190,6 +216,7 @@ class AccountController extends Controller
                 'Cuenta creada correctamente.'
             );
     }
+
 
 
     /*

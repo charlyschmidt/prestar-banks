@@ -31,7 +31,7 @@ class DashboardController extends Controller
         if (!$summary['has_day']) {
 
 
-        /*
+            /*
         |--------------------------------------------------------------------------
         | Onboarding inicial
         |--------------------------------------------------------------------------
@@ -132,6 +132,26 @@ class DashboardController extends Controller
 
             'movements_total' =>
             $summary['movimientos_total'],
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | HTML de las tarjetas de cuentas
+            |--------------------------------------------------------------------------
+            |
+            | Utilizamos el mismo Blade que renderiza el dashboard.
+            | Esto permite incorporar cuentas nuevas en tiempo real
+            | sin duplicar el diseño en JavaScript.
+            |
+            */
+
+            'accounts_html' => view(
+                'dashboard.partials.account-cards',
+                [
+                    'accounts' => $summary['accounts'],
+                ]
+            )->render(),
+
 
 
             /*
@@ -250,18 +270,18 @@ class DashboardController extends Controller
                         */
 
                         'source' =>
-                            $movement->source,
+                        $movement->source,
 
                         'external_id' =>
-                            $movement->external_id,
+                        $movement->external_id,
 
                         'api_key' => $movement->apiKey
                             ? [
                                 'id' =>
-                                    $movement->apiKey->id,
+                                $movement->apiKey->id,
 
                                 'name' =>
-                                    $movement->apiKey->name,
+                                $movement->apiKey->name,
                             ]
                             : null,
 
