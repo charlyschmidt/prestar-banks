@@ -463,98 +463,98 @@ class PlatformAdminController extends Controller
     }
 
     public function destroy(Company $company): RedirectResponse
-{
-    DB::transaction(function () use ($company) {
+    {
+        DB::transaction(function () use ($company) {
 
-        /*
+            /*
         |--------------------------------------------------------------------------
         | Movimientos
         |--------------------------------------------------------------------------
         */
 
-        Transaction::withoutGlobalScopes()
-            ->where('company_id', $company->id)
-            ->delete();
+            Transaction::withoutGlobalScopes()
+                ->where('company_id', $company->id)
+                ->delete();
 
 
-        /*
+            /*
         |--------------------------------------------------------------------------
         | Saldos diarios
         |--------------------------------------------------------------------------
         */
 
-        AccountDailyBalance::withoutGlobalScopes()
-            ->where('company_id', $company->id)
-            ->delete();
+            AccountDailyBalance::withoutGlobalScopes()
+                ->where('company_id', $company->id)
+                ->delete();
 
 
-        /*
+            /*
         |--------------------------------------------------------------------------
         | Jornadas financieras
         |--------------------------------------------------------------------------
         */
 
-        FinancialDay::withoutGlobalScopes()
-            ->where('company_id', $company->id)
-            ->delete();
+            FinancialDay::withoutGlobalScopes()
+                ->where('company_id', $company->id)
+                ->delete();
 
 
-        /*
+            /*
         |--------------------------------------------------------------------------
         | Recordatorios
         |--------------------------------------------------------------------------
         */
 
-        FinancialReminder::withoutGlobalScopes()
-            ->where('company_id', $company->id)
-            ->delete();
+            FinancialReminder::withoutGlobalScopes()
+                ->where('company_id', $company->id)
+                ->delete();
 
 
-        /*
+            /*
         |--------------------------------------------------------------------------
         | Saldos / monedas de cuentas
         |--------------------------------------------------------------------------
         */
 
-        AccountBalance::withoutGlobalScopes()
-            ->where('company_id', $company->id)
-            ->delete();
+            AccountBalance::withoutGlobalScopes()
+                ->where('company_id', $company->id)
+                ->delete();
 
 
-        /*
+            /*
         |--------------------------------------------------------------------------
         | Cuentas
         |--------------------------------------------------------------------------
         */
 
-        Account::withoutGlobalScopes()
-            ->where('company_id', $company->id)
-            ->delete();
+            Account::withoutGlobalScopes()
+                ->where('company_id', $company->id)
+                ->delete();
 
 
-        /*
+            /*
         |--------------------------------------------------------------------------
         | Pagos de suscripción
         |--------------------------------------------------------------------------
         */
 
-        SubscriptionPayment::query()
-            ->where('company_id', $company->id)
-            ->delete();
+            SubscriptionPayment::query()
+                ->where('company_id', $company->id)
+                ->delete();
 
 
-        /*
+            /*
         |--------------------------------------------------------------------------
         | Suscripciones
         |--------------------------------------------------------------------------
         */
 
-        Subscription::query()
-            ->where('company_id', $company->id)
-            ->delete();
+            Subscription::query()
+                ->where('company_id', $company->id)
+                ->delete();
 
 
-        /*
+            /*
         |--------------------------------------------------------------------------
         | Usuarios
         |--------------------------------------------------------------------------
@@ -564,24 +564,58 @@ class PlatformAdminController extends Controller
         |
         */
 
-        $company->users()->detach();
+
+            /*
+            |--------------------------------------------------------------------------
+            | Usuarios
+            |--------------------------------------------------------------------------
+            |
+            | Eliminar usuarios exclusivos de esta empresa.
+            | Conservar los que pertenezcan a otras empresas.
+            |
+            */
+
+            $users = $company->users()->get();
+
+            foreach ($users as $user) {
+
+                $otherCompanies = DB::table('company_user')
+                    ->where('user_id', $user->id)
+                    ->where('company_id', '!=', $company->id)
+                    ->exists();
+
+                if (!$otherCompanies) {
+
+                    // El usuario pertenece únicamente a esta empresa.
+                    $company->users()->detach($user->id);
+
+                    // Eliminar el usuario.
+                    $user->delete();
+                } else {
+
+                    // El usuario también pertenece a otra empresa.
+                    // Solo eliminar la relación con esta empresa.
+                    $company->users()->detach($user->id);
+                }
+            }
 
 
-        /*
+
+            /*
         |--------------------------------------------------------------------------
         | Empresa
         |--------------------------------------------------------------------------
         */
 
-        $company->delete();
-    });
+            $company->delete();
+        });
 
 
-    return redirect()
-        ->route('aeria-admin.index')
-        ->with(
-            'success',
-            'La empresa y todos sus datos fueron eliminados correctamente.'
-        );
-}
+        return redirect()
+            ->route('aeria-admin.index')
+            ->with(
+                'success',
+                'La empresa y todos sus datos fueron eliminados correctamente.'
+            );
+    }
 }

@@ -2,7 +2,6 @@
 
 namespace App\Mail;
 
-use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
@@ -15,10 +14,8 @@ class AccountApprovedMail extends Mailable
 
     public function __construct(
         public string $recipientName,
-        public string $loginUrl,
-        public Carbon $trialEndsAt
-    ) {
-    }
+        public string $loginUrl
+    ) {}
 
     public function envelope(): Envelope
     {

@@ -37,6 +37,7 @@ class AeriaMailService
     }
 
 
+
     public function sendAccountApproved(
         User $user,
         Company $company
@@ -44,18 +45,15 @@ class AeriaMailService
 
         $loginUrl = route('login');
 
-        $trialEndsAt =
-            $company->trial_ends_at;
-
         Mail::to($user->email)
             ->send(
                 new AccountApprovedMail(
                     recipientName: $user->name,
-                    loginUrl: $loginUrl,
-                    trialEndsAt: $trialEndsAt
+                    loginUrl: $loginUrl
                 )
             );
     }
+
 
     public function sendAccountCreated(
         User $user

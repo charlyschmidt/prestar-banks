@@ -131,7 +131,7 @@
                 </span>
 
                 <span>
-                    Carlos A. Schmidt
+                    Bahía Blanca, Buenos Aires
                 </span>
 
                 <span class="aeria-footer__separator">
