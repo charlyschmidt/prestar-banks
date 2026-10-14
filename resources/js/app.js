@@ -119,4 +119,6 @@ import './subscription';
 
 import './settings-api';
 
+import './accounts-create';
+
 
