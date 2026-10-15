@@ -361,7 +361,7 @@ CONFIGURACIÓN
                                                 'transfer_tax_rate',
                                                 rtrim(rtrim(number_format((float) $account->transfer_tax_rate, 4, '.', ''), '0'), '.'),
                                             ) }}"
-                                            placeholder="0.6" class="dark-input">
+                                            placeholder="0.6" class="dark-input money-input">
 
 
                                     </div>

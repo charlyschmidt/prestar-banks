@@ -62,6 +62,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
             }
 
+            /*
+            |--------------------------------------------------------------------------
+            | Permitir que el campo quede vacío
+            |--------------------------------------------------------------------------
+            */
+
+            if (value === '') {
+                this.value = '';
+                return;
+            }
 
             const parts = value.split(',');
 

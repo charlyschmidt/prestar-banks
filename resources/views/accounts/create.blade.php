@@ -246,7 +246,7 @@
 
                                             <input type="text" name="initial_balances[{{ $code }}]"
                                                 id="balance-{{ $code }}"
-                                                value="{{ old('initial_balances.' . $code, '0,00') }}"
+                                                value="{{ old('initial_balances.' . $code, '') }}"
                                                 class="dark-input form-control money-input" inputmode="decimal"
                                                 autocomplete="off" placeholder="0,00" disabled>
 

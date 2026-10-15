@@ -592,3 +592,58 @@ body[data-theme="light"] .alert-error {
     }
 
 }
+
+
+/* ==========================
+   SALDOS INICIALES
+========================== */
+
+.account-initial-balance-item .input-group > .dark-input.form-control {
+    flex: 1 1 auto;
+    width: 1%;
+    min-width: 0;
+
+    background-color: var(--company-hover);
+    color: var(--company-text);
+
+    border: 1px solid var(--company-border);
+    border-radius: 0 12px 12px 0;
+
+    box-shadow: none;
+}
+
+/* Input deshabilitado */
+
+.account-initial-balance-item .dark-input.form-control:disabled {
+    background-color: var(--company-hover);
+    color: var(--company-text);
+    opacity: 1;
+}
+
+/* Input con foco */
+
+.account-initial-balance-item .dark-input.form-control:focus {
+    background-color: var(--company-hover);
+    color: var(--company-text);
+
+    border-color: var(--company-text);
+    box-shadow: none;
+    outline: none;
+}
+
+/* Placeholder */
+
+.account-initial-balance-item .dark-input.form-control::placeholder {
+    color: var(--company-muted);
+    opacity: 1;
+}
+
+/* Prefijo de moneda */
+
+.account-initial-balance-item .input-group-text {
+    background-color: var(--company-hover);
+    color: var(--company-text);
+
+    border: 1px solid var(--company-border);
+    border-radius: 12px 0 0 12px;
+}
