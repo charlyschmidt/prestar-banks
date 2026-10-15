@@ -212,56 +212,57 @@
 
 
                         @if ($hasOpenDay)
-                        {{-- =====================================================
+                            {{-- =====================================================
                             SALDOS INICIALES POR MONEDA
                         ====================================================== --}}
 
-                        <div class="account-initial-balances mt-4">
+                            <div class="account-initial-balances mt-4">
 
-                            <div class="account-currencies-header mb-3">
-                                <label>
-                                    Saldos iniciales
-                                </label>
-
-                                <small>
-                                    Indicá el dinero disponible al incorporar
-                                    esta cuenta a AERIA. Si no tiene saldo,
-                                    dejá el valor en cero.
-                                </small>
-                            </div>
-
-                            @foreach ($currencies as $code => $name)
-                                <div class="form-group account-initial-balance-item mb-3"
-                                    data-currency="{{ $code }}" style="display: none;">
-                                    <label for="balance-{{ $code }}">
-                                        Saldo inicial {{ $code }}
+                                <div class="account-currencies-header mb-3">
+                                    <label>
+                                        Saldos iniciales
                                     </label>
 
-                                    <div class="input-group">
+                                    <small>
+                                        Indicá el dinero disponible al incorporar
+                                        esta cuenta a AERIA. Si no tiene saldo,
+                                        dejá el valor en cero.
+                                    </small>
+                                </div>
 
-                                        <span class="input-group-text">
-                                            {{ $code }}
-                                        </span>
+                                @foreach ($currencies as $code => $name)
+                                    <div class="form-group account-initial-balance-item mb-3"
+                                        data-currency="{{ $code }}" style="display: none;">
+                                        <label for="balance-{{ $code }}">
+                                            Saldo inicial {{ $code }}
+                                        </label>
 
-                                        <input type="number" name="initial_balances[{{ $code }}]"
-                                            id="balance-{{ $code }}"
-                                            value="{{ old('initial_balances.' . $code, '0') }}"
-                                            class="dark-input form-control" min="0" step="0.01"
-                                            inputmode="decimal" placeholder="0.00" disabled>
+                                        <div class="input-group">
+
+                                            <span class="input-group-text">
+                                                {{ $code }}
+                                            </span>
+
+
+                                            <input type="text" name="initial_balances[{{ $code }}]"
+                                                id="balance-{{ $code }}"
+                                                value="{{ old('initial_balances.' . $code, '0,00') }}"
+                                                class="dark-input form-control money-input" inputmode="decimal"
+                                                autocomplete="off" placeholder="0,00" disabled>
+
+
+                                        </div>
+
+                                        @error('initial_balances.' . $code)
+                                            <small class="text-danger d-block mt-2">
+                                                {{ $message }}
+                                            </small>
+                                        @enderror
 
                                     </div>
+                                @endforeach
 
-                                    @error('initial_balances.' . $code)
-                                        <small class="text-danger d-block mt-2">
-                                            {{ $message }}
-                                        </small>
-                                    @enderror
-
-                                </div>
-                            @endforeach
-
-                        </div>
-
+                            </div>
                         @endif
 
                     </div>

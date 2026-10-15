@@ -158,6 +158,12 @@
                                 class="searchable-select-value" value="{{ old('destination_bank') }}">
 
                             <div id="destination-bank-options" class="bank-search-options searchable-select-options" hidden>
+                                <button type="button" class="bank-search-option searchable-select-option"
+                                    data-value="No corresponde">
+
+                                    No corresponde
+
+                                </button>
 
                                 @foreach ($banks as $bank)
                                     <button type="button" class="bank-search-option searchable-select-option"
@@ -265,10 +271,10 @@
 
     <script>
         /*
-            |--------------------------------------------------------------------------
-            | Cuenta + moneda
-            |--------------------------------------------------------------------------
-            */
+                |--------------------------------------------------------------------------
+                | Cuenta + moneda
+                |--------------------------------------------------------------------------
+                */
 
         const accountSelect =
             document.getElementById(

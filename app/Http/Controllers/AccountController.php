@@ -301,15 +301,29 @@ class AccountController extends Controller
         ]);
 
 
+
+        /*
+        |--------------------------------------------------------------------------
+        | Logo de la cuenta
+        |--------------------------------------------------------------------------
+        |
+        | Si se carga una imagen nueva, la almacenamos
+        | en accounts.
+        |
+        | Si no se carga ninguna, conservamos el logo actual.
+        |
+        */
+
         if ($request->hasFile('logo')) {
 
-            $data['logo'] =
-                $request->file('logo')
-                ->store(
-                    'banks',
-                    'public'
-                );
+            $data['logo'] = $request
+                ->file('logo')
+                ->store('accounts', 'public');
+        } else {
+
+            unset($data['logo']);
         }
+
 
 
         DB::transaction(

@@ -1,48 +1,36 @@
+
 document.addEventListener('DOMContentLoaded', () => {
 
     const searchableSelects =
-        document.querySelectorAll(
-            '.searchable-select'
-        );
+        document.querySelectorAll('.searchable-select');
 
     if (!searchableSelects.length) {
         return;
     }
 
-
     searchableSelects.forEach(select => {
 
-        const input =
-            select.querySelector(
-                '.searchable-select-input'
-            );
+        const input = select.querySelector(
+            '.searchable-select-input'
+        );
 
-        const valueInput =
-            select.querySelector(
-                '.searchable-select-value'
-            );
+        const valueInput = select.querySelector(
+            '.searchable-select-value'
+        );
 
-        const optionsContainer =
-            select.querySelector(
-                '.searchable-select-options'
-            );
+        const optionsContainer = select.querySelector(
+            '.searchable-select-options'
+        );
 
-        const options =
-            Array.from(
-                select.querySelectorAll(
-                    '.searchable-select-option'
-                )
-            );
+        const options = Array.from(
+            select.querySelectorAll(
+                '.searchable-select-option'
+            )
+        );
 
-
-        if (
-            !input ||
-            !valueInput ||
-            !optionsContainer
-        ) {
+        if (!input || !valueInput || !optionsContainer) {
             return;
         }
-
 
         /*
         |--------------------------------------------------------------------------
@@ -54,50 +42,51 @@ document.addEventListener('DOMContentLoaded', () => {
 
             return String(text || '')
                 .normalize('NFD')
-                .replace(
-                    /[\u0300-\u036f]/g,
-                    ''
-                )
+                .replace(/[\u0300-\u036f]/g, '')
                 .toLowerCase()
                 .trim();
 
         }
 
+        /*
+        |--------------------------------------------------------------------------
+        | Mostrar TODAS las opciones
+        |--------------------------------------------------------------------------
+        */
+
+        function showAllOptions() {
+
+            options.forEach(option => {
+                option.hidden = false;
+            });
+
+            optionsContainer.hidden =
+                options.length === 0;
+
+        }
 
         /*
         |--------------------------------------------------------------------------
-        | Filtrar opciones
+        | Filtrar opciones mientras escribe
         |--------------------------------------------------------------------------
         */
 
         function filterOptions() {
 
-            const search =
-                normalizeText(
-                    input.value
-                );
+            const search = normalizeText(input.value);
 
             let visibleCount = 0;
 
-
             options.forEach(option => {
 
-                const optionText =
-                    normalizeText(
-                        option.dataset.value
-                        ??
-                        option.textContent
-                    );
+                const optionText = normalizeText(
+                    option.dataset.value ??
+                    option.textContent
+                );
 
-                const visible =
-                    optionText.includes(
-                        search
-                    );
+                const visible = optionText.includes(search);
 
-
-                option.hidden =
-                    !visible;
-
+                option.hidden = !visible;
 
                 if (visible) {
                     visibleCount++;
@@ -105,60 +94,48 @@ document.addEventListener('DOMContentLoaded', () => {
 
             });
 
-
             optionsContainer.hidden =
                 visibleCount === 0;
 
         }
 
-
         /*
         |--------------------------------------------------------------------------
-        | Abrir opciones
+        | Abrir selector
+        |
+        | Siempre mostrar todas las opciones.
+        | No borrar la selección actual.
         |--------------------------------------------------------------------------
         */
 
-        input.addEventListener(
-            'focus',
-            () => {
+        input.addEventListener('focus', () => {
+            showAllOptions();
+        });
 
-                filterOptions();
-
-            }
-        );
-
+        input.addEventListener('click', () => {
+            showAllOptions();
+        });
 
         /*
         |--------------------------------------------------------------------------
-        | Buscar
+        | Buscar mientras escribe
         |--------------------------------------------------------------------------
         */
 
-        input.addEventListener(
-            'input',
-            () => {
+        input.addEventListener('input', () => {
 
-                /*
-                 * Al escribir manualmente,
-                 * invalidamos la selección anterior.
-                 */
+            // Al escribir, invalidar selección anterior.
+            valueInput.value = '';
 
-                valueInput.value = '';
+            filterOptions();
 
-                filterOptions();
+            valueInput.dispatchEvent(
+                new Event('change', {
+                    bubbles: true
+                })
+            );
 
-                valueInput.dispatchEvent(
-                    new Event(
-                        'change',
-                        {
-                            bubbles: true
-                        }
-                    )
-                );
-
-            }
-        );
-
+        });
 
         /*
         |--------------------------------------------------------------------------
@@ -168,98 +145,87 @@ document.addEventListener('DOMContentLoaded', () => {
 
         options.forEach(option => {
 
-            option.addEventListener(
-                'click',
-                () => {
+            option.addEventListener('click', () => {
 
-                    const value =
-                        option.dataset.value
-                        ??
-                        option.textContent.trim();
+                const value =
+                    option.dataset.value ??
+                    option.textContent.trim();
 
+                valueInput.value = value;
 
-                    valueInput.value =
-                        value;
+                input.value =
+                    option.textContent.trim();
 
-                    input.value =
-                        option.textContent.trim();
+                optionsContainer.hidden = true;
 
-                    optionsContainer.hidden =
-                        true;
+                /*
+                 * Notificar a otros componentes
+                 * sobre el cambio.
+                 */
 
+                valueInput.dispatchEvent(
+                    new Event('change', {
+                        bubbles: true
+                    })
+                );
 
-                    /*
-                     * Importante:
-                     * permite que otros JS reaccionen
-                     * a la selección.
-                     */
-
-                    valueInput.dispatchEvent(
-                        new Event(
-                            'change',
-                            {
-                                bubbles: true
-                            }
-                        )
-                    );
-
-                }
-            );
+            });
 
         });
 
-
         /*
         |--------------------------------------------------------------------------
-        | Restaurar valor existente
+        | Restaurar selección anterior
         |--------------------------------------------------------------------------
         */
 
         if (valueInput.value) {
 
-            const selectedOption =
-                options.find(
-                    option =>
-                        String(
-                            option.dataset.value
-                        ) ===
-                        String(
-                            valueInput.value
-                        )
-                );
+            const selectedOption = options.find(
+                option =>
+                    String(option.dataset.value) ===
+                    String(valueInput.value)
+            );
 
-
-            input.value =
-                selectedOption
-                    ? selectedOption.textContent.trim()
-                    : valueInput.value;
+            input.value = selectedOption
+                ? selectedOption.textContent.trim()
+                : valueInput.value;
 
         }
 
-
         /*
         |--------------------------------------------------------------------------
-        | Cerrar al hacer click afuera
+        | Cerrar al hacer clic afuera
         |--------------------------------------------------------------------------
         */
 
-        document.addEventListener(
-            'click',
-            event => {
+        document.addEventListener('click', event => {
 
-                if (
-                    !select.contains(
-                        event.target
-                    )
-                ) {
+            if (!select.contains(event.target)) {
 
-                    optionsContainer.hidden =
-                        true;
-
-                }
+                optionsContainer.hidden = true;
 
             }
-        );
+
+        });
+
+        /*
+        |--------------------------------------------------------------------------
+        | Cerrar con tecla Escape
+        |--------------------------------------------------------------------------
+        */
+
+        input.addEventListener('keydown', event => {
+
+            if (event.key === 'Escape') {
+
+                optionsContainer.hidden = true;
+
+                input.blur();
+
+            }
+
+        });
 
     });
 
