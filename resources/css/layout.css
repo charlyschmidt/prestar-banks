@@ -1531,6 +1531,14 @@ body[data-theme="dark"] .sidebar-close {
     border-color: var(--company-muted);
 }
 
+/* Mantiene la distribución del header
+   sin mostrar el buscador */
+
+.header-global-search-placeholder {
+    visibility: hidden;
+    pointer-events: none;
+}
+
 /* ==========================
    APP FOOTER
 ========================== */
@@ -1654,7 +1662,6 @@ body[data-theme="dark"] .sidebar-close {
         align-items: center;
 
         gap: 20px;
-
         padding: 0 30px;
     }
 
@@ -1667,7 +1674,6 @@ body[data-theme="dark"] .sidebar-close {
 
     .header-balance-row {
         width: auto;
-
         display: contents;
     }
 
@@ -1683,6 +1689,7 @@ body[data-theme="dark"] .sidebar-close {
 
     .header-global-search {
         width: 240px;
+        flex-shrink: 0;
 
         margin-left: auto;
         margin-right: 20px;
@@ -1700,6 +1707,15 @@ body[data-theme="dark"] .sidebar-close {
         align-items: center;
 
         gap: 20px;
+
+        /* Empujar las acciones hacia la derecha */
+        margin-left: auto;
+
+        flex-shrink: 0;
+    }
+
+    .header-global-search+.header-actions {
+        margin-left: 0;
     }
 
 
