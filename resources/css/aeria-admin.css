@@ -1535,3 +1535,63 @@ body {
         margin-top: 0;
     }
 }
+
+
+/* ==========================
+   LIFETIME - PLATFORM ADMIN
+========================== */
+
+.company-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.admin-button-lifetime {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+
+    background: #172f53;
+    color: #e2eeff;
+
+    border: 1px solid #37679e;
+}
+
+.admin-button-lifetime:hover {
+    background: #234b7c;
+    color: #ffffff;
+}
+
+.admin-button-lifetime-remove {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+
+    background: #39262d;
+    color: #ffd1d8;
+
+    border: 1px solid #89505d;
+}
+
+.admin-button-lifetime-remove:hover {
+    background: #59313e;
+    color: #ffffff;
+}
+
+.company-lifetime-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    padding: 5px 10px;
+    border-radius: 6px;
+
+    background: #e8efff;
+    color: #254e8b;
+
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+}

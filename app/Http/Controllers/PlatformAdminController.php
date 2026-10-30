@@ -618,4 +618,81 @@ class PlatformAdminController extends Controller
                 'La empresa y todos sus datos fueron eliminados correctamente.'
             );
     }
+
+
+    /*
+|--------------------------------------------------------------------------
+| ACTIVAR / QUITAR LICENCIA LIFETIME
+|--------------------------------------------------------------------------
+*/
+
+    public function setLifetime(
+        \Illuminate\Http\Request $request,
+        \App\Models\Company $company
+    ): \Illuminate\Http\RedirectResponse {
+
+        $request->validate([
+            'lifetime' => [
+                'required',
+                'boolean',
+            ],
+        ]);
+
+        $activate = $request->boolean('lifetime');
+
+        /*
+    |--------------------------------------------------------------------------
+    | SEGURIDAD DE FACTURACIÓN
+    |--------------------------------------------------------------------------
+    |
+    | Evitar activar Lifetime sobre una suscripción
+    | recurrente activa o pendiente en Mercado Pago.
+    |
+    | Cambiar el flag local NO cancela el cobro externo.
+    |
+    */
+
+        if ($activate) {
+
+            $hasProviderSubscription = $company
+                ->subscriptions()
+                ->whereIn('status', [
+                    'active',
+                    'pending',
+                ])
+                ->whereNotNull('provider_subscription_id')
+                ->exists();
+
+            if ($hasProviderSubscription) {
+
+                return back()->with(
+                    'error',
+                    'La empresa tiene una suscripción de Mercado Pago activa o pendiente. Revisá y cancelá primero la autorización correspondiente para evitar cobros recurrentes.'
+                );
+            }
+        }
+
+        /*
+    |--------------------------------------------------------------------------
+    | ACTUALIZAR LICENCIA
+    |--------------------------------------------------------------------------
+    */
+
+        $company->subscription_lifetime = $activate;
+
+        $company->save();
+
+        /*
+    |--------------------------------------------------------------------------
+    | RESPUESTA
+    |--------------------------------------------------------------------------
+    */
+
+        return back()->with(
+            'success',
+            $activate
+                ? 'Licencia Lifetime activada para ' . $company->name . '.'
+                : 'Licencia Lifetime desactivada para ' . $company->name . '.'
+        );
+    }
 }

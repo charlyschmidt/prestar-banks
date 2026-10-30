@@ -545,4 +545,9 @@ Route::middleware([
             '/companies/{company}',
             [PlatformAdminController::class, 'destroy']
         )->name('companies.destroy');
+
+        Route::patch(
+            '/companies/{company}/lifetime',
+            [PlatformAdminController::class, 'setLifetime']
+        )->name('companies.lifetime');
     });
