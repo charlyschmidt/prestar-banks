@@ -594,3 +594,82 @@
         gap: 10px;
     }
 }
+
+
+/* ==========================
+   SUSCRIPCIÓN - COTIZACIÓN
+========================== */
+
+.subscription-field-help {
+    margin: 8px 0 20px;
+    font-size: 12px;
+    line-height: 1.6;
+    color: #afa5b1;
+}
+
+.subscription-exchange-rate {
+    margin: 16px 0;
+    padding: 16px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 9px;
+}
+
+.subscription-exchange-rate > span {
+    display: block;
+    font-size: 12px;
+    color: #bbb0bd;
+}
+
+.subscription-exchange-rate > strong {
+    display: block;
+    margin-top: 7px;
+    color: #ffffff;
+    font-size: 21px;
+    font-weight: 700;
+}
+
+.subscription-exchange-rate > small {
+    display: block;
+    margin-top: 5px;
+    font-size: 11px;
+    color: #a69ba9;
+}
+
+.subscription-rate-unavailable {
+    font-size: 12px;
+    color: #e1b0bc;
+}
+
+.subscription-plan-ars {
+    display: block;
+    margin-top: 8px;
+    color: #d6b9ca;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.subscription-plans > .subscription-button {
+    display: block;
+    width: 100%;
+}
+
+.subscription-estimate-notice {
+    margin: 18px 0 0;
+    font-size: 11px;
+    line-height: 1.6;
+    text-align: center;
+    color: #ada1af;
+}
+
+/* CAPAS DEL FONDO */
+
+.subscription-page .welcome-nebula,
+.subscription-page .welcome-particles {
+    pointer-events: none;
+}
+
+.subscription-container {
+    position: relative;
+    z-index: 2;
+}

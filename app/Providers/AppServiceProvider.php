@@ -5,6 +5,9 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\View;
 use App\Services\HeaderService;
+use App\Services\ExchangeRateService;
+use Illuminate\Support\Facades\Cache;
+
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -35,5 +38,29 @@ class AppServiceProvider extends ServiceProvider
                 );
             }
         );
+
+
+        View::composer('subscription.expired', function ($view) {
+
+            $exchangeRate = null;
+
+            try {
+
+                $exchangeRate = Cache::remember(
+                    'aeria_usd_oficial_venta',
+                    now()->addMinutes(10),
+                    fn() => app(ExchangeRateService::class)
+                        ->getUsdSellRate()
+                );
+            } catch (\Throwable $e) {
+
+                report($e);
+            }
+
+            $view->with(
+                'exchangeRate',
+                $exchangeRate
+            );
+        });
     }
 }
