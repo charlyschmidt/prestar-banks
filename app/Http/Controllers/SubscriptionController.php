@@ -66,12 +66,18 @@ class SubscriptionController extends Controller
             ->where('status', 'paid')
             ->first();
 
+        $cancelableSubscriptions = $company
+            ->subscriptions()
+            ->whereIn('status', ['pending', 'active'])
+            ->latest('id')
+            ->get();
 
         $data = [
             'company' => $company,
             'subscription' => $subscription,
             'lastPayment' => $lastPayment,
             'plans' => $this->planService->all(),
+            'cancelableSubscriptions' => $cancelableSubscriptions,
         ];
 
 
@@ -584,109 +590,83 @@ class SubscriptionController extends Controller
         );
     }
 
-    public function cancel(Request $request): RedirectResponse
-    {
+
+    public function cancel(
+        \Illuminate\Http\Request $request,
+        \App\Services\SubscriptionCancellationService $cancellationService
+    ): \Illuminate\Http\RedirectResponse {
+
+        $data = $request->validate([
+            'subscription_id' => [
+                'nullable',
+                'integer',
+            ],
+        ]);
+
         $company = $this->companyContextService->company();
 
         if (!$company) {
-            return redirect()
-                ->route('subscription.index')
-                ->with('error', 'No se pudo identificar la empresa.');
+            return back()->with(
+                'error',
+                'No se pudo identificar la empresa activa.'
+            );
         }
 
-        /*
-    |--------------------------------------------------------------------------
-    | Lifetime no puede cancelarse
-    |--------------------------------------------------------------------------
-    */
-
-        if ($company->subscription_lifetime) {
-            return redirect()
-                ->route('subscription.index')
-                ->with(
-                    'error',
-                    'El acceso de por vida no requiere cancelación.'
-                );
-        }
-
-        /*
-    |--------------------------------------------------------------------------
-    | Suscripción activa
-    |--------------------------------------------------------------------------
-    */
-
-        $subscription = $company
+        $query = $company
             ->subscriptions()
-            ->where('status', 'active')
-            ->latest('id')
-            ->first();
+            ->whereIn('status', ['pending', 'active']);
+
+        if (!empty($data['subscription_id'])) {
+
+            // El ID debe pertenecer a la empresa actual.
+            $subscription = $query
+                ->whereKey($data['subscription_id'])
+                ->first();
+        } else {
+
+            // Compatibilidad con el formulario existente:
+            // priorizar una suscripción activa.
+            $subscription = $query
+                ->orderByRaw(
+                    "CASE WHEN status = 'active' THEN 0 ELSE 1 END"
+                )
+                ->orderByDesc('id')
+                ->first();
+        }
 
         if (!$subscription) {
-            return redirect()
-                ->route('subscription.index')
-                ->with(
-                    'error',
-                    'No encontramos una suscripción activa.'
-                );
+            return back()->with(
+                'error',
+                'No encontramos una suscripción pendiente o activa.'
+            );
         }
 
-        if (!$subscription->provider_subscription_id) {
-            return redirect()
-                ->route('subscription.index')
-                ->with(
-                    'error',
-                    'La suscripción no está vinculada correctamente con Mercado Pago.'
-                );
-        }
-
-        /*
-    |--------------------------------------------------------------------------
-    | Cancelar primero en Mercado Pago
-    |--------------------------------------------------------------------------
-    */
+        $wasPending = $subscription->status === 'pending';
 
         try {
 
-            $providerData = $this->mercadoPagoService
-                ->cancelSubscription(
-                    $subscription->provider_subscription_id
-                );
+            $cancellationService->cancel($subscription);
         } catch (\Throwable $e) {
 
             report($e);
 
-            return redirect()
-                ->route('subscription.index')
-                ->with(
-                    'error',
-                    'No pudimos cancelar la suscripción. Intentá nuevamente.'
-                );
+            return back()->with(
+                'error',
+                'No pudimos confirmar la cancelación '
+                    . 'con Mercado Pago. No se marcó como cancelada '
+                    . 'en AERIA. Intentá nuevamente.'
+            );
         }
-
-        /*
-    |--------------------------------------------------------------------------
-    | Actualizar estado local
-    |--------------------------------------------------------------------------
-    */
-
-        $subscription->update([
-            'provider_status' =>
-            $providerData['status'] ?? 'cancelled',
-
-            'status' => 'cancelled',
-
-            'cancelled_at' => now(),
-
-            'next_billing_at' => null,
-
-            'renewal_prepared_at' => null,
-        ]);
 
         return redirect()
             ->route('subscription.index')
             ->with(
                 'success',
-                'La suscripción fue cancelada correctamente.'
+                $wasPending
+                    ? 'La solicitud pendiente fue cancelada correctamente.'
+                    : 'La suscripción fue cancelada. '
+                    . 'No se programarán nuevas renovaciones '
+                    . 'de esta suscripción.'
             );
     }
 }

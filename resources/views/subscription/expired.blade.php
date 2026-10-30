@@ -1,41 +1,28 @@
-
 <!DOCTYPE html>
 <html lang="es">
 
 <head>
     <meta charset="UTF-8">
 
-    <meta name="viewport"
-        content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta name="description"
-        content="AERIA Finance - Activar suscripción">
+    <meta name="description" content="AERIA Finance - Activar suscripción">
 
     <title>
         Período de prueba finalizado | AERIA Finance
     </title>
 
-    @vite([
-        'resources/css/welcome.css',
-        'resources/css/subscription.css',
-        'resources/js/welcome.js'
-    ])
+    @vite(['resources/css/welcome.css', 'resources/css/subscription.css', 'resources/js/welcome.js'])
 
-    <link rel="apple-touch-icon" sizes="180x180"
-        href="{{ asset('apple-touch-icon.png') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png') }}">
 
-    <link rel="icon" type="image/png" sizes="32x32"
-        href="{{ asset('favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon-32x32.png') }}">
 
-    <link rel="icon" type="image/png" sizes="16x16"
-        href="{{ asset('favicon-16x16.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('favicon-16x16.png') }}">
 
-    <link rel="manifest"
-        href="{{ asset('site.webmanifest') }}">
+    <link rel="manifest" href="{{ asset('site.webmanifest') }}">
 
-    <script async
-        src="https://www.googletagmanager.com/gtag/js?id=G-32MQLSS6RJ">
-    </script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-32MQLSS6RJ"></script>
 
     <script>
         window.dataLayer = window.dataLayer || [];
@@ -56,9 +43,7 @@
 
         {{-- FONDO AERIA --}}
 
-        <div class="welcome-nebula"
-            id="welcome-nebula"
-            aria-hidden="true">
+        <div class="welcome-nebula" id="welcome-nebula" aria-hidden="true">
 
             <div class="welcome-nebula-cloud welcome-nebula-cloud-1"></div>
             <div class="welcome-nebula-cloud welcome-nebula-cloud-2"></div>
@@ -66,29 +51,21 @@
 
         </div>
 
-        <canvas
-            id="welcome-particles"
-            class="welcome-particles"
-            aria-hidden="true">
+        <canvas id="welcome-particles" class="welcome-particles" aria-hidden="true">
         </canvas>
 
 
         {{-- COTIZACIÓN INFORMADA POR LARAVEL --}}
 
         @php
-            $exchangeRate = isset($exchangeRate)
-                && is_numeric($exchangeRate)
-                && (float) $exchangeRate > 0
+            $exchangeRate =
+                isset($exchangeRate) && is_numeric($exchangeRate) && (float) $exchangeRate > 0
                     ? (float) $exchangeRate
                     : null;
 
-            $monthlyArs = $exchangeRate !== null
-                ? round(99 * $exchangeRate, 2)
-                : null;
+            $monthlyArs = $exchangeRate !== null ? round(99 * $exchangeRate, 2) : null;
 
-            $annualArs = $exchangeRate !== null
-                ? round(990 * $exchangeRate, 2)
-                : null;
+            $annualArs = $exchangeRate !== null ? round(990 * $exchangeRate, 2) : null;
         @endphp
 
 
@@ -147,11 +124,9 @@
                 {{-- MENSAJES --}}
 
                 @if (session('error'))
-
                     <div class="subscription-alert subscription-alert-error">
                         {{ session('error') }}
                     </div>
-
                 @endif
 
                 @if ($errors->any())
@@ -167,20 +142,15 @@
                 @endif
 
                 @if (session('success'))
-
                     <div class="subscription-alert subscription-alert-success">
                         {{ session('success') }}
                     </div>
-
                 @endif
 
 
                 {{-- UN SOLO FORMULARIO PARA AMBOS PLANES --}}
 
-                <form
-                    method="POST"
-                    action="{{ route('subscription.subscribe') }}"
-                    class="subscription-checkout-form">
+                <form method="POST" action="{{ route('subscription.subscribe') }}" class="subscription-checkout-form">
 
                     @csrf
 
@@ -193,16 +163,9 @@
                             Correo electrónico de Mercado Pago
                         </label>
 
-                        <input
-                            type="email"
-                            id="payer_email"
-                            name="payer_email"
+                        <input type="email" id="payer_email" name="payer_email"
                             value="{{ old('payer_email', auth()->user()->email ?? '') }}"
-                            placeholder="correo@ejemplo.com"
-                            maxlength="255"
-                            autocomplete="email"
-                            required
-                        >
+                            placeholder="correo@ejemplo.com" maxlength="255" autocomplete="email" required>
 
                         <p class="subscription-field-help">
                             Utilizá el correo de la cuenta de
@@ -236,7 +199,6 @@
                             </p>
 
                             @if ($exchangeRate !== null)
-
                                 <div class="subscription-exchange-rate">
 
                                     <span>
@@ -254,15 +216,12 @@
                                     </small>
 
                                 </div>
-
                             @else
-
                                 <p class="subscription-rate-unavailable">
                                     La cotización no está disponible
                                     temporalmente. El importe en pesos
                                     se informará al iniciar la contratación.
                                 </p>
-
                             @endif
 
                             <p>
@@ -297,12 +256,10 @@
                                 </strong>
 
                                 @if ($monthlyArs !== null)
-
                                     <small class="subscription-plan-ars">
                                         Aproximadamente ARS
                                         {{ number_format($monthlyArs, 2, ',', '.') }}
                                     </small>
-
                                 @endif
 
                             </div>
@@ -325,11 +282,7 @@
 
                         </div>
 
-                        <button
-                            type="submit"
-                            name="plan"
-                            value="monthly"
-                            class="subscription-button">
+                        <button type="submit" name="plan" value="monthly" class="subscription-button">
 
                             Activar plan mensual
 
@@ -355,12 +308,10 @@
                                 </small>
 
                                 @if ($annualArs !== null)
-
                                     <small class="subscription-plan-ars">
                                         Aproximadamente ARS
                                         {{ number_format($annualArs, 2, ',', '.') }}
                                     </small>
-
                                 @endif
 
                             </div>
@@ -383,11 +334,7 @@
 
                         </div>
 
-                        <button
-                            type="submit"
-                            name="plan"
-                            value="annual"
-                            class="subscription-button">
+                        <button type="submit" name="plan" value="annual" class="subscription-button">
 
                             Activar plan anual
 
@@ -406,18 +353,35 @@
                 </form>
 
 
+                {{-- CANCELAR SUSCRIPCIONES PENDIENTES O ACTIVAS --}}
+
+                @foreach ($cancelableSubscriptions ?? collect() as $subscriptionItem)
+                    <form method="POST" action="{{ route('subscription.cancel') }}" class="subscription-cancel-form"
+                        onsubmit="return confirm(
+            '¿Confirmás que querés cancelar esta suscripción?'
+        );">
+                        @csrf
+
+                        <input type="hidden" name="subscription_id" value="{{ $subscriptionItem->id }}">
+
+                        <button type="submit" class="subscription-cancel-button">
+                            <i class="bi bi-x-circle"></i>
+
+                            {{ $subscriptionItem->status === 'pending' ? 'Cancelar solicitud pendiente' : 'Cancelar suscripción activa' }}
+                        </button>
+
+                    </form>
+                @endforeach
+
+
+
                 {{-- CERRAR SESIÓN --}}
 
-                <form
-                    method="POST"
-                    action="{{ route('logout') }}"
-                    class="subscription-logout-form">
+                <form method="POST" action="{{ route('logout') }}" class="subscription-logout-form">
 
                     @csrf
 
-                    <button
-                        type="submit"
-                        class="subscription-logout">
+                    <button type="submit" class="subscription-logout">
 
                         Cerrar sesión
 

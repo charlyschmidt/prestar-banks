@@ -34,9 +34,15 @@ class PlatformAdminController extends Controller
 
         $companies = Company::query()
             ->withCount('users')
+            ->with([
+                'subscriptions' => function ($query) {
+                    $query
+                        ->whereIn('status', ['pending', 'active'])
+                        ->latest('id');
+                }
+            ])
             ->latest()
             ->get();
-
 
         /*
     |--------------------------------------------------------------------------
@@ -60,16 +66,16 @@ class PlatformAdminController extends Controller
 
 
         /*
-    |--------------------------------------------------------------------------
-    | Usuarios
-    |--------------------------------------------------------------------------
-    |
-    | Contamos membresías de empresa.
-    |
-    | Esto representa la cantidad total de usuarios registrados
-    | dentro de empresas de AERIA.
-    |
-    */
+        |--------------------------------------------------------------------------
+        | Usuarios
+        |--------------------------------------------------------------------------
+        |
+        | Contamos membresías de empresa.
+        |
+        | Esto representa la cantidad total de usuarios registrados
+        | dentro de empresas de AERIA.
+        |
+        */
 
         $usersTotal = $companies
             ->sum('users_count');
@@ -626,73 +632,243 @@ class PlatformAdminController extends Controller
 |--------------------------------------------------------------------------
 */
 
+
     public function setLifetime(
         \Illuminate\Http\Request $request,
-        \App\Models\Company $company
+        \App\Models\Company $company,
+        \App\Services\MercadoPagoSubscriptionService $mercadoPagoService
     ): \Illuminate\Http\RedirectResponse {
 
         $request->validate([
-            'lifetime' => [
-                'required',
-                'boolean',
-            ],
+            'lifetime' => ['required', 'boolean'],
         ]);
 
         $activate = $request->boolean('lifetime');
 
         /*
     |--------------------------------------------------------------------------
-    | SEGURIDAD DE FACTURACIÓN
+    | ACTIVAR LIFETIME
     |--------------------------------------------------------------------------
-    |
-    | Evitar activar Lifetime sobre una suscripción
-    | recurrente activa o pendiente en Mercado Pago.
-    |
-    | Cambiar el flag local NO cancela el cobro externo.
-    |
     */
 
         if ($activate) {
 
-            $hasProviderSubscription = $company
+            // Obtener las suscripciones que todavía podrían estar vigentes.
+            $subscriptions = $company
                 ->subscriptions()
-                ->whereIn('status', [
-                    'active',
-                    'pending',
-                ])
-                ->whereNotNull('provider_subscription_id')
-                ->exists();
+                ->whereIn('status', ['active', 'pending'])
+                ->orderBy('id')
+                ->get();
 
-            if ($hasProviderSubscription) {
+            foreach ($subscriptions as $subscription) {
 
-                return back()->with(
-                    'error',
-                    'La empresa tiene una suscripción de Mercado Pago activa o pendiente. Revisá y cancelá primero la autorización correspondiente para evitar cobros recurrentes.'
-                );
+                /*
+            |--------------------------------------------------------------------------
+            | SUSCRIPCIÓN ACTIVA
+            |--------------------------------------------------------------------------
+            */
+
+                if ($subscription->status === 'active') {
+
+                    return back()->with(
+                        'error',
+                        'La empresa tiene una suscripción activa. '
+                            . 'Debés revisar su cancelación antes de otorgar Lifetime.'
+                    );
+                }
+
+                /*
+            |--------------------------------------------------------------------------
+            | SUSCRIPCIÓN PENDIENTE SIN ID EXTERNO
+            |--------------------------------------------------------------------------
+            */
+
+                if (!$subscription->provider_subscription_id) {
+
+                    // Si existe un checkout pero no tenemos el ID externo,
+                    // no podemos verificar con seguridad su situación.
+                    if ($subscription->init_point) {
+
+                        return back()->with(
+                            'error',
+                            'Hay una suscripción pendiente con un checkout '
+                                . 'de Mercado Pago, pero sin identificador externo. '
+                                . 'Revisala antes de activar Lifetime.'
+                        );
+                    }
+
+                    // Registro local incompleto, sin checkout ni referencia externa.
+                    $subscription->update([
+                        'status' => 'cancelled',
+                        'cancelled_at' => now(),
+                        'next_billing_at' => null,
+                        'renewal_prepared_at' => null,
+                    ]);
+
+                    continue;
+                }
+
+                /*
+            |--------------------------------------------------------------------------
+            | CONSULTAR ESTADO REAL EN MERCADO PAGO
+            |--------------------------------------------------------------------------
+            */
+
+                try {
+
+                    $providerData = $mercadoPagoService
+                        ->getSubscription(
+                            $subscription->provider_subscription_id
+                        );
+
+                    $providerStatus = $providerData['status'] ?? null;
+
+                    /*
+                | Si fue autorizada, no otorgar Lifetime.
+                */
+
+                    if ($providerStatus === 'authorized') {
+
+                        return back()->with(
+                            'error',
+                            'Mercado Pago informa que existe una suscripción '
+                                . 'autorizada. Cancelala antes de activar Lifetime.'
+                        );
+                    }
+
+                    /*
+                | Si continúa pendiente, cancelarla en Mercado Pago.
+                */
+
+                    if ($providerStatus === 'pending') {
+
+                        $cancelData = $mercadoPagoService
+                            ->cancelSubscription(
+                                $subscription->provider_subscription_id
+                            );
+
+                        $providerStatus = $cancelData['status'] ?? null;
+
+                        // Verificación adicional cuando la respuesta
+                        // de cancelación no informa un estado definitivo.
+                        if ($providerStatus !== 'canceled') {
+
+                            $verifiedData = $mercadoPagoService
+                                ->getSubscription(
+                                    $subscription->provider_subscription_id
+                                );
+
+                            $providerStatus = $verifiedData['status'] ?? null;
+                        }
+                    }
+
+                    /*
+                | Solamente continuar si Mercado Pago
+                | confirma que está cancelada.
+                */
+
+                    if ($providerStatus !== 'canceled') {
+
+                        return back()->with(
+                            'error',
+                            'No se pudo confirmar la cancelación de una '
+                                . 'suscripción en Mercado Pago. Estado informado: '
+                                . ($providerStatus ?? 'desconocido')
+                        );
+                    }
+
+                    /*
+                |--------------------------------------------------------------------------
+                | SINCRONIZAR ESTADO LOCAL
+                |--------------------------------------------------------------------------
+                */
+
+                    $subscription->update([
+                        'status' => 'cancelled',
+                        'provider_status' => 'canceled',
+                        'cancelled_at' => now(),
+                        'next_billing_at' => null,
+                        'renewal_prepared_at' => null,
+                    ]);
+                } catch (\Throwable $e) {
+
+                    report($e);
+
+                    return back()->with(
+                        'error',
+                        'No pudimos verificar o cancelar la suscripción '
+                            . 'pendiente en Mercado Pago. No se modificó '
+                            . 'la licencia Lifetime.'
+                    );
+                }
             }
         }
 
         /*
     |--------------------------------------------------------------------------
-    | ACTUALIZAR LICENCIA
+    | ACTUALIZAR LIFETIME
     |--------------------------------------------------------------------------
     */
 
         $company->subscription_lifetime = $activate;
-
         $company->save();
-
-        /*
-    |--------------------------------------------------------------------------
-    | RESPUESTA
-    |--------------------------------------------------------------------------
-    */
 
         return back()->with(
             'success',
             $activate
                 ? 'Licencia Lifetime activada para ' . $company->name . '.'
                 : 'Licencia Lifetime desactivada para ' . $company->name . '.'
+        );
+    }
+
+
+    public function cancelSubscription(
+        \Illuminate\Http\Request $request,
+        \App\Models\Company $company,
+        \App\Models\Subscription $subscription,
+        \App\Services\SubscriptionCancellationService $cancellationService
+    ): \Illuminate\Http\RedirectResponse {
+
+        // Evitar cancelar una suscripción de otra empresa.
+        abort_unless(
+            (int) $subscription->company_id === (int) $company->id,
+            404
+        );
+
+        if (!in_array(
+            $subscription->status,
+            ['pending', 'active'],
+            true
+        )) {
+            return back()->with(
+                'error',
+                'Esta suscripción ya no está pendiente ni activa.'
+            );
+        }
+
+        $wasPending = $subscription->status === 'pending';
+
+        try {
+
+            $cancellationService->cancel($subscription);
+        } catch (\Throwable $e) {
+
+            report($e);
+
+            return back()->with(
+                'error',
+                'No se pudo confirmar la cancelación '
+                    . 'con Mercado Pago. Revisá el log de Laravel.'
+            );
+        }
+
+        return back()->with(
+            'success',
+            $wasPending
+                ? 'Solicitud pendiente cancelada para '
+                . $company->name . '.'
+                : 'Suscripción activa cancelada para '
+                . $company->name . '.'
         );
     }
 }

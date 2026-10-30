@@ -480,9 +480,32 @@
                         @endif
 
 
+                        {{-- CANCELAR SUSCRIPCIONES --}}
+
+                        @foreach ($company->subscriptions as $subscriptionItem)
+                            <form method="POST"
+                                action="{{ route('aeria-admin.companies.subscriptions.cancel', [$company, $subscriptionItem]) }}"
+                                onsubmit="return confirm(
+            '¿Confirmás que querés cancelar esta suscripción de {{ $company->name }}? Esta acción detendrá su recurrencia en Mercado Pago.'
+        );">
+                                @csrf
+
+                                <button type="submit"
+                                    class="admin-button admin-button-cancel-subscription
+                {{ $subscriptionItem->status === 'active' ? 'admin-button-cancel-active' : '' }}">
+                                    <i class="bi bi-x-circle"></i>
+
+                                    {{ $subscriptionItem->status === 'pending' ? 'Cancelar pendiente' : 'Cancelar activa' }}
+                                </button>
+
+                            </form>
+                        @endforeach
+
+
+
                         {{-- ==========================
-     LICENCIA LIFETIME
-========================== --}}
+                            LICENCIA LIFETIME
+                        ========================== --}}
 
                         @if ($company->subscription_lifetime)
                             {{-- QUITAR LIFETIME --}}

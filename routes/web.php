@@ -550,4 +550,9 @@ Route::middleware([
             '/companies/{company}/lifetime',
             [PlatformAdminController::class, 'setLifetime']
         )->name('companies.lifetime');
+
+        Route::post(
+            '/companies/{company}/subscriptions/{subscription}/cancel',
+            [PlatformAdminController::class, 'cancelSubscription']
+        )->name('companies.subscriptions.cancel');
     });

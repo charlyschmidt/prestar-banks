@@ -749,6 +749,37 @@ body {
     color: #facc15;
 }
 
+/* =========================================================
+   CANCELACIÓN DE SUSCRIPCIONES
+   Consistente con botones Suspender y Lifetime
+========================================================= */
+
+/* Solicitud pendiente: advertencia ámbar, sin competir con Lifetime. */
+.admin-button-cancel-subscription {
+    background: rgba(234, 179, 8, .08);
+    border-color: rgba(234, 179, 8, .20);
+    color: #eab308;
+}
+
+.admin-button-cancel-subscription:hover {
+    background: rgba(234, 179, 8, .15);
+    border-color: rgba(234, 179, 8, .32);
+    color: #facc15;
+}
+
+/* Suscripción activa: acción de cancelación en rojo discreto. */
+.admin-button-cancel-active {
+    background: rgba(239, 68, 68, .08);
+    border-color: rgba(239, 68, 68, .20);
+    color: #ef4444;
+}
+
+.admin-button-cancel-active:hover {
+    background: rgba(239, 68, 68, .16);
+    border-color: rgba(239, 68, 68, .32);
+    color: #f87171;
+}
+
 /* ==========================
    EMPTY STATE
 ========================== */
@@ -1447,14 +1478,14 @@ body {
     }
 
     /* Desktop ancho: volvemos al listado de cinco columnas,
-       reservando más espacio para Suspender + Lifetime. */
+       reservando espacio para acciones de suscripción y Lifetime. */
     .company-row {
         grid-template-columns:
             minmax(170px, 1.35fr)
             76px
             minmax(140px, 1.2fr)
             125px
-            minmax(200px, 1fr);
+            minmax(220px, 1.15fr);
         gap: 14px;
     }
 
