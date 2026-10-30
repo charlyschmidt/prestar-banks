@@ -25,7 +25,10 @@
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-32MQLSS6RJ"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
         gtag('js', new Date());
 
         gtag('config', 'G-32MQLSS6RJ');
@@ -117,6 +120,32 @@
 
 
 
+                {{-- MENSAJES DE ERROR --}}
+
+                @if (session('error'))
+                    <div class="subscription-alert subscription-alert-error">
+                        {{ session('error') }}
+                    </div>
+                @endif
+
+                @if ($errors->any())
+
+                    <div class="subscription-alert subscription-alert-error">
+
+                        @foreach ($errors->all() as $error)
+                            <p>{{ $error }}</p>
+                        @endforeach
+
+                    </div>
+
+                @endif
+
+                @if (session('success'))
+                    <div class="subscription-alert subscription-alert-success">
+                        {{ session('success') }}
+                    </div>
+                @endif
+
                 <div class="subscription-plans">
 
                     {{-- PLAN MENSUAL --}}
@@ -155,17 +184,31 @@
                     </div>
 
 
+
                     <form method="POST" action="{{ route('subscription.subscribe') }}">
 
                         @csrf
 
                         <input type="hidden" name="plan" value="monthly">
 
+                        <div class="subscription-email-field">
+
+                            <label for="payer_email_monthly">
+                                Correo electrónico de Mercado Pago
+                            </label>
+
+                            <input type="email" id="payer_email_monthly" name="payer_email"
+                                value="{{ old('payer_email', auth()->user()->email) }}" placeholder="correo@ejemplo.com"
+                                maxlength="255" autocomplete="email" required>
+
+                        </div>
+
                         <button type="submit" class="subscription-button">
                             Activar plan mensual
                         </button>
 
                     </form>
+
 
 
 
@@ -209,17 +252,31 @@
                     </div>
 
 
+
                     <form method="POST" action="{{ route('subscription.subscribe') }}">
 
                         @csrf
 
                         <input type="hidden" name="plan" value="annual">
 
+                        <div class="subscription-email-field">
+
+                            <label for="payer_email_annual">
+                                Correo electrónico de Mercado Pago
+                            </label>
+
+                            <input type="email" id="payer_email_annual" name="payer_email"
+                                value="{{ old('payer_email', auth()->user()->email) }}"
+                                placeholder="correo@ejemplo.com" maxlength="255" autocomplete="email" required>
+
+                        </div>
+
                         <button type="submit" class="subscription-button">
                             Activar plan anual
                         </button>
 
                     </form>
+
 
                 </div>
 

@@ -66,7 +66,7 @@
     "isEntry": true
   },
   "resources/css/subscription.css": {
-    "file": "assets/subscription-BltYugn_.css",
+    "file": "assets/subscription-DBjw-g4V.css",
     "name": "subscription",
     "names": [
       "subscription.css"
@@ -84,7 +84,7 @@
     "isEntry": true
   },
   "resources/js/app.js": {
-    "file": "assets/app-B9lX-Z4U.js",
+    "file": "assets/app-BDqshyts.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
@@ -92,7 +92,7 @@
       "assets/app-Cd1hblk1.css",
       "assets/welcome-Vd3gmU33.css",
       "assets/register-pending-LXepLUu1.css",
-      "assets/subscription-BltYugn_.css"
+      "assets/subscription-DBjw-g4V.css"
     ],
     "assets": [
       "assets/bootstrap-icons-mSm7cUeB.woff2",
