@@ -281,6 +281,39 @@
                 </div>
 
 
+                {{-- INFORMACIÓN SOBRE FACTURACIÓN --}}
+
+                <div class="subscription-billing-info">
+
+                    <div class="subscription-billing-icon">
+                        <i class="bi bi-info-circle"></i>
+                    </div>
+
+                    <div class="subscription-billing-content">
+
+                        <strong>
+                            Facturación en pesos argentinos
+                        </strong>
+
+                        <p>
+                            Los precios de AERIA Finance están expresados
+                            en dólares estadounidenses (USD), pero
+                            <strong>el cobro se realiza en pesos argentinos (ARS)</strong>.
+
+                            El importe se calcula según la
+                            <strong>cotización oficial de venta del Banco Nación</strong>
+                            vigente al momento de contratar.
+                        </p>
+
+                        <p>
+                            En cada renovación, el importe en pesos
+                            se actualizará según la cotización vigente.
+                        </p>
+
+                    </div>
+
+                </div>
+
 
                 <form method="POST" action="{{ route('logout') }}" class="subscription-logout-form">
 

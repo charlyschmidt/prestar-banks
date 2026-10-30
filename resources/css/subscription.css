@@ -543,3 +543,54 @@
     border: 1px solid rgba(25, 135, 84, .35);
     color: #a6e9c7;
 }
+
+
+/* ==========================
+   INFORMACIÓN DE FACTURACIÓN
+========================== */
+
+.subscription-billing-info {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+
+    margin-top: 30px;
+    padding: 18px 20px;
+
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: 12px;
+}
+
+.subscription-billing-icon {
+    flex-shrink: 0;
+    color: #d6a5bb;
+    font-size: 19px;
+}
+
+.subscription-billing-content strong {
+    display: block;
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.subscription-billing-content p {
+    margin: 9px 0 0;
+    color: #b7aeb9;
+    font-size: 12px;
+    line-height: 1.7;
+}
+
+.subscription-billing-content p strong {
+    display: inline;
+    font-size: inherit;
+    color: #e8d7df;
+}
+
+@media (max-width: 576px) {
+    .subscription-billing-info {
+        padding: 15px;
+        gap: 10px;
+    }
+}
