@@ -209,7 +209,7 @@ class MercadoPagoSubscriptionService
                     . '/preapproval/'
                     . $providerSubscriptionId,
                 [
-                    'status' => 'canceled',
+                    'status' => 'cancelled',
                 ]
             );
 

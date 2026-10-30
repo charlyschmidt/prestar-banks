@@ -11,12 +11,11 @@ class SubscriptionCancellationService
         private MercadoPagoSubscriptionService $mercadoPago
     ) {}
 
+
     public function cancel(Subscription $subscription): void
     {
         $subscription->refresh();
 
-        // Idempotencia: una cancelación ya finalizada
-        // no vuelve a ejecutarse.
         if ($subscription->status === 'cancelled') {
             return;
         }
@@ -33,62 +32,68 @@ class SubscriptionCancellationService
 
         $providerId = $subscription->provider_subscription_id;
 
+        $providerStatus = $subscription->provider_status;
+
+        $cancelledStatuses = ['cancelled', 'canceled'];
+
         if ($providerId) {
 
-            // Primero verificamos el estado REAL en Mercado Pago.
-            $data = $this->mercadoPago->getSubscription(
-                $providerId
-            );
+            // Consultar estado real.
+            $data = $this->mercadoPago->getSubscription($providerId);
 
-            $status = $data['status'] ?? null;
+            $providerStatus = $data['status'] ?? null;
 
-            if ($status !== 'canceled') {
+            if (!in_array(
+                $providerStatus,
+                $cancelledStatuses,
+                true
+            )) {
 
                 if (!in_array(
-                    $status,
+                    $providerStatus,
                     ['pending', 'authorized', 'paused'],
                     true
                 )) {
                     throw new RuntimeException(
-                        'Mercado Pago informó un estado no previsto: '
-                        . ($status ?? 'desconocido')
+                        'Estado no previsto en Mercado Pago: '
+                            . ($providerStatus ?? 'desconocido')
                     );
                 }
 
-                $this->mercadoPago->cancelSubscription(
-                    $providerId
-                );
+                // Solicitar cancelación.
+                $this->mercadoPago->cancelSubscription($providerId);
 
-                // Confirmar que la cancelación se aplicó.
-                $verified = $this->mercadoPago->getSubscription(
-                    $providerId
-                );
+                // Verificar nuevamente en Mercado Pago.
+                $verified = $this->mercadoPago
+                    ->getSubscription($providerId);
 
-                if (($verified['status'] ?? null) !== 'canceled') {
-                    throw new RuntimeException(
-                        'Mercado Pago todavía no confirmó '
-                        . 'la cancelación. Reintentá más tarde.'
-                    );
-                }
+                $providerStatus = $verified['status'] ?? null;
             }
 
+            // No actualizar AERIA sin confirmación.
+            if (!in_array(
+                $providerStatus,
+                $cancelledStatuses,
+                true
+            )) {
+                throw new RuntimeException(
+                    'Mercado Pago no confirmó la cancelación. '
+                        . 'Estado: '
+                        . ($providerStatus ?? 'desconocido')
+                );
+            }
         } elseif ($subscription->init_point) {
 
-            // Hay checkout pero no podemos identificarlo
-            // de forma segura en Mercado Pago.
             throw new RuntimeException(
-                'La suscripción tiene un checkout pendiente '
-                . 'sin identificador de Mercado Pago. '
-                . 'Requiere revisión administrativa.'
+                'Existe un checkout sin identificador externo. '
+                    . 'Requiere revisión administrativa.'
             );
         }
 
-        // Sólo después de validar el proveedor.
+        // Actualizar AERIA después de confirmar.
         $subscription->update([
             'status' => 'cancelled',
-            'provider_status' => $providerId
-                ? 'canceled'
-                : $subscription->provider_status,
+            'provider_status' => $providerStatus,
             'cancelled_at' => now(),
             'next_billing_at' => null,
             'renewal_prepared_at' => null,
