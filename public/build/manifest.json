@@ -65,6 +65,15 @@
     "src": "resources/css/software-tesoreria.css",
     "isEntry": true
   },
+  "resources/css/subscription.css": {
+    "file": "assets/subscription-BltYugn_.css",
+    "name": "subscription",
+    "names": [
+      "subscription.css"
+    ],
+    "src": "resources/css/subscription.css",
+    "isEntry": true
+  },
   "resources/css/welcome.css": {
     "file": "assets/welcome-Vd3gmU33.css",
     "name": "welcome",
@@ -75,14 +84,15 @@
     "isEntry": true
   },
   "resources/js/app.js": {
-    "file": "assets/app-Uv9w1N3L.js",
+    "file": "assets/app-B9lX-Z4U.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
     "css": [
-      "assets/app-BZWqcdWY.css",
+      "assets/app-Cd1hblk1.css",
       "assets/welcome-Vd3gmU33.css",
-      "assets/register-pending-LXepLUu1.css"
+      "assets/register-pending-LXepLUu1.css",
+      "assets/subscription-BltYugn_.css"
     ],
     "assets": [
       "assets/bootstrap-icons-mSm7cUeB.woff2",

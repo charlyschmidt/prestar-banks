@@ -18,6 +18,7 @@ export default defineConfig({
                 'resources/js/welcome.js',
                 'resources/css/software-tesoreria.css',
                 'resources/css/guia-de-uso.css',
+                'resources/css/subscription.css',
                 'resources/js/guia-de-uso.js',
             ],
 
