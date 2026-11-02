@@ -56,3 +56,16 @@ Schedule::call(function () {
     ->name('financial-reminders')
     ->everyMinute()
     ->withoutOverlapping();
+
+// Cotizaciones de referencia Finanzas Argy; Scheduler único punto de consulta.
+// Emite un evento por WebSocket incluso cuando conserva el último dato
+// y marca stale=true ante un fallo de la fuente externa.
+Schedule::call(function () {
+    $data = app(\App\Services\FinanzasArgyRatesService::class)
+        ->refresh();
+
+    event(new \App\Events\OfficialRatesUpdated($data));
+})
+    ->name('finanzas-argy-rates-refresh')
+    ->everyFiveMinutes()
+    ->withoutOverlapping();

@@ -6,6 +6,7 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\View;
 use App\Services\HeaderService;
 use App\Services\ExchangeRateService;
+use App\Services\FinanzasArgyRatesService;
 use Illuminate\Support\Facades\Cache;
 
 
@@ -60,6 +61,14 @@ class AppServiceProvider extends ServiceProvider
             $view->with(
                 'exchangeRate',
                 $exchangeRate
+            );
+        });
+
+        // Header: solo leer cache (nunca hacer HTTP mientras se renderiza).
+        View::composer('layouts.header', function ($view) {
+            $view->with(
+                'officialRates',
+                app(FinanzasArgyRatesService::class)->current()
             );
         });
     }

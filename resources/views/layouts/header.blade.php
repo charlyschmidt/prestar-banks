@@ -866,3 +866,32 @@
 
 
 </header>
+
+{{-- Cotizaciones elegidas por la empresa; si ninguna, la barra no ocupa espacio. --}}
+@php
+    $fxCompany = app(\App\Services\CompanyContextService::class)->company();
+    $visibleFxMarkets = $fxCompany
+        ? \App\Support\FxMarketVisibility::selected($fxCompany->visible_fx_markets)
+        : [];
+@endphp
+@if (count($visibleFxMarkets) > 0)
+<div id="official-rates-app"
+     data-initial-rates="{{ json_encode($officialRates ?? ['rates' => []], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) }}"
+     data-visible-markets="{{ json_encode($visibleFxMarkets, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) }}">
+    <div class="aeria-fx-bar" aria-label="Cotizaciones informativas en pesos argentinos">
+        <div class="aeria-fx-bar-content">
+            <span class="aeria-fx-bar-heading">Cotizaciones:</span>
+            <div class="aeria-fx-bar-values">
+                @foreach (\App\Support\FxMarketVisibility::labels() as $code => $name)
+                    @continue(!in_array($code, $visibleFxMarkets, true))
+                    <span class="aeria-fx-pair">
+                        <span class="aeria-fx-code">{{ $name }}</span>
+                        <span class="aeria-fx-buy">C <strong>{{ isset($officialRates['rates'][$code]['buy']) ? '$'.number_format($officialRates['rates'][$code]['buy'], 2, ',', '.') : '—' }}</strong></span>
+                        <span class="aeria-fx-sell">V <strong>{{ isset($officialRates['rates'][$code]['sell']) ? '$'.number_format($officialRates['rates'][$code]['sell'], 2, ',', '.') : '—' }}</strong></span>
+                    </span>
+                @endforeach
+            </div>
+        </div>
+    </div>
+</div>
+@endif

@@ -158,6 +158,12 @@
                         </a>
 
 
+                        <a href="{{ route('settings.cotizaciones') }}"
+                            class="{{ request()->routeIs('settings.cotizaciones*') ? 'active' : '' }}">
+                            <i class="bi bi-currency-exchange"></i>
+                            Cotizaciones
+                        </a>
+
                         <a href="{{ route('settings.api') }}"
                             class="{{ request()->routeIs('settings.api') ? 'active' : '' }}">
 
@@ -355,6 +361,12 @@
 
                     </a>
 
+
+                    <a href="{{ route('settings.cotizaciones') }}"
+                        class="{{ request()->routeIs('settings.cotizaciones*') ? 'active' : '' }}">
+                        <i class="bi bi-currency-exchange"></i>
+                        Cotizaciones
+                    </a>
 
                     <a href="{{ route('settings.api') }}"
                         class="{{ request()->routeIs('settings.api') ? 'active' : '' }}">

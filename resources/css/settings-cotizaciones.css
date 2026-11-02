@@ -1,0 +1,147 @@
+/* AERIA Finance — Configuración/Cotizaciones (aislado del resto del layout). */
+.fx-settings-card {
+    width: 100%;
+    max-width: none;
+}
+
+/* Dos columnas de igual ancho; cada grupo es independiente. */
+.fx-settings-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+    align-items: start;
+}
+
+.fx-settings-group {
+    min-width: 0;
+    padding: 18px;
+    border: 1px solid var(--company-border);
+    border-radius: 14px;
+}
+
+.fx-settings-group h4 {
+    margin: 0 0 12px;
+    color: var(--company-text);
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.fx-settings-market-list {
+    display: grid;
+    gap: 8px;
+}
+
+.fx-settings-market {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 14px 16px;
+    color: var(--company-text);
+    border: 1px solid var(--company-border);
+    background: var(--company-hover);
+    border-radius: 12px;
+    cursor: pointer;
+}
+
+.fx-settings-market-description {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    min-width: 0;
+}
+
+.fx-settings-market-description strong {
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.fx-settings-market-description small,
+.fx-settings-actions p {
+    color: var(--company-muted);
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+.fx-settings-quote {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    color: var(--company-text);
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+}
+
+.fx-settings-buy { color: #34d399; }
+.fx-settings-sell { color: #fbbf24; }
+
+.fx-settings-toggle {
+    appearance: none;
+    -webkit-appearance: none;
+    position: relative;
+    flex: 0 0 42px;
+    width: 42px;
+    height: 24px;
+    margin: 0;
+    border-radius: 999px;
+    border: 1px solid var(--company-border);
+    background: var(--company-muted);
+    opacity: .85;
+    cursor: pointer;
+    transition: background .15s ease;
+}
+
+.fx-settings-toggle::before {
+    content: '';
+    display: block;
+    position: absolute;
+    left: 3px;
+    top: 3px;
+    width: 16px;
+    height: 16px;
+    background: white;
+    border-radius: 50%;
+    transition: transform .15s ease;
+}
+
+.fx-settings-toggle:checked {
+    background: #22c55e;
+    border-color: #16a34a;
+    opacity: 1;
+}
+
+.fx-settings-toggle:checked::before {
+    transform: translateX(18px);
+}
+
+.fx-settings-toggle:focus-visible {
+    outline: 2px solid #38bdf8;
+    outline-offset: 3px;
+}
+
+.fx-settings-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding-top: 22px;
+    margin-top: 24px;
+    border-top: 1px solid var(--company-border);
+}
+
+.fx-settings-actions p {
+    margin: 0;
+    max-width: 540px;
+}
+
+@media (max-width: 900px) {
+    .fx-settings-grid { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (max-width: 580px) {
+    .fx-settings-group { padding: 12px; }
+
+    .fx-settings-market { padding: 12px; gap: 10px; }
+    .fx-settings-actions .primary-action-button { width: 100%; justify-content: center; }
+}

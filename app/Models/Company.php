@@ -51,6 +51,7 @@ class Company extends Model
             'trial_expired_email_sent_at' => 'datetime',
             'onboarding_completed_at' => 'datetime',
             'requires_invoice' => 'boolean',
+            'visible_fx_markets' => 'array',
         ];
     }
 

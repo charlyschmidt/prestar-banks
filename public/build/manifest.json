@@ -8,7 +8,7 @@
     "src": "node_modules/bootstrap-icons/font/fonts/bootstrap-icons.woff2"
   },
   "resources/css/app.css": {
-    "file": "assets/app-L4ZsgDZL.css",
+    "file": "assets/app-CtAfp4nK.css",
     "name": "app",
     "names": [
       "app.css"
@@ -84,12 +84,15 @@
     "isEntry": true
   },
   "resources/js/app.js": {
-    "file": "assets/app-CDftLVou.js",
+    "file": "assets/app-BjxsJOO0.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
+    "dynamicImports": [
+      "resources/js/official-rates.js"
+    ],
     "css": [
-      "assets/app-Dmy8jgpP.css",
+      "assets/app-BTtT_TR8.css",
       "assets/welcome-Vd3gmU33.css",
       "assets/register-pending-LXepLUu1.css",
       "assets/subscription-BVFLvsFJ.css"
@@ -104,6 +107,12 @@
     "name": "guia-de-uso",
     "src": "resources/js/guia-de-uso.js",
     "isEntry": true
+  },
+  "resources/js/official-rates.js": {
+    "file": "assets/official-rates-BbemZZH8.js",
+    "name": "official-rates",
+    "src": "resources/js/official-rates.js",
+    "isDynamicEntry": true
   },
   "resources/js/welcome.js": {
     "file": "assets/welcome-BmW93YJc.js",

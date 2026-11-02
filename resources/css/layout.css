@@ -1662,7 +1662,7 @@ body[data-theme="dark"] .sidebar-close {
         align-items: center;
 
         gap: 20px;
-        padding: 0 30px;
+        padding: 0 25px;
     }
 
 
@@ -1923,4 +1923,175 @@ body[data-theme="dark"] .sidebar-close {
 
     width: 100%;
     margin-top: 22px !important;
+}
+
+/* =========================================================
+   AERIA FINANCE - COTIZACIONES (FINANZAS ARGY)
+   Un solo bloque: Vue + respaldo Blade
+   Alto total: 25px | Tipografía: 12px | Gap: 8px
+========================================================= */
+
+#official-rates-app,
+.aeria-fx-bar {
+    width: 100%;
+    height: 25px;
+    min-height: 25px;
+    max-height: 25px;
+}
+
+#official-rates-app {
+    overflow: hidden;
+}
+
+.aeria-fx-bar {
+    box-sizing: border-box;
+    overflow: hidden;
+    border-bottom: 1px solid var(--company-border, rgba(255, 255, 255, .08));
+    background: var(--company-card, #0b203a);
+    color: var(--company-text, #fff);
+    font-size: 12px;
+}
+
+.aeria-fx-bar-content {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    gap: 8px;
+    width: 100%;
+    height: 24px; /* Queda 1px para el borde de la barra */
+    margin: 0;
+    padding: 0 25px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+.aeria-fx-bar-content::-webkit-scrollbar {
+    display: none;
+}
+
+.aeria-fx-bar-heading {
+    flex: 0 0 auto;
+    color: var(--company-muted, rgba(255, 255, 255, .68));
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.aeria-fx-bar-values {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 8px;
+    width: auto;
+}
+
+.aeria-fx-pair {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 8px;
+    color: var(--company-text, #fff);
+    font-size: 12px;
+    line-height: 1;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+.aeria-fx-code {
+    color: var(--company-muted, rgba(255, 255, 255, .68));
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.aeria-fx-buy,
+.aeria-fx-sell {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px; /* Etiqueta C/V junto a su importe */
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+/* Colorea C y V tanto en Vue como en el respaldo Blade. */
+.aeria-fx-buy,
+.aeria-fx-label-buy {
+    color: #34d399;
+}
+
+.aeria-fx-sell,
+.aeria-fx-label-sell {
+    color: #fbbf24;
+}
+
+.aeria-fx-label-buy,
+.aeria-fx-label-sell {
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.aeria-fx-pair strong,
+.aeria-fx-buy strong,
+.aeria-fx-sell strong {
+    color: var(--company-text, #fff);
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1;
+}
+
+/* Punto entre mercados, sin agregar elementos al Blade/Vue. */
+.aeria-fx-pair + .aeria-fx-pair::before {
+    content: "·";
+    color: var(--company-muted, rgba(255, 255, 255, .40));
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.aeria-fx-short-name {
+    display: none;
+}
+
+.aeria-fx-pair-stale strong {
+    opacity: .65;
+}
+
+/* Estado accesible: no ocupa espacio en la fila. */
+.aeria-fx-bar-meta {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Tablet: mantener la única fila y priorizar ventas. */
+@media (max-width: 950px) {
+    .aeria-fx-buy {
+        display: none;
+    }
+}
+
+/* Móvil: mismo tamaño 12px; abreviar el nombre. */
+@media (max-width: 650px) {
+    .aeria-fx-bar-heading,
+    .aeria-fx-full-name {
+        display: none;
+    }
+
+    .aeria-fx-short-name {
+        display: inline;
+    }
+
+    .aeria-fx-bar-content {
+        padding: 0 8px;
+    }
 }

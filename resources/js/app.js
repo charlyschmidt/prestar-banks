@@ -49,6 +49,7 @@ import '../css/movement.css';
 import '../css/history.css';
 
 import '../css/settings.css';
+import '../css/settings-cotizaciones.css';
 
 
 /*
@@ -121,4 +122,17 @@ import './settings-api';
 
 import './accounts-create';
 
+// Vue solo se carga cuando existe el componente (evita peso en páginas públicas).
+const loadOfficialRatesBar = () => {
+    if (!document.getElementById('official-rates-app')) return;
 
+    import('./official-rates').catch(error => {
+        console.error('AERIA: no se pudo cargar la barra de cotizaciones.', error);
+    });
+};
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', loadOfficialRatesBar, { once: true });
+} else {
+    loadOfficialRatesBar();
+}

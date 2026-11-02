@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\HistoryController;
 use App\Http\Controllers\CompanySelectionController;
 use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\SettingsRatesController;
 use App\Http\Controllers\PlatformAdminController;
 use App\Http\Controllers\FinancialReminderController;
 use App\Http\Controllers\OpeningBalanceImportController;
@@ -17,6 +18,7 @@ use App\Http\Controllers\ContactController;
 use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\MercadoPagoWebhookController;
 use App\Http\Controllers\CompanyApiKeyController;
+use App\Http\Controllers\OfficialExchangeRatesController;
 
 
 /*
@@ -86,6 +88,10 @@ Route::view(
 */
 
 Route::middleware('auth')->group(function () {
+    Route::get(
+        '/exchange-rates/header',
+        OfficialExchangeRatesController::class
+    )->name('exchange-rates.header');
 
     Route::get(
         '/subscription',
@@ -242,6 +248,17 @@ Route::middleware('auth')->group(function () {
             '/settings/company',
             [SettingsController::class, 'updateCompany']
         )->name('settings.company.update');
+
+        // Cotizaciones visibles por empresa (no requieren jornada abierta).
+        Route::get(
+            '/settings/cotizaciones',
+            [SettingsRatesController::class, 'index']
+        )->name('settings.cotizaciones');
+
+        Route::patch(
+            '/settings/cotizaciones',
+            [SettingsRatesController::class, 'update']
+        )->name('settings.cotizaciones.update');
 
 
         Route::post(
