@@ -89,6 +89,10 @@ import '../css/settings-api.css';
 
 import '../css/cheques.css';
 
+import '../css/cheques/create.css';
+
+import '../css/cheques/show.css';
+
 /*
 |--------------------------------------------------------------------------
 | Javascript propio
@@ -126,6 +130,8 @@ import './settings-api';
 import './accounts-create';
 
 import './cheques/show.js';
+
+import './cheques/create.js';
 
 // Vue solo se carga cuando existe el componente (evita peso en páginas públicas).
 const loadOfficialRatesBar = () => {

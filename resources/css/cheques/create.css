@@ -1,0 +1,657 @@
+
+/*
+|--------------------------------------------------------------------------
+| AERIA FINANCE
+| CHEQUES - NUEVA LIQUIDACIÓN
+|--------------------------------------------------------------------------
+|
+| Estilos para:
+| - Liquidaciones individuales y múltiples
+| - Tarjetas de cheques
+| - Condiciones particulares
+| - Resumen consolidado
+| - Tabla de resultados
+| - Diseño responsive
+|
+| Utiliza las variables del tema de cada empresa.
+|
+*/
+
+.cheques-page {
+
+    --cheque-border:
+        var(--company-border, #343a46);
+
+    --cheque-card:
+        var(--company-card, #20252e);
+
+    --cheque-text:
+        var(--company-text, #f1f5f9);
+
+    --cheque-muted:
+        var(--company-muted, #94a3b8);
+
+    --cheque-hover:
+        var(--company-hover, rgba(128, 128, 128, .08));
+
+    --cheque-accent:
+        var(--company-button, #2563eb);
+
+    --cheque-danger: #ef6464;
+
+}
+
+/*
+|--------------------------------------------------------------------------
+| TARJETAS INDIVIDUALES
+|--------------------------------------------------------------------------
+*/
+
+.cheques-page .cheque-item {
+
+    background: var(--cheque-card);
+
+    border: 1px solid var(--cheque-border);
+
+    border-radius: 14px;
+
+    padding: 22px;
+
+    margin-bottom: 16px;
+
+    transition:
+        border-color .2s ease,
+        box-shadow .2s ease;
+
+}
+
+.cheques-page .cheque-item:hover {
+
+    border-color: var(--cheque-muted);
+
+}
+
+/*
+|--------------------------------------------------------------------------
+| ENCABEZADO DE CADA CHEQUE
+|--------------------------------------------------------------------------
+*/
+
+.cheques-page .cheque-item-header {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 16px;
+
+    margin-bottom: 20px;
+
+}
+
+.cheques-page .cheque-item-title {
+
+    color: var(--cheque-text);
+
+    font-size: 16px;
+
+    font-weight: 650;
+
+    letter-spacing: -.2px;
+
+}
+
+/*
+|--------------------------------------------------------------------------
+| BOTÓN QUITAR CHEQUE
+|--------------------------------------------------------------------------
+*/
+
+.cheques-page .cheque-remove-button {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 7px;
+
+    padding: 8px 12px;
+
+    border-radius: 8px;
+
+    border: 1px solid rgba(239, 68, 68, .25);
+
+    background: rgba(239, 68, 68, .08);
+
+    color: var(--cheque-danger);
+
+    font-size: 13px;
+
+    font-weight: 500;
+
+    cursor: pointer;
+
+    transition:
+        background .2s ease,
+        border-color .2s ease;
+
+}
+
+.cheques-page .cheque-remove-button:hover:not(:disabled) {
+
+    background: rgba(239, 68, 68, .16);
+
+    border-color: rgba(239, 68, 68, .45);
+
+}
+
+.cheques-page .cheque-remove-button:disabled {
+
+    opacity: .35;
+
+    cursor: not-allowed;
+
+}
+
+/*
+|--------------------------------------------------------------------------
+| BOTÓN AGREGAR CHEQUE
+|--------------------------------------------------------------------------
+*/
+
+.cheques-page .cheque-add-button {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 10px;
+
+    width: 100%;
+
+    min-height: 54px;
+
+    padding: 14px 18px;
+
+    border-radius: 12px;
+
+    border: 1px dashed var(--cheque-border);
+
+    background: transparent;
+
+    color: var(--cheque-text);
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background .2s ease,
+        border-color .2s ease;
+
+}
+
+.cheques-page .cheque-add-button i {
+
+    font-size: 18px;
+
+    color: var(--cheque-accent);
+
+}
+
+.cheques-page .cheque-add-button:hover:not(:disabled) {
+
+    background: var(--cheque-hover);
+
+    border-color: var(--cheque-accent);
+
+}
+
+.cheques-page .cheque-add-button:disabled {
+
+    opacity: .4;
+
+    cursor: not-allowed;
+
+}
+
+/*
+|--------------------------------------------------------------------------
+| CONDICIONES PARTICULARES
+|--------------------------------------------------------------------------
+*/
+
+.cheques-page .cheque-custom-label {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    color: var(--cheque-muted);
+
+    font-size: 13px;
+
+    font-weight: 500;
+
+    cursor: pointer;
+
+    user-select: none;
+
+}
+
+.cheques-page .cheque-custom-label:hover {
+
+    color: var(--cheque-text);
+
+}
+
+.cheques-page .cheque-custom-label input {
+
+    width: 16px;
+
+    height: 16px;
+
+    margin: 0;
+
+    accent-color: var(--cheque-accent);
+
+    cursor: pointer;
+
+}
+
+/*
+|--------------------------------------------------------------------------
+| PANEL DE PARÁMETROS PARTICULARES
+|--------------------------------------------------------------------------
+*/
+
+.cheques-page .cheque-custom-fields {
+
+    padding: 18px;
+
+    border-radius: 10px;
+
+    border: 1px solid var(--cheque-border);
+
+    background: var(--cheque-hover);
+
+}
+
+.cheques-page .cheque-custom-fields .cheques-grid {
+
+    margin: 0;
+
+}
+
+/*
+|--------------------------------------------------------------------------
+| RESUMEN INFERIOR DE CADA CHEQUE
+|--------------------------------------------------------------------------
+*/
+
+.cheques-page .cheque-item-footer {
+
+    display: flex;
+
+    flex-wrap: wrap;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 16px;
+
+    margin-top: 22px;
+
+    padding-top: 16px;
+
+    border-top: 1px solid var(--cheque-border);
+
+}
+
+.cheques-page .cheque-item-footer > div {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 5px;
+
+}
+
+.cheques-page .cheque-item-footer span {
+
+    color: var(--cheque-muted);
+
+    font-size: 12px;
+
+    font-weight: 400;
+
+}
+
+.cheques-page .cheque-item-footer strong {
+
+    color: var(--cheque-text);
+
+    font-size: 16px;
+
+    font-weight: 650;
+
+    font-variant-numeric: tabular-nums;
+
+}
+
+/*
+|--------------------------------------------------------------------------
+| RESUMEN DINÁMICO DE LA OPERACIÓN
+|--------------------------------------------------------------------------
+*/
+
+.cheques-page .cheques-live-summary {
+
+    padding: 22px;
+
+    border-radius: 12px;
+
+    border: 1px solid var(--cheque-border);
+
+    background: var(--cheque-hover);
+
+}
+
+.cheques-page .cheques-live-summary .cheques-summary-grid {
+
+    margin-top: 0;
+
+}
+
+.cheques-page .cheques-live-summary strong {
+
+    font-variant-numeric: tabular-nums;
+
+}
+
+/*
+|--------------------------------------------------------------------------
+| TABLA DE RESULTADOS
+|--------------------------------------------------------------------------
+*/
+
+.cheques-page .cheques-detail-table {
+
+    width: 100%;
+
+    margin-bottom: 0;
+
+    color: var(--cheque-text);
+
+    font-size: 13px;
+
+    border-color: var(--cheque-border);
+
+    --bs-table-bg: transparent;
+
+    --bs-table-color: var(--cheque-text);
+
+    --bs-table-border-color: var(--cheque-border);
+
+    --bs-table-hover-bg: var(--cheque-hover);
+
+    --bs-table-hover-color: var(--cheque-text);
+
+}
+
+.cheques-page .cheques-detail-table thead th {
+
+    padding: 13px 12px;
+
+    color: var(--cheque-muted);
+
+    font-weight: 600;
+
+    border-bottom: 1px solid var(--cheque-border);
+
+    white-space: nowrap;
+
+}
+
+.cheques-page .cheques-detail-table tbody td {
+
+    padding: 14px 12px;
+
+    color: var(--cheque-text);
+
+    vertical-align: middle;
+
+    border-bottom: 1px solid var(--cheque-border);
+
+}
+
+.cheques-page .cheques-detail-table tbody tr:last-child td {
+
+    border-bottom: 0;
+
+}
+
+.cheques-page .cheques-detail-table tbody tr:hover {
+
+    background: var(--cheque-hover);
+
+}
+
+.cheques-page .cheques-detail-table .cheques-note {
+
+    font-size: 11px;
+
+    margin-top: 4px;
+
+}
+
+/*
+|--------------------------------------------------------------------------
+| COLORES DE IMPORTES
+|--------------------------------------------------------------------------
+*/
+
+.cheques-page .cheques-detail-table .cheques-amount-expense {
+
+    color: #ef6464;
+
+}
+
+.cheques-page .cheques-detail-table .cheques-amount-income {
+
+    color: #22c55e;
+
+}
+
+/*
+|--------------------------------------------------------------------------
+| CAMPOS DEL FORMULARIO
+|--------------------------------------------------------------------------
+*/
+
+.cheques-page .cheque-item .form-control,
+.cheques-page .cheque-item .form-select {
+
+    width: 100%;
+
+    min-width: 0;
+
+}
+
+.cheques-page .cheque-item .form-control:focus,
+.cheques-page .cheque-item .form-select:focus {
+
+    border-color: var(--cheque-accent);
+
+}
+
+/*
+|--------------------------------------------------------------------------
+| ESTADOS DE VALIDACIÓN
+|--------------------------------------------------------------------------
+*/
+
+.cheques-page .cheque-item .form-control.is-invalid,
+.cheques-page .cheque-item .form-select.is-invalid {
+
+    border-color: var(--cheque-danger);
+
+}
+
+.cheques-page .cheque-item .invalid-feedback {
+
+    color: var(--cheque-danger);
+
+    font-size: 12px;
+
+}
+
+/*
+|--------------------------------------------------------------------------
+| ACCESIBILIDAD
+|--------------------------------------------------------------------------
+*/
+
+.cheques-page .cheque-add-button:focus-visible,
+.cheques-page .cheque-remove-button:focus-visible,
+.cheques-page .cheque-custom-label input:focus-visible {
+
+    outline: 2px solid var(--cheque-accent);
+
+    outline-offset: 3px;
+
+}
+
+/*
+|--------------------------------------------------------------------------
+| RESPONSIVE - TABLET
+|--------------------------------------------------------------------------
+*/
+
+@media (max-width: 991px) {
+
+    .cheques-page .cheque-item {
+
+        padding: 18px;
+
+    }
+
+    .cheques-page .cheques-detail-table {
+
+        min-width: 750px;
+
+    }
+
+}
+
+/*
+|--------------------------------------------------------------------------
+| RESPONSIVE - MÓVIL
+|--------------------------------------------------------------------------
+*/
+
+@media (max-width: 767px) {
+
+    .cheques-page .cheque-item {
+
+        padding: 16px;
+
+        border-radius: 12px;
+
+    }
+
+    .cheques-page .cheque-item-header {
+
+        align-items: flex-start;
+
+        margin-bottom: 18px;
+
+    }
+
+    .cheques-page .cheque-item-title {
+
+        font-size: 15px;
+
+    }
+
+    .cheques-page .cheque-remove-button {
+
+        padding: 7px 10px;
+
+        font-size: 12px;
+
+    }
+
+    .cheques-page .cheque-custom-fields {
+
+        padding: 14px;
+
+    }
+
+    .cheques-page .cheque-item-footer {
+
+        margin-top: 18px;
+
+        padding-top: 14px;
+
+    }
+
+    .cheques-page .cheque-item-footer strong {
+
+        font-size: 14px;
+
+    }
+
+    .cheques-page .cheque-add-button {
+
+        min-height: 50px;
+
+        font-size: 13px;
+
+    }
+
+    .cheques-page .cheques-live-summary {
+
+        padding: 16px;
+
+    }
+
+    .cheques-page .cheques-detail-table {
+
+        min-width: 720px;
+
+        font-size: 12px;
+
+    }
+
+}
+
+/*
+|--------------------------------------------------------------------------
+| PREFERENCIAS DE MOVIMIENTO
+|--------------------------------------------------------------------------
+*/
+
+@media (prefers-reduced-motion: reduce) {
+
+    .cheques-page .cheque-item,
+    .cheques-page .cheque-add-button,
+    .cheques-page .cheque-remove-button {
+
+        transition: none;
+
+    }
+
+}

@@ -1,0 +1,604 @@
+
+/*
+|--------------------------------------------------------------------------
+| AERIA FINANCE
+| CHEQUES - DETALLE DE LIQUIDACIÓN
+|--------------------------------------------------------------------------
+|
+| Tabla financiera de cheques múltiples.
+|
+| - Filas compactas
+| - Primera columna fija
+| - Encabezados fijos en desplazamiento horizontal
+| - Importes alineados
+| - Totales destacados
+| - Compatible con temas de empresa
+| - Responsive
+|
+*/
+
+.cheques-page {
+
+    --cheque-detail-bg:
+        var(--company-card, #20252e);
+
+    --cheque-detail-text:
+        var(--company-text, #f1f5f9);
+
+    --cheque-detail-muted:
+        var(--company-muted, #94a3b8);
+
+    --cheque-detail-border:
+        var(--company-border, #343a46);
+
+    --cheque-detail-hover:
+        var(--company-hover, rgba(128, 128, 128, .08));
+
+    --cheque-detail-accent:
+        var(--company-button, #2563eb);
+
+    --cheque-detail-danger: #ef6464;
+
+    --cheque-detail-success: #22c55e;
+
+}
+
+/*
+|--------------------------------------------------------------------------
+| CONTENEDOR HORIZONTAL
+|--------------------------------------------------------------------------
+*/
+
+.cheques-page .table-responsive:has(.cheques-detail-table) {
+
+    position: relative;
+
+    width: 100%;
+
+    overflow-x: auto;
+
+    overflow-y: hidden;
+
+    border: 1px solid var(--cheque-detail-border);
+
+    border-radius: 12px;
+
+    scrollbar-width: thin;
+
+    scrollbar-color:
+        var(--cheque-detail-border)
+        transparent;
+
+}
+
+/*
+|--------------------------------------------------------------------------
+| TABLA PRINCIPAL
+|--------------------------------------------------------------------------
+*/
+
+.cheques-page .cheques-detail-table {
+
+    width: max-content;
+
+    min-width: 100%;
+
+    margin: 0;
+
+    border-collapse: separate;
+
+    border-spacing: 0;
+
+    font-size: 12px;
+
+    line-height: 1.35;
+
+    color: var(--cheque-detail-text);
+
+    font-variant-numeric: tabular-nums;
+
+    --bs-table-bg: transparent;
+
+    --bs-table-color: var(--cheque-detail-text);
+
+    --bs-table-border-color: var(--cheque-detail-border);
+
+    --bs-table-hover-bg: transparent;
+
+    --bs-table-hover-color: var(--cheque-detail-text);
+
+}
+
+/*
+|--------------------------------------------------------------------------
+| ENCABEZADOS
+|--------------------------------------------------------------------------
+*/
+
+.cheques-page .cheques-detail-table thead th {
+
+    position: relative;
+
+    padding: 13px 12px;
+
+    background: var(--cheque-detail-bg);
+
+    color: var(--cheque-detail-muted);
+
+    font-size: 11px;
+
+    font-weight: 650;
+
+    letter-spacing: .15px;
+
+    white-space: nowrap;
+
+    vertical-align: middle;
+
+    border-bottom: 1px solid var(--cheque-detail-border);
+
+}
+
+/*
+|--------------------------------------------------------------------------
+| FILAS
+|--------------------------------------------------------------------------
+*/
+
+.cheques-page .cheques-detail-table tbody td {
+
+    padding: 12px;
+
+    background: var(--cheque-detail-bg);
+
+    color: var(--cheque-detail-text);
+
+    white-space: nowrap;
+
+    vertical-align: middle;
+
+    border-bottom: 1px solid var(--cheque-detail-border);
+
+    transition: background .15s ease;
+
+}
+
+.cheques-page .cheques-detail-table tbody tr:last-child td {
+
+    border-bottom: 0;
+
+}
+
+.cheques-page .cheques-detail-table tbody tr:hover td {
+
+    background: var(--cheque-detail-hover);
+
+}
+
+/*
+|--------------------------------------------------------------------------
+| PRIMERA COLUMNA FIJA
+|--------------------------------------------------------------------------
+|
+| Conservamos visible el número de fila al
+| desplazarnos horizontalmente.
+|
+*/
+
+.cheques-page .cheques-detail-table thead th:first-child,
+.cheques-page .cheques-detail-table tbody td:first-child {
+
+    position: sticky;
+
+    left: 0;
+
+    z-index: 3;
+
+    width: 46px;
+
+    min-width: 46px;
+
+    text-align: center;
+
+    background: var(--cheque-detail-bg);
+
+    border-right: 1px solid var(--cheque-detail-border);
+
+}
+
+.cheques-page .cheques-detail-table thead th:first-child {
+
+    z-index: 5;
+
+}
+
+.cheques-page .cheques-detail-table tbody tr:hover td:first-child {
+
+    background: var(--cheque-detail-hover);
+
+}
+
+/*
+|--------------------------------------------------------------------------
+| COLUMNAS IDENTIFICATORIAS
+|--------------------------------------------------------------------------
+*/
+
+.cheques-page .cheques-detail-table th:nth-child(2),
+.cheques-page .cheques-detail-table td:nth-child(2) {
+
+    min-width: 82px;
+
+}
+
+.cheques-page .cheques-detail-table th:nth-child(3),
+.cheques-page .cheques-detail-table td:nth-child(3) {
+
+    min-width: 115px;
+
+    max-width: 190px;
+
+    overflow-wrap: anywhere;
+
+    white-space: normal;
+
+}
+
+.cheques-page .cheques-detail-table th:nth-child(4),
+.cheques-page .cheques-detail-table td:nth-child(4) {
+
+    min-width: 105px;
+
+}
+
+.cheques-page .cheques-detail-table th:nth-child(5),
+.cheques-page .cheques-detail-table td:nth-child(5) {
+
+    min-width: 115px;
+
+    max-width: 190px;
+
+    overflow-wrap: anywhere;
+
+    white-space: normal;
+
+}
+
+.cheques-page .cheques-detail-table th:nth-child(6),
+.cheques-page .cheques-detail-table td:nth-child(6) {
+
+    min-width: 105px;
+
+}
+
+/*
+|--------------------------------------------------------------------------
+| COLUMNAS DE PLAZOS
+|--------------------------------------------------------------------------
+|
+| Calendario, clearing y plazo computado.
+|
+*/
+
+.cheques-page .cheques-detail-table th:nth-child(7),
+.cheques-page .cheques-detail-table th:nth-child(8),
+.cheques-page .cheques-detail-table th:nth-child(9),
+.cheques-page .cheques-detail-table td:nth-child(7),
+.cheques-page .cheques-detail-table td:nth-child(8),
+.cheques-page .cheques-detail-table td:nth-child(9) {
+
+    min-width: 88px;
+
+    text-align: right;
+
+}
+
+/*
+|--------------------------------------------------------------------------
+| TASA ANUAL
+|--------------------------------------------------------------------------
+*/
+
+.cheques-page .cheques-detail-table th:nth-child(10),
+.cheques-page .cheques-detail-table td:nth-child(10) {
+
+    min-width: 80px;
+
+    text-align: right;
+
+}
+
+/*
+|--------------------------------------------------------------------------
+| IMPORTES FINANCIEROS
+|--------------------------------------------------------------------------
+|
+| Nominal
+| Intereses
+| Impuesto cheque
+| IIBB
+| IVA
+| Descuento
+| Neto
+|
+*/
+
+.cheques-page .cheques-detail-table th:nth-child(n+11):nth-child(-n+17),
+.cheques-page .cheques-detail-table td:nth-child(n+11):nth-child(-n+17) {
+
+    min-width: 128px;
+
+    text-align: right;
+
+}
+
+/*
+|--------------------------------------------------------------------------
+| NOMINAL
+|--------------------------------------------------------------------------
+*/
+
+.cheques-page .cheques-detail-table tbody td:nth-child(11) {
+
+    font-weight: 650;
+
+}
+
+/*
+|--------------------------------------------------------------------------
+| INTERESES
+|--------------------------------------------------------------------------
+*/
+
+.cheques-page .cheques-detail-table tbody td:nth-child(12) {
+
+    color: var(--cheque-detail-success);
+
+}
+
+/*
+|--------------------------------------------------------------------------
+| DESCUENTO
+|--------------------------------------------------------------------------
+*/
+
+.cheques-page .cheques-detail-table tbody td:nth-child(16) {
+
+    color: var(--cheque-detail-danger);
+
+}
+
+/*
+|--------------------------------------------------------------------------
+| NETO INDIVIDUAL
+|--------------------------------------------------------------------------
+*/
+
+.cheques-page .cheques-detail-table tbody td:nth-child(17) {
+
+    font-weight: 700;
+
+    border-left: 1px solid var(--cheque-detail-border);
+
+}
+
+/*
+|--------------------------------------------------------------------------
+| ESTADO
+|--------------------------------------------------------------------------
+*/
+
+.cheques-page .cheques-detail-table th:nth-child(18),
+.cheques-page .cheques-detail-table td:nth-child(18) {
+
+    min-width: 150px;
+
+}
+
+.cheques-page .cheques-detail-table tbody td:nth-child(18)
+.cheques-status {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    white-space: nowrap;
+
+    font-size: 11px;
+
+}
+
+/*
+|--------------------------------------------------------------------------
+| TOTALES
+|--------------------------------------------------------------------------
+*/
+
+.cheques-page .cheques-detail-table tfoot th {
+
+    padding: 15px 12px;
+
+    background: var(--cheque-detail-hover);
+
+    color: var(--cheque-detail-text);
+
+    border-top: 2px solid var(--cheque-detail-border);
+
+    font-size: 12px;
+
+    font-weight: 700;
+
+    white-space: nowrap;
+
+    font-variant-numeric: tabular-nums;
+
+}
+
+.cheques-page .cheques-detail-table tfoot th:nth-child(7) {
+
+    border-left: 1px solid var(--cheque-detail-border);
+
+}
+
+/*
+|--------------------------------------------------------------------------
+| DESTAQUES DE TOTALES
+|--------------------------------------------------------------------------
+|
+| En el footer actual:
+|
+| 1: Etiqueta general (colspan=10)
+| 2: Nominal
+| 3: Intereses
+| 4: Impuesto cheque
+| 5: IIBB
+| 6: IVA
+| 7: Descuento
+| 8: Neto
+| 9: Estado
+|
+*/
+
+.cheques-page .cheques-detail-table tfoot th:nth-child(3) {
+
+    color: var(--cheque-detail-success);
+
+}
+
+.cheques-page .cheques-detail-table tfoot th:nth-child(7) {
+
+    color: var(--cheque-detail-danger);
+
+}
+
+.cheques-page .cheques-detail-table tfoot th:nth-child(8) {
+
+    font-size: 13px;
+
+    font-weight: 750;
+
+}
+
+/*
+|--------------------------------------------------------------------------
+| RESUMEN FINANCIERO
+|--------------------------------------------------------------------------
+*/
+
+.cheques-page .cheques-summary-grid {
+
+    font-variant-numeric: tabular-nums;
+
+}
+
+.cheques-page .cheques-summary-grid strong {
+
+    overflow-wrap: anywhere;
+
+}
+
+/*
+|--------------------------------------------------------------------------
+| SCROLL HORIZONTAL
+|--------------------------------------------------------------------------
+*/
+
+.cheques-page .table-responsive:has(.cheques-detail-table)::-webkit-scrollbar {
+
+    height: 9px;
+
+}
+
+.cheques-page .table-responsive:has(.cheques-detail-table)::-webkit-scrollbar-track {
+
+    background: transparent;
+
+}
+
+.cheques-page .table-responsive:has(.cheques-detail-table)::-webkit-scrollbar-thumb {
+
+    background: var(--cheque-detail-border);
+
+    border-radius: 20px;
+
+}
+
+/*
+|--------------------------------------------------------------------------
+| RESPONSIVE
+|--------------------------------------------------------------------------
+*/
+
+@media (max-width: 991px) {
+
+    .cheques-page .cheques-detail-table {
+
+        font-size: 12px;
+
+    }
+
+    .cheques-page .cheques-detail-table thead th,
+    .cheques-page .cheques-detail-table tbody td {
+
+        padding: 11px 10px;
+
+    }
+
+}
+
+@media (max-width: 767px) {
+
+    .cheques-page .cheques-detail-table {
+
+        font-size: 11px;
+
+    }
+
+    .cheques-page .cheques-detail-table thead th {
+
+        font-size: 10px;
+
+        padding: 10px 9px;
+
+    }
+
+    .cheques-page .cheques-detail-table tbody td {
+
+        padding: 11px 9px;
+
+    }
+
+    .cheques-page .cheques-detail-table tfoot th {
+
+        padding: 12px 9px;
+
+        font-size: 11px;
+
+    }
+
+    .cheques-page .cheques-detail-table thead th:first-child,
+    .cheques-page .cheques-detail-table tbody td:first-child {
+
+        width: 38px;
+
+        min-width: 38px;
+
+    }
+
+}
+
+/*
+|--------------------------------------------------------------------------
+| MOVIMIENTO REDUCIDO
+|--------------------------------------------------------------------------
+*/
+
+@media (prefers-reduced-motion: reduce) {
+
+    .cheques-page .cheques-detail-table tbody td {
+
+        transition: none;
+
+    }
+
+}
