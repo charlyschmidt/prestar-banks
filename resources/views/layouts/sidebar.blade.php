@@ -112,6 +112,15 @@
             </a>
 
 
+            <a href="{{ route('cheques.index') }}" class="{{ request()->routeIs('cheques.*') ? 'active' : '' }}">
+
+                <i class="bi bi-bank"></i>
+
+                Cheques
+
+            </a>
+
+
             @if (auth()->user()->isSuperAdmin())
                 <a href="{{ route('history.index') }}" class="{{ request()->routeIs('history.*') ? 'active' : '' }}">
 
@@ -312,6 +321,14 @@
             <i class="bi bi-calendar2-check"></i>
 
             Recordatorios
+
+        </a>
+
+        <a href="{{ route('cheques.index') }}" class="{{ request()->routeIs('cheques.*') ? 'active' : '' }}">
+
+            <i class="bi bi-bank"></i>
+
+            Cheques
 
         </a>
 

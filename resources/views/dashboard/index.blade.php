@@ -67,7 +67,7 @@
         <div class="section-title banks-section-title">
 
             <h1>
-                Mis bancos
+                Mis cuentas
             </h1>
 
         </div>
@@ -403,5 +403,173 @@
 
 
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            const grid = document.querySelector('.banks-grid');
+
+            if (!grid) {
+                return;
+            }
+
+            let scheduled = false;
+
+            /*
+            |--------------------------------------------------------------------------
+            | Calcular altura de cada tarjeta
+            |--------------------------------------------------------------------------
+            */
+
+            function resizeCards() {
+
+                scheduled = false;
+
+                const cards = grid.querySelectorAll('.bank-card-link');
+
+                if (!cards.length) {
+                    return;
+                }
+
+                const styles = window.getComputedStyle(grid);
+
+                const rowHeight = parseFloat(styles.gridAutoRows);
+                const rowGap = parseFloat(styles.rowGap) || 0;
+
+                if (!rowHeight || !Number.isFinite(rowHeight)) {
+                    return;
+                }
+
+                cards.forEach(function(card) {
+
+                    const content = card.querySelector('.bank-card');
+
+                    if (!content) {
+                        return;
+                    }
+
+                    const height = content.getBoundingClientRect().height;
+
+                    const span = Math.max(
+                        1,
+                        Math.ceil(
+                            (height + rowGap) /
+                            (rowHeight + rowGap)
+                        )
+                    );
+
+                    card.style.setProperty(
+                        '--masonry-span',
+                        span
+                    );
+
+                });
+
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | Evitar cálculos repetidos en un mismo frame
+            |--------------------------------------------------------------------------
+            */
+
+            function scheduleResize() {
+
+                if (scheduled) {
+                    return;
+                }
+
+                scheduled = true;
+
+                requestAnimationFrame(resizeCards);
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | Activar masonry
+            |--------------------------------------------------------------------------
+            */
+
+            grid.classList.add('is-masonry');
+
+            scheduleResize();
+
+            /*
+            |--------------------------------------------------------------------------
+            | Cambios en el tamaño del navegador
+            |--------------------------------------------------------------------------
+            */
+
+            window.addEventListener('resize', scheduleResize);
+
+            /*
+            |--------------------------------------------------------------------------
+            | Cambios de altura en las tarjetas
+            |--------------------------------------------------------------------------
+            |
+            | Si una tarjeta crece o disminuye, por ejemplo
+            | cuando tiene varias monedas, se recalcula.
+            |
+            */
+
+            if ('ResizeObserver' in window) {
+
+                const observer = new ResizeObserver(scheduleResize);
+
+                grid.querySelectorAll('.bank-card').forEach(function(card) {
+                    observer.observe(card);
+                });
+
+                observer.observe(grid);
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | Nuevas cuentas agregadas dinámicamente
+            |--------------------------------------------------------------------------
+            */
+
+            if ('MutationObserver' in window) {
+
+                const mutationObserver = new MutationObserver(function() {
+
+                    scheduleResize();
+
+                });
+
+                mutationObserver.observe(grid, {
+                    childList: true
+                });
+
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | Imágenes de logos
+            |--------------------------------------------------------------------------
+            */
+
+            grid.querySelectorAll('img').forEach(function(img) {
+
+                if (!img.complete) {
+                    img.addEventListener('load', scheduleResize, {
+                        once: true
+                    });
+                }
+
+            });
+
+            /*
+            |--------------------------------------------------------------------------
+            | Ajuste inicial
+            |--------------------------------------------------------------------------
+            */
+
+            requestAnimationFrame(function() {
+                scheduleResize();
+            });
+
+        });
+    </script>
 
 @endsection

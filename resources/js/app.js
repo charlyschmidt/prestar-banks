@@ -49,6 +49,7 @@ import '../css/movement.css';
 import '../css/history.css';
 
 import '../css/settings.css';
+
 import '../css/settings-cotizaciones.css';
 
 
@@ -85,6 +86,8 @@ import '../css/subscription.css';
 import '../css/subscription-dashboard.css';
 
 import '../css/settings-api.css';
+
+import '../css/cheques.css';
 
 /*
 |--------------------------------------------------------------------------

@@ -1,0 +1,480 @@
+
+/* =========================================
+   AERIA FINANCE — CHEQUES
+   Estilos exclusivos del módulo
+
+   Los botones principales y secundarios
+   se heredan de components.css
+========================================= */
+
+/* =========================================
+   BASE
+========================================= */
+
+.cheques-page {
+    color: var(--company-text);
+}
+
+/* =========================================
+   PANELES
+========================================= */
+
+.cheques-page .cheques-panel {
+    background: var(--company-card);
+    border: 1px solid var(--company-border);
+    border-radius: 14px;
+    padding: 22px;
+    margin-bottom: 12px;
+}
+
+.cheques-page .cheques-section-title {
+    color: var(--company-text);
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: .1px;
+    margin-bottom: 16px;
+}
+
+/* =========================================
+   FORMULARIOS
+========================================= */
+
+.cheques-page .cheques-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.cheques-page .cheques-grid label {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+
+    color: var(--company-muted);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.cheques-page .cheques-grid .form-control,
+.cheques-page .cheques-grid .form-select {
+    background: var(--company-bg);
+    color: var(--company-text);
+
+    border: 1px solid var(--company-border);
+    border-radius: 10px;
+
+    font-size: 13px;
+    min-height: 40px;
+
+    box-shadow: none;
+}
+
+.cheques-page .cheques-grid .form-control:focus,
+.cheques-page .cheques-grid .form-select:focus {
+    background: var(--company-bg);
+    color: var(--company-text);
+
+    border-color: var(--company-text);
+    box-shadow: none;
+}
+
+.cheques-page .cheques-grid .form-control::placeholder {
+    color: var(--company-muted);
+}
+
+.cheques-page .cheques-grid .form-select option {
+    background: var(--company-bg);
+    color: var(--company-text);
+}
+
+.cheques-page .cheques-optional,
+.cheques-page .cheques-note {
+    color: var(--company-muted);
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+/* =========================================
+   ACCIONES
+
+   primary-action-button y secondary-button
+   ya están definidos en components.css
+========================================= */
+
+.cheques-page .cheques-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+}
+
+.cheques-page .cheques-actions form {
+    margin: 0;
+}
+
+.cheques-page .cheques-small-button {
+    padding: 8px 12px;
+    font-size: 12px;
+}
+
+.cheques-page .cheques-table-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+/* =========================================
+   ELIMINAR OPERACIÓN
+========================================= */
+
+.cheques-page .cheques-danger-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    padding: 12px 18px;
+
+    background: transparent;
+    color: var(--expense);
+
+    border: 1px solid var(--company-border);
+    border-radius: 12px;
+
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.4;
+
+    cursor: pointer;
+
+    transition:
+        background .2s ease,
+        opacity .2s ease;
+}
+
+.cheques-page .cheques-danger-button:hover {
+    background: var(--company-hover);
+    color: var(--expense);
+}
+
+.cheques-page .cheques-danger-button:focus-visible {
+    outline: 2px solid var(--company-text);
+    outline-offset: 3px;
+}
+
+/* =========================================
+   RESULTADO DE LIQUIDACIÓN
+========================================= */
+
+.cheques-page .cheques-result-panel {
+    scroll-margin-top: 90px;
+}
+
+.cheques-page .cheques-result-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.cheques-page .cheques-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.cheques-page .cheques-summary-grid > div {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    min-width: 0;
+    padding: 12px;
+
+    background: var(--company-hover);
+    border-radius: 10px;
+}
+
+.cheques-page .cheques-summary-grid span {
+    color: var(--company-muted);
+    font-size: 12px;
+}
+
+.cheques-page .cheques-summary-grid strong {
+    color: var(--company-text);
+    font-size: 15px;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+}
+
+.cheques-page .cheques-summary-total {
+    border: 1px solid var(--company-border);
+}
+
+.cheques-page .cheques-summary-total strong {
+    font-size: 17px;
+}
+
+/* =========================================
+   NETO A ENTREGAR
+========================================= */
+
+.cheques-page .cheques-net {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+
+    gap: 12px;
+
+    margin-top: 16px;
+    padding: 18px;
+
+    background: var(--company-hover);
+    border: 1px solid var(--company-border);
+    border-radius: 12px;
+}
+
+.cheques-page .cheques-net span {
+    display: block;
+    margin-bottom: 6px;
+
+    color: var(--company-muted);
+    font-size: 13px;
+}
+
+.cheques-page .cheques-net strong {
+    display: block;
+
+    color: var(--company-text);
+    font-size: 26px;
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+.cheques-page .cheques-net-featured {
+    margin-top: 0;
+    padding: 24px;
+}
+
+.cheques-page .cheques-net-featured strong {
+    color: var(--company-text);
+    font-size: clamp(26px, 4vw, 36px);
+    letter-spacing: -.5px;
+}
+
+/* =========================================
+   TABLAS
+========================================= */
+
+.cheques-page .cheques-table {
+    --bs-table-bg: transparent;
+    --bs-table-color: var(--company-text);
+    --bs-table-border-color: var(--company-border);
+
+    width: 100%;
+    font-size: 13px;
+}
+
+.cheques-page .cheques-table td,
+.cheques-page .cheques-table th {
+    padding: 13px;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+
+.cheques-page .cheques-table th {
+    color: var(--company-muted);
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.cheques-page .cheques-table td {
+    color: var(--company-text);
+}
+
+.cheques-page .cheques-table .cheques-amount {
+    font-weight: 700;
+}
+
+/* =========================================
+   ESTADOS
+========================================= */
+
+.cheques-page .cheques-status {
+    display: inline-flex;
+    align-items: center;
+
+    padding: 5px 10px;
+
+    background: var(--company-hover);
+    color: var(--company-text);
+
+    border: 1px solid var(--company-border);
+    border-radius: 15px;
+
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.cheques-page .cheques-status-held {
+    color: var(--warning);
+    border-color: var(--company-border);
+    background: var(--company-hover);
+}
+
+/* =========================================
+   ENLACES
+========================================= */
+
+.cheques-page .cheques-link {
+    color: var(--company-text);
+    font-size: 13px;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.cheques-page .cheques-link:hover {
+    color: var(--company-text);
+    opacity: .8;
+}
+
+/* =========================================
+   HISTORIAL
+========================================= */
+
+.cheques-page .cheques-history-line {
+    padding: 11px 0;
+
+    border-bottom: 1px solid var(--company-border);
+
+    color: var(--company-muted);
+    font-size: 12px;
+}
+
+.cheques-page .cheques-history-line:last-child {
+    border-bottom: none;
+}
+
+/* =========================================
+   TABLET
+========================================= */
+
+@media (max-width: 900px) {
+
+    .cheques-page .cheques-grid,
+    .cheques-page .cheques-summary-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+}
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 600px) {
+
+    .cheques-page .cheques-grid,
+    .cheques-page .cheques-summary-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .cheques-page .cheques-panel {
+        padding: 16px;
+    }
+
+    .cheques-page .cheques-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .cheques-page .cheques-actions form,
+    .cheques-page .cheques-actions button,
+    .cheques-page .cheques-actions a {
+        width: 100%;
+    }
+
+    .cheques-page .cheques-net-featured {
+        padding: 18px;
+    }
+
+    .cheques-page .cheques-net-featured strong {
+        font-size: 28px;
+    }
+
+    .cheques-page .cheques-result-header {
+        align-items: flex-start;
+    }
+
+}
+
+/* =========================================
+   CHEQUES — COLORES FINANCIEROS
+========================================= */
+
+.cheques-page .cheques-net .cheques-net-amount {
+    color: var(--green);
+}
+
+.cheques-page .cheques-summary-grid .cheques-amount-income {
+    color: var(--income);
+}
+
+.cheques-page .cheques-summary-grid .cheques-amount-expense {
+    color: var(--expense);
+}
+
+/* =========================================
+   ETIQUETA BANCO DESTINO
+========================================= */
+
+.cheques-page .cheques-grid label.cheques-destination-label {
+    display: flex;
+    flex-direction: row;
+    align-items: baseline;
+    justify-content: flex-start;
+    gap: 5px;
+    width: 100%;
+    white-space: nowrap;
+    text-align: left;
+}
+
+.cheques-page .cheques-grid label.cheques-destination-label .cheques-optional {
+    display: inline;
+    margin: 0;
+    white-space: nowrap;
+}
+
+/* =========================================
+   AVISOS DE CUENTAS NO DISPONIBLES
+========================================= */
+
+.cheques-page .cheques-account-warning {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 5px;
+
+    margin: 8px 0 0;
+
+    color: var(--company-muted);
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.cheques-page .cheques-account-warning .bi {
+    color: var(--warning);
+}
+
+.cheques-page .cheques-account-warning .cheques-link {
+    font-size: inherit;
+}

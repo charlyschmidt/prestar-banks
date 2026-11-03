@@ -19,7 +19,7 @@ use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\MercadoPagoWebhookController;
 use App\Http\Controllers\CompanyApiKeyController;
 use App\Http\Controllers\OfficialExchangeRatesController;
-
+use App\Http\Controllers\ChequeLiquidationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -336,6 +336,87 @@ Route::middleware('auth')->group(function () {
             '/reminders/{reminder}',
             [FinancialReminderController::class, 'destroy']
         )->name('reminders.destroy');
+
+
+
+
+        /*
+|--------------------------------------------------------------------------
+| AERIA Cheques
+| Liquidaciones y operaciones financieras
+|--------------------------------------------------------------------------
+*/
+
+        Route::get('/cheques', [
+            ChequeLiquidationController::class,
+            'index'
+        ])->name('cheques.index');
+
+        Route::get('/cheques/nueva', [
+            ChequeLiquidationController::class,
+            'create'
+        ])->name('cheques.create');
+
+        Route::post('/cheques/simular', [
+            ChequeLiquidationController::class,
+            'preview'
+        ])->name('cheques.preview');
+
+        Route::post('/cheques', [
+            ChequeLiquidationController::class,
+            'store'
+        ])->name('cheques.store');
+
+        Route::get('/cheques/{liquidation}', [
+            ChequeLiquidationController::class,
+            'show'
+        ])->whereNumber('liquidation')
+            ->name('cheques.show');
+
+        /*
+|--------------------------------------------------------------------------
+| Confirmar liquidación
+|--------------------------------------------------------------------------
+|
+| Registra el egreso real y coloca el cheque en cartera.
+|
+*/
+
+        Route::post('/cheques/{liquidation}/confirmar', [
+            ChequeLiquidationController::class,
+            'confirm'
+        ])->whereNumber('liquidation')
+            ->name('cheques.confirm');
+
+        /*
+|--------------------------------------------------------------------------
+| Retener / liberar borradores
+|--------------------------------------------------------------------------
+*/
+
+        Route::patch('/cheques/{liquidation}/retener', [
+            ChequeLiquidationController::class,
+            'hold'
+        ])->whereNumber('liquidation')
+            ->name('cheques.hold');
+
+        Route::patch('/cheques/{liquidation}/liberar', [
+            ChequeLiquidationController::class,
+            'release'
+        ])->whereNumber('liquidation')
+            ->name('cheques.release');
+
+        /*
+        |--------------------------------------------------------------------------
+        | Eliminar liquidaciones sin ejecución financiera
+        |--------------------------------------------------------------------------
+        */
+
+        Route::delete('/cheques/{liquidation}', [
+            ChequeLiquidationController::class,
+            'destroy'
+        ])->whereNumber('liquidation')
+            ->name('cheques.destroy');
 
         /*
         |--------------------------------------------------------------------------

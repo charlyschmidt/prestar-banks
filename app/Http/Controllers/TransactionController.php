@@ -39,11 +39,11 @@ class TransactionController extends Controller
         }
 
 
-            $transactions = Transaction::with([
-                'account',
-                'user',
-                'apiKey'
-            ])
+        $transactions = Transaction::with([
+            'account',
+            'user',
+            'apiKey'
+        ])
             ->where(
                 'financial_day_id',
                 $day->id
@@ -129,123 +129,137 @@ class TransactionController extends Controller
         );
     }
 
-public function store(
-    Request $request,
-    TransactionService $transactionService
-) {
+    public function store(
+        Request $request,
+        TransactionService $transactionService
+    ) {
 
-    /*
+        /*
     |--------------------------------------------------------------------------
     | Validación
     |--------------------------------------------------------------------------
     */
 
-    $data = $request->validate([
+        $data = $request->validate([
 
-        'account_id' => [
-            'required',
-            'integer',
+            'account_id' => [
+                'required',
+                'integer',
 
-            Rule::exists(
-                'accounts',
-                'id'
-            )->where(
-                fn($query) =>
-                $query->where(
-                    'company_id',
-                    session('company_id')
-                )
-            ),
-        ],
+                Rule::exists(
+                    'accounts',
+                    'id'
+                )->where(
+                    fn($query) =>
+                    $query->where(
+                        'company_id',
+                        session('company_id')
+                    )
+                ),
+            ],
 
-        'account_balance_id' => [
-            'required',
-            'integer',
+            'account_balance_id' => [
+                'required',
+                'integer',
 
-            Rule::exists(
-                'account_balances',
-                'id'
-            )->where(
-                fn($query) =>
-                $query->where(
-                    'company_id',
-                    session('company_id')
-                )
-            ),
-        ],
+                Rule::exists(
+                    'account_balances',
+                    'id'
+                )->where(
+                    fn($query) =>
+                    $query->where(
+                        'company_id',
+                        session('company_id')
+                    )
+                ),
+            ],
 
-        'type' => [
-            'required',
-            'in:income,expense,reserve,transfer_in,transfer_out',
-        ],
+            'type' => [
+                'required',
+                'in:income,expense,reserve,transfer_in,transfer_out',
+            ],
 
-        'amount' => [
-            'required',
-            'numeric',
-            'min:0.01',
-        ],
+            'amount' => [
+                'required',
+                'numeric',
+                'min:0.01',
+            ],
 
-        'description' => [
-            'nullable',
-            'string',
-            'max:255',
-        ],
+            'description' => [
+                'nullable',
+                'string',
+                'max:255',
+            ],
 
-        'date' => [
-            'required',
-            'date',
-        ],
+            'date' => [
+                'required',
+                'date',
+            ],
 
-        'destination_bank' => [
-            'required_if:type,expense',
-            'nullable',
-            'string',
-            'max:150',
-        ],
+            'destination_bank' => [
+                'required_if:type,expense',
+                'nullable',
+                'string',
+                'max:150',
+            ],
 
-    ]);
+        ]);
 
 
-    /*
+        /*
     |--------------------------------------------------------------------------
     | Crear movimiento
     |--------------------------------------------------------------------------
     */
 
-    try {
+        try {
 
-        $transactionService->create(
-            data: $data,
-            companyId: (int) session('company_id'),
-            userId: auth()->id(),
-            source: 'manual',
-            externalId: null
-        );
+            $transactionService->create(
+                data: $data,
+                companyId: (int) session('company_id'),
+                userId: auth()->id(),
+                source: 'manual',
+                externalId: null
+            );
+        } catch (\Throwable $e) {
 
-    } catch (\Throwable $e) {
+            return back()
+                ->withInput()
+                ->with(
+                    'error',
+                    $e->getMessage()
+                );
+        }
 
-        return back()
-            ->withInput()
+
+        return redirect()
+            ->route('transactions.index')
             ->with(
-                'error',
-                $e->getMessage()
+                'success',
+                'Movimiento creado correctamente.'
             );
     }
 
 
-    return redirect()
-        ->route('transactions.index')
-        ->with(
-            'success',
-            'Movimiento creado correctamente.'
-        );
-}
 
 
-
-
-   public function edit(Transaction $transaction)
+    public function edit(Transaction $transaction)
     {
+
+        /*
+|--------------------------------------------------------------------------
+| Proteger movimientos de liquidaciones de cheques
+|--------------------------------------------------------------------------
+*/
+
+        if ($transaction->source === 'cheque_liquidation') {
+            return redirect()
+                ->route('transactions.index')
+                ->with(
+                    'error',
+                    'Este movimiento pertenece a una liquidación de cheques y no puede editarse desde Movimientos.'
+                );
+        }
 
         /*
 |--------------------------------------------------------------------------
@@ -381,11 +395,28 @@ public function store(
         FinancialDayService $financialDayService
     ) {
 
+
         /*
-|--------------------------------------------------------------------------
-| Movimiento ejecutado
-|--------------------------------------------------------------------------
-*/
+        |--------------------------------------------------------------------------
+        | Impedir modificaciones directas de movimientos de cheques
+        |--------------------------------------------------------------------------
+        */
+
+        if ($transaction->source === 'cheque_liquidation') {
+            return redirect()
+                ->route('transactions.index')
+                ->with(
+                    'error',
+                    'Los movimientos generados por liquidaciones de cheques no pueden modificarse directamente.'
+                );
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Movimiento ejecutado
+        |--------------------------------------------------------------------------
+        */
 
         if ($transaction->executed_at) {
 
@@ -869,6 +900,18 @@ public function store(
     public function destroy(Transaction $transaction)
     {
 
+        /*
+        |--------------------------------------------------------------------------
+        | Impedir eliminación de movimientos vinculados a cheques
+        |--------------------------------------------------------------------------
+        */
+
+        if ($transaction->source === 'cheque_liquidation') {
+            return back()->with(
+                'error',
+                'No se puede eliminar este movimiento porque pertenece a una liquidación de cheques.'
+            );
+        }
 
         /*
         |--------------------------------------------------------------------------
@@ -1068,14 +1111,28 @@ public function store(
 
     public function execute(Transaction $transaction)
     {
+
+        /*
+        |--------------------------------------------------------------------------
+        | Las liquidaciones de cheques se ejecutan desde Cheques
+        |--------------------------------------------------------------------------
+        */
+
+        if ($transaction->source === 'cheque_liquidation') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Este movimiento ya fue registrado por el módulo Cheques y no se ejecuta desde Movimientos.',
+            ], 422);
+        }
+
         $user = auth()->user();
 
 
         /*
-    |--------------------------------------------------------------------------
-    | Permisos
-    |--------------------------------------------------------------------------
-    */
+        |--------------------------------------------------------------------------
+        | Permisos
+        |--------------------------------------------------------------------------
+        */
 
         if (!$user->canExecuteTransactions()) {
 

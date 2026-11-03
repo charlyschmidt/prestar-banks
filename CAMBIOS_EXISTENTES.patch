@@ -1,0 +1,83 @@
+--- a/routes/web.php
++++ b/routes/web.php
+@@ -18,6 +18,7 @@
+ use App\Http\Controllers\MercadoPagoWebhookController;
+ use App\Http\Controllers\CompanyApiKeyController;
+ use App\Http\Controllers\OfficialExchangeRatesController;
++use App\Http\Controllers\ChequeLiquidationController;
+ 
+ 
+ /*
+@@ -327,6 +328,19 @@
+ 
+         /*
+         |--------------------------------------------------------------------------
++        | AERIA Cheques (v1: simulación y borradores, SIN movimientos financieros)
++        |--------------------------------------------------------------------------
++        */
++        Route::get('/cheques', [ChequeLiquidationController::class, 'index'])->name('cheques.index');
++        Route::get('/cheques/nueva', [ChequeLiquidationController::class, 'create'])->name('cheques.create');
++        Route::post('/cheques/simular', [ChequeLiquidationController::class, 'preview'])->name('cheques.preview');
++        Route::post('/cheques', [ChequeLiquidationController::class, 'store'])->name('cheques.store');
++        Route::get('/cheques/{liquidation}', [ChequeLiquidationController::class, 'show'])->name('cheques.show');
++        Route::patch('/cheques/{liquidation}/retener', [ChequeLiquidationController::class, 'hold'])->name('cheques.hold');
++        Route::patch('/cheques/{liquidation}/liberar', [ChequeLiquidationController::class, 'release'])->name('cheques.release');
++
++        /*
++        |--------------------------------------------------------------------------
+         | Accounts
+         |--------------------------------------------------------------------------
+         |
+--- a/resources/views/layouts/sidebar.blade.php
++++ b/resources/views/layouts/sidebar.blade.php
+@@ -112,6 +112,19 @@
+             </a>
+ 
+ 
++            <a href="{{ route('cheques.index') }}" class="{{ request()->routeIs('cheques.*') ? 'active' : '' }}">
++
++
++                <i class="bi bi-bank"></i>
++
++
++                Cheques
++
++
++            </a>
++
++
++
+             @if (auth()->user()->isSuperAdmin())
+                 <a href="{{ route('history.index') }}" class="{{ request()->routeIs('history.*') ? 'active' : '' }}">
+ 
+@@ -310,6 +323,19 @@
+         </a>
+ 
+ 
++        <a href="{{ route('cheques.index') }}" class="{{ request()->routeIs('cheques.*') ? 'active' : '' }}">
++
++
++            <i class="bi bi-bank"></i>
++
++
++            Cheques
++
++
++        </a>
++
++
++
+         @if (auth()->user()->isSuperAdmin())
+             <a href="{{ route('history.index') }}" class="{{ request()->routeIs('history.*') ? 'active' : '' }}">
+ 
+--- a/resources/js/app.js
++++ b/resources/js/app.js
+@@ -49,6 +49,8 @@
+ import '../css/history.css';
+ 
+ import '../css/settings.css';
++
++import '../css/cheques.css';
+ 
+ 
+ /*
