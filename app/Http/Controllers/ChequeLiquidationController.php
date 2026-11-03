@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\AccountBalance;
 use App\Models\ChequeLiquidation;
 use App\Services\Cheques\ChequeLiquidationCalculator;
+use App\Services\CompanyContextService;
 use App\Services\TransactionService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -18,8 +19,27 @@ use RuntimeException;
 
 class ChequeLiquidationController extends Controller
 {
+    private function activeCompanyId(): int
+    {
+        abort_unless(auth()->check(), 401);
+
+        $companyId = (int) app(CompanyContextService::class)->id();
+        abort_if($companyId <= 0, 403);
+
+        return $companyId;
+    }
+
+    private function ensureLiquidationCompany(ChequeLiquidation $liquidation): int
+    {
+        $companyId = $this->activeCompanyId();
+        abort_unless((int) $liquidation->company_id === $companyId, 404);
+
+        return $companyId;
+    }
+
     public function index(): View
     {
+        $this->activeCompanyId();
         $liquidations = ChequeLiquidation::query()
             ->with('cheques')
             ->orderByDesc('id')
@@ -30,6 +50,7 @@ class ChequeLiquidationController extends Controller
 
     public function create(): View
     {
+        $this->activeCompanyId();
         return view('cheques.create', [
             'form' => [
                 'operation_date' => now()->toDateString(),
@@ -136,6 +157,7 @@ class ChequeLiquidationController extends Controller
         Request $request,
         ChequeLiquidationCalculator $calculator
     ): View {
+        $this->activeCompanyId();
         $form = $this->validated($request);
 
         $preview = $this->calculate(
@@ -153,6 +175,7 @@ class ChequeLiquidationController extends Controller
         Request $request,
         ChequeLiquidationCalculator $calculator
     ): RedirectResponse {
+        $this->activeCompanyId();
         $form = $this->validated($request);
 
         $amounts = $this->calculate(
@@ -202,15 +225,10 @@ class ChequeLiquidationController extends Controller
             );
     }
 
-
     public function show(
         ChequeLiquidation $liquidation
     ): View {
-        /*
-    |--------------------------------------------------------------------------
-    | Datos de la liquidación
-    |--------------------------------------------------------------------------
-    */
+        $companyId = $this->ensureLiquidationCompany($liquidation);
 
         $liquidation->load([
             'cheques',
@@ -218,31 +236,12 @@ class ChequeLiquidationController extends Controller
             $query->orderByDesc('id'),
         ]);
 
-        /*
-    |--------------------------------------------------------------------------
-    | Cuentas ARS disponibles para confirmar
-    |--------------------------------------------------------------------------
-    |
-    | Solo mostramos cuentas de la empresa activa
-    | que tengan configurada la moneda ARS.
-    |
-    */
-
         $accountBalances = collect();
 
         if (
             $liquidation->status === 'draft' &&
             $liquidation->transaction_id === null
         ) {
-            $companyId = (int) session('company_id');
-
-            abort_if($companyId <= 0, 403);
-
-            abort_unless(
-                (int) $liquidation->company_id === $companyId,
-                404
-            );
-
             $accountBalances = AccountBalance::query()
                 ->with('account')
                 ->where('company_id', $companyId)
@@ -258,12 +257,6 @@ class ChequeLiquidationController extends Controller
                 ->values();
         }
 
-        /*
-    |--------------------------------------------------------------------------
-    | Vista de liquidación
-    |--------------------------------------------------------------------------
-    */
-
         return view('cheques.show', [
             'liquidation' => $liquidation,
             'accountBalances' => $accountBalances,
@@ -271,46 +264,13 @@ class ChequeLiquidationController extends Controller
         ]);
     }
 
-
-    /**
-     * Confirmar la entrega del dinero al cliente.
-     *
-     * - Solo permite liquidaciones en borrador.
-     * - Exige una cuenta y moneda ARS.
-     * - Reutiliza TransactionService.
-     * - Registra un egreso real.
-     * - Incorpora el cheque a cartera.
-     * - Vincula el egreso a la liquidación.
-     *
-     * Todos los cambios de base de datos son atómicos.
-     */
-
     public function confirm(
         Request $request,
         ChequeLiquidation $liquidation,
         TransactionService $transactionService
     ): RedirectResponse {
 
-        /*
-    |--------------------------------------------------------------------------
-    | Empresa activa
-    |--------------------------------------------------------------------------
-    */
-
-        $companyId = (int) session('company_id');
-
-        abort_if($companyId <= 0, 403);
-
-        abort_unless(
-            (int) $liquidation->company_id === $companyId,
-            404
-        );
-
-        /*
-    |--------------------------------------------------------------------------
-    | Validación del medio de pago
-    |--------------------------------------------------------------------------
-    */
+        $companyId = $this->ensureLiquidationCompany($liquidation);
 
         $data = $request->validate([
             'account_balance_id' => [
@@ -332,12 +292,6 @@ class ChequeLiquidationController extends Controller
                 'max:150',
             ],
         ]);
-
-        /*
-    |--------------------------------------------------------------------------
-    | Cuenta y moneda
-    |--------------------------------------------------------------------------
-    */
 
         $accountBalance = AccountBalance::withoutGlobalScopes()
             ->where('id', $data['account_balance_id'])
@@ -364,19 +318,6 @@ class ChequeLiquidationController extends Controller
             ]);
         }
 
-        /*
-    |--------------------------------------------------------------------------
-    | Compatibilidad del medio de pago
-    |--------------------------------------------------------------------------
-    |
-    | Efectivo:
-    |   cuenta de tipo cash.
-    |
-    | Transferencia:
-    |   cuenta de tipo bank o wallet.
-    |
-    */
-
         $paymentMethod = $data['payment_method'];
 
         if (
@@ -399,12 +340,6 @@ class ChequeLiquidationController extends Controller
             ]);
         }
 
-        /*
-    |--------------------------------------------------------------------------
-    | Banco destino
-    |--------------------------------------------------------------------------
-    */
-
         $destinationBank = null;
 
         if ($paymentMethod === 'transfer') {
@@ -421,12 +356,6 @@ class ChequeLiquidationController extends Controller
             }
         }
 
-        /*
-    |--------------------------------------------------------------------------
-    | Confirmación financiera
-    |--------------------------------------------------------------------------
-    */
-
         try {
 
             DB::transaction(function () use (
@@ -437,23 +366,11 @@ class ChequeLiquidationController extends Controller
                 $destinationBank
             ) {
 
-                /*
-            |--------------------------------------------------------------------------
-            | Bloquear liquidación
-            |--------------------------------------------------------------------------
-            */
-
                 $locked = ChequeLiquidation::query()
                     ->where('company_id', $companyId)
                     ->whereKey($liquidation->id)
                     ->lockForUpdate()
                     ->firstOrFail();
-
-                /*
-            |--------------------------------------------------------------------------
-            | Estado permitido
-            |--------------------------------------------------------------------------
-            */
 
                 if ($locked->status !== 'draft') {
                     throw ValidationException::withMessages([
@@ -469,24 +386,12 @@ class ChequeLiquidationController extends Controller
                     ]);
                 }
 
-                /*
-            |--------------------------------------------------------------------------
-            | Neto válido
-            |--------------------------------------------------------------------------
-            */
-
                 if ((float) $locked->net_amount <= 0) {
                     throw ValidationException::withMessages([
                         'net_amount' =>
                         'El neto a entregar debe ser mayor que cero.',
                     ]);
                 }
-
-                /*
-            |--------------------------------------------------------------------------
-            | Cheque pendiente
-            |--------------------------------------------------------------------------
-            */
 
                 $cheques = $locked->cheques()
                     ->lockForUpdate()
@@ -502,23 +407,6 @@ class ChequeLiquidationController extends Controller
                     ]);
                 }
 
-                /*
-            |--------------------------------------------------------------------------
-            | Registrar egreso
-            |--------------------------------------------------------------------------
-            |
-            | TransactionService:
-            |
-            | - Verifica la jornada abierta.
-            | - Valida el saldo disponible.
-            | - Aplica impuesto de transferencia si corresponde.
-            | - Registra el egreso.
-            | - Actualiza el saldo.
-            |
-            | source + externalId identifican la operación.
-            |
-            */
-
                 $transaction = $transactionService->create(
                     data: [
                         'account_balance_id' =>
@@ -530,8 +418,7 @@ class ChequeLiquidationController extends Controller
                         $locked->net_amount,
 
                         'description' =>
-                        'Descuento de cheque - Liquidación #'
-                            . $locked->id,
+                        'Entrega de fondos por operación de cheque',
 
                         'date' => now(),
 
@@ -548,12 +435,6 @@ class ChequeLiquidationController extends Controller
                     externalId: (string) $locked->id
                 );
 
-                /*
-            |--------------------------------------------------------------------------
-            | Verificar movimiento vinculado
-            |--------------------------------------------------------------------------
-            */
-
                 if (
                     (int) $transaction->company_id !== $companyId ||
                     $transaction->source !== 'cheque_liquidation' ||
@@ -569,12 +450,6 @@ class ChequeLiquidationController extends Controller
                     );
                 }
 
-                /*
-            |--------------------------------------------------------------------------
-            | Confirmar liquidación
-            |--------------------------------------------------------------------------
-            */
-
                 $locked->update([
                     'status' => 'confirmed',
 
@@ -584,24 +459,9 @@ class ChequeLiquidationController extends Controller
                     'confirmed_at' => now(),
                 ]);
 
-                /*
-            |--------------------------------------------------------------------------
-            | Ingresar cheque en cartera
-            |--------------------------------------------------------------------------
-            |
-            | Todavía NO genera ingreso bancario.
-            |
-            */
-
                 $cheques->first()->update([
                     'status' => 'in_portfolio',
                 ]);
-
-                /*
-            |--------------------------------------------------------------------------
-            | Historial
-            |--------------------------------------------------------------------------
-            */
 
                 $locked->events()->create([
                     'user_id' => auth()->id(),
@@ -621,12 +481,6 @@ class ChequeLiquidationController extends Controller
             ]);
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | Confirmación exitosa
-        |--------------------------------------------------------------------------
-        */
-
         return redirect()
             ->route('cheques.show', $liquidation)
             ->with(
@@ -635,10 +489,6 @@ class ChequeLiquidationController extends Controller
             );
     }
 
-
-    /**
-     * Retener una liquidación no confirmada.
-     */
     public function hold(
         ChequeLiquidation $liquidation
     ): RedirectResponse {
@@ -649,9 +499,6 @@ class ChequeLiquidationController extends Controller
         );
     }
 
-    /**
-     * Liberar retención.
-     */
     public function release(
         ChequeLiquidation $liquidation
     ): RedirectResponse {
@@ -667,14 +514,19 @@ class ChequeLiquidationController extends Controller
         string $from,
         string $to
     ): RedirectResponse {
+        $companyId = $this->ensureLiquidationCompany($liquidation);
+
         DB::transaction(function () use (
             $liquidation,
+            $companyId,
             $from,
             $to
         ) {
             $locked = ChequeLiquidation::query()
+                ->where('company_id', $companyId)
+                ->whereKey($liquidation->id)
                 ->lockForUpdate()
-                ->findOrFail($liquidation->id);
+                ->firstOrFail();
 
             if ($locked->status !== $from) {
                 throw ValidationException::withMessages([
@@ -714,19 +566,18 @@ class ChequeLiquidationController extends Controller
             );
     }
 
-    /**
-     * Eliminar liquidaciones sin ejecución financiera.
-     *
-     * Las confirmadas no se pueden eliminar.
-     */
     public function destroy(
         ChequeLiquidation $liquidation
     ): RedirectResponse {
-        DB::transaction(function () use ($liquidation) {
+        $companyId = $this->ensureLiquidationCompany($liquidation);
+
+        DB::transaction(function () use ($liquidation, $companyId) {
 
             $locked = ChequeLiquidation::query()
+                ->where('company_id', $companyId)
+                ->whereKey($liquidation->id)
                 ->lockForUpdate()
-                ->findOrFail($liquidation->id);
+                ->firstOrFail();
 
             if (
                 !in_array(

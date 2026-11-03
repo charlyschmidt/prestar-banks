@@ -1061,7 +1061,7 @@
                     confirmButtonText: 'Sí, cancelar',
                     cancelButtonText: 'Volver',
 
-                    reverseButtons: true,
+                    reverseButtons: false,
 
                     customClass: {
                         popup: 'aeria-swal',

@@ -125,6 +125,8 @@ import './settings-api';
 
 import './accounts-create';
 
+import './cheques/show.js';
+
 // Vue solo se carga cuando existe el componente (evita peso en páginas públicas).
 const loadOfficialRatesBar = () => {
     if (!document.getElementById('official-rates-app')) return;

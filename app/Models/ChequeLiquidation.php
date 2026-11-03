@@ -6,6 +6,7 @@ use App\Models\Concerns\BelongsToCompany;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Str;
 
 class ChequeLiquidation extends Model
 {
@@ -51,6 +52,32 @@ class ChequeLiquidation extends Model
             'confirmed_at' => 'datetime',
         ];
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | UUID público
+    |--------------------------------------------------------------------------
+    */
+
+    protected static function booted(): void
+    {
+        static::creating(function (ChequeLiquidation $liquidation) {
+            if (empty($liquidation->uuid)) {
+                $liquidation->uuid = (string) Str::uuid();
+            }
+        });
+    }
+
+    public function getRouteKeyName(): string
+    {
+        return 'uuid';
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Relaciones
+    |--------------------------------------------------------------------------
+    */
 
     public function cheques(): HasMany
     {

@@ -111,14 +111,15 @@
 
             </a>
 
+            @if (auth()->user()->isSuperAdmin())
+                <a href="{{ route('cheques.index') }}" class="{{ request()->routeIs('cheques.*') ? 'active' : '' }}">
 
-            <a href="{{ route('cheques.index') }}" class="{{ request()->routeIs('cheques.*') ? 'active' : '' }}">
+                    <i class="bi bi-bank"></i>
 
-                <i class="bi bi-bank"></i>
+                    Cheques
 
-                Cheques
-
-            </a>
+                </a>
+            @endif
 
 
             @if (auth()->user()->isSuperAdmin())

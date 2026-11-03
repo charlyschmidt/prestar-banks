@@ -168,7 +168,7 @@
 
                 <label>
                     Importe nominal (ARS)
-                    <input type="number" step="0.01" min="0.01" class="form-control" name="nominal_amount" required
+                    <input type="number" step="0.01" min="0.01" class="form-control money-input" name="nominal_amount" required
                         value="{{ $v('nominal_amount') }}" placeholder="100000.00">
                 </label>
 
@@ -221,7 +221,7 @@
 
                 <label>
                     Tasa anual (%)
-                    <input type="number" step="0.0001" min="0" max="300" class="form-control"
+                    <input type="number" step="0.0001" min="0" max="300" class="form-control money-input"
                         name="annual_rate" required value="{{ $v('annual_rate') }}">
                 </label>
 
@@ -233,19 +233,19 @@
 
                 <label>
                     Impuesto al cheque (%)
-                    <input type="number" step="0.0001" min="0" max="100" class="form-control"
+                    <input type="number" step="0.0001" min="0" max="100" class="form-control money-input"
                         name="cheque_tax_rate" required value="{{ $v('cheque_tax_rate') }}">
                 </label>
 
                 <label>
                     Ingresos Brutos (%)
-                    <input type="number" step="0.0001" min="0" max="100" class="form-control"
+                    <input type="number" step="0.0001" min="0" max="100" class="form-control money-input"
                         name="gross_income_rate" required value="{{ $v('gross_income_rate') }}">
                 </label>
 
                 <label>
                     IVA (%)
-                    <input type="number" step="0.0001" min="0" max="100" class="form-control"
+                    <input type="number" step="0.0001" min="0" max="100" class="form-control money-input"
                         name="vat_rate" required value="{{ $v('vat_rate') }}">
                 </label>
 

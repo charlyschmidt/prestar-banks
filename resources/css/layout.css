@@ -1789,7 +1789,7 @@ body[data-theme="dark"] .sidebar-close {
 ========================== */
 
 .aeria-swal {
-    width: min(92vw, 420px) !important;
+    width: min(92vw, 520px) !important;
     padding: 28px 24px 22px !important;
 
     background: var(--company-bg) !important;

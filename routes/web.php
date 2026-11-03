@@ -338,14 +338,12 @@ Route::middleware('auth')->group(function () {
         )->name('reminders.destroy');
 
 
-
-
         /*
-|--------------------------------------------------------------------------
-| AERIA Cheques
-| Liquidaciones y operaciones financieras
-|--------------------------------------------------------------------------
-*/
+        |--------------------------------------------------------------------------
+        | AERIA Cheques
+        | Liquidaciones y operaciones financieras
+        |--------------------------------------------------------------------------
+        */
 
         Route::get('/cheques', [
             ChequeLiquidationController::class,
@@ -367,43 +365,49 @@ Route::middleware('auth')->group(function () {
             'store'
         ])->name('cheques.store');
 
+        /*
+        |--------------------------------------------------------------------------
+        | Consultar liquidación por UUID
+        |--------------------------------------------------------------------------
+        */
+
         Route::get('/cheques/{liquidation}', [
             ChequeLiquidationController::class,
             'show'
-        ])->whereNumber('liquidation')
+        ])->whereUuid('liquidation')
             ->name('cheques.show');
 
         /*
-|--------------------------------------------------------------------------
-| Confirmar liquidación
-|--------------------------------------------------------------------------
-|
-| Registra el egreso real y coloca el cheque en cartera.
-|
-*/
+        |--------------------------------------------------------------------------
+        | Confirmar liquidación
+        |--------------------------------------------------------------------------
+        |
+        | Registra el egreso real y coloca el cheque en cartera.
+        |
+        */
 
         Route::post('/cheques/{liquidation}/confirmar', [
             ChequeLiquidationController::class,
             'confirm'
-        ])->whereNumber('liquidation')
+        ])->whereUuid('liquidation')
             ->name('cheques.confirm');
 
         /*
-|--------------------------------------------------------------------------
-| Retener / liberar borradores
-|--------------------------------------------------------------------------
-*/
+        |--------------------------------------------------------------------------
+        | Retener / liberar borradores
+        |--------------------------------------------------------------------------
+        */
 
         Route::patch('/cheques/{liquidation}/retener', [
             ChequeLiquidationController::class,
             'hold'
-        ])->whereNumber('liquidation')
+        ])->whereUuid('liquidation')
             ->name('cheques.hold');
 
         Route::patch('/cheques/{liquidation}/liberar', [
             ChequeLiquidationController::class,
             'release'
-        ])->whereNumber('liquidation')
+        ])->whereUuid('liquidation')
             ->name('cheques.release');
 
         /*
@@ -415,8 +419,9 @@ Route::middleware('auth')->group(function () {
         Route::delete('/cheques/{liquidation}', [
             ChequeLiquidationController::class,
             'destroy'
-        ])->whereNumber('liquidation')
+        ])->whereUuid('liquidation')
             ->name('cheques.destroy');
+
 
         /*
         |--------------------------------------------------------------------------
