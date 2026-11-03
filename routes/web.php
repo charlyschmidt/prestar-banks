@@ -21,6 +21,8 @@ use App\Http\Controllers\CompanyApiKeyController;
 use App\Http\Controllers\OfficialExchangeRatesController;
 use App\Http\Controllers\ChequeLiquidationController;
 
+use App\Http\Controllers\ChequeLiquidationExportController;
+
 /*
 |--------------------------------------------------------------------------
 | Main Entry
@@ -338,6 +340,7 @@ Route::middleware('auth')->group(function () {
         )->name('reminders.destroy');
 
 
+
         /*
         |--------------------------------------------------------------------------
         | AERIA Cheques
@@ -367,6 +370,25 @@ Route::middleware('auth')->group(function () {
 
         /*
         |--------------------------------------------------------------------------
+        | Exportar liquidación a Excel
+        |--------------------------------------------------------------------------
+        |
+        | Descarga un XLSX con:
+        | - Resumen financiero
+        | - Detalle individual de todos los cheques
+        |
+        | Solo lectura. No modifica estados ni movimientos.
+        |
+        */
+
+        Route::get('/cheques/{liquidation}/excel', [
+            ChequeLiquidationExportController::class,
+            '__invoke'
+        ])->whereUuid('liquidation')
+            ->name('cheques.export');
+
+        /*
+        |--------------------------------------------------------------------------
         | Consultar liquidación por UUID
         |--------------------------------------------------------------------------
         */
@@ -382,7 +404,8 @@ Route::middleware('auth')->group(function () {
         | Confirmar liquidación
         |--------------------------------------------------------------------------
         |
-        | Registra el egreso real y coloca el cheque en cartera.
+        | Registra un único egreso y coloca todos
+        | los cheques de la liquidación en cartera.
         |
         */
 

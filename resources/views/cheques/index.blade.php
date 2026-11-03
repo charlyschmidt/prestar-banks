@@ -1,224 +1,208 @@
-
 @extends('layouts.app')
 
 @section('content')
-
-@php
-    /*
+    @php
+        /*
     |--------------------------------------------------------------------------
     | ESTADOS DE LIQUIDACIÓN
     |--------------------------------------------------------------------------
     */
 
-    $statusLabels = [
-        'draft' => 'Borrador',
-        'held' => 'Retenida',
-        'confirmed' => 'Confirmada',
-        'deposited' => 'Depositada',
-        'accredited' => 'Acreditada',
-        'rejected' => 'Rechazada',
-    ];
+        $statusLabels = [
+            'draft' => 'Borrador',
+            'held' => 'Retenida',
+            'confirmed' => 'Confirmada',
+            'deposited' => 'Depositada',
+            'accredited' => 'Acreditada',
+            'rejected' => 'Rechazada',
+        ];
 
-    $statusClasses = [
-        'draft' => 'cheques-status-draft',
-        'held' => 'cheques-status-held',
-        'confirmed' => 'cheques-status-confirmed',
-        'deposited' => 'cheques-status-deposited',
-        'accredited' => 'cheques-status-accredited',
-        'rejected' => 'cheques-status-rejected',
-    ];
+        $statusClasses = [
+            'draft' => 'cheques-status-draft',
+            'held' => 'cheques-status-held',
+            'confirmed' => 'cheques-status-confirmed',
+            'deposited' => 'cheques-status-deposited',
+            'accredited' => 'cheques-status-accredited',
+            'rejected' => 'cheques-status-rejected',
+        ];
 
-    $money = static fn($amount) =>
-        '$ ' . number_format(
-            (float) $amount,
-            2,
-            ',',
-            '.'
-        );
-@endphp
+        $money = static fn($amount) => '$ ' . number_format((float) $amount, 2, ',', '.');
+    @endphp
 
-<div class="page-container cheques-page">
+    <div class="page-container cheques-page">
 
-    {{-- ENCABEZADO --}}
+        {{-- ENCABEZADO --}}
 
-    <div class="page-header">
+        <div class="page-header">
 
-        <div>
-            <h1>Cheques</h1>
+            <div>
+                <h1>Cheques</h1>
 
-            <p>
-                Gestión de liquidaciones de cheques de terceros.
-            </p>
+                <p>
+                    Gestión de liquidaciones de cheques de terceros.
+                </p>
+            </div>
+
+            <a href="{{ route('cheques.create') }}" class="primary-action-button text-decoration-none">
+                <i class="bi bi-plus-lg"></i>
+                Nueva liquidación
+            </a>
+
         </div>
 
-        <a
-            href="{{ route('cheques.create') }}"
-            class="primary-action-button text-decoration-none"
-        >
-            <i class="bi bi-plus-lg"></i>
-            Nueva liquidación
-        </a>
+        {{-- MENSAJES --}}
 
-    </div>
+        @if (session('success'))
+            <div class="alert alert-success">
+                {{ session('success') }}
+            </div>
+        @endif
 
-    {{-- MENSAJES --}}
+        {{-- OPERACIONES --}}
 
-    @if (session('success'))
+        <section class="cheques-panel">
 
-        <div class="alert alert-success">
-            {{ session('success') }}
-        </div>
+            <div class="cheques-section-title">
+                Operaciones registradas
+            </div>
 
-    @endif
+            <div class="table-responsive">
 
-    {{-- OPERACIONES --}}
+                <table class="table cheques-table align-middle mb-0">
 
-    <section class="cheques-panel">
-
-        <div class="cheques-section-title">
-            Operaciones registradas
-        </div>
-
-        <div class="table-responsive">
-
-            <table class="table cheques-table align-middle mb-0">
-
-                <thead>
-
-                    <tr>
-                        <th>Nº</th>
-                        <th>Cliente</th>
-                        <th>Fecha</th>
-                        <th>Cheques</th>
-                        <th>Nominal</th>
-                        <th>Neto</th>
-                        <th>Estado</th>
-                        <th class="text-end">Acciones</th>
-                    </tr>
-
-                </thead>
-
-                <tbody>
-
-                    @forelse ($liquidations as $item)
-
-                        @php
-                            $status = $item->status;
-
-                            $statusLabel = $statusLabels[$status]
-                                ?? ucfirst($status);
-
-                            $statusClass = $statusClasses[$status]
-                                ?? '';
-                        @endphp
+                    <thead>
 
                         <tr>
-
-                            {{-- ID --}}
-
-                            <td>
-                                <strong>
-                                    #{{ $item->id }}
-                                </strong>
-                            </td>
-
-                            {{-- CLIENTE --}}
-
-                            <td>
-                                {{ $item->client_name }}
-                            </td>
-
-                            {{-- FECHA --}}
-
-                            <td>
-                                {{ $item->operation_date->format('d/m/Y') }}
-                            </td>
-
-                            {{-- CANTIDAD DE CHEQUES --}}
-
-                            <td>
-                                <span class="cheques-count">
-                                    <i class="bi bi-file-earmark-text"></i>
-
-                                    {{ $item->cheques->count() }}
-                                </span>
-                            </td>
-
-                            {{-- NOMINAL --}}
-
-                            <td>
-                                {{ $money($item->nominal_amount) }}
-                            </td>
-
-                            {{-- NETO --}}
-
-                            <td class="cheques-amount">
-                                <strong>
-                                    {{ $money($item->net_amount) }}
-                                </strong>
-                            </td>
-
-                            {{-- ESTADO --}}
-
-                            <td>
-
-                                <span class="cheques-status {{ $statusClass }}">
-                                    {{ $statusLabel }}
-                                </span>
-
-                            </td>
-
-                            {{-- ACCIONES --}}
-
-                            <td>
-
-                                <div class="cheques-table-actions">
-
-                                    <a
-                                        href="{{ route('cheques.show', $item) }}"
-                                        class="secondary-button cheques-small-button"
-                                    >
-                                        <i class="bi bi-eye"></i>
-                                        Ver detalle
-                                    </a>
-
-                                </div>
-
-                            </td>
-
+                            <th>Nº</th>
+                            <th>Cliente</th>
+                            <th>Fecha</th>
+                            <th>Cheques</th>
+                            <th>Nominal</th>
+                            <th>Neto</th>
+                            <th>Estado</th>
+                            <th class="text-end">Acciones</th>
                         </tr>
 
-                    @empty
+                    </thead>
 
-                        <tr>
+                    <tbody>
 
-                            <td
-                                colspan="8"
-                                class="text-center py-5"
-                            >
-                                Todavía no hay operaciones registradas.
+                        @forelse ($liquidations as $item)
+                            @php
+                                $status = $item->status;
 
-                                Creá una liquidación para comenzar.
-                            </td>
+                                $statusLabel = $statusLabels[$status] ?? ucfirst($status);
 
-                        </tr>
+                                $statusClass = $statusClasses[$status] ?? '';
+                            @endphp
 
-                    @endforelse
+                            <tr>
 
-                </tbody>
+                                {{-- ID --}}
 
-            </table>
+                                <td>
+                                    <strong>
+                                        #{{ $item->id }}
+                                    </strong>
+                                </td>
 
+                                {{-- CLIENTE --}}
+
+                                <td>
+                                    {{ $item->client_name }}
+                                </td>
+
+                                {{-- FECHA --}}
+
+                                <td>
+                                    {{ $item->operation_date->format('d/m/Y') }}
+                                </td>
+
+                                {{-- CANTIDAD DE CHEQUES --}}
+
+                                <td>
+                                    <span class="cheques-count">
+                                        <i class="bi bi-file-earmark-text"></i>
+
+                                        {{ $item->cheques->count() }}
+                                    </span>
+                                </td>
+
+                                {{-- NOMINAL --}}
+
+                                <td>
+                                    {{ $money($item->nominal_amount) }}
+                                </td>
+
+                                {{-- NETO --}}
+
+                                <td class="cheques-amount">
+                                    <strong>
+                                        {{ $money($item->net_amount) }}
+                                    </strong>
+                                </td>
+
+                                {{-- ESTADO --}}
+
+                                <td>
+
+                                    <span class="cheques-status {{ $statusClass }}">
+                                        {{ $statusLabel }}
+                                    </span>
+
+                                </td>
+
+                                {{-- ACCIONES --}}
+
+                                <td>
+
+                                    <div class="cheques-table-actions">
+
+                                        <a href="{{ route('cheques.show', $item) }}"
+                                            class="secondary-button cheques-small-button">
+                                            <i class="bi bi-eye"></i>
+                                            Ver detalle
+                                        </a>
+
+                                        <a href="{{ route('cheques.export', $item) }}"
+                                            class="secondary-button cheques-small-button"
+                                            title="Descargar liquidación en Excel">
+                                            <i class="bi bi-file-earmark-excel text-success"></i>
+                                            Excel
+                                        </a>
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+
+                        @empty
+
+                            <tr>
+
+                                <td colspan="8" class="text-center py-5">
+                                    Todavía no hay operaciones registradas.
+
+                                    Creá una liquidación para comenzar.
+                                </td>
+
+                            </tr>
+                        @endforelse
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+        {{-- PAGINACIÓN --}}
+
+        <div class="mt-3">
+            {{ $liquidations->links() }}
         </div>
 
-    </section>
-
-    {{-- PAGINACIÓN --}}
-
-    <div class="mt-3">
-        {{ $liquidations->links() }}
     </div>
-
-</div>
-
 @endsection
