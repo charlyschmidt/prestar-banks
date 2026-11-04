@@ -1,4 +1,8 @@
 {
+  "_runtime-dom.esm-bundler-BS1pH2QC.js": {
+    "file": "assets/runtime-dom.esm-bundler-BS1pH2QC.js",
+    "name": "runtime-dom.esm-bundler"
+  },
   "node_modules/bootstrap-icons/font/fonts/bootstrap-icons.woff": {
     "file": "assets/bootstrap-icons-BeopsB42.woff",
     "src": "node_modules/bootstrap-icons/font/fonts/bootstrap-icons.woff"
@@ -8,7 +12,7 @@
     "src": "node_modules/bootstrap-icons/font/fonts/bootstrap-icons.woff2"
   },
   "resources/css/app.css": {
-    "file": "assets/app-DpTUkRd8.css",
+    "file": "assets/app-DfD5XyHo.css",
     "name": "app",
     "names": [
       "app.css"
@@ -84,15 +88,16 @@
     "isEntry": true
   },
   "resources/js/app.js": {
-    "file": "assets/app-DUyKLAOk.js",
+    "file": "assets/app-BSbXn-rx.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
     "dynamicImports": [
-      "resources/js/official-rates.js"
+      "resources/js/official-rates.js",
+      "resources/js/cheques/deliveries.js"
     ],
     "css": [
-      "assets/app-CPDf-3Z7.css",
+      "assets/app-dXUeTGZ8.css",
       "assets/welcome-Vd3gmU33.css",
       "assets/register-pending-LXepLUu1.css",
       "assets/subscription-BVFLvsFJ.css"
@@ -102,6 +107,15 @@
       "assets/bootstrap-icons-BeopsB42.woff"
     ]
   },
+  "resources/js/cheques/deliveries.js": {
+    "file": "assets/deliveries-BWsJyyV7.js",
+    "name": "deliveries",
+    "src": "resources/js/cheques/deliveries.js",
+    "isDynamicEntry": true,
+    "imports": [
+      "_runtime-dom.esm-bundler-BS1pH2QC.js"
+    ]
+  },
   "resources/js/guia-de-uso.js": {
     "file": "assets/guia-de-uso-C560VtAc.js",
     "name": "guia-de-uso",
@@ -109,10 +123,13 @@
     "isEntry": true
   },
   "resources/js/official-rates.js": {
-    "file": "assets/official-rates-BbemZZH8.js",
+    "file": "assets/official-rates-BxReEZIc.js",
     "name": "official-rates",
     "src": "resources/js/official-rates.js",
-    "isDynamicEntry": true
+    "isDynamicEntry": true,
+    "imports": [
+      "_runtime-dom.esm-bundler-BS1pH2QC.js"
+    ]
   },
   "resources/js/welcome.js": {
     "file": "assets/welcome-BmW93YJc.js",

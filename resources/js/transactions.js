@@ -351,6 +351,35 @@ document.addEventListener('DOMContentLoaded', () => {
             const account = event.account;
 
 
+            /*
+            |--------------------------------------------------------------------------
+            | Evitar duplicados por eventos realtime
+            |--------------------------------------------------------------------------
+            */
+
+            if (!transaction?.id || !account) {
+                return;
+            }
+
+            const existingRow = document.querySelector(
+                `#transactions-body tr[data-transaction-id="${transaction.id}"]`
+            );
+
+            if (existingRow) {
+                return;
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | Identificar movimientos de cheques
+            |--------------------------------------------------------------------------
+            */
+
+            const isChequeLiquidation =
+                transaction.source === 'cheque_liquidation';
+
+
+
 
             const tbody = document.getElementById(
                 'transactions-body'
@@ -378,17 +407,34 @@ document.addEventListener('DOMContentLoaded', () => {
                     hour12: false,
                 });
 
+
+            /*
+            |--------------------------------------------------------------------------
+            | Permisos de acciones sobre movimientos
+            |--------------------------------------------------------------------------
+            |
+            | Las entregas de liquidaciones confirmadas
+            | no se ejecutan ni editan nuevamente.
+            |
+            | La autorización definitiva también debe
+            | existir en el backend Laravel.
+            |
+            */
+
             const canExecute =
-                canExecuteTransactions
-                && transaction.type === 'expense'
-                && !transaction.executed_at;
+                !isChequeLiquidation &&
+                canExecuteTransactions &&
+                transaction.type === 'expense' &&
+                !transaction.executed_at;
 
             const canManage =
-                !transaction.executed_at
-                && (
-                    isSuperAdmin
-                    || Number(transaction.user?.id) === currentUserId
+                !isChequeLiquidation &&
+                !transaction.executed_at &&
+                (
+                    isSuperAdmin ||
+                    Number(transaction.user?.id) === currentUserId
                 );
+
 
             const row = `
 
@@ -443,7 +489,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     ${transaction.type === 'expense'
 
-                        ? `
+                    ? `
                             <div class="destination-bank">
 
                                 <i class="bi bi-bank"></i>
@@ -467,12 +513,12 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>
                         `
 
-                        : `
+                    : `
                             <span class="text-muted">
                                 —
                             </span>
                         `
-                    }
+                }
 
                 </td>
 
@@ -482,34 +528,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     <div class="movement-user">
 
-                        ${transaction.source === 'api'
-                                    ? `
-                                <i class="bi bi-plug"></i>
-
-                                <span>
-                                    ${transaction.api_key?.name ?? 'Integración API'}
-                                </span>
-                                `
+                       
+                    ${isChequeLiquidation
+                            ? `
+                        <i class="bi bi-bank2"></i>
+                        <span>Liquidación de cheques</span>
+                        `
+                                    : transaction.source === 'api'
+                                        ? `
+                            <i class="bi bi-plug"></i>
+                            <span>
+                                ${transaction.api_key?.name ?? 'Integración API'}
+                            </span>
+                        `
                                 : transaction.source === 'import'
                                     ? `
-                                <i class="bi bi-file-earmark-arrow-up"></i>
-
-                                <span>
-                                    Importación
-                                </span>
-                                `
-                                    : `
-                                <i class="bi bi-person-circle"></i>
-
-                                <span>
-                                    ${transaction.user?.email
-                                        ? transaction.user.email.split('@')[0]
-                                        : 'Sin registro'
-                                    }
-                                </span>
-                            `
-                            }
-
+                            <i class="bi bi-file-earmark-arrow-up"></i>
+                            <span>Importación</span>
+                        `
+                                        : `
+                            <i class="bi bi-person-circle"></i>
+                            <span>
+                                ${transaction.user?.email
+                                            ? transaction.user.email.split('@')[0]
+                                            : 'Sin registro'
+                                        }
+                            </span>
+                        `
+                    }
                     </div>
 
                 </td>

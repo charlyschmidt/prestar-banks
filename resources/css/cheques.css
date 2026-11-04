@@ -338,13 +338,13 @@
 .cheques-page .cheques-link {
     color: var(--company-text);
     font-size: 13px;
-    text-decoration: underline;
+
     text-underline-offset: 3px;
 }
 
 .cheques-page .cheques-link:hover {
     color: var(--company-text);
-    opacity: .8;
+        text-decoration: underline;
 }
 
 /* =========================================

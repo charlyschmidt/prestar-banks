@@ -1,318 +1,436 @@
 
-document.addEventListener('DOMContentLoaded', function () {
-    const form = document.getElementById('cheques-confirm-form');
+/*
+|--------------------------------------------------------------------------
+| AERIA Finance — Liquidaciones de cheques
+|--------------------------------------------------------------------------
+|
+| Responsabilidades:
+|
+| - Confirmación de operaciones con SweetAlert.
+| - Retener liquidaciones.
+| - Eliminar liquidaciones.
+| - Evitar envíos duplicados.
+| - Coordinar confirmación con Vue 3.
+|
+| Vue administra exclusivamente los medios de pago.
+|
+*/
 
-    const paymentMethod = document.getElementById(
-        'cheques-payment-method'
+document.addEventListener('DOMContentLoaded', () => {
+
+    /*
+    |--------------------------------------------------------------------------
+    | Formularios
+    |--------------------------------------------------------------------------
+    */
+
+    const confirmForm = document.getElementById(
+        'cheques-confirm-form'
     );
 
-    const accountSelect = document.getElementById(
-        'cheques-account-balance'
+    const confirmButton = document.getElementById(
+        'cheques-confirm-button'
     );
 
-    const destinationField = document.getElementById(
-        'cheques-destination-field'
+    const confirmStatus = document.getElementById(
+        'cheques-confirm-status'
     );
 
-    const bankSearch = document.getElementById(
-        'cheques-destination-search'
+    const holdForm = document.getElementById(
+        'cheques-hold-form'
     );
 
-    const destinationBank = document.getElementById(
-        'cheques-destination-bank'
+    const holdButton = document.getElementById(
+        'cheques-hold-button'
     );
 
-    const optionsContainer = document.getElementById(
-        'cheques-destination-options'
+    const deleteForm = document.getElementById(
+        'cheques-delete-form'
+    );
+
+    const deleteButton = document.getElementById(
+        'cheques-delete-button'
     );
 
     /*
     |--------------------------------------------------------------------------
-    | SweetAlert - Confirmar, retener y eliminar
+    | Estado
     |--------------------------------------------------------------------------
     */
-
-    const confirmButton = document.getElementById('cheques-confirm-button');
-    const holdButton = document.getElementById('cheques-hold-button');
-    const deleteButton = document.getElementById('cheques-delete-button');
 
     let submitting = false;
 
-    function submitOnce(targetForm) {
-        if (!targetForm || submitting) return;
+    /*
+     * La distribución debe estar efectivamente
+     * guardada en Laravel.
+     */
 
-        if (!targetForm.reportValidity()) return;
+    const savedComplete =
+        confirmButton?.dataset.savedComplete === '1';
 
-        submitting = true;
-        targetForm.requestSubmit();
-    }
+    /*
+     * Vue debe informar su estado.
+     *
+     * Inicialmente no permitimos confirmar
+     * hasta que el componente esté preparado.
+     */
 
-    if (confirmButton) {
-        confirmButton.addEventListener('click', async function () {
-            if (!form || !form.reportValidity()) return;
+    let vueReady = false;
 
-            if (paymentMethod?.value === 'transfer' &&
-                !destinationBank?.value.trim()) {
-                bankSearch?.setCustomValidity(
-                    'Seleccioná un banco de la lista.'
-                );
-                bankSearch?.reportValidity();
-                bankSearch?.focus();
-                return;
-            }
+    let vueDirty = true;
 
-            const amount = confirmButton.dataset.amount || '';
+    let vueBalanced = false;
 
-            const result = await Swal.fire({
-                title: '¿Confirmar operación?',
-                text: `Se entregarán ${amount} al cliente. Se registrará un egreso real y el cheque ingresará en cartera.`,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Sí, confirmar operación',
-                cancelButtonText: 'Cancelar',
-                reverseButtons: false,
-                customClass: {
-                    popup: 'aeria-swal',
-                    confirmButton: 'aeria-swal-danger',
-                    cancelButton: 'aeria-swal-secondary'
-                }
-            });
+    /*
+    |--------------------------------------------------------------------------
+    | Estado del botón de confirmación
+    |--------------------------------------------------------------------------
+    */
 
-            if (result.isConfirmed) {
-                submitOnce(form);
-            }
-        });
-    }
+    function updateConfirmButton() {
 
-    if (holdButton) {
-        holdButton.addEventListener('click', async function () {
-            const result = await Swal.fire({
-                title: '¿Retener liquidación?',
-                text: 'La operación quedará retenida y no se registrarán movimientos financieros.',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: 'Sí, retener',
-                cancelButtonText: 'Cancelar',
-                customClass: {
-                    popup: 'aeria-swal',
-                    confirmButton: 'aeria-swal-danger',
-                    cancelButton: 'aeria-swal-secondary'
-                }
-            });
+        if (!confirmButton) {
+            return;
+        }
 
-            if (result.isConfirmed) {
-                submitOnce(
-                    document.getElementById('cheques-hold-form')
-                );
-            }
-        });
-    }
+        const canConfirm =
+            savedComplete &&
+            vueReady &&
+            !vueDirty &&
+            vueBalanced &&
+            !submitting;
 
-    if (deleteButton) {
-        deleteButton.addEventListener('click', async function () {
-            const result = await Swal.fire({
-                title: '¿Eliminar operación?',
-                text: 'Esta acción es definitiva y no se puede deshacer.',
-                icon: 'error',
-                showCancelButton: true,
-                confirmButtonText: 'Sí, eliminar',
-                cancelButtonText: 'Cancelar',
-                customClass: {
-                    popup: 'aeria-swal',
-                    confirmButton: 'aeria-swal-danger',
-                    cancelButton: 'aeria-swal-secondary'
-                }
-            });
+        confirmButton.disabled = !canConfirm;
 
-            if (result.isConfirmed) {
-                submitOnce(
-                    document.getElementById('cheques-delete-form')
-                );
-            }
-        });
+        if (!confirmStatus) {
+            return;
+        }
+
+        if (!savedComplete) {
+
+            confirmStatus.textContent =
+                'Primero guardá una distribución completa de los medios de pago.';
+
+            return;
+        }
+
+        if (!vueReady) {
+
+            confirmStatus.textContent =
+                'Verificando los medios de pago guardados...';
+
+            return;
+        }
+
+        if (vueDirty) {
+
+            confirmStatus.textContent =
+                'Hay modificaciones sin guardar. Guardá nuevamente los medios de pago antes de confirmar.';
+
+            return;
+        }
+
+        if (!vueBalanced) {
+
+            confirmStatus.textContent =
+                'La distribución debe coincidir exactamente con el neto de la liquidación.';
+
+            return;
+        }
+
+        if (submitting) {
+
+            confirmStatus.textContent =
+                'Procesando la operación...';
+
+            return;
+        }
+
+        confirmStatus.textContent =
+            'La distribución está guardada y completa. Podés confirmar la operación.';
     }
 
     /*
     |--------------------------------------------------------------------------
-    | Formulario de confirmación y buscador de bancos
+    | Comunicación con Vue 3
+    |--------------------------------------------------------------------------
+    |
+    | El componente ChequeDeliveries.vue emitirá:
+    |
+    | cheques:deliveries-state
+    |
+    | Con:
+    |
+    | {
+    |     dirty: boolean,
+    |     balanced: boolean
+    | }
+    |
+    | No utilizamos variables globales ni
+    | accedemos al estado interno de Vue.
+    |
+    */
+
+    document.addEventListener(
+        'cheques:deliveries-state',
+        (event) => {
+
+            if (
+                !event.detail ||
+                typeof event.detail.dirty !== 'boolean' ||
+                typeof event.detail.balanced !== 'boolean'
+            ) {
+                return;
+            }
+
+            vueReady = true;
+
+            vueDirty = event.detail.dirty;
+
+            vueBalanced = event.detail.balanced;
+
+            updateConfirmButton();
+        }
+    );
+
+    /*
+    |--------------------------------------------------------------------------
+    | Enviar formulario una única vez
     |--------------------------------------------------------------------------
     */
 
-    if (
-        !form ||
-        !paymentMethod ||
-        !accountSelect ||
-        !destinationField ||
-        !bankSearch ||
-        !destinationBank ||
-        !optionsContainer
-    ) {
-        return;
-    }
+    function submitOnce(targetForm) {
 
-    const accountOptions = Array.from(
-        accountSelect.querySelectorAll('option[data-account-type]')
-    );
-
-    const bankOptions = Array.from(
-        optionsContainer.querySelectorAll('.searchable-select-option')
-    );
-
-    function normalize(value) {
-        return String(value || '')
-            .normalize('NFD')
-            .replace(/[\u0300-\u036f]/g, '')
-            .toLowerCase()
-            .trim();
-    }
-
-    function closeBankOptions() {
-        optionsContainer.hidden = true;
-        bankSearch.setAttribute('aria-expanded', 'false');
-    }
-
-    function filterBankOptions() {
-        const query = normalize(bankSearch.value);
-        let visible = 0;
-
-        bankOptions.forEach(function (option) {
-            const matches = normalize(
-                option.dataset.value
-            ).includes(query);
-
-            option.hidden = !matches;
-            option.style.display = matches ? '' : 'none';
-
-            if (matches) visible++;
-        });
-
-        optionsContainer.hidden = visible === 0;
-
-        bankSearch.setAttribute(
-            'aria-expanded',
-            visible > 0 ? 'true' : 'false'
-        );
-    }
-
-    function clearBank() {
-        bankSearch.value = '';
-        destinationBank.value = '';
-        bankSearch.setCustomValidity('');
-        closeBankOptions();
-    }
-
-    function updatePaymentMethod() {
-        const method = paymentMethod.value;
-        const isTransfer = method === 'transfer';
-
-        destinationField.style.display = isTransfer ? '' : 'none';
-        bankSearch.disabled = !isTransfer;
-        destinationBank.disabled = !isTransfer;
-
-        if (!isTransfer) clearBank();
-
-        accountOptions.forEach(function (option) {
-            const accountType = option.dataset.accountType;
-
-            const compatible =
-                (method === 'cash' && accountType === 'cash') ||
-                (method === 'transfer' &&
-                    ['bank', 'wallet'].includes(accountType));
-
-            option.disabled = !compatible;
-            option.hidden = !compatible;
-            option.style.display = compatible ? '' : 'none';
-        });
-
-        const selected = accountSelect.selectedOptions[0];
-
-        if (selected && selected.disabled) {
-            accountSelect.value = '';
-        }
-    }
-
-    bankOptions.forEach(function (option) {
-        option.addEventListener('click', function () {
-            const value = option.dataset.value || '';
-
-            destinationBank.value = value;
-            bankSearch.value = value;
-            bankSearch.setCustomValidity('');
-
-            closeBankOptions();
-        });
-    });
-
-    bankSearch.addEventListener('input', function () {
-        destinationBank.value = '';
-        bankSearch.setCustomValidity('');
-        filterBankOptions();
-    });
-
-    bankSearch.addEventListener('focus', function () {
-        if (paymentMethod.value === 'transfer') {
-            filterBankOptions();
-        }
-    });
-
-    bankSearch.addEventListener('keydown', function (event) {
-        if (event.key === 'Escape') {
-            closeBankOptions();
+        if (!targetForm || submitting) {
             return;
         }
 
-        if (event.key === 'Enter' && !optionsContainer.hidden) {
-            const firstVisible = bankOptions.find(
-                option => !option.hidden
-            );
-
-            if (firstVisible) {
-                event.preventDefault();
-                firstVisible.click();
-            }
+        if (!targetForm.reportValidity()) {
+            return;
         }
-    });
 
-    document.addEventListener('click', function (event) {
-        if (!destinationField.contains(event.target)) {
-            closeBankOptions();
-        }
-    });
+        submitting = true;
 
-    form.addEventListener('submit', function (event) {
-        if (paymentMethod.value !== 'transfer') return;
+        updateConfirmButton();
 
-        if (!destinationBank.value.trim()) {
-            event.preventDefault();
+        try {
+
+            targetForm.requestSubmit();
+
+        } catch (error) {
+
             submitting = false;
 
-            bankSearch.setCustomValidity(
-                'Seleccioná un banco de la lista.'
+            updateConfirmButton();
+
+            console.error(
+                'AERIA: error al enviar el formulario.',
+                error
             );
-
-            bankSearch.reportValidity();
-            bankSearch.focus();
-            filterBankOptions();
-            return;
-        }
-
-        bankSearch.setCustomValidity('');
-    });
-
-    const previousBank = destinationBank.value.trim();
-
-    if (previousBank) {
-        const exists = bankOptions.some(
-            option => option.dataset.value === previousBank
-        );
-
-        if (exists) {
-            bankSearch.value = previousBank;
-        } else {
-            destinationBank.value = '';
         }
     }
 
-    paymentMethod.addEventListener('change', updatePaymentMethod);
-    updatePaymentMethod();
+    /*
+    |--------------------------------------------------------------------------
+    | Confirmar liquidación
+    |--------------------------------------------------------------------------
+    */
+
+    if (confirmButton && confirmForm) {
+
+        confirmButton.addEventListener(
+            'click',
+            async () => {
+
+                if (
+                    confirmButton.disabled ||
+                    submitting ||
+                    !savedComplete ||
+                    !vueReady ||
+                    vueDirty ||
+                    !vueBalanced
+                ) {
+                    return;
+                }
+
+                const amount =
+                    confirmButton.dataset.amount || '';
+
+                const result = await Swal.fire({
+
+                    title: '¿Confirmar liquidación?',
+
+                    text:
+                        `Se entregarán ${amount} al cliente. ` +
+                        'Se descontarán los fondos de las cuentas seleccionadas, ' +
+                        'se entregarán los cheques de terceros correspondientes ' +
+                        'y los cheques recibidos ingresarán en cartera.',
+
+                    icon: 'warning',
+
+                    showCancelButton: true,
+
+                    confirmButtonText:
+                        'Sí, confirmar operación',
+
+                    cancelButtonText:
+                        'Cancelar',
+
+                    reverseButtons: false,
+
+                    customClass: {
+                        popup: 'aeria-swal',
+                        confirmButton: 'aeria-swal-danger',
+                        cancelButton: 'aeria-swal-secondary'
+                    }
+                });
+
+                if (!result.isConfirmed) {
+                    return;
+                }
+
+                /*
+                 * Verificamos nuevamente el estado.
+                 *
+                 * El operador podría haber modificado
+                 * la distribución mientras SweetAlert
+                 * estaba abierto.
+                 */
+
+                if (
+                    submitting ||
+                    !savedComplete ||
+                    !vueReady ||
+                    vueDirty ||
+                    !vueBalanced
+                ) {
+                    updateConfirmButton();
+                    return;
+                }
+
+                submitOnce(confirmForm);
+            }
+        );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Retener liquidación
+    |--------------------------------------------------------------------------
+    */
+
+    if (holdButton && holdForm) {
+
+        holdButton.addEventListener(
+            'click',
+            async () => {
+
+                if (submitting) {
+                    return;
+                }
+
+                const result = await Swal.fire({
+
+                    title: '¿Retener liquidación?',
+
+                    text:
+                        'La operación quedará retenida y no se registrarán movimientos financieros.',
+
+                    icon: 'question',
+
+                    showCancelButton: true,
+
+                    confirmButtonText:
+                        'Sí, retener',
+
+                    cancelButtonText:
+                        'Cancelar',
+
+                    customClass: {
+                        popup: 'aeria-swal',
+                        confirmButton: 'aeria-swal-danger',
+                        cancelButton: 'aeria-swal-secondary'
+                    }
+                });
+
+                if (result.isConfirmed) {
+                    submitOnce(holdForm);
+                }
+            }
+        );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Eliminar liquidación
+    |--------------------------------------------------------------------------
+    */
+
+    if (deleteButton && deleteForm) {
+
+        deleteButton.addEventListener(
+            'click',
+            async () => {
+
+                if (submitting) {
+                    return;
+                }
+
+                const result = await Swal.fire({
+
+                    title: '¿Eliminar operación?',
+
+                    text:
+                        'Esta acción es definitiva y no se puede deshacer.',
+
+                    icon: 'error',
+
+                    showCancelButton: true,
+
+                    confirmButtonText:
+                        'Sí, eliminar',
+
+                    cancelButtonText:
+                        'Cancelar',
+
+                    customClass: {
+                        popup: 'aeria-swal',
+                        confirmButton: 'aeria-swal-danger',
+                        cancelButton: 'aeria-swal-secondary'
+                    }
+                });
+
+                if (result.isConfirmed) {
+                    submitOnce(deleteForm);
+                }
+            }
+        );
+    }
+
+    /*
+|--------------------------------------------------------------------------
+| Estado inicial y sincronización con Vue
+|--------------------------------------------------------------------------
+*/
+
+    document.addEventListener(
+        'cheques:deliveries-state',
+        (event) => {
+            vueReady = true;
+            vueDirty = event.detail.dirty;
+            vueBalanced = event.detail.balanced;
+
+            updateConfirmButton();
+        }
+    );
+
+    /*
+     * Avisamos que show.js ya está escuchando.
+     * Vue responderá con su estado actual.
+     */
+
+    document.dispatchEvent(
+        new CustomEvent('cheques:request-deliveries-state')
+    );
+
 });

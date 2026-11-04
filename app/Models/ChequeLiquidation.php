@@ -102,4 +102,80 @@ class ChequeLiquidation extends Model
             'transaction_id'
         );
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Medios de pago / Entregas
+    |--------------------------------------------------------------------------
+    |
+    | Una liquidación puede pagarse utilizando:
+    |
+    | - Efectivo ARS
+    | - Efectivo USD
+    | - Efectivo EUR
+    | - Transferencias
+    | - Cheques de terceros en cartera
+    |
+    | Cada medio de pago se registra por separado.
+    |
+    */
+
+    public function deliveries(): HasMany
+    {
+        return $this->hasMany(
+            ChequeLiquidationDelivery::class,
+            'cheque_liquidation_id'
+        );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Total distribuido en ARS
+    |--------------------------------------------------------------------------
+    */
+
+    public function getDeliveredAmountAttribute(): string
+    {
+        return number_format(
+            (float) $this->deliveries()->sum('amount_ars'),
+            2,
+            '.',
+            ''
+        );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Saldo pendiente de distribución
+    |--------------------------------------------------------------------------
+    */
+
+    public function getPendingDeliveryAmountAttribute(): string
+    {
+        $pending = round(
+            (float) $this->net_amount -
+            (float) $this->delivered_amount,
+            2
+        );
+
+        return number_format(
+            $pending,
+            2,
+            '.',
+            ''
+        );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | ¿Está completamente distribuida?
+    |--------------------------------------------------------------------------
+    */
+
+    public function isFullyDistributed(): bool
+    {
+        return abs(
+            (float) $this->pending_delivery_amount
+        ) < 0.005;
+    }
 }

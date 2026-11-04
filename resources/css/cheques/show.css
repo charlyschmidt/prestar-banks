@@ -1,24 +1,27 @@
-
 /*
 |--------------------------------------------------------------------------
 | AERIA FINANCE
-| CHEQUES - DETALLE DE LIQUIDACIÓN
+| CHEQUES — DETALLE DE LIQUIDACIÓN
 |--------------------------------------------------------------------------
 |
-| Tabla financiera de cheques múltiples.
+| Responsabilidades:
 |
-| - Filas compactas
-| - Primera columna fija
-| - Encabezados fijos en desplazamiento horizontal
-| - Importes alineados
-| - Totales destacados
-| - Compatible con temas de empresa
-| - Responsive
+| - Tabla financiera de cheques múltiples.
+| - Primera columna fija.
+| - Totales y estados.
+| - Distribución de pagos múltiples con Vue 3.
+| - Tarjetas, grillas y espaciados.
+| - Buscador personalizado de bancos.
+| - Diseño responsive.
+|
+| Los colores de inputs, selects y botones generales
+| corresponden a components.css.
+|
+| La paleta se obtiene del tema de empresa.
 |
 */
 
 .cheques-page {
-
     --cheque-detail-bg:
         var(--company-card, #20252e);
 
@@ -35,40 +38,31 @@
         var(--company-hover, rgba(128, 128, 128, .08));
 
     --cheque-detail-accent:
-        var(--company-button, #2563eb);
+        var(--company-button, #ffffff);
 
     --cheque-detail-danger: #ef6464;
-
     --cheque-detail-success: #22c55e;
-
 }
 
 /*
 |--------------------------------------------------------------------------
-| CONTENEDOR HORIZONTAL
+| TABLA — CONTENEDOR
 |--------------------------------------------------------------------------
 */
 
 .cheques-page .table-responsive:has(.cheques-detail-table) {
-
     position: relative;
 
     width: 100%;
-
     overflow-x: auto;
-
     overflow-y: hidden;
 
     border: 1px solid var(--cheque-detail-border);
-
     border-radius: 12px;
 
     scrollbar-width: thin;
-
     scrollbar-color:
-        var(--cheque-detail-border)
-        transparent;
-
+        var(--cheque-detail-border) transparent;
 }
 
 /*
@@ -78,35 +72,25 @@
 */
 
 .cheques-page .cheques-detail-table {
-
     width: max-content;
-
     min-width: 100%;
 
     margin: 0;
 
     border-collapse: separate;
-
     border-spacing: 0;
 
     font-size: 12px;
-
     line-height: 1.35;
 
     color: var(--cheque-detail-text);
-
     font-variant-numeric: tabular-nums;
 
     --bs-table-bg: transparent;
-
     --bs-table-color: var(--cheque-detail-text);
-
     --bs-table-border-color: var(--cheque-detail-border);
-
     --bs-table-hover-bg: transparent;
-
     --bs-table-hover-color: var(--cheque-detail-text);
-
 }
 
 /*
@@ -116,27 +100,21 @@
 */
 
 .cheques-page .cheques-detail-table thead th {
-
     position: relative;
 
     padding: 13px 12px;
 
     background: var(--cheque-detail-bg);
-
     color: var(--cheque-detail-muted);
 
     font-size: 11px;
-
     font-weight: 650;
-
     letter-spacing: .15px;
 
     white-space: nowrap;
-
     vertical-align: middle;
 
     border-bottom: 1px solid var(--cheque-detail-border);
-
 }
 
 /*
@@ -146,56 +124,40 @@
 */
 
 .cheques-page .cheques-detail-table tbody td {
-
     padding: 12px;
 
     background: var(--cheque-detail-bg);
-
     color: var(--cheque-detail-text);
 
     white-space: nowrap;
-
     vertical-align: middle;
 
     border-bottom: 1px solid var(--cheque-detail-border);
 
     transition: background .15s ease;
-
 }
 
 .cheques-page .cheques-detail-table tbody tr:last-child td {
-
     border-bottom: 0;
-
 }
 
 .cheques-page .cheques-detail-table tbody tr:hover td {
-
     background: var(--cheque-detail-hover);
-
 }
 
 /*
 |--------------------------------------------------------------------------
 | PRIMERA COLUMNA FIJA
 |--------------------------------------------------------------------------
-|
-| Conservamos visible el número de fila al
-| desplazarnos horizontalmente.
-|
 */
 
 .cheques-page .cheques-detail-table thead th:first-child,
 .cheques-page .cheques-detail-table tbody td:first-child {
-
     position: sticky;
-
     left: 0;
-
     z-index: 3;
 
     width: 46px;
-
     min-width: 46px;
 
     text-align: center;
@@ -203,19 +165,14 @@
     background: var(--cheque-detail-bg);
 
     border-right: 1px solid var(--cheque-detail-border);
-
 }
 
 .cheques-page .cheques-detail-table thead th:first-child {
-
     z-index: 5;
-
 }
 
 .cheques-page .cheques-detail-table tbody tr:hover td:first-child {
-
     background: var(--cheque-detail-hover);
-
 }
 
 /*
@@ -226,58 +183,41 @@
 
 .cheques-page .cheques-detail-table th:nth-child(2),
 .cheques-page .cheques-detail-table td:nth-child(2) {
-
     min-width: 82px;
-
 }
 
 .cheques-page .cheques-detail-table th:nth-child(3),
 .cheques-page .cheques-detail-table td:nth-child(3) {
-
     min-width: 115px;
-
     max-width: 190px;
 
     overflow-wrap: anywhere;
-
     white-space: normal;
-
 }
 
 .cheques-page .cheques-detail-table th:nth-child(4),
 .cheques-page .cheques-detail-table td:nth-child(4) {
-
     min-width: 105px;
-
 }
 
 .cheques-page .cheques-detail-table th:nth-child(5),
 .cheques-page .cheques-detail-table td:nth-child(5) {
-
     min-width: 115px;
-
     max-width: 190px;
 
     overflow-wrap: anywhere;
-
     white-space: normal;
-
 }
 
 .cheques-page .cheques-detail-table th:nth-child(6),
 .cheques-page .cheques-detail-table td:nth-child(6) {
-
     min-width: 105px;
-
 }
 
 /*
 |--------------------------------------------------------------------------
-| COLUMNAS DE PLAZOS
+| PLAZOS
 |--------------------------------------------------------------------------
-|
-| Calendario, clearing y plazo computado.
-|
 */
 
 .cheques-page .cheques-detail-table th:nth-child(7),
@@ -286,11 +226,8 @@
 .cheques-page .cheques-detail-table td:nth-child(7),
 .cheques-page .cheques-detail-table td:nth-child(8),
 .cheques-page .cheques-detail-table td:nth-child(9) {
-
     min-width: 88px;
-
     text-align: right;
-
 }
 
 /*
@@ -301,111 +238,58 @@
 
 .cheques-page .cheques-detail-table th:nth-child(10),
 .cheques-page .cheques-detail-table td:nth-child(10) {
-
     min-width: 80px;
-
     text-align: right;
-
 }
 
 /*
 |--------------------------------------------------------------------------
 | IMPORTES FINANCIEROS
 |--------------------------------------------------------------------------
-|
-| Nominal
-| Intereses
-| Impuesto cheque
-| IIBB
-| IVA
-| Descuento
-| Neto
-|
 */
 
 .cheques-page .cheques-detail-table th:nth-child(n+11):nth-child(-n+17),
 .cheques-page .cheques-detail-table td:nth-child(n+11):nth-child(-n+17) {
-
     min-width: 128px;
-
     text-align: right;
-
 }
-
-/*
-|--------------------------------------------------------------------------
-| NOMINAL
-|--------------------------------------------------------------------------
-*/
 
 .cheques-page .cheques-detail-table tbody td:nth-child(11) {
-
     font-weight: 650;
-
 }
-
-/*
-|--------------------------------------------------------------------------
-| INTERESES
-|--------------------------------------------------------------------------
-*/
 
 .cheques-page .cheques-detail-table tbody td:nth-child(12) {
-
     color: var(--cheque-detail-success);
-
 }
-
-/*
-|--------------------------------------------------------------------------
-| DESCUENTO
-|--------------------------------------------------------------------------
-*/
 
 .cheques-page .cheques-detail-table tbody td:nth-child(16) {
-
     color: var(--cheque-detail-danger);
-
 }
-
-/*
-|--------------------------------------------------------------------------
-| NETO INDIVIDUAL
-|--------------------------------------------------------------------------
-*/
 
 .cheques-page .cheques-detail-table tbody td:nth-child(17) {
-
     font-weight: 700;
-
     border-left: 1px solid var(--cheque-detail-border);
-
 }
 
 /*
 |--------------------------------------------------------------------------
-| ESTADO
+| ESTADOS
 |--------------------------------------------------------------------------
 */
 
 .cheques-page .cheques-detail-table th:nth-child(18),
 .cheques-page .cheques-detail-table td:nth-child(18) {
-
     min-width: 150px;
-
 }
 
-.cheques-page .cheques-detail-table tbody td:nth-child(18)
-.cheques-status {
-
+.cheques-page
+.cheques-detail-table
+tbody td:nth-child(18) .cheques-status {
     display: inline-flex;
-
     align-items: center;
 
     white-space: nowrap;
-
     font-size: 11px;
-
 }
 
 /*
@@ -415,68 +299,32 @@
 */
 
 .cheques-page .cheques-detail-table tfoot th {
-
     padding: 15px 12px;
 
     background: var(--cheque-detail-hover);
-
     color: var(--cheque-detail-text);
 
     border-top: 2px solid var(--cheque-detail-border);
 
     font-size: 12px;
-
     font-weight: 700;
 
     white-space: nowrap;
-
     font-variant-numeric: tabular-nums;
-
 }
 
 .cheques-page .cheques-detail-table tfoot th:nth-child(7) {
-
     border-left: 1px solid var(--cheque-detail-border);
-
+    color: var(--cheque-detail-danger);
 }
-
-/*
-|--------------------------------------------------------------------------
-| DESTAQUES DE TOTALES
-|--------------------------------------------------------------------------
-|
-| En el footer actual:
-|
-| 1: Etiqueta general (colspan=10)
-| 2: Nominal
-| 3: Intereses
-| 4: Impuesto cheque
-| 5: IIBB
-| 6: IVA
-| 7: Descuento
-| 8: Neto
-| 9: Estado
-|
-*/
 
 .cheques-page .cheques-detail-table tfoot th:nth-child(3) {
-
     color: var(--cheque-detail-success);
-
-}
-
-.cheques-page .cheques-detail-table tfoot th:nth-child(7) {
-
-    color: var(--cheque-detail-danger);
-
 }
 
 .cheques-page .cheques-detail-table tfoot th:nth-child(8) {
-
     font-size: 13px;
-
     font-weight: 750;
-
 }
 
 /*
@@ -486,15 +334,11 @@
 */
 
 .cheques-page .cheques-summary-grid {
-
     font-variant-numeric: tabular-nums;
-
 }
 
 .cheques-page .cheques-summary-grid strong {
-
     overflow-wrap: anywhere;
-
 }
 
 /*
@@ -503,88 +347,668 @@
 |--------------------------------------------------------------------------
 */
 
-.cheques-page .table-responsive:has(.cheques-detail-table)::-webkit-scrollbar {
-
+.cheques-page
+.table-responsive:has(.cheques-detail-table)::-webkit-scrollbar {
     height: 9px;
-
 }
 
-.cheques-page .table-responsive:has(.cheques-detail-table)::-webkit-scrollbar-track {
-
+.cheques-page
+.table-responsive:has(.cheques-detail-table)::-webkit-scrollbar-track {
     background: transparent;
-
 }
 
-.cheques-page .table-responsive:has(.cheques-detail-table)::-webkit-scrollbar-thumb {
-
+.cheques-page
+.table-responsive:has(.cheques-detail-table)::-webkit-scrollbar-thumb {
     background: var(--cheque-detail-border);
-
     border-radius: 20px;
-
 }
 
 /*
 |--------------------------------------------------------------------------
-| RESPONSIVE
+| VUE — CONTENEDOR DE ENTREGAS
+|--------------------------------------------------------------------------
+*/
+
+.cheques-page .cheque-deliveries {
+    width: 100%;
+    min-width: 0;
+
+    color: var(--company-text);
+}
+
+/*
+|--------------------------------------------------------------------------
+| TARJETA DE MEDIO DE PAGO
+|--------------------------------------------------------------------------
+*/
+
+.cheques-page .cheques-delivery-card {
+    position: relative;
+
+    width: 100%;
+    min-width: 0;
+
+    margin-bottom: 16px;
+    padding: 20px;
+
+    background: var(--company-card);
+
+    border: 1px solid var(--company-border);
+    border-radius: 12px;
+}
+
+/*
+|--------------------------------------------------------------------------
+| ENCABEZADO DE TARJETA
+|--------------------------------------------------------------------------
+*/
+
+.cheques-page .cheques-delivery-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.cheques-page .cheques-delivery-card-header strong {
+    color: var(--company-text);
+
+    font-size: 15px;
+    font-weight: 700;
+}
+
+/*
+|--------------------------------------------------------------------------
+| ELIMINAR MEDIO DE PAGO
+|--------------------------------------------------------------------------
+*/
+
+.cheques-page .cheques-delivery-remove {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    width: 36px;
+    height: 36px;
+    padding: 0;
+
+    background: transparent;
+    color: var(--company-text);
+
+    border: 1px solid var(--company-border);
+    border-radius: 9px;
+
+    cursor: pointer;
+
+    transition:
+        background .15s ease,
+        color .15s ease,
+        border-color .15s ease;
+}
+
+.cheques-page .cheques-delivery-remove i {
+    font-size: 15px;
+}
+
+.cheques-page .cheques-delivery-remove:hover {
+    color: var(--cheque-detail-danger);
+
+    background: rgba(220, 53, 69, .10);
+    border-color: rgba(220, 53, 69, .35);
+}
+
+.cheques-page .cheques-delivery-remove:focus-visible {
+    outline: 2px solid var(--company-text);
+    outline-offset: 3px;
+}
+
+/*
+|--------------------------------------------------------------------------
+| GRID DE ENTREGAS
+|--------------------------------------------------------------------------
+*/
+
+.cheques-page .cheques-delivery-grid {
+    display: grid;
+
+    grid-template-columns: repeat(
+        3,
+        minmax(0, 1fr)
+    );
+
+    column-gap: 20px;
+    row-gap: 18px;
+
+    align-items: start;
+
+    width: 100%;
+    min-width: 0;
+}
+
+.cheques-page .cheques-delivery-second-row,
+.cheques-page .cheques-delivery-extra-row {
+    margin-top: 18px;
+}
+
+/*
+|--------------------------------------------------------------------------
+| FORM GROUPS
+|--------------------------------------------------------------------------
+*/
+
+.cheques-page .cheques-delivery-grid .form-group {
+    display: flex;
+    flex-direction: column;
+
+    min-width: 0;
+    margin: 0;
+}
+
+.cheques-page .cheques-delivery-grid .form-group > label {
+    display: block;
+
+    min-height: 18px;
+    margin-bottom: 10px;
+
+    color: var(--company-muted);
+
+    font-size: 12px;
+    font-weight: 650;
+    line-height: 1.4;
+}
+
+/*
+|--------------------------------------------------------------------------
+| DIMENSIONES DE CONTROLES
+|--------------------------------------------------------------------------
+|
+| Los colores, fondos y bordes se heredan
+| de components.css.
+|
+*/
+
+.cheques-page .cheques-delivery-grid .form-control,
+.cheques-page .cheques-delivery-grid .form-select,
+.cheques-page .cheques-delivery-grid .dark-input {
+    width: 100%;
+    min-width: 0;
+
+    min-height: 46px;
+
+    font-size: 13px;
+    font-weight: 500;
+
+    font-variant-numeric: tabular-nums;
+}
+
+/*
+|--------------------------------------------------------------------------
+| EQUIVALENTE EN ARS
+|--------------------------------------------------------------------------
+*/
+
+.cheques-page .cheques-delivery-equivalent {
+    color: var(--cheque-detail-success);
+
+    font-size: 17px;
+    font-weight: 750;
+
+    letter-spacing: .1px;
+    font-variant-numeric: tabular-nums;
+}
+
+/*
+|--------------------------------------------------------------------------
+| SALDO ACTUAL DE LA CUENTA
+|--------------------------------------------------------------------------
+*/
+
+.cheques-page .cheques-delivery-balance {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+
+    gap: 5px;
+
+    margin: 9px 0 0;
+
+    color: var(--company-muted);
+
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.cheques-page .cheques-delivery-balance i {
+    margin-right: 2px;
+    font-size: 13px;
+}
+
+.cheques-page .cheques-delivery-balance strong {
+    color: var(--company-text);
+    font-weight: 700;
+}
+
+/*
+|--------------------------------------------------------------------------
+| BOTÓN COMPLETAR CON MÁXIMO
+|--------------------------------------------------------------------------
+*/
+
+.cheques-page .cheques-max-action {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+
+    min-width: 0;
+}
+
+.cheques-page .cheques-fill-maximum {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 8px;
+
+    width: auto;
+    max-width: 100%;
+
+    min-height: 46px;
+    padding: 9px 15px;
+
+    border-radius: 9px;
+
+    font-size: 12px;
+    font-weight: 650;
+    line-height: 1.3;
+
+    white-space: normal;
+    text-align: center;
+}
+
+.cheques-page .cheques-fill-maximum i {
+    flex-shrink: 0;
+    font-size: 14px;
+}
+
+.cheques-page .cheques-fill-maximum:disabled {
+    opacity: .45;
+    cursor: not-allowed;
+}
+
+.cheques-page .cheques-max-action .cheques-note {
+    margin-top: 8px;
+
+    font-size: 12px;
+    line-height: 1.5;
+
+    overflow-wrap: anywhere;
+}
+
+.cheques-page .cheques-max-action .cheques-note strong {
+    color: var(--company-text);
+    font-weight: 700;
+}
+
+/*
+|--------------------------------------------------------------------------
+| BUSCADOR DE BANCOS
+|--------------------------------------------------------------------------
+|
+| El componente es personalizado.
+|
+| A diferencia de los selects nativos, necesita
+| un fondo opaco en el menú desplegable.
+|
+*/
+
+.cheques-page .cheque-deliveries .bank-search-select {
+    position: relative;
+
+    width: 100%;
+    min-width: 0;
+}
+
+/*
+|--------------------------------------------------------------------------
+| CAMPO DE BÚSQUEDA
+|--------------------------------------------------------------------------
+|
+| Se utiliza .dark-input, cuyo estilo general
+| está definido en components.css.
+|
+*/
+
+.cheques-page .cheque-deliveries
+.bank-search-select .searchable-select-input {
+    width: 100%;
+    min-height: 46px;
+
+    font-size: 13px;
+}
+
+/*
+|--------------------------------------------------------------------------
+| MENÚ DESPLEGABLE
+|--------------------------------------------------------------------------
+*/
+
+.cheques-page .cheque-deliveries
+.bank-search-select .searchable-select-options {
+    position: absolute;
+
+    top: calc(100% + 5px);
+    left: 0;
+    right: 0;
+
+    z-index: 100;
+
+    max-height: 240px;
+    overflow-y: auto;
+
+    padding: 6px;
+
+    /*
+     * Usamos un fondo opaco.
+     * --company-card puede ser semitransparente.
+     */
+
+    background-color: var(--company-bg);
+
+    border: 1px solid var(--company-border);
+    border-radius: 10px;
+
+    box-shadow: 0 12px 30px rgba(0, 0, 0, .25);
+}
+
+/*
+|--------------------------------------------------------------------------
+| OPCIONES DEL BUSCADOR
+|--------------------------------------------------------------------------
+*/
+
+.cheques-page .cheque-deliveries
+.bank-search-select .searchable-select-option {
+    display: block;
+
+    width: 100%;
+    margin: 0;
+    padding: 10px 12px;
+
+    background: transparent;
+    color: var(--company-text);
+
+    border: 0;
+    border-radius: 7px;
+
+    font-size: 13px;
+    font-weight: 500;
+
+    text-align: left;
+    cursor: pointer;
+}
+
+.cheques-page .cheque-deliveries
+.bank-search-select .searchable-select-option:hover,
+.cheques-page .cheque-deliveries
+.bank-search-select .searchable-select-option:focus-visible {
+    background: var(--company-hover);
+    color: var(--company-text);
+}
+
+/*
+|--------------------------------------------------------------------------
+| ALERTA DE SALDO INSUFICIENTE
+|--------------------------------------------------------------------------
+|
+| Utiliza las clases globales de alerta.
+| Solo definimos la ubicación en la tarjeta.
+|
+*/
+
+.cheques-page .cheques-balance-alert {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    width: 100%;
+    margin-top: 18px;
+
+    padding: 11px 14px;
+    border-radius: 10px;
+
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.5;
+}
+
+/*
+|--------------------------------------------------------------------------
+| TEMA OSCURO — ALERTA
+|--------------------------------------------------------------------------
+*/
+
+body[data-theme="dark"]
+.cheques-page .cheques-balance-alert {
+    background: rgba(164, 73, 73, .12);
+    color: #d99a9a;
+
+    border: 1px solid rgba(164, 73, 73, .26);
+}
+
+/*
+|--------------------------------------------------------------------------
+| TEMA CLARO — ALERTA
+|--------------------------------------------------------------------------
+*/
+
+body[data-theme="light"]
+.cheques-page .cheques-balance-alert {
+    background: rgba(140, 55, 55, .09);
+    color: #7d3232;
+
+    border: 1px solid rgba(140, 55, 55, .22);
+}
+
+.cheques-page .cheques-balance-alert i {
+    flex-shrink: 0;
+
+    color: currentColor;
+    font-size: 15px;
+}
+
+/*
+|--------------------------------------------------------------------------
+| AGREGAR OTRO MEDIO
+|--------------------------------------------------------------------------
+*/
+
+.cheques-page .cheques-add-delivery {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 9px;
+
+    min-height: 42px;
+    padding: 9px 15px;
+
+    font-size: 12px;
+    font-weight: 650;
+}
+
+.cheques-page .cheques-add-delivery i {
+    font-size: 15px;
+}
+
+.cheques-page .cheques-add-delivery:disabled {
+    opacity: .45;
+    cursor: not-allowed;
+}
+
+/*
+|--------------------------------------------------------------------------
+| ACCESIBILIDAD
+|--------------------------------------------------------------------------
+*/
+
+.cheques-page .cheque-deliveries button:focus-visible,
+.cheques-page .cheque-deliveries select:focus-visible,
+.cheques-page .cheque-deliveries input:focus-visible {
+    outline-offset: 2px;
+}
+
+/*
+|--------------------------------------------------------------------------
+| RESPONSIVE — TABLET
+|--------------------------------------------------------------------------
+*/
+
+@media (max-width: 1199px) {
+
+    .cheques-page .cheques-delivery-grid {
+        grid-template-columns: repeat(
+            2,
+            minmax(0, 1fr)
+        );
+
+        column-gap: 16px;
+        row-gap: 16px;
+    }
+
+    .cheques-page .cheques-delivery-card {
+        padding: 18px;
+    }
+}
+
+/*
+|--------------------------------------------------------------------------
+| RESPONSIVE — TABLET PEQUEÑA
 |--------------------------------------------------------------------------
 */
 
 @media (max-width: 991px) {
 
     .cheques-page .cheques-detail-table {
-
         font-size: 12px;
-
     }
 
     .cheques-page .cheques-detail-table thead th,
     .cheques-page .cheques-detail-table tbody td {
-
         padding: 11px 10px;
-
     }
 
+    .cheques-page .cheques-delivery-grid {
+        column-gap: 14px;
+        row-gap: 14px;
+    }
 }
+
+/*
+|--------------------------------------------------------------------------
+| RESPONSIVE — MÓVIL
+|--------------------------------------------------------------------------
+*/
 
 @media (max-width: 767px) {
 
+    /*
+     * Tabla financiera.
+     */
+
     .cheques-page .cheques-detail-table {
-
         font-size: 11px;
-
     }
 
     .cheques-page .cheques-detail-table thead th {
-
         font-size: 10px;
-
         padding: 10px 9px;
-
     }
 
     .cheques-page .cheques-detail-table tbody td {
-
         padding: 11px 9px;
-
     }
 
     .cheques-page .cheques-detail-table tfoot th {
-
         padding: 12px 9px;
-
         font-size: 11px;
-
     }
 
     .cheques-page .cheques-detail-table thead th:first-child,
     .cheques-page .cheques-detail-table tbody td:first-child {
-
         width: 38px;
-
         min-width: 38px;
-
     }
 
+    /*
+     * Medios de pago.
+     */
+
+    .cheques-page .cheques-delivery-card {
+        padding: 15px;
+        border-radius: 10px;
+    }
+
+    .cheques-page .cheques-delivery-card-header {
+        margin-bottom: 17px;
+    }
+
+    .cheques-page .cheques-delivery-card-header strong {
+        font-size: 14px;
+    }
+
+    .cheques-page .cheques-delivery-grid {
+        grid-template-columns: minmax(0, 1fr);
+        row-gap: 15px;
+    }
+
+    .cheques-page .cheques-delivery-second-row,
+    .cheques-page .cheques-delivery-extra-row {
+        margin-top: 15px;
+    }
+
+    .cheques-page .cheques-max-action {
+        align-items: stretch;
+    }
+
+    .cheques-page .cheques-fill-maximum,
+    .cheques-page .cheques-add-delivery {
+        width: 100%;
+    }
+
+    .cheques-page .cheques-balance-alert {
+        padding: 11px 12px;
+    }
+}
+
+/*
+|--------------------------------------------------------------------------
+| TELÉFONOS PEQUEÑOS
+|--------------------------------------------------------------------------
+*/
+
+@media (max-width: 420px) {
+
+    .cheques-page .cheques-delivery-card {
+        padding: 12px;
+    }
+
+    .cheques-page .cheques-delivery-grid .form-control,
+    .cheques-page .cheques-delivery-grid .form-select,
+    .cheques-page .cheques-delivery-grid .dark-input {
+        font-size: 12px;
+    }
+
+    .cheques-page .cheques-delivery-equivalent {
+        font-size: 15px;
+    }
+
+    .cheques-page .cheques-fill-maximum {
+        font-size: 11px;
+    }
 }
 
 /*
@@ -595,10 +1019,316 @@
 
 @media (prefers-reduced-motion: reduce) {
 
-    .cheques-page .cheques-detail-table tbody td {
-
+    .cheques-page .cheques-detail-table tbody td,
+    .cheques-page .cheques-delivery-remove {
         transition: none;
+    }
+}
 
+
+
+/*
+|--------------------------------------------------------------------------
+| AERIA FINANCE
+| TABLA DE FONDOS Y VALORES ENTREGADOS
+|--------------------------------------------------------------------------
+|
+| Detalle histórico de una liquidación confirmada.
+|
+| Utiliza exclusivamente las variables corporativas
+| definidas en layouts/app.blade.php.
+|
+*/
+
+/* Contenedor con desplazamiento horizontal */
+
+.cheques-page
+.table-responsive:has(.cheques-deliveries-table) {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+
+    border: 1px solid var(--company-border);
+    border-radius: 12px;
+
+    scrollbar-width: thin;
+    scrollbar-color: var(--company-border) transparent;
+}
+
+/* Tabla principal */
+
+.cheques-page .cheques-deliveries-table {
+    width: max-content;
+    min-width: 100%;
+    margin: 0;
+
+    border-collapse: separate;
+    border-spacing: 0;
+
+    font-size: 12px;
+    line-height: 1.45;
+    font-variant-numeric: tabular-nums;
+
+    color: var(--company-text);
+
+    --bs-table-bg: transparent;
+    --bs-table-color: var(--company-text);
+    --bs-table-border-color: var(--company-border);
+    --bs-table-hover-bg: transparent;
+    --bs-table-hover-color: var(--company-text);
+}
+
+/* Encabezados */
+
+.cheques-page .cheques-deliveries-table thead th {
+    padding: 13px 14px;
+
+    background: var(--company-card);
+    color: var(--company-muted);
+
+    font-size: 11px;
+    font-weight: 650;
+    white-space: nowrap;
+
+    vertical-align: middle;
+    border-bottom: 1px solid var(--company-border);
+}
+
+/* Celdas */
+
+.cheques-page .cheques-deliveries-table tbody td {
+    padding: 14px;
+
+    background: var(--company-card);
+    color: var(--company-text);
+
+    vertical-align: middle;
+    white-space: nowrap;
+
+    border-bottom: 1px solid var(--company-border);
+
+    transition: background .15s ease;
+}
+
+/* Hover */
+
+.cheques-page .cheques-deliveries-table tbody tr:hover td {
+    background: var(--company-hover);
+}
+
+/* Última fila */
+
+.cheques-page
+.cheques-deliveries-table
+tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+/* Primera columna fija */
+
+.cheques-page .cheques-deliveries-table thead th:first-child,
+.cheques-page .cheques-deliveries-table tbody td:first-child {
+    position: sticky;
+    left: 0;
+
+    z-index: 3;
+
+    width: 45px;
+    min-width: 45px;
+
+    text-align: center;
+
+    background: var(--company-bg);
+    border-right: 1px solid var(--company-border);
+}
+
+.cheques-page
+.cheques-deliveries-table
+thead th:first-child {
+    z-index: 5;
+}
+
+/* Medio de pago */
+
+.cheques-page .cheques-deliveries-table th:nth-child(2),
+.cheques-page .cheques-deliveries-table td:nth-child(2) {
+    min-width: 175px;
+}
+
+/* Información complementaria de cheques entregados */
+
+.cheques-page
+.cheques-deliveries-table
+td:nth-child(2) .cheques-note {
+    max-width: 280px;
+
+    color: var(--company-muted);
+    font-size: 11px;
+
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+
+/* Cuenta de origen */
+
+.cheques-page .cheques-deliveries-table th:nth-child(3),
+.cheques-page .cheques-deliveries-table td:nth-child(3) {
+    min-width: 160px;
+}
+
+/* Banco de destino o referencia */
+
+.cheques-page .cheques-deliveries-table th:nth-child(4),
+.cheques-page .cheques-deliveries-table td:nth-child(4) {
+    min-width: 160px;
+    max-width: 260px;
+
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+
+/* Moneda */
+
+.cheques-page .cheques-deliveries-table th:nth-child(5),
+.cheques-page .cheques-deliveries-table td:nth-child(5) {
+    min-width: 75px;
+    font-weight: 650;
+}
+
+/* Importes y cotizaciones */
+
+.cheques-page
+.cheques-deliveries-table
+th:nth-child(n+6):nth-child(-n+10),
+.cheques-page
+.cheques-deliveries-table
+td:nth-child(n+6):nth-child(-n+10) {
+    min-width: 140px;
+    text-align: right;
+    white-space: nowrap;
+}
+
+/* Entregado al cliente en ARS */
+
+.cheques-page
+.cheques-deliveries-table
+tbody td:nth-child(8) {
+    font-weight: 700;
+    border-left: 1px solid var(--company-border);
+}
+
+/* Impuesto de transferencia */
+
+.cheques-page
+.cheques-deliveries-table
+tbody td:nth-child(9) {
+    color: var(--company-text);
+}
+
+/*
+|--------------------------------------------------------------------------
+| TOTALES
+|--------------------------------------------------------------------------
+*/
+
+.cheques-page .cheques-deliveries-table tfoot th {
+    padding: 15px 14px;
+
+    background: var(--company-hover);
+    color: var(--company-text);
+
+    border-top: 2px solid var(--company-border);
+
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+
+    font-variant-numeric: tabular-nums;
+}
+
+/* Total entregado en ARS */
+
+.cheques-page
+.cheques-deliveries-table
+tfoot th:nth-child(2) {
+    font-size: 14px;
+    font-weight: 750;
+}
+
+/*
+|--------------------------------------------------------------------------
+| SCROLLBAR
+|--------------------------------------------------------------------------
+*/
+
+.cheques-page
+.table-responsive:has(.cheques-deliveries-table)::-webkit-scrollbar {
+    height: 9px;
+}
+
+.cheques-page
+.table-responsive:has(.cheques-deliveries-table)::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.cheques-page
+.table-responsive:has(.cheques-deliveries-table)::-webkit-scrollbar-thumb {
+    background: var(--company-border);
+    border-radius: 20px;
+}
+
+/*
+|--------------------------------------------------------------------------
+| RESPONSIVE
+|--------------------------------------------------------------------------
+*/
+
+@media (max-width: 991px) {
+
+    .cheques-page .cheques-deliveries-table {
+        font-size: 12px;
     }
 
+    .cheques-page .cheques-deliveries-table thead th,
+    .cheques-page .cheques-deliveries-table tbody td {
+        padding: 11px 10px;
+    }
+}
+
+@media (max-width: 767px) {
+
+    .cheques-page .cheques-deliveries-table {
+        font-size: 11px;
+    }
+
+    .cheques-page .cheques-deliveries-table thead th {
+        padding: 10px 9px;
+        font-size: 10px;
+    }
+
+    .cheques-page .cheques-deliveries-table tbody td {
+        padding: 11px 9px;
+    }
+
+    .cheques-page .cheques-deliveries-table tfoot th {
+        padding: 12px 9px;
+        font-size: 11px;
+    }
+
+    .cheques-page
+    .cheques-deliveries-table
+    thead th:first-child,
+    .cheques-page
+    .cheques-deliveries-table
+    tbody td:first-child {
+        min-width: 38px;
+        width: 38px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .cheques-page .cheques-deliveries-table tbody td {
+        transition: none;
+    }
 }

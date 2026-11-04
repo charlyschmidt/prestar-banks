@@ -210,6 +210,85 @@ button {
 }
 
 
+/*
+|--------------------------------------------------------------------------
+| AERIA — CONTROLES DE FORMULARIO
+|--------------------------------------------------------------------------
+|
+| Estilo global para formularios Bootstrap y propios.
+|
+| Los controles heredan automáticamente el tema
+| activo de la empresa.
+|
+| No se utilizan colores fijos para fondos o textos.
+|
+*/
+
+/* Inputs y selectores */
+
+.page-container .form-control,
+.page-container .form-select,
+.page-container .dark-input {
+    background-color: var(--company-hover);
+    color: var(--company-text);
+
+    border: 1px solid var(--company-border);
+    border-radius: 12px;
+
+    font-family: inherit;
+    font-size: 13px;
+
+    box-shadow: none;
+}
+
+/* Foco */
+
+.page-container .form-control:focus,
+.page-container .form-select:focus,
+.page-container .dark-input:focus {
+    background-color: var(--company-hover);
+    color: var(--company-text);
+
+    border-color: var(--company-text);
+
+    outline: none;
+    box-shadow: none;
+}
+
+/* Opciones de selectores nativos */
+
+.page-container .form-select option,
+.page-container .dark-input option {
+    background-color: var(--company-bg);
+    color: var(--company-text);
+}
+
+/* Placeholder */
+
+.page-container .form-control::placeholder,
+.page-container .dark-input::placeholder {
+    color: var(--company-muted);
+    opacity: 1;
+}
+
+/* Campos de solo lectura */
+
+.page-container input[readonly] {
+    opacity: 1;
+}
+
+/* Colores nativos del navegador */
+
+body[data-theme="dark"] {
+    color-scheme: dark;
+}
+
+body[data-theme="light"] {
+    color-scheme: light;
+}
+
+
+
 /* ==========================
    SALDO DE CUENTA
 ========================== */
@@ -598,7 +677,7 @@ body[data-theme="light"] .alert-error {
    SALDOS INICIALES
 ========================== */
 
-.account-initial-balance-item .input-group > .dark-input.form-control {
+.account-initial-balance-item .input-group>.dark-input.form-control {
     flex: 1 1 auto;
     width: 1%;
     min-width: 0;

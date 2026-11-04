@@ -165,12 +165,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     event.account?.id;
 
 
+
                 const accountBalanceId =
-                    event.accountBalance?.id
+                    event.account_balance?.id
                     ??
-                    event.account_balance_id
+                    event.accountBalanceId
                     ??
-                    event.transaction?.account_balance_id;
+                    event.transaction?.account_balance_id
+                    ??
+                    null;
+
 
 
                 const currency =
@@ -736,14 +740,16 @@ function normalizeRealtimeEvent(event) {
         '';
 
 
+
     const accountBalanceId =
-        event.accountBalance?.id
+        event.account_balance?.id
         ??
-        event.account_balance_id
+        event.accountBalanceId
         ??
         event.transaction?.account_balance_id
         ??
         null;
+
 
 
     return {
@@ -1099,36 +1105,38 @@ function addMovementToTable(event, animate = true) {
 
         <div class="movement-user">
 
-        ${movement.source === 'api'
+        
+        ${movement.source === 'cheque_liquidation'
             ? `
-                <i class="bi bi-plug"></i>
-
-                <span>
-                    ${escapeHtml(
-                movement.api_key?.name ?? 'Integración API'
-            )}
-                </span>
-            `
-            : movement.source === 'import'
-                ? `
-                    <i class="bi bi-file-earmark-arrow-up"></i>
-
-                    <span>
-                        Importación
-                    </span>
+            <i class="bi bi-bank2"></i>
+            <span>Liquidación de cheques</span>
                 `
-                : `
-                    <i class="bi bi-person-circle"></i>
-
+            : movement.source === 'api'
+                ? `
+                    <i class="bi bi-plug"></i>
                     <span>
                         ${escapeHtml(
-                    movement.user?.email
-                        ? movement.user.email.split('@')[0]
-                        : 'Sin registro'
+                    movement.api_key?.name ?? 'Integración API'
                 )}
                     </span>
                 `
+                : movement.source === 'import'
+                    ? `
+                        <i class="bi bi-file-earmark-arrow-up"></i>
+                        <span>Importación</span>
+                    `
+                    : `
+                        <i class="bi bi-person-circle"></i>
+                        <span>
+                            ${escapeHtml(
+                        movement.user?.email
+                            ? movement.user.email.split('@')[0]
+                            : 'Sin registro'
+                    )}
+                        </span>
+                    `
         }
+
 
             </div>
 

@@ -3,6 +3,7 @@
 namespace App\Exports;
 
 use App\Models\ChequeLiquidation;
+use Maatwebsite\Excel\Concerns\Export;
 use Maatwebsite\Excel\Concerns\FromArray;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithColumnFormatting;
@@ -16,7 +17,6 @@ use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\Cell\DefaultValueBinder;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
-use Maatwebsite\Excel\Concerns\Export;
 
 class ChequeLiquidationExport implements Export, WithMultipleSheets
 {
@@ -24,12 +24,29 @@ class ChequeLiquidationExport implements Export, WithMultipleSheets
 
     public function __construct(ChequeLiquidation $liquidation)
     {
-        $this->liquidation = $liquidation->loadMissing('cheques');
+        /*
+        |--------------------------------------------------------------------------
+        | Cargar información histórica
+        |--------------------------------------------------------------------------
+        |
+        | Conservamos los importes, cotizaciones y
+        | movimientos registrados en cada operación.
+        |
+        | No utilizamos cotizaciones actuales.
+        |
+        */
+
+        $this->liquidation = $liquidation->loadMissing([
+            'cheques',
+            'deliveries.account',
+            'deliveries.deliveredCheque',
+            'deliveries.transaction',
+        ]);
     }
 
     /*
     |--------------------------------------------------------------------------
-    | HOJAS DEL EXCEL
+    | Generar las tres hojas
     |--------------------------------------------------------------------------
     */
 
@@ -42,13 +59,46 @@ class ChequeLiquidationExport implements Export, WithMultipleSheets
             'held' => 'Retenida',
             'confirmed' => 'Confirmada',
             'in_portfolio' => 'En cartera',
+            'delivered' => 'Entregado a tercero',
             'deposited' => 'Depositado',
             'accredited' => 'Acreditado',
             'rejected' => 'Rechazado',
         ];
 
         $statusName = static fn($status) =>
-            $statusLabels[$status] ?? ucfirst((string) $status);
+        $statusLabels[$status]
+            ?? ucfirst((string) $status);
+
+        $numeric = static fn($value) =>
+        $value === null ? null : (float) $value;
+
+        $percentage = static fn($value) =>
+        $value === null ? null : (float) $value / 100;
+
+        /*
+        |--------------------------------------------------------------------------
+        | Preparar entregas
+        |--------------------------------------------------------------------------
+        */
+
+        $deliveries = $liquidation->deliveries
+            ->sortBy('id')
+            ->values();
+
+        $hasDeliveries = $deliveries->isNotEmpty();
+
+        $totalDeliveredCents = $deliveries->sum(
+            fn($delivery) =>
+            (int) round(
+                (float) $delivery->amount_ars * 100
+            )
+        );
+
+        $netCents = (int) round(
+            (float) $liquidation->net_amount * 100
+        );
+
+        $pendingCents = $netCents - $totalDeliveredCents;
 
         /*
         |--------------------------------------------------------------------------
@@ -57,35 +107,106 @@ class ChequeLiquidationExport implements Export, WithMultipleSheets
         */
 
         $summaryRows = [
-            ['Liquidación', '#' . $liquidation->id],
-            ['Cliente', $liquidation->client_name],
+            [
+                'Liquidación',
+                '#' . $liquidation->id,
+            ],
+            [
+                'Cliente',
+                $liquidation->client_name,
+            ],
             [
                 'Fecha de operación',
                 $liquidation->operation_date?->format('d/m/Y'),
             ],
-            ['Estado', $statusName($liquidation->status)],
-            ['Cantidad de cheques', $liquidation->cheques->count()],
-            ['Moneda', 'ARS'],
+            [
+                'Estado',
+                $statusName($liquidation->status),
+            ],
+            [
+                'Fecha de confirmación',
+                $liquidation->confirmed_at?->format('d/m/Y H:i'),
+            ],
+            [
+                'Cantidad de cheques recibidos',
+                $liquidation->cheques->count(),
+            ],
+            [
+                'Moneda de liquidación',
+                'ARS',
+            ],
             ['', null],
+
             ['RESUMEN FINANCIERO', null],
-            ['Nominal total', (float) $liquidation->nominal_amount],
-            ['Intereses', (float) $liquidation->interest_amount],
-            ['Impuesto al cheque', (float) $liquidation->cheque_tax_amount],
-            ['Ingresos Brutos', (float) $liquidation->gross_income_amount],
-            ['IVA', (float) $liquidation->vat_amount],
-            ['Descuento total', (float) $liquidation->total_discount],
-            ['Neto a entregar', (float) $liquidation->net_amount],
+
+            [
+                'Nominal total',
+                $numeric($liquidation->nominal_amount),
+            ],
+            [
+                'Intereses',
+                $numeric($liquidation->interest_amount),
+            ],
+            [
+                'Impuesto al cheque',
+                $numeric($liquidation->cheque_tax_amount),
+            ],
+            [
+                'Ingresos Brutos',
+                $numeric($liquidation->gross_income_amount),
+            ],
+            [
+                'IVA',
+                $numeric($liquidation->vat_amount),
+            ],
+            [
+                'Descuento total',
+                $numeric($liquidation->total_discount),
+            ],
+            [
+                'Neto a entregar',
+                $numeric($liquidation->net_amount),
+            ],
+
+            ['', null],
+
+            ['DISTRIBUCIÓN DE MEDIOS DE PAGO', null],
+
+            [
+                'Cantidad de medios utilizados',
+                $hasDeliveries
+                    ? $deliveries->count()
+                    : null,
+            ],
+            [
+                'Total distribuido ARS',
+                $hasDeliveries
+                    ? $totalDeliveredCents / 100
+                    : null,
+            ],
+            [
+                'Diferencia pendiente ARS',
+                $hasDeliveries
+                    ? $pendingCents / 100
+                    : null,
+            ],
+            [
+                'Detalle de entregas',
+                $hasDeliveries
+                    ? 'Consultar hoja Medios de pago'
+                    : 'Sin desglose de entregas registrado',
+            ],
         ];
 
         $summarySheet = new class($summaryRows)
-            extends DefaultValueBinder
-            implements
-                FromArray,
-                WithTitle,
-                WithHeadings,
-                WithStyles,
-                WithColumnFormatting,
-                WithCustomValueBinder
+        extends DefaultValueBinder
+        implements
+            FromArray,
+            WithTitle,
+            WithHeadings,
+            WithStyles,
+            WithColumnFormatting,
+            WithCustomValueBinder
         {
             public function __construct(
                 private array $rows
@@ -132,16 +253,25 @@ class ChequeLiquidationExport implements Export, WithMultipleSheets
                 ];
             }
 
-            public function styles(Worksheet $sheet): array
-            {
+            public function styles(
+                Worksheet $sheet
+            ): array {
                 $sheet->getColumnDimension('A')
-                    ->setWidth(34);
+                    ->setWidth(38);
 
                 $sheet->getColumnDimension('B')
-                    ->setWidth(42);
+                    ->setWidth(48);
 
                 $sheet->getRowDimension(1)
                     ->setRowHeight(30);
+
+                /*
+                 * Encabezado principal.
+                 */
+
+                $sheet->getStyle('A1:B1')
+                    ->getFont()
+                    ->setBold(true);
 
                 $sheet->getStyle('A1:B1')
                     ->getFont()
@@ -154,23 +284,74 @@ class ChequeLiquidationExport implements Export, WithMultipleSheets
                     ->getStartColor()
                     ->setRGB('172638');
 
-                $sheet->getStyle('A1:B1')
-                    ->getFont()
-                    ->setBold(true);
+                /*
+                 * Secciones y totales.
+                 *
+                 * Buscamos las filas por su nombre
+                 * para evitar índices rígidos.
+                 */
 
-                $sheet->getStyle('A9:B9')
-                    ->getFont()
-                    ->setBold(true);
+                foreach ($this->rows as $index => $row) {
+                    $excelRow = $index + 2;
 
-                $sheet->getStyle('A15:B16')
-                    ->getFont()
-                    ->setBold(true);
+                    $label = $row[0] ?? '';
 
-                $sheet->getStyle('A16:B16')
-                    ->getFill()
-                    ->setFillType(Fill::FILL_SOLID)
-                    ->getStartColor()
-                    ->setRGB('DCFCE7');
+                    if (in_array(
+                        $label,
+                        [
+                            'RESUMEN FINANCIERO',
+                            'DISTRIBUCIÓN DE MEDIOS DE PAGO',
+                        ],
+                        true
+                    )) {
+                        $range = "A{$excelRow}:B{$excelRow}";
+
+                        $sheet->getStyle($range)
+                            ->getFont()
+                            ->setBold(true);
+
+                        $sheet->getStyle($range)
+                            ->getFill()
+                            ->setFillType(Fill::FILL_SOLID)
+                            ->getStartColor()
+                            ->setRGB('E2E8F0');
+                    }
+
+                    if (in_array(
+                        $label,
+                        [
+                            'Neto a entregar',
+                            'Total distribuido ARS',
+                        ],
+                        true
+                    )) {
+                        $range = "A{$excelRow}:B{$excelRow}";
+
+                        $sheet->getStyle($range)
+                            ->getFont()
+                            ->setBold(true);
+
+                        $sheet->getStyle($range)
+                            ->getFill()
+                            ->setFillType(Fill::FILL_SOLID)
+                            ->getStartColor()
+                            ->setRGB('DCFCE7');
+                    }
+
+                    if ($label === 'Diferencia pendiente ARS') {
+                        $range = "A{$excelRow}:B{$excelRow}";
+
+                        $sheet->getStyle($range)
+                            ->getFont()
+                            ->setBold(true);
+
+                        $sheet->getStyle($range)
+                            ->getFill()
+                            ->setFillType(Fill::FILL_SOLID)
+                            ->getStartColor()
+                            ->setRGB('FEF3C7');
+                    }
+                }
 
                 return [];
             }
@@ -178,32 +359,30 @@ class ChequeLiquidationExport implements Export, WithMultipleSheets
 
         /*
         |--------------------------------------------------------------------------
-        | HOJA 2: DETALLE INDIVIDUAL
+        | HOJA 2: DETALLE DE CHEQUES RECIBIDOS
         |--------------------------------------------------------------------------
+        |
+        | Conservamos los campos individuales y
+        | sus cálculos financieros originales.
+        |
         */
 
         $detailRows = [];
 
         foreach ($liquidation->cheques as $index => $cheque) {
-
-            /*
-             * Los valores NULL de cheques antiguos
-             * se conservan como celdas vacías.
-             */
-
-            $numeric = static fn($value) =>
-                $value === null ? null : (float) $value;
-
-            $percentage = static fn($value) =>
-                $value === null ? null : (float) $value / 100;
-
             $detailRows[] = [
                 $index + 1,
-                $cheque->format === 'echeq' ? 'Echeq' : 'Físico',
+
+                $cheque->format === 'echeq'
+                    ? 'Echeq'
+                    : 'Físico',
+
                 $cheque->bank ?? '',
                 $cheque->number ?? '',
                 $cheque->issuer ?? '',
+
                 $cheque->due_date?->format('d/m/Y') ?? '',
+
                 $statusName($cheque->status),
 
                 $cheque->calendar_days,
@@ -226,14 +405,12 @@ class ChequeLiquidationExport implements Export, WithMultipleSheets
         }
 
         /*
-         * Los totales provienen de la cabecera
-         * consolidada de la liquidación.
+         * Totales históricos de la cabecera.
          */
 
         $detailRows[] = array_fill(0, 21, null);
 
         $totalRow = array_fill(0, 21, null);
-
         $totalRow[0] = 'TOTALES';
 
         $fields = [
@@ -253,15 +430,15 @@ class ChequeLiquidationExport implements Export, WithMultipleSheets
         $detailRows[] = $totalRow;
 
         $detailSheet = new class($detailRows)
-            extends DefaultValueBinder
-            implements
-                FromArray,
-                WithTitle,
-                WithHeadings,
-                WithStyles,
-                WithColumnFormatting,
-                WithCustomValueBinder,
-                ShouldAutoSize
+        extends DefaultValueBinder
+        implements
+            FromArray,
+            WithTitle,
+            WithHeadings,
+            WithStyles,
+            WithColumnFormatting,
+            WithCustomValueBinder,
+            ShouldAutoSize
         {
             public function __construct(
                 private array $rows
@@ -338,8 +515,9 @@ class ChequeLiquidationExport implements Export, WithMultipleSheets
                 ];
             }
 
-            public function styles(Worksheet $sheet): array
-            {
+            public function styles(
+                Worksheet $sheet
+            ): array {
                 $sheet->getRowDimension(1)
                     ->setRowHeight(30);
 
@@ -382,9 +560,315 @@ class ChequeLiquidationExport implements Export, WithMultipleSheets
             }
         };
 
+        /*
+        |--------------------------------------------------------------------------
+        | HOJA 3: MEDIOS DE PAGO
+        |--------------------------------------------------------------------------
+        |
+        | Cada fila representa una entrega real
+        | o una entrega guardada pendiente.
+        |
+        | Se conserva:
+        |
+        | - Medio utilizado.
+        | - Cuenta de origen.
+        | - Banco de destino.
+        | - Moneda e importe original.
+        | - Cotización histórica.
+        | - Equivalente ARS.
+        | - Impuesto de transferencia.
+        | - Débito monetario.
+        | - Datos del cheque de terceros.
+        | - Referencia a Transaction.
+        |
+        */
+
+        $deliveryRows = [];
+
+        foreach ($deliveries as $index => $delivery) {
+            $transaction = $delivery->transaction;
+            $cheque = $delivery->deliveredCheque;
+
+            $typeLabel = match ($delivery->type) {
+                'cash' => 'Efectivo',
+                'transfer' => 'Transferencia bancaria',
+                'third_party_cheque' => 'Cheque de terceros',
+                default => $delivery->type,
+            };
+
+            $isMonetary = in_array(
+                $delivery->type,
+                ['cash', 'transfer'],
+                true
+            );
+
+            /*
+             * El impuesto registrado está expresado
+             * en la moneda del movimiento.
+             *
+             * Si no existe movimiento, no inventamos
+             * un impuesto histórico.
+             */
+
+            $transferTax = $transaction
+                ? $numeric($transaction->transfer_tax_amount)
+                : null;
+
+            $debitAmount = $transaction
+                ? (float) $transaction->amount
+                + (float) (
+                    $transaction->transfer_tax_amount ?? 0
+                )
+                : null;
+
+            $deliveryRows[] = [
+                $index + 1,
+
+                $typeLabel,
+
+                $isMonetary
+                    ? ($delivery->account?->name ?? '')
+                    : 'Cheque de cartera',
+
+                $delivery->isTransfer()
+                    ? ($delivery->notes ?? '')
+                    : '',
+
+                $delivery->currency,
+
+                $numeric($delivery->amount),
+
+                $delivery->currency === 'ARS'
+                    ? null
+                    : $numeric($delivery->exchange_rate),
+
+                $numeric($delivery->amount_ars),
+
+                $transferTax,
+
+                $debitAmount,
+
+                $cheque?->bank ?? '',
+
+                $cheque?->number ?? '',
+
+                $cheque?->issuer ?? '',
+
+                $cheque?->due_date?->format('d/m/Y') ?? '',
+
+            ];
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Totales de la hoja
+        |--------------------------------------------------------------------------
+        |
+        | No sumamos importes en diferentes monedas.
+        |
+        | Solo sumamos el equivalente en ARS.
+        |
+        */
+
+        if ($hasDeliveries) {
+            $deliveryRows[] = array_fill(0, 14, null);
+
+            $deliveryTotalRow = array_fill(0, 14, null);
+
+            $deliveryTotalRow[0] = 'TOTAL ENTREGADO';
+
+            $deliveryTotalRow[7] =
+                $totalDeliveredCents / 100;
+
+            $deliveryRows[] = $deliveryTotalRow;
+        } else {
+            /*
+             * Para liquidaciones antiguas sin
+             * desglose, no inventamos entregas.
+             */
+
+            $emptyRow = array_fill(0, 14, null);
+
+            $emptyRow[0] =
+                'Sin desglose de medios de pago registrado';
+
+            $deliveryRows[] = $emptyRow;
+        }
+
+        $deliverySheet = new class(
+            $deliveryRows,
+            $hasDeliveries
+        )
+        extends DefaultValueBinder
+        implements
+            FromArray,
+            WithTitle,
+            WithHeadings,
+            WithStyles,
+            WithColumnFormatting,
+            WithCustomValueBinder,
+            ShouldAutoSize
+        {
+            public function __construct(
+                private array $rows,
+                private bool $hasDeliveries
+            ) {}
+
+            public function title(): string
+            {
+                return 'Medios de pago';
+            }
+
+            public function headings(): array
+            {
+                return [
+                    'Nº',
+                    'Medio de pago',
+                    'Cuenta de origen',
+                    'Banco destino',
+                    'Moneda',
+                    'Importe original',
+                    'Cotización ARS',
+                    'Equivalente ARS',
+                    'Impuesto transferencia',
+                    'Débito total moneda origen',
+                    'Banco del cheque',
+                    'Número de cheque',
+                    'Emisor del cheque',
+                    'Vencimiento cheque',
+                ];
+            }
+
+            public function array(): array
+            {
+                return $this->rows;
+            }
+
+            public function bindValue(
+                Cell $cell,
+                $value
+            ): bool {
+                /*
+                 * Conservar cadenas como texto.
+                 *
+                 * Especialmente importante para:
+                 * - Números de cheques.
+                 * - Referencias de movimientos.
+                 * - Bancos y emisores.
+                 */
+
+                if (is_string($value)) {
+                    $cell->setValueExplicit(
+                        $value,
+                        DataType::TYPE_STRING
+                    );
+
+                    return true;
+                }
+
+                return parent::bindValue($cell, $value);
+            }
+
+            public function columnFormats(): array
+            {
+                return [
+                    'F' => '#,##0.00',
+                    'G' => '#,##0.000000',
+                    'H' => '#,##0.00',
+                    'I' => '#,##0.00',
+                    'J' => '#,##0.00',
+                ];
+            }
+
+            public function styles(
+                Worksheet $sheet
+            ): array {
+                /*
+                 * Encabezado.
+                 */
+
+                $sheet->getRowDimension(1)
+                    ->setRowHeight(32);
+
+                $sheet->getStyle('A1:N1')
+                    ->getFont()
+                    ->setBold(true);
+
+                $sheet->getStyle('A1:N1')
+                    ->getFont()
+                    ->getColor()
+                    ->setRGB('FFFFFF');
+
+                $sheet->getStyle('A1:N1')
+                    ->getFill()
+                    ->setFillType(Fill::FILL_SOLID)
+                    ->getStartColor()
+                    ->setRGB('172638');
+
+                /*
+                 * Mantener visible el encabezado.
+                 */
+
+                $sheet->freezePane('F2');
+
+                /*
+                 * Filtros de las entregas.
+                 */
+
+                if ($this->hasDeliveries) {
+                    $lastDataRow = count($this->rows) - 1;
+
+                    if ($lastDataRow >= 2) {
+                        $sheet->setAutoFilter(
+                            'A1:N' . $lastDataRow
+                        );
+                    }
+                }
+
+                /*
+                 * Destacar los equivalentes en pesos.
+                 */
+
+                $lastRow = count($this->rows) + 1;
+
+                $sheet->getStyle("H2:H{$lastRow}")
+                    ->getFont()
+                    ->getColor()
+                    ->setRGB('15803D');
+
+                /*
+                 * Total consolidado.
+                 */
+
+                if ($this->hasDeliveries) {
+                    $totalRange =
+                        "A{$lastRow}:N{$lastRow}";
+
+                    $sheet->getStyle($totalRange)
+                        ->getFont()
+                        ->setBold(true);
+
+                    $sheet->getStyle($totalRange)
+                        ->getFill()
+                        ->setFillType(Fill::FILL_SOLID)
+                        ->getStartColor()
+                        ->setRGB('DCFCE7');
+                }
+
+                return [];
+            }
+        };
+
+        /*
+        |--------------------------------------------------------------------------
+        | Resultado
+        |--------------------------------------------------------------------------
+        */
+
         return [
             $summarySheet,
             $detailSheet,
+            $deliverySheet,
         ];
     }
 }

@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Account;
 use App\Models\AccountBalance;
+use App\Models\Cheque;
 use App\Models\ChequeLiquidation;
+use App\Models\ChequeLiquidationDelivery;
 use App\Services\Cheques\ChequeLiquidationCalculator;
 use App\Services\CompanyContextService;
 use App\Services\TransactionService;
@@ -16,6 +18,9 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 use InvalidArgumentException;
 use RuntimeException;
+use App\Models\AccountDailyBalance;
+use App\Services\FinancialDayService;
+use App\Events\ChequeLiquidationConfirmed;
 
 class ChequeLiquidationController extends Controller
 {
@@ -379,7 +384,7 @@ class ChequeLiquidationController extends Controller
             $form['cheques'] = [
                 [
                     'nominal_amount' =>
-                        $form['nominal_amount'],
+                    $form['nominal_amount'],
 
                     'due_date' => $form['due_date'],
 
@@ -497,7 +502,6 @@ class ChequeLiquidationController extends Controller
                     'items' => $items,
                 ]
             );
-
         } catch (InvalidArgumentException $error) {
             throw ValidationException::withMessages([
                 'cheques' => $error->getMessage(),
@@ -607,7 +611,7 @@ class ChequeLiquidationController extends Controller
                     ),
 
                     'operation_date' =>
-                        $form['operation_date'],
+                    $form['operation_date'],
 
                     'status' => 'draft',
                 ])
@@ -648,58 +652,58 @@ class ChequeLiquidationController extends Controller
                      */
 
                     'nominal_amount' =>
-                        $item['nominal_amount'],
+                    $item['nominal_amount'],
 
                     /*
                      * Plazos individuales.
                      */
 
                     'calendar_days' =>
-                        $item['calendar_days'],
+                    $item['calendar_days'],
 
                     'clearing_days' =>
-                        $item['clearing_days'],
+                    $item['clearing_days'],
 
                     'term_days' =>
-                        $item['term_days'],
+                    $item['term_days'],
 
                     /*
                      * Porcentajes particulares.
                      */
 
                     'annual_rate' =>
-                        $item['annual_rate'],
+                    $item['annual_rate'],
 
                     'cheque_tax_rate' =>
-                        $item['cheque_tax_rate'],
+                    $item['cheque_tax_rate'],
 
                     'gross_income_rate' =>
-                        $item['gross_income_rate'],
+                    $item['gross_income_rate'],
 
                     'vat_rate' =>
-                        $item['vat_rate'],
+                    $item['vat_rate'],
 
                     /*
                      * Resultados financieros.
                      */
 
                     'interest_amount' =>
-                        $item['interest_amount'],
+                    $item['interest_amount'],
 
                     'cheque_tax_amount' =>
-                        $item['cheque_tax_amount'],
+                    $item['cheque_tax_amount'],
 
                     'gross_income_amount' =>
-                        $item['gross_income_amount'],
+                    $item['gross_income_amount'],
 
                     'vat_amount' =>
-                        $item['vat_amount'],
+                    $item['vat_amount'],
 
                     'total_discount' =>
-                        $item['total_discount'],
+                    $item['total_discount'],
 
                     'net_amount' =>
-                        $item['net_amount'],
+                    $item['net_amount'],
                 ]);
             }
 
@@ -718,7 +722,6 @@ class ChequeLiquidationController extends Controller
             ]);
 
             return $liquidation;
-
         }, 3);
 
         return redirect()
@@ -726,10 +729,767 @@ class ChequeLiquidationController extends Controller
             ->with(
                 'success',
                 'Liquidación guardada como borrador con ' .
-                count($result['items']) .
-                ' cheque(s). No se registraron movimientos de fondos.'
+                    count($result['items']) .
+                    ' cheque(s). No se registraron movimientos de fondos.'
             );
     }
+
+
+
+    public function saveDeliveries(
+        Request $request,
+        ChequeLiquidation $liquidation
+    ): RedirectResponse {
+
+        $companyId = $this->ensureLiquidationCompany(
+            $liquidation
+        );
+
+        /*
+    |--------------------------------------------------------------------------
+    | 1. Validar estructura de las entregas
+    |--------------------------------------------------------------------------
+    */
+
+        $data = $request->validate([
+            'deliveries' => [
+                'required',
+                'array',
+                'min:1',
+                'max:100',
+            ],
+            'deliveries.*.type' => [
+                'required',
+                Rule::in([
+                    'cash',
+                    'transfer',
+                    'third_party_cheque',
+                ]),
+            ],
+            'deliveries.*.account_balance_id' => [
+                'nullable',
+                'integer',
+            ],
+            'deliveries.*.delivered_cheque_id' => [
+                'nullable',
+                'integer',
+            ],
+            'deliveries.*.currency' => [
+                'required',
+                Rule::in(['ARS', 'USD', 'EUR']),
+            ],
+            'deliveries.*.amount' => [
+                'required',
+                'string',
+                'max:40',
+            ],
+            'deliveries.*.exchange_rate' => [
+                'required',
+                'string',
+                'max:40',
+            ],
+            'deliveries.*.destination_bank' => [
+                'nullable',
+                'string',
+                'max:150',
+            ],
+        ]);
+
+        /*
+    |--------------------------------------------------------------------------
+    | 2. Normalización de importes
+    |--------------------------------------------------------------------------
+    |
+    | Se aceptan:
+    | 1500000
+    | 1500000.50
+    | 1.500.000,50
+    |
+    */
+
+        $parseDecimal = static function (
+            mixed $value,
+            int $decimals
+        ): string {
+
+            $value = trim((string) $value);
+            $value = str_replace(' ', '', $value);
+
+            if (str_contains($value, ',')) {
+
+                if (!preg_match(
+                    '/^\d{1,3}(\.\d{3})*(,\d+)?$|^\d+(,\d+)?$/',
+                    $value
+                )) {
+                    throw ValidationException::withMessages([
+                        'deliveries' =>
+                        'El formato de un importe es inválido.',
+                    ]);
+                }
+
+                $value = str_replace('.', '', $value);
+                $value = str_replace(',', '.', $value);
+            }
+
+            if (!preg_match(
+                '/^\d+(\.\d+)?$/',
+                $value
+            )) {
+                throw ValidationException::withMessages([
+                    'deliveries' =>
+                    'El formato de un importe es inválido.',
+                ]);
+            }
+
+            $parts = explode('.', $value);
+
+            if (
+                isset($parts[1]) &&
+                strlen($parts[1]) > $decimals
+            ) {
+                throw ValidationException::withMessages([
+                    'deliveries' =>
+                    'Un importe tiene demasiados decimales.',
+                ]);
+            }
+
+            $number = (float) $value;
+
+            if (
+                !is_finite($number) ||
+                $number <= 0 ||
+                $number > 1000000000
+            ) {
+                throw ValidationException::withMessages([
+                    'deliveries' =>
+                    'El importe o cotización está fuera del rango permitido.',
+                ]);
+            }
+
+            return number_format(
+                $number,
+                $decimals,
+                '.',
+                ''
+            );
+        };
+
+        /*
+    |--------------------------------------------------------------------------
+    | 3. Transacción de base de datos
+    |--------------------------------------------------------------------------
+    */
+
+        DB::transaction(function () use (
+            $liquidation,
+            $companyId,
+            $data,
+            $parseDecimal
+        ) {
+
+            /*
+        |--------------------------------------------------------------------------
+        | Bloquear liquidación
+        |--------------------------------------------------------------------------
+        */
+
+            $locked = ChequeLiquidation::query()
+                ->where('company_id', $companyId)
+                ->whereKey($liquidation->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            if (
+                $locked->status !== 'draft' ||
+                $locked->transaction_id !== null
+            ) {
+                throw ValidationException::withMessages([
+                    'status' =>
+                    'La liquidación ya no permite modificar sus pagos.',
+                ]);
+            }
+
+            /*
+        |--------------------------------------------------------------------------
+        | Verificar entregas anteriores
+        |--------------------------------------------------------------------------
+        */
+
+            $previousDeliveries = $locked->deliveries()
+                ->lockForUpdate()
+                ->get();
+
+            if ($previousDeliveries->contains(
+                fn($delivery) =>
+                $delivery->transaction_id !== null
+            )) {
+                throw ValidationException::withMessages([
+                    'deliveries' =>
+                    'No se pueden modificar entregas que ya generaron movimientos.',
+                ]);
+            }
+
+            /*
+        |--------------------------------------------------------------------------
+        | 4. Jornada financiera actual
+        |--------------------------------------------------------------------------
+        */
+
+            $financialDay = app(
+                \App\Services\FinancialDayService::class
+            )->current($companyId);
+
+            /*
+        |--------------------------------------------------------------------------
+        | 5. Preparar acumuladores
+        |--------------------------------------------------------------------------
+        */
+
+            $rows = [];
+
+            $totalCents = 0;
+
+            $selectedChequeIds = [];
+
+            /*
+         * Total a debitar de cada AccountBalance.
+         *
+         * Incluye impuestos de transferencia.
+         */
+            $debitsByBalance = [];
+
+            /*
+         * Información para mostrar errores claros.
+         */
+            $balanceDetails = [];
+
+            /*
+        |--------------------------------------------------------------------------
+        | 6. Procesar y validar cada entrega
+        |--------------------------------------------------------------------------
+        */
+
+            foreach ($data['deliveries'] as $index => $item) {
+
+                $number = $index + 1;
+
+                $type = $item['type'];
+
+                $currency = $item['currency'];
+
+                $amount = $parseDecimal(
+                    $item['amount'],
+                    2
+                );
+
+                $rate = $parseDecimal(
+                    $item['exchange_rate'],
+                    6
+                );
+
+                $amountCents = (int) round(
+                    (float) $amount * 100
+                );
+
+                $rateValue = (float) $rate;
+
+                /*
+            |--------------------------------------------------------------------------
+            | Cotización
+            |--------------------------------------------------------------------------
+            */
+
+                if (
+                    $currency === 'ARS' &&
+                    $rateValue !== 1.0
+                ) {
+                    throw ValidationException::withMessages([
+                        'deliveries' =>
+                        "Entrega #{$number}: la cotización de ARS debe ser 1.",
+                    ]);
+                }
+
+                $equivalent = $amountCents * $rateValue;
+
+                if (
+                    !is_finite($equivalent) ||
+                    $equivalent <= 0 ||
+                    $equivalent > 100000000000
+                ) {
+                    throw ValidationException::withMessages([
+                        'deliveries' =>
+                        "Entrega #{$number}: el equivalente en ARS es inválido.",
+                    ]);
+                }
+
+                $equivalentCents = (int) round(
+                    $equivalent
+                );
+
+                if ($equivalentCents <= 0) {
+                    throw ValidationException::withMessages([
+                        'deliveries' =>
+                        "Entrega #{$number}: el equivalente debe ser positivo.",
+                    ]);
+                }
+
+                $accountId = null;
+                $chequeId = null;
+                $notes = null;
+
+                /*
+            |--------------------------------------------------------------------------
+            | 7. Efectivo o transferencia
+            |--------------------------------------------------------------------------
+            */
+
+                if (in_array(
+                    $type,
+                    ['cash', 'transfer'],
+                    true
+                )) {
+
+                    if (!$financialDay) {
+                        throw ValidationException::withMessages([
+                            'deliveries' =>
+                            'No hay una jornada financiera abierta. Primero iniciá el día.',
+                        ]);
+                    }
+
+                    if (
+                        empty($item['account_balance_id']) ||
+                        !empty($item['delivered_cheque_id'])
+                    ) {
+                        throw ValidationException::withMessages([
+                            'deliveries' =>
+                            "Entrega #{$number}: seleccioná una cuenta válida.",
+                        ]);
+                    }
+
+                    /*
+                 * Validar AccountBalance.
+                 */
+
+                    $balance = AccountBalance::withoutGlobalScopes()
+                        ->with('account')
+                        ->where('company_id', $companyId)
+                        ->whereKey(
+                            $item['account_balance_id']
+                        )
+                        ->first();
+
+                    if (
+                        !$balance ||
+                        !$balance->account ||
+                        (int) $balance->account->company_id !==
+                        $companyId
+                    ) {
+                        throw ValidationException::withMessages([
+                            'deliveries' =>
+                            "Entrega #{$number}: la cuenta no pertenece a la empresa activa.",
+                        ]);
+                    }
+
+                    if ($balance->currency !== $currency) {
+                        throw ValidationException::withMessages([
+                            'deliveries' =>
+                            "Entrega #{$number}: la moneda no coincide con la cuenta.",
+                        ]);
+                    }
+
+                    $account = $balance->account;
+
+                    /*
+                 * Validar tipo de cuenta.
+                 */
+
+                    if (
+                        $type === 'cash' &&
+                        $account->type !== 'cash'
+                    ) {
+                        throw ValidationException::withMessages([
+                            'deliveries' =>
+                            "Entrega #{$number}: el efectivo debe salir de una caja.",
+                        ]);
+                    }
+
+                    if (
+                        $type === 'transfer' &&
+                        !in_array(
+                            $account->type,
+                            ['bank', 'wallet'],
+                            true
+                        )
+                    ) {
+                        throw ValidationException::withMessages([
+                            'deliveries' =>
+                            "Entrega #{$number}: la transferencia debe salir de un banco o billetera.",
+                        ]);
+                    }
+
+                    $accountId = $account->id;
+
+                    /*
+                |--------------------------------------------------------------------------
+                | Banco de destino
+                |--------------------------------------------------------------------------
+                */
+
+                    if ($type === 'transfer') {
+
+                        $notes = trim(
+                            (string) (
+                                $item['destination_bank'] ?? ''
+                            )
+                        );
+
+                        if ($notes === '') {
+                            throw ValidationException::withMessages([
+                                'deliveries' =>
+                                "Entrega #{$number}: seleccioná el banco de destino.",
+                            ]);
+                        }
+
+                        $validBanks = array_merge(
+                            ['No corresponde'],
+                            \App\Support\ArgentineBanks::all()
+                        );
+
+                        if (!in_array(
+                            $notes,
+                            $validBanks,
+                            true
+                        )) {
+                            throw ValidationException::withMessages([
+                                'deliveries' =>
+                                "Entrega #{$number}: el banco de destino es inválido.",
+                            ]);
+                        }
+                    }
+
+                    /*
+                |--------------------------------------------------------------------------
+                | Calcular impuesto de transferencia
+                |--------------------------------------------------------------------------
+                |
+                | Misma regla actual de TransactionService:
+                | un destino no vacío genera el impuesto
+                | configurado para la cuenta.
+                |
+                | IMPORTANTE: "No corresponde" también
+                | es un valor no vacío.
+                |
+                */
+
+                    $taxRate = 0.0;
+
+                    if ($type === 'transfer') {
+
+                        $taxRate = (float) (
+                            $account->transfer_tax_rate ?? 0
+                        );
+                    }
+
+                    if (
+                        !is_finite($taxRate) ||
+                        $taxRate < 0
+                    ) {
+                        throw ValidationException::withMessages([
+                            'deliveries' =>
+                            "Entrega #{$number}: el impuesto de transferencia es inválido.",
+                        ]);
+                    }
+
+                    $taxCents = (int) round(
+                        $amountCents * $taxRate / 100
+                    );
+
+                    $debitCents =
+                        $amountCents + $taxCents;
+
+                    /*
+                |--------------------------------------------------------------------------
+                | Acumular débitos de una misma cuenta
+                |--------------------------------------------------------------------------
+                |
+                | Utilizamos AccountBalance ID como clave,
+                | porque identifica cuenta + moneda.
+                |
+                */
+
+                    $balanceId = (int) $balance->id;
+
+                    $debitsByBalance[$balanceId] =
+                        ($debitsByBalance[$balanceId] ?? 0)
+                        + $debitCents;
+
+                    $balanceDetails[$balanceId] = [
+                        'name' => $account->name,
+                        'currency' => $balance->currency,
+                        'account_id' => $account->id,
+                    ];
+                }
+
+                /*
+            |--------------------------------------------------------------------------
+            | 8. Cheques de terceros
+            |--------------------------------------------------------------------------
+            */
+
+                if ($type === 'third_party_cheque') {
+
+                    if (
+                        empty($item['delivered_cheque_id']) ||
+                        !empty($item['account_balance_id']) ||
+                        $currency !== 'ARS' ||
+                        $rateValue !== 1.0
+                    ) {
+                        throw ValidationException::withMessages([
+                            'deliveries' =>
+                            "Entrega #{$number}: los datos del cheque son inválidos.",
+                        ]);
+                    }
+
+                    $chequeId = (int) (
+                        $item['delivered_cheque_id']
+                    );
+
+                    if (in_array(
+                        $chequeId,
+                        $selectedChequeIds,
+                        true
+                    )) {
+                        throw ValidationException::withMessages([
+                            'deliveries' =>
+                            'No podés utilizar el mismo cheque dos veces.',
+                        ]);
+                    }
+
+                    $selectedChequeIds[] = $chequeId;
+
+                    $cheque = Cheque::query()
+                        ->where('company_id', $companyId)
+                        ->whereKey($chequeId)
+                        ->lockForUpdate()
+                        ->first();
+
+                    if (
+                        !$cheque ||
+                        !$cheque->canBeDelivered() ||
+                        (int) $cheque->cheque_liquidation_id ===
+                        (int) $locked->id
+                    ) {
+                        throw ValidationException::withMessages([
+                            'deliveries' =>
+                            "Entrega #{$number}: el cheque no está disponible en cartera.",
+                        ]);
+                    }
+
+                    $nominalCents = (int) round(
+                        (float) $cheque->nominal_amount * 100
+                    );
+
+                    if ($nominalCents !== $amountCents) {
+                        throw ValidationException::withMessages([
+                            'deliveries' =>
+                            "Entrega #{$number}: el importe debe coincidir con el nominal del cheque.",
+                        ]);
+                    }
+
+                    /*
+                 * Comprobar reservas de otras
+                 * liquidaciones.
+                 */
+
+                    $usedElsewhere =
+                        ChequeLiquidationDelivery::query()
+                        ->where(
+                            'delivered_cheque_id',
+                            $chequeId
+                        )
+                        ->where(
+                            'cheque_liquidation_id',
+                            '!=',
+                            $locked->id
+                        )
+                        ->exists();
+
+                    if ($usedElsewhere) {
+                        throw ValidationException::withMessages([
+                            'deliveries' =>
+                            "Entrega #{$number}: el cheque está asignado a otra liquidación.",
+                        ]);
+                    }
+                }
+
+                /*
+            |--------------------------------------------------------------------------
+            | 9. Preparar registro
+            |--------------------------------------------------------------------------
+            */
+
+                $rows[] = [
+                    'type' => $type,
+                    'currency' => $currency,
+                    'amount' => $amount,
+                    'exchange_rate' => $rate,
+
+                    'amount_ars' => number_format(
+                        $equivalentCents / 100,
+                        2,
+                        '.',
+                        ''
+                    ),
+
+                    'account_id' => $accountId,
+
+                    'delivered_cheque_id' => $chequeId,
+
+                    'transaction_id' => null,
+
+                    'notes' => $notes,
+                ];
+
+                $totalCents += $equivalentCents;
+            }
+
+            /*
+        |--------------------------------------------------------------------------
+        | 10. Verificar distribución contra el neto
+        |--------------------------------------------------------------------------
+        */
+
+            $netCents = (int) round(
+                (float) $locked->net_amount * 100
+            );
+
+            if ($netCents <= 0) {
+                throw ValidationException::withMessages([
+                    'net_amount' =>
+                    'El neto de la liquidación debe ser mayor a cero.',
+                ]);
+            }
+
+            if ($totalCents > $netCents) {
+                throw ValidationException::withMessages([
+                    'deliveries' =>
+                    'La distribución supera el neto de la liquidación.',
+                ]);
+            }
+
+            /*
+        |--------------------------------------------------------------------------
+        | 11. Verificar saldos reales de la jornada
+        |--------------------------------------------------------------------------
+        |
+        | Se bloquean los saldos en orden ascendente.
+        |
+        | Esto ayuda a evitar conflictos cuando
+        | varias operaciones usan las mismas cuentas.
+        |
+        | IMPORTANTE:
+        | Esta validación no reserva el dinero.
+        | TransactionService verificará nuevamente
+        | al confirmar la operación.
+        |
+        */
+
+            ksort($debitsByBalance, SORT_NUMERIC);
+
+            foreach ($debitsByBalance as $balanceId => $debitCents) {
+
+                $dailyBalance =
+                    \App\Models\AccountDailyBalance::withoutGlobalScopes()
+                    ->where('company_id', $companyId)
+                    ->where(
+                        'financial_day_id',
+                        $financialDay->id
+                    )
+                    ->where(
+                        'account_balance_id',
+                        $balanceId
+                    )
+                    ->lockForUpdate()
+                    ->first();
+
+                if (
+                    !$dailyBalance ||
+                    (int) $dailyBalance->account_id !==
+                    (int) $balanceDetails[$balanceId]['account_id']
+                ) {
+                    throw ValidationException::withMessages([
+                        'deliveries' =>
+                        'Una cuenta no tiene saldo registrado en la jornada actual.',
+                    ]);
+                }
+
+                $availableCents = (int) round(
+                    (float) $dailyBalance->current_balance * 100
+                );
+
+                if ($debitCents > $availableCents) {
+
+                    $details = $balanceDetails[$balanceId];
+
+                    $available = number_format(
+                        $availableCents / 100,
+                        2,
+                        ',',
+                        '.'
+                    );
+
+                    $required = number_format(
+                        $debitCents / 100,
+                        2,
+                        ',',
+                        '.'
+                    );
+
+                    throw ValidationException::withMessages([
+                        'deliveries' =>
+                        "Saldo insuficiente en {$details['name']} ({$details['currency']}). " .
+                            "Disponible: {$available}. " .
+                            "Necesario, incluyendo impuestos: {$required}.",
+                    ]);
+                }
+            }
+
+            /*
+        |--------------------------------------------------------------------------
+        | 12. Reemplazar distribución
+        |--------------------------------------------------------------------------
+        |
+        | Todavía NO se generan transacciones.
+        |
+        | Los cheques permanecen en cartera,
+        | aunque quedan asignados a esta operación
+        | mediante delivered_cheque_id.
+        |
+        */
+
+            $locked->deliveries()->delete();
+
+            foreach ($rows as $row) {
+                $locked->deliveries()->create($row);
+            }
+        }, 3);
+
+        /*
+    |--------------------------------------------------------------------------
+    | 13. Volver a la liquidación
+    |--------------------------------------------------------------------------
+    */
+
+        return redirect()
+            ->route('cheques.show', $liquidation)
+            ->with(
+                'success',
+                'Los medios de pago se guardaron correctamente. Todavía no se descontaron fondos ni se entregaron cheques.'
+            );
+    }
+
+
+
 
     /*
     |--------------------------------------------------------------------------
@@ -737,29 +1497,101 @@ class ChequeLiquidationController extends Controller
     |--------------------------------------------------------------------------
     */
 
+
+
     public function show(
         ChequeLiquidation $liquidation
     ): View {
+
+        /*
+    |--------------------------------------------------------------------------
+    | 1. Empresa activa
+    |--------------------------------------------------------------------------
+    */
+
         $companyId = $this->ensureLiquidationCompany(
             $liquidation
         );
 
+        /*
+    |--------------------------------------------------------------------------
+    | 2. Relaciones de la liquidación
+    |--------------------------------------------------------------------------
+    */
+
         $liquidation->load([
             'cheques',
+
+            'deliveries' => fn($query) =>
+            $query->orderBy('id'),
+
+            'deliveries.account',
+
+            'deliveries.deliveredCheque',
+
+            'deliveries.transaction',
+
             'events' => fn($query) =>
-                $query->orderByDesc('id'),
+            $query->orderByDesc('id'),
         ]);
 
+        /*
+    |--------------------------------------------------------------------------
+    | 3. Inicializar datos
+    |--------------------------------------------------------------------------
+    */
+
         $accountBalances = collect();
+
+        $portfolioCheques = collect();
+
+        $hasOpenFinancialDay = false;
+
+        /*
+    |--------------------------------------------------------------------------
+    | 4. Medios disponibles
+    |--------------------------------------------------------------------------
+    */
 
         if (
             $liquidation->status === 'draft' &&
             $liquidation->transaction_id === null
         ) {
+
+            /*
+        |--------------------------------------------------------------------------
+        | 5. Jornada financiera actual
+        |--------------------------------------------------------------------------
+        |
+        | Usamos el mismo servicio que TransactionService.
+        |
+        | Nunca tomamos el saldo inicial como disponible.
+        | El disponible real está en AccountDailyBalance.
+        |
+        */
+
+            $financialDay = app(
+                FinancialDayService::class
+            )->current($companyId);
+
+            $hasOpenFinancialDay = $financialDay !== null;
+
+            /*
+        |--------------------------------------------------------------------------
+        | 6. Cuentas de la empresa
+        |--------------------------------------------------------------------------
+        |
+        | Cargamos ARS, USD y EUR.
+        |
+        */
+
             $accountBalances = AccountBalance::query()
                 ->with('account')
                 ->where('company_id', $companyId)
-                ->where('currency', 'ARS')
+                ->whereIn(
+                    'currency',
+                    ['ARS', 'USD', 'EUR']
+                )
                 ->whereHas('account', function ($query) use (
                     $companyId
                 ) {
@@ -769,134 +1601,166 @@ class ChequeLiquidationController extends Controller
                     );
                 })
                 ->get()
-                ->sortBy(
-                    fn($balance) =>
-                        $balance->account?->name ?? ''
-                )
+                ->sortBy([
+                    [
+                        fn($balance) =>
+                        $balance->account?->name ?? '',
+                        'asc',
+                    ],
+                    [
+                        'currency',
+                        'asc',
+                    ],
+                ])
                 ->values();
+
+            /*
+        |--------------------------------------------------------------------------
+        | 7. Saldos reales de la jornada
+        |--------------------------------------------------------------------------
+        |
+        | Buscamos todos los saldos en una consulta
+        | para evitar hacer una consulta por cuenta.
+        |
+        */
+
+            $dailyBalances = collect();
+
+            if ($financialDay) {
+
+                $dailyBalances = AccountDailyBalance::withoutGlobalScopes()
+                    ->where('company_id', $companyId)
+                    ->where(
+                        'financial_day_id',
+                        $financialDay->id
+                    )
+                    ->whereIn(
+                        'account_balance_id',
+                        $accountBalances->pluck('id')->all()
+                    )
+                    ->get()
+                    ->keyBy('account_balance_id');
+            }
+
+            /*
+        |--------------------------------------------------------------------------
+        | 8. Incorporar saldo y tasa de transferencia
+        |--------------------------------------------------------------------------
+        |
+        | available_balance:
+        |   Saldo real disponible en la moneda.
+        |
+        | transfer_tax_rate:
+        |   Impuesto configurado para la cuenta.
+        |
+        | Si no existe saldo de jornada, usamos NULL,
+        | nunca un saldo histórico.
+        |
+        */
+
+            $accountBalances->each(
+                function ($balance) use ($dailyBalances) {
+
+                    $daily = $dailyBalances->get(
+                        $balance->id
+                    );
+
+                    $balance->setAttribute(
+                        'available_balance',
+                        $daily
+                            ? number_format(
+                                (float) $daily->current_balance,
+                                2,
+                                '.',
+                                ''
+                            )
+                            : null
+                    );
+
+                    $balance->setAttribute(
+                        'transfer_tax_rate',
+                        number_format(
+                            (float) (
+                                $balance->account?->transfer_tax_rate
+                                ?? 0
+                            ),
+                            4,
+                            '.',
+                            ''
+                        )
+                    );
+                }
+            );
+
+            /*
+        |--------------------------------------------------------------------------
+        | 9. Cheques de terceros en cartera
+        |--------------------------------------------------------------------------
+        */
+
+            $portfolioCheques = Cheque::query()
+                ->where('company_id', $companyId)
+                ->where(
+                    'status',
+                    Cheque::STATUS_IN_PORTFOLIO
+                )
+                ->where(
+                    'cheque_liquidation_id',
+                    '!=',
+                    $liquidation->id
+                )
+                ->where('nominal_amount', '>', 0)
+                ->orderBy('due_date')
+                ->orderBy('bank')
+                ->orderBy('number')
+                ->get();
         }
+
+        /*
+    |--------------------------------------------------------------------------
+    | 10. Vista
+    |--------------------------------------------------------------------------
+    */
 
         return view('cheques.show', [
             'liquidation' => $liquidation,
+
             'accountBalances' => $accountBalances,
+
+            'portfolioCheques' => $portfolioCheques,
+
+            'hasOpenFinancialDay' => $hasOpenFinancialDay,
+
             'banks' => \App\Support\ArgentineBanks::all(),
         ]);
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | CONFIRMAR LIQUIDACIÓN
-    |--------------------------------------------------------------------------
-    */
+
 
     public function confirm(
         Request $request,
         ChequeLiquidation $liquidation,
         TransactionService $transactionService
     ): RedirectResponse {
+
         $companyId = $this->ensureLiquidationCompany(
             $liquidation
         );
 
-        $data = $request->validate([
-            'account_balance_id' => [
-                'required',
-                'integer',
-                Rule::exists(
-                    'account_balances',
-                    'id'
-                )->where('company_id', $companyId),
-            ],
-
-            'payment_method' => [
-                'required',
-                Rule::in(['cash', 'transfer']),
-            ],
-
-            'destination_bank' => [
-                'nullable',
-                'required_if:payment_method,transfer',
-                'string',
-                'max:150',
-            ],
-        ]);
-
-        $accountBalance = AccountBalance::withoutGlobalScopes()
-            ->where('id', $data['account_balance_id'])
-            ->where('company_id', $companyId)
-            ->where('currency', 'ARS')
-            ->first();
-
-        if (!$accountBalance) {
-            throw ValidationException::withMessages([
-                'account_balance_id' =>
-                    'Seleccioná una cuenta válida en pesos argentinos.',
-            ]);
-        }
-
-        $account = Account::withoutGlobalScopes()
-            ->whereKey($accountBalance->account_id)
-            ->where('company_id', $companyId)
-            ->first();
-
-        if (!$account) {
-            throw ValidationException::withMessages([
-                'account_balance_id' =>
-                    'La cuenta seleccionada no pertenece a la empresa activa.',
-            ]);
-        }
-
-        $paymentMethod = $data['payment_method'];
-
-        if (
-            $paymentMethod === 'cash' &&
-            $account->type !== 'cash'
-        ) {
-            throw ValidationException::withMessages([
-                'account_balance_id' =>
-                    'Para entregar efectivo seleccioná una cuenta de caja.',
-            ]);
-        }
-
-        if (
-            $paymentMethod === 'transfer' &&
-            !in_array(
-                $account->type,
-                ['bank', 'wallet'],
-                true
-            )
-        ) {
-            throw ValidationException::withMessages([
-                'account_balance_id' =>
-                    'Para transferir seleccioná una cuenta bancaria o billetera.',
-            ]);
-        }
-
-        $destinationBank = null;
-
-        if ($paymentMethod === 'transfer') {
-            $destinationBank = trim(
-                (string) (
-                    $data['destination_bank'] ?? ''
-                )
-            );
-
-            if ($destinationBank === '') {
-                throw ValidationException::withMessages([
-                    'destination_bank' =>
-                        'Indicá el banco de destino de la transferencia.',
-                ]);
-            }
-        }
-
         try {
+
             DB::transaction(function () use (
                 $liquidation,
                 $transactionService,
-                $companyId,
-                $accountBalance,
-                $destinationBank
+                $companyId
             ) {
+
+                /*
+            |--------------------------------------------------------------------------
+            | 1. Bloquear liquidación
+            |--------------------------------------------------------------------------
+            */
+
                 $locked = ChequeLiquidation::query()
                     ->where('company_id', $companyId)
                     ->whereKey($liquidation->id)
@@ -906,196 +1770,698 @@ class ChequeLiquidationController extends Controller
                 if ($locked->status !== 'draft') {
                     throw ValidationException::withMessages([
                         'status' =>
-                            'Solo se pueden confirmar liquidaciones en borrador.',
+                        'La liquidación ya no está pendiente de confirmación.',
                     ]);
                 }
 
                 if ($locked->transaction_id !== null) {
                     throw ValidationException::withMessages([
                         'status' =>
-                            'La liquidación ya tiene un movimiento asociado.',
+                        'Esta liquidación ya tiene un movimiento financiero.',
                     ]);
                 }
 
-                if ((float) $locked->net_amount <= 0) {
+                $netCents = (int) round(
+                    (float) $locked->net_amount * 100
+                );
+
+                if ($netCents <= 0) {
                     throw ValidationException::withMessages([
                         'net_amount' =>
-                            'El neto a entregar debe ser mayor que cero.',
+                        'El neto de la liquidación debe ser positivo.',
                     ]);
                 }
 
                 /*
-                 * Todos los cheques deben estar pendientes.
-                 */
+            |--------------------------------------------------------------------------
+            | 2. Validar cheques recibidos
+            |--------------------------------------------------------------------------
+            */
 
                 $cheques = $locked->cheques()
+                    ->orderBy('id')
                     ->lockForUpdate()
                     ->get();
 
                 if ($cheques->isEmpty()) {
                     throw ValidationException::withMessages([
                         'status' =>
-                            'La liquidación no contiene cheques.',
+                        'La liquidación no contiene cheques.',
                     ]);
                 }
 
-                if (
-                    $cheques->contains(
-                        fn($cheque) =>
-                            $cheque->status !== 'draft'
-                    )
-                ) {
+                if ($cheques->contains(
+                    fn($cheque) => $cheque->status !== 'draft'
+                )) {
                     throw ValidationException::withMessages([
                         'status' =>
-                            'Todos los cheques deben estar pendientes para confirmar la liquidación.',
+                        'Todos los cheques recibidos deben estar pendientes.',
                     ]);
                 }
-
-                /*
-                 * Comprobación del nominal total.
-                 */
 
                 $nominalCents = (int) round(
                     (float) $locked->nominal_amount * 100
                 );
 
-                $chequesNominalCents = 0;
-
-                foreach ($cheques as $cheque) {
-                    $chequesNominalCents += (int) round(
+                $chequesNominalCents = $cheques->sum(
+                    fn($cheque) =>
+                    (int) round(
                         (float) $cheque->nominal_amount * 100
-                    );
-                }
+                    )
+                );
 
-                if (
-                    $nominalCents !== $chequesNominalCents
-                ) {
+                if ($nominalCents !== $chequesNominalCents) {
                     throw ValidationException::withMessages([
                         'nominal_amount' =>
-                            'El nominal total no coincide con los cheques de la liquidación.',
+                        'El nominal total no coincide con los cheques recibidos.',
                     ]);
                 }
 
                 /*
-                 * Comprobación adicional de los netos.
-                 *
-                 * Para liquidaciones antiguas que no tienen
-                 * desglose individual, se mantiene la
-                 * compatibilidad con el cálculo consolidado.
-                 */
+            |--------------------------------------------------------------------------
+            | 3. Validar netos individuales
+            |--------------------------------------------------------------------------
+            |
+            | Mantener compatibilidad con liquidaciones
+            | anteriores sin desglose individual.
+            |
+            */
 
-                $hasIndividualFinancialData = $cheques->every(
+                $hasIndividualData = $cheques->every(
                     fn($cheque) =>
-                        $cheque->net_amount !== null &&
+                    $cheque->net_amount !== null &&
                         $cheque->total_discount !== null
                 );
 
-                if ($hasIndividualFinancialData) {
-                    $netCents = (int) round(
-                        (float) $locked->net_amount * 100
+                if ($hasIndividualData) {
+
+                    $chequesNetCents = $cheques->sum(
+                        fn($cheque) =>
+                        (int) round(
+                            (float) $cheque->net_amount * 100
+                        )
                     );
 
-                    $chequesNetCents = 0;
-
-                    foreach ($cheques as $cheque) {
-                        $chequesNetCents += (int) round(
-                            (float) $cheque->net_amount * 100
-                        );
-                    }
-
-                    if ($netCents !== $chequesNetCents) {
+                    if ($chequesNetCents !== $netCents) {
                         throw ValidationException::withMessages([
                             'net_amount' =>
-                                'El neto total no coincide con la suma de los cheques.',
+                            'El neto no coincide con la suma individual de los cheques.',
                         ]);
                     }
                 }
 
                 /*
-                 * Un único egreso por el neto total.
-                 */
+            |--------------------------------------------------------------------------
+            | 4. Bloquear entregas guardadas
+            |--------------------------------------------------------------------------
+            */
 
-                $transaction = $transactionService->create(
-                    data: [
-                        'account_balance_id' =>
-                            $accountBalance->id,
+                $deliveries = $locked->deliveries()
+                    ->orderBy('id')
+                    ->lockForUpdate()
+                    ->get();
 
-                        'type' => 'expense',
-
-                        'amount' =>
-                            $locked->net_amount,
-
-                        'description' =>
-                            'Entrega de fondos por liquidación de ' .
-                            $cheques->count() .
-                            ' cheque(s) - Cliente: ' .
-                            $locked->client_name,
-
-                        'date' => now(),
-
-                        'destination_bank' =>
-                            $destinationBank,
-                    ],
-
-                    companyId: $companyId,
-
-                    userId: auth()->id(),
-
-                    source: 'cheque_liquidation',
-
-                    externalId: (string) $locked->id
-                );
-
-                if (
-                    (int) $transaction->company_id !==
-                        $companyId ||
-
-                    $transaction->source !==
-                        'cheque_liquidation' ||
-
-                    $transaction->external_id !==
-                        (string) $locked->id ||
-
-                    $transaction->type !== 'expense' ||
-
-                    (int) $transaction->account_balance_id !==
-                        (int) $accountBalance->id ||
-
-                    round(
-                        (float) $transaction->amount,
-                        2
-                    ) !== round(
-                        (float) $locked->net_amount,
-                        2
-                    )
-                ) {
-                    throw new RuntimeException(
-                        'El movimiento no coincide con la liquidación.'
-                    );
+                if ($deliveries->isEmpty()) {
+                    throw ValidationException::withMessages([
+                        'deliveries' =>
+                        'Primero guardá los medios de pago.',
+                    ]);
                 }
 
                 /*
-                 * Confirmamos la liquidación.
+            |--------------------------------------------------------------------------
+            | 5. Validar total distribuido
+            |--------------------------------------------------------------------------
+            */
+
+                $distributedCents = 0;
+
+                foreach ($deliveries as $delivery) {
+
+                    if ($delivery->transaction_id !== null) {
+                        throw ValidationException::withMessages([
+                            'deliveries' =>
+                            'Una entrega ya fue procesada.',
+                        ]);
+                    }
+
+                    if (!in_array(
+                        $delivery->type,
+                        [
+                            'cash',
+                            'transfer',
+                            'third_party_cheque',
+                        ],
+                        true
+                    )) {
+                        throw ValidationException::withMessages([
+                            'deliveries' =>
+                            'Se encontró un medio de pago inválido.',
+                        ]);
+                    }
+
+                    if (!in_array(
+                        $delivery->currency,
+                        ['ARS', 'USD', 'EUR'],
+                        true
+                    )) {
+                        throw ValidationException::withMessages([
+                            'deliveries' =>
+                            'La moneda de una entrega es inválida.',
+                        ]);
+                    }
+
+                    $amountCents = (int) round(
+                        (float) $delivery->amount * 100
+                    );
+
+                    $rate = (float) $delivery->exchange_rate;
+
+                    $equivalentCents = (int) round(
+                        (float) $delivery->amount_ars * 100
+                    );
+
+                    if (
+                        $amountCents <= 0 ||
+                        !is_finite($rate) ||
+                        $rate <= 0 ||
+                        $rate > 1000000000 ||
+                        $equivalentCents <= 0
+                    ) {
+                        throw ValidationException::withMessages([
+                            'deliveries' =>
+                            'Una entrega tiene importes inválidos.',
+                        ]);
+                    }
+
+                    if (
+                        $delivery->currency === 'ARS' &&
+                        $rate !== 1.0
+                    ) {
+                        throw ValidationException::withMessages([
+                            'deliveries' =>
+                            'La cotización de ARS debe ser 1.',
+                        ]);
+                    }
+
+                    $expectedCents = (int) round(
+                        $amountCents * $rate
+                    );
+
+                    if ($expectedCents !== $equivalentCents) {
+                        throw ValidationException::withMessages([
+                            'deliveries' =>
+                            'El equivalente en pesos de una entrega no coincide.',
+                        ]);
+                    }
+
+                    $distributedCents += $equivalentCents;
+                }
+
+                if ($distributedCents !== $netCents) {
+                    throw ValidationException::withMessages([
+                        'deliveries' =>
+                        'La distribución debe coincidir exactamente con el neto a entregar.',
+                    ]);
+                }
+
+                /*
+            |--------------------------------------------------------------------------
+            | 6. Validar los medios antes de ejecutar
+            |--------------------------------------------------------------------------
+            |
+            | Primero verificamos la disponibilidad.
+            | Después procesamos los movimientos.
+            |
+            */
+
+                $monetaryDeliveries = [];
+
+                $portfolioCheques = [];
+
+                $selectedChequeIds = [];
+
+                $debitsByBalance = [];
+
+                $balanceDetails = [];
+
+                foreach ($deliveries as $delivery) {
+
+                    /*
+                |--------------------------------------------------------------------------
+                | A. Cheque de terceros
+                |--------------------------------------------------------------------------
+                */
+
+                    if ($delivery->isThirdPartyCheque()) {
+
+                        if (
+                            $delivery->account_id !== null ||
+                            $delivery->delivered_cheque_id === null ||
+                            $delivery->currency !== 'ARS'
+                        ) {
+                            throw ValidationException::withMessages([
+                                'deliveries' =>
+                                'Los datos del cheque entregado son inválidos.',
+                            ]);
+                        }
+
+                        $chequeId = (int) $delivery->delivered_cheque_id;
+
+                        if (in_array(
+                            $chequeId,
+                            $selectedChequeIds,
+                            true
+                        )) {
+                            throw ValidationException::withMessages([
+                                'deliveries' =>
+                                'No podés entregar el mismo cheque dos veces.',
+                            ]);
+                        }
+
+                        $selectedChequeIds[] = $chequeId;
+
+                        $portfolioCheque = Cheque::query()
+                            ->where('company_id', $companyId)
+                            ->whereKey($chequeId)
+                            ->lockForUpdate()
+                            ->first();
+
+                        if (
+                            !$portfolioCheque ||
+                            !$portfolioCheque->canBeDelivered() ||
+                            (int) $portfolioCheque->cheque_liquidation_id ===
+                            (int) $locked->id
+                        ) {
+                            throw ValidationException::withMessages([
+                                'deliveries' =>
+                                'Un cheque ya no está disponible en cartera.',
+                            ]);
+                        }
+
+                        $chequeCents = (int) round(
+                            (float) $portfolioCheque->nominal_amount * 100
+                        );
+
+                        $deliveryCents = (int) round(
+                            (float) $delivery->amount * 100
+                        );
+
+                        if ($chequeCents !== $deliveryCents) {
+                            throw ValidationException::withMessages([
+                                'deliveries' =>
+                                'El importe del cheque no coincide con su nominal.',
+                            ]);
+                        }
+
+                        /*
+                     * Verificar que no esté asignado
+                     * a otra operación.
+                     */
+
+                        $usedElsewhere = ChequeLiquidationDelivery::query()
+                            ->where('delivered_cheque_id', $chequeId)
+                            ->where(
+                                'cheque_liquidation_id',
+                                '!=',
+                                $locked->id
+                            )
+                            ->exists();
+
+                        if ($usedElsewhere) {
+                            throw ValidationException::withMessages([
+                                'deliveries' =>
+                                'Un cheque está asignado a otra liquidación.',
+                            ]);
+                        }
+
+                        $portfolioCheques[$chequeId] = $portfolioCheque;
+
+                        continue;
+                    }
+
+                    /*
+                |--------------------------------------------------------------------------
+                | B. Efectivo y transferencias
+                |--------------------------------------------------------------------------
+                */
+
+                    if (
+                        $delivery->account_id === null ||
+                        $delivery->delivered_cheque_id !== null
+                    ) {
+                        throw ValidationException::withMessages([
+                            'deliveries' =>
+                            'Una entrega monetaria no tiene una cuenta válida.',
+                        ]);
+                    }
+
+                    $account = Account::withoutGlobalScopes()
+                        ->where('company_id', $companyId)
+                        ->whereKey($delivery->account_id)
+                        ->first();
+
+                    if (!$account) {
+                        throw ValidationException::withMessages([
+                            'deliveries' =>
+                            'Una cuenta no pertenece a la empresa activa.',
+                        ]);
+                    }
+
+                    if (
+                        $delivery->isCash() &&
+                        $account->type !== 'cash'
+                    ) {
+                        throw ValidationException::withMessages([
+                            'deliveries' =>
+                            'El efectivo debe salir de una caja.',
+                        ]);
+                    }
+
+                    if (
+                        $delivery->isTransfer() &&
+                        !in_array(
+                            $account->type,
+                            ['bank', 'wallet'],
+                            true
+                        )
+                    ) {
+                        throw ValidationException::withMessages([
+                            'deliveries' =>
+                            'La transferencia debe salir de un banco o billetera.',
+                        ]);
+                    }
+
+                    $accountBalance = AccountBalance::withoutGlobalScopes()
+                        ->where('company_id', $companyId)
+                        ->where('account_id', $account->id)
+                        ->where('currency', $delivery->currency)
+                        ->first();
+
+                    if (!$accountBalance) {
+                        throw ValidationException::withMessages([
+                            'deliveries' =>
+                            'La cuenta no dispone de la moneda seleccionada.',
+                        ]);
+                    }
+
+                    /*
+                |--------------------------------------------------------------------------
+                | Banco de destino e impuesto
+                |--------------------------------------------------------------------------
+                */
+
+                    $destinationBank = null;
+                    $transferTaxCents = 0;
+
+                    if ($delivery->isTransfer()) {
+
+                        $destinationBank = trim(
+                            (string) $delivery->notes
+                        );
+
+                        $validBanks = array_merge(
+                            ['No corresponde'],
+                            \App\Support\ArgentineBanks::all()
+                        );
+
+                        if (
+                            $destinationBank === '' ||
+                            !in_array(
+                                $destinationBank,
+                                $validBanks,
+                                true
+                            )
+                        ) {
+                            throw ValidationException::withMessages([
+                                'deliveries' =>
+                                'El banco de destino no es válido.',
+                            ]);
+                        }
+
+                        /*
+                     * Misma regla de TransactionService:
+                     * todo destino no vacío aplica la
+                     * tasa configurada en la cuenta.
+                     */
+
+                        $taxRate = (float) (
+                            $account->transfer_tax_rate ?? 0
+                        );
+
+                        if (
+                            !is_finite($taxRate) ||
+                            $taxRate < 0
+                        ) {
+                            throw ValidationException::withMessages([
+                                'deliveries' =>
+                                'La tasa de transferencia es inválida.',
+                            ]);
+                        }
+
+                        $transferTaxCents = (int) round(
+                            (float) $delivery->amount *
+                                $taxRate
+                        );
+                    }
+
+                    $amountCents = (int) round(
+                        (float) $delivery->amount * 100
+                    );
+
+                    $debitCents = $amountCents + $transferTaxCents;
+
+                    $balanceId = (int) $accountBalance->id;
+
+                    $debitsByBalance[$balanceId] =
+                        ($debitsByBalance[$balanceId] ?? 0)
+                        + $debitCents;
+
+                    $balanceDetails[$balanceId] = [
+                        'account_id' => $account->id,
+                        'name' => $account->name,
+                        'currency' => $accountBalance->currency,
+                    ];
+
+                    $monetaryDeliveries[] = [
+                        'delivery' => $delivery,
+                        'account_balance' => $accountBalance,
+                        'destination_bank' => $destinationBank,
+                    ];
+                }
+
+                /*
+            |--------------------------------------------------------------------------
+            | 7. Validar saldos de la jornada
+            |--------------------------------------------------------------------------
+            */
+
+                if (count($monetaryDeliveries) > 0) {
+
+                    $financialDay = app(
+                        \App\Services\FinancialDayService::class
+                    )->current($companyId);
+
+                    if (!$financialDay) {
+                        throw ValidationException::withMessages([
+                            'deliveries' =>
+                            'No hay una jornada financiera abierta.',
+                        ]);
+                    }
+
+                    ksort($debitsByBalance, SORT_NUMERIC);
+
+                    foreach ($debitsByBalance as $balanceId => $requiredCents) {
+
+                        $dailyBalance =
+                            \App\Models\AccountDailyBalance::withoutGlobalScopes()
+                            ->where('company_id', $companyId)
+                            ->where(
+                                'financial_day_id',
+                                $financialDay->id
+                            )
+                            ->where(
+                                'account_balance_id',
+                                $balanceId
+                            )
+                            ->lockForUpdate()
+                            ->first();
+
+                        if (
+                            !$dailyBalance ||
+                            (int) $dailyBalance->account_id !==
+                            (int) $balanceDetails[$balanceId]['account_id']
+                        ) {
+                            throw ValidationException::withMessages([
+                                'deliveries' =>
+                                'Una cuenta no tiene saldo en la jornada actual.',
+                            ]);
+                        }
+
+                        $availableCents = (int) round(
+                            (float) $dailyBalance->current_balance * 100
+                        );
+
+                        if ($requiredCents > $availableCents) {
+
+                            $details = $balanceDetails[$balanceId];
+
+                            throw ValidationException::withMessages([
+                                'deliveries' =>
+                                'Saldo insuficiente en ' .
+                                    $details['name'] .
+                                    ' (' . $details['currency'] . ').',
+                            ]);
+                        }
+                    }
+                }
+
+                /*
+            |--------------------------------------------------------------------------
+            | 8. Generar egresos monetarios
+            |--------------------------------------------------------------------------
+            |
+            | TransactionService:
+            |
+            | - Controla la jornada.
+            | - Valida saldos.
+            | - Descuenta dinero.
+            | - Registra transacciones.
+            | - Emite TransactionCreated después del commit.
+            |
+            */
+
+                $firstTransactionId = null;
+
+                foreach ($monetaryDeliveries as $item) {
+
+                    $delivery = $item['delivery'];
+
+                    $accountBalance = $item['account_balance'];
+
+                    $transaction = $transactionService->create(
+                        data: [
+                            'account_balance_id' =>
+                            $accountBalance->id,
+
+                            'type' => 'expense',
+
+                            'amount' => $delivery->amount,
+
+                            'description' =>
+                            'Entrega por liquidación de cheques - ' .
+                                'Cliente: ' . $locked->client_name .
+                                ' - Medio: ' .
+                                (
+                                    $delivery->isTransfer()
+                                    ? 'Transferencia'
+                                    : 'Efectivo'
+                                ),
+
+                            'date' => now(),
+
+                            'destination_bank' =>
+                            $item['destination_bank'],
+                        ],
+
+                        companyId: $companyId,
+
+                        userId: auth()->id(),
+
+                        source: 'cheque_liquidation',
+
+                        externalId: $delivery->transactionExternalId()
+                    );
+
+                    /*
+                 * Verificación de consistencia.
                  */
+
+                    if (
+                        (int) $transaction->company_id !== $companyId ||
+                        $transaction->source !== 'cheque_liquidation' ||
+                        $transaction->external_id !==
+                        $delivery->transactionExternalId() ||
+                        $transaction->type !== 'expense' ||
+                        (int) $transaction->account_balance_id !==
+                        (int) $accountBalance->id ||
+                        (int) round(
+                            (float) $transaction->amount * 100
+                        ) !== (int) round(
+                            (float) $delivery->amount * 100
+                        )
+                    ) {
+                        throw new RuntimeException(
+                            'El movimiento financiero no coincide con la entrega.'
+                        );
+                    }
+
+                    $delivery->update([
+                        'transaction_id' => $transaction->id,
+                    ]);
+
+                    if ($firstTransactionId === null) {
+                        $firstTransactionId = $transaction->id;
+                    }
+                }
+
+                /*
+            |--------------------------------------------------------------------------
+            | 9. Entregar cheques de cartera
+            |--------------------------------------------------------------------------
+            */
+
+                foreach ($portfolioCheques as $portfolioCheque) {
+
+                    $portfolioCheque->update([
+                        'status' => Cheque::STATUS_DELIVERED,
+                    ]);
+                }
+
+                /*
+            |--------------------------------------------------------------------------
+            | 10. Incorporar cheques recibidos
+            |--------------------------------------------------------------------------
+            */
+
+                foreach ($cheques as $cheque) {
+
+                    $cheque->update([
+                        'status' => Cheque::STATUS_IN_PORTFOLIO,
+                    ]);
+                }
+
+                /*
+            |--------------------------------------------------------------------------
+            | 11. Confirmar liquidación
+            |--------------------------------------------------------------------------
+            |
+            | transaction_id conserva la primera
+            | transacción monetaria como referencia
+            | de compatibilidad.
+            |
+            | Cada entrega monetaria posee además
+            | su propio transaction_id.
+            |
+            | Si todo se pagó con cheques de terceros,
+            | transaction_id permanece NULL.
+            |
+            */
 
                 $locked->update([
                     'status' => 'confirmed',
 
-                    'transaction_id' =>
-                        $transaction->id,
+                    'transaction_id' => $firstTransactionId,
 
                     'confirmed_at' => now(),
                 ]);
 
-                /*
-                 * Todos los cheques ingresan en cartera.
-                 */
 
-                foreach ($cheques as $cheque) {
-                    $cheque->update([
-                        'status' => 'in_portfolio',
-                    ]);
-                }
+                /*
+                |--------------------------------------------------------------------------
+                | 12. Historial
+                |--------------------------------------------------------------------------
+                */
 
                 $locked->events()->create([
                     'user_id' => auth()->id(),
@@ -1107,12 +2473,57 @@ class ChequeLiquidationController extends Controller
                     'to_status' => 'confirmed',
                 ]);
 
-            }, 3);
+                /*
+                |--------------------------------------------------------------------------
+                | 13. Notificar confirmación mediante Laravel Reverb
+                |--------------------------------------------------------------------------
+                |
+                | El evento se envía únicamente después de que
+                | MySQL confirma exitosamente la transacción.
+                |
+                | Esto garantiza que los demás usuarios no reciban
+                | notificaciones de operaciones revertidas.
+                |
+                | TransactionCreated continúa notificando los
+                | egresos monetarios por separado.
+                |
+                */
 
+                $confirmedCompanyId = (int) $companyId;
+
+                $confirmedLiquidationId = (int) $locked->id;
+
+                $receivedChequesCount = $cheques->count();
+
+                $deliveredChequesCount = count($portfolioCheques);
+
+                $deliveriesCount = $deliveries->count();
+
+                DB::afterCommit(function () use (
+                    $confirmedCompanyId,
+                    $confirmedLiquidationId,
+                    $receivedChequesCount,
+                    $deliveredChequesCount,
+                    $deliveriesCount
+                ) {
+
+                    ChequeLiquidationConfirmed::dispatch(
+                        companyId: $confirmedCompanyId,
+
+                        liquidationId: $confirmedLiquidationId,
+
+                        receivedChequesCount: $receivedChequesCount,
+
+                        deliveredChequesCount: $deliveredChequesCount,
+
+                        deliveriesCount: $deliveriesCount
+                    );
+                });
+            }, 3);
         } catch (RuntimeException $error) {
+
             throw ValidationException::withMessages([
-                'account_balance_id' =>
-                    $error->getMessage(),
+                'deliveries' => $error->getMessage(),
             ]);
         }
 
@@ -1120,9 +2531,11 @@ class ChequeLiquidationController extends Controller
             ->route('cheques.show', $liquidation)
             ->with(
                 'success',
-                'Operación confirmada. Se registró un único egreso por el neto total y todos los cheques ingresaron en cartera.'
+                'Liquidación confirmada. Se procesaron los medios de pago y se actualizó la cartera de cheques.'
             );
     }
+
+
 
     /*
     |--------------------------------------------------------------------------
@@ -1186,14 +2599,14 @@ class ChequeLiquidationController extends Controller
             if ($locked->status !== $from) {
                 throw ValidationException::withMessages([
                     'status' =>
-                        'La liquidación cambió de estado. Actualizá la pantalla.',
+                    'La liquidación cambió de estado. Actualizá la pantalla.',
                 ]);
             }
 
             if ($locked->transaction_id !== null) {
                 throw ValidationException::withMessages([
                     'status' =>
-                        'No se puede cambiar el estado de una operación con movimientos financieros.',
+                    'No se puede cambiar el estado de una operación con movimientos financieros.',
                 ]);
             }
 
@@ -1257,7 +2670,7 @@ class ChequeLiquidationController extends Controller
             ) {
                 throw ValidationException::withMessages([
                     'status' =>
-                        'No se puede eliminar una liquidación con ejecución financiera.',
+                    'No se puede eliminar una liquidación con ejecución financiera.',
                 ]);
             }
 

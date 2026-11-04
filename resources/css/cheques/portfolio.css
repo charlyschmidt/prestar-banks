@@ -1,0 +1,514 @@
+/*
+|--------------------------------------------------------------------------
+| AERIA FINANCE
+| CARTERA DE CHEQUES
+|--------------------------------------------------------------------------
+|
+| Estilos exclusivos de la cartera.
+|
+| - Indicadores financieros
+| - Tabla compacta
+| - Estados de vencimiento
+| - Compatibilidad con temas empresariales
+| - Diseño responsive
+|
+*/
+
+.cheque-portfolio-page {
+    --portfolio-bg: var(--company-card, #20252e);
+    --portfolio-text: var(--company-text, #f1f5f9);
+    --portfolio-muted: var(--company-muted, #94a3b8);
+    --portfolio-border: var(--company-border, #343a46);
+    --portfolio-hover: var(
+        --company-hover,
+        rgba(128, 128, 128, .08)
+    );
+    --portfolio-accent: var(--company-button, #2563eb);
+
+    --portfolio-success: #22c55e;
+    --portfolio-warning: #f59e0b;
+    --portfolio-danger: #ef4444;
+}
+
+/*
+|--------------------------------------------------------------------------
+| INDICADORES DE CARTERA
+|--------------------------------------------------------------------------
+*/
+
+.cheque-portfolio-page .cheque-portfolio-stats {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.cheque-portfolio-page .cheque-portfolio-stat {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+
+    min-width: 0;
+    padding: 22px;
+
+    background: var(--portfolio-bg);
+    border: 1px solid var(--portfolio-border);
+    border-radius: 14px;
+}
+
+.cheque-portfolio-page .cheque-portfolio-stat-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex: 0 0 48px;
+    width: 48px;
+    height: 48px;
+
+    border-radius: 12px;
+
+    color: var(--portfolio-accent);
+    background: var(--portfolio-hover);
+
+    font-size: 23px;
+}
+
+.cheque-portfolio-page .cheque-portfolio-stat > div:last-child {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+
+.cheque-portfolio-page .cheque-portfolio-stat span {
+    color: var(--portfolio-muted);
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.cheque-portfolio-page .cheque-portfolio-stat strong {
+    color: var(--portfolio-text);
+    font-size: 25px;
+    font-weight: 700;
+    letter-spacing: -.5px;
+    font-variant-numeric: tabular-nums;
+    overflow-wrap: anywhere;
+}
+
+/*
+|--------------------------------------------------------------------------
+| CONTENEDOR DE LA TABLA
+|--------------------------------------------------------------------------
+*/
+
+.cheque-portfolio-page .table-responsive:has(
+    .cheque-portfolio-table
+) {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    border: 1px solid var(--portfolio-border);
+    border-radius: 12px;
+
+    scrollbar-width: thin;
+    scrollbar-color: var(--portfolio-border) transparent;
+}
+
+/*
+|--------------------------------------------------------------------------
+| TABLA DE CARTERA
+|--------------------------------------------------------------------------
+*/
+
+.cheque-portfolio-page .cheque-portfolio-table {
+    width: max-content;
+    min-width: 100%;
+
+    margin: 0;
+
+    border-collapse: separate;
+    border-spacing: 0;
+
+    color: var(--portfolio-text);
+    font-size: 12px;
+    line-height: 1.4;
+    font-variant-numeric: tabular-nums;
+
+    --bs-table-bg: transparent;
+    --bs-table-color: var(--portfolio-text);
+    --bs-table-border-color: var(--portfolio-border);
+    --bs-table-hover-bg: transparent;
+    --bs-table-hover-color: var(--portfolio-text);
+}
+
+/*
+|--------------------------------------------------------------------------
+| ENCABEZADOS
+|--------------------------------------------------------------------------
+*/
+
+.cheque-portfolio-page .cheque-portfolio-table thead th {
+    padding: 14px 12px;
+
+    color: var(--portfolio-muted);
+    background: var(--portfolio-bg);
+
+    font-size: 11px;
+    font-weight: 650;
+    letter-spacing: .15px;
+
+    white-space: nowrap;
+    vertical-align: middle;
+
+    border-bottom: 1px solid var(--portfolio-border);
+}
+
+/*
+|--------------------------------------------------------------------------
+| FILAS
+|--------------------------------------------------------------------------
+*/
+
+.cheque-portfolio-page .cheque-portfolio-table tbody td {
+    padding: 13px 12px;
+
+    color: var(--portfolio-text);
+    background: var(--portfolio-bg);
+
+    white-space: nowrap;
+    vertical-align: middle;
+
+    border-bottom: 1px solid var(--portfolio-border);
+
+    transition: background .15s ease;
+}
+
+.cheque-portfolio-page .cheque-portfolio-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.cheque-portfolio-page .cheque-portfolio-table tbody tr:hover td {
+    background: var(--portfolio-hover);
+}
+
+/*
+|--------------------------------------------------------------------------
+| PRIMERA COLUMNA FIJA
+|--------------------------------------------------------------------------
+|
+| Permite identificar el cheque al desplazarse
+| horizontalmente.
+|
+*/
+
+.cheque-portfolio-page .cheque-portfolio-table thead th:first-child,
+.cheque-portfolio-page .cheque-portfolio-table tbody td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 2;
+
+    min-width: 65px;
+
+    background: var(--portfolio-bg);
+    border-right: 1px solid var(--portfolio-border);
+}
+
+.cheque-portfolio-page .cheque-portfolio-table thead th:first-child {
+    z-index: 3;
+}
+
+.cheque-portfolio-page .cheque-portfolio-table tbody tr:hover td:first-child {
+    background: var(--portfolio-hover);
+}
+
+/*
+|--------------------------------------------------------------------------
+| COLUMNAS IDENTIFICATORIAS
+|--------------------------------------------------------------------------
+*/
+
+.cheque-portfolio-page .cheque-portfolio-table th:nth-child(2),
+.cheque-portfolio-page .cheque-portfolio-table td:nth-child(2) {
+    min-width: 120px;
+}
+
+.cheque-portfolio-page .cheque-portfolio-table th:nth-child(3),
+.cheque-portfolio-page .cheque-portfolio-table td:nth-child(3) {
+    min-width: 110px;
+}
+
+.cheque-portfolio-page .cheque-portfolio-table th:nth-child(4),
+.cheque-portfolio-page .cheque-portfolio-table td:nth-child(4) {
+    min-width: 85px;
+}
+
+.cheque-portfolio-page .cheque-portfolio-table th:nth-child(5),
+.cheque-portfolio-page .cheque-portfolio-table td:nth-child(5) {
+    min-width: 140px;
+    max-width: 220px;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+
+.cheque-portfolio-page .cheque-portfolio-table th:nth-child(6),
+.cheque-portfolio-page .cheque-portfolio-table td:nth-child(6) {
+    min-width: 150px;
+    max-width: 230px;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+
+/*
+|--------------------------------------------------------------------------
+| VENCIMIENTO
+|--------------------------------------------------------------------------
+*/
+
+.cheque-portfolio-page .cheque-portfolio-table th:nth-child(7),
+.cheque-portfolio-page .cheque-portfolio-table td:nth-child(7) {
+    min-width: 115px;
+}
+
+/*
+|--------------------------------------------------------------------------
+| SITUACIÓN DE VENCIMIENTO
+|--------------------------------------------------------------------------
+*/
+
+.cheque-portfolio-page .cheque-portfolio-due {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    padding: 5px 10px;
+    border: 1px solid transparent;
+    border-radius: 999px;
+
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+/*
+ * Vencimiento normal.
+ */
+
+.cheque-portfolio-page .cheque-portfolio-normal {
+    color: var(--portfolio-muted);
+    background: var(--portfolio-hover);
+    border-color: var(--portfolio-border);
+}
+
+/*
+ * Próximo a vencer: 1 a 7 días.
+ */
+
+.cheque-portfolio-page .cheque-portfolio-near {
+    color: var(--portfolio-warning);
+    background: rgba(245, 158, 11, .10);
+    border-color: rgba(245, 158, 11, .25);
+}
+
+/*
+ * Vence hoy.
+ */
+
+.cheque-portfolio-page .cheque-portfolio-today {
+    color: var(--portfolio-warning);
+    background: rgba(245, 158, 11, .14);
+    border-color: rgba(245, 158, 11, .35);
+}
+
+/*
+ * Vencido.
+ */
+
+.cheque-portfolio-page .cheque-portfolio-overdue {
+    color: var(--portfolio-danger);
+    background: rgba(239, 68, 68, .10);
+    border-color: rgba(239, 68, 68, .30);
+}
+
+/*
+|--------------------------------------------------------------------------
+| IMPORTES
+|--------------------------------------------------------------------------
+*/
+
+.cheque-portfolio-page .cheque-portfolio-table th:nth-child(9),
+.cheque-portfolio-page .cheque-portfolio-table td:nth-child(9),
+.cheque-portfolio-page .cheque-portfolio-table th:nth-child(10),
+.cheque-portfolio-page .cheque-portfolio-table td:nth-child(10) {
+    min-width: 150px;
+    text-align: right;
+}
+
+.cheque-portfolio-page .cheque-portfolio-table td:nth-child(9) strong {
+    font-weight: 700;
+}
+
+.cheque-portfolio-page .cheque-portfolio-table td:nth-child(10) {
+    color: var(--portfolio-muted);
+}
+
+/*
+|--------------------------------------------------------------------------
+| ACCIONES
+|--------------------------------------------------------------------------
+*/
+
+.cheque-portfolio-page .cheque-portfolio-table th:nth-child(11),
+.cheque-portfolio-page .cheque-portfolio-table td:nth-child(11) {
+    min-width: 140px;
+    text-align: right;
+}
+
+.cheque-portfolio-page .cheque-portfolio-table .cheques-small-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+
+    white-space: nowrap;
+}
+
+/*
+|--------------------------------------------------------------------------
+| BADGE VERDE DE CARTERA
+|--------------------------------------------------------------------------
+*/
+
+.cheque-portfolio-page .cheques-status-in-portfolio {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    color: var(--portfolio-success);
+    background: rgba(34, 197, 94, .12);
+
+    border: 1px solid rgba(34, 197, 94, .25);
+    border-radius: 999px;
+
+    padding: 5px 11px;
+
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+/*
+|--------------------------------------------------------------------------
+| ESTADO VACÍO
+|--------------------------------------------------------------------------
+*/
+
+.cheque-portfolio-page .cheque-portfolio-table tbody td[colspan] {
+    color: var(--portfolio-muted);
+}
+
+.cheque-portfolio-page .cheque-portfolio-table tbody td[colspan] strong {
+    color: var(--portfolio-text);
+}
+
+/*
+|--------------------------------------------------------------------------
+| FOCUS / ACCESIBILIDAD
+|--------------------------------------------------------------------------
+*/
+
+.cheque-portfolio-page .cheque-portfolio-table a:focus-visible {
+    outline: 2px solid var(--portfolio-accent);
+    outline-offset: 3px;
+}
+
+/*
+|--------------------------------------------------------------------------
+| RESPONSIVE TABLET
+|--------------------------------------------------------------------------
+*/
+
+@media (max-width: 991px) {
+
+    .cheque-portfolio-page .cheque-portfolio-stats {
+        gap: 12px;
+    }
+
+    .cheque-portfolio-page .cheque-portfolio-stat {
+        padding: 18px;
+    }
+
+    .cheque-portfolio-page .cheque-portfolio-stat strong {
+        font-size: 21px;
+    }
+
+    .cheque-portfolio-page .cheque-portfolio-table thead th,
+    .cheque-portfolio-page .cheque-portfolio-table tbody td {
+        padding: 11px 10px;
+    }
+}
+
+/*
+|--------------------------------------------------------------------------
+| RESPONSIVE MÓVIL
+|--------------------------------------------------------------------------
+*/
+
+@media (max-width: 767px) {
+
+    .cheque-portfolio-page .cheque-portfolio-stats {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .cheque-portfolio-page .cheque-portfolio-stat {
+        padding: 16px;
+        gap: 14px;
+    }
+
+    .cheque-portfolio-page .cheque-portfolio-stat-icon {
+        flex-basis: 42px;
+        width: 42px;
+        height: 42px;
+        font-size: 20px;
+    }
+
+    .cheque-portfolio-page .cheque-portfolio-stat strong {
+        font-size: 20px;
+    }
+
+    .cheque-portfolio-page .cheque-portfolio-table {
+        font-size: 11px;
+    }
+
+    .cheque-portfolio-page .cheque-portfolio-table thead th {
+        font-size: 10px;
+        padding: 10px 9px;
+    }
+
+    .cheque-portfolio-page .cheque-portfolio-table tbody td {
+        padding: 11px 9px;
+    }
+
+    .cheque-portfolio-page .cheque-portfolio-table thead th:first-child,
+    .cheque-portfolio-page .cheque-portfolio-table tbody td:first-child {
+        min-width: 52px;
+    }
+
+    .cheque-portfolio-page .cheque-portfolio-due {
+        padding: 4px 8px;
+        font-size: 10px;
+    }
+}
+
+/*
+|--------------------------------------------------------------------------
+| MOVIMIENTO REDUCIDO
+|--------------------------------------------------------------------------
+*/
+
+@media (prefers-reduced-motion: reduce) {
+
+    .cheque-portfolio-page .cheque-portfolio-table tbody td {
+        transition: none;
+    }
+}
