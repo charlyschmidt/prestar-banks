@@ -388,6 +388,72 @@ Route::middleware('auth')->group(function () {
 
         /*
         |--------------------------------------------------------------------------
+        | AERIA Cheques - Operaciones bancarias
+        |--------------------------------------------------------------------------
+        |
+        | Administración del ciclo bancario de cheques
+        | de terceros adquiridos por la financiera.
+        |
+        | Circuito:
+        |
+        | En cartera -> Depositado
+        | Depositado -> Acreditado
+        | Depositado -> Rechazado
+        |
+        | Los cheques entregados como medios de pago
+        | no pueden depositarse.
+        |
+        | Todas las operaciones deberán validar:
+        | - Empresa activa
+        | - Usuario autorizado
+        | - Estado actual
+        | - Cuenta bancaria correspondiente
+        | - Consistencia financiera
+        |
+        */
+
+        /*
+        |--------------------------------------------------------------------------
+        | Registrar depósito bancario
+        |--------------------------------------------------------------------------
+        */
+
+        Route::post('/cheques/cartera/{cheque}/depositar', [
+            ChequePortfolioController::class,
+            'deposit'
+        ])->whereUuid('cheque')
+            ->name('cheques.portfolio.deposit');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Confirmar acreditación
+        |--------------------------------------------------------------------------
+        */
+
+        Route::post('/cheques/cartera/{cheque}/acreditar', [
+            ChequePortfolioController::class,
+            'accredit'
+        ])->whereUuid('cheque')
+            ->name('cheques.portfolio.accredit');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Registrar rechazo bancario
+        |--------------------------------------------------------------------------
+        */
+
+        Route::post('/cheques/cartera/{cheque}/rechazar', [
+            ChequePortfolioController::class,
+            'reject'
+        ])->whereUuid('cheque')
+            ->name('cheques.portfolio.reject');
+
+
+
+        /*
+        |--------------------------------------------------------------------------
         | Exportar liquidación a Excel
         |--------------------------------------------------------------------------
         |
