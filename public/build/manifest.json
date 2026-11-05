@@ -12,7 +12,7 @@
     "src": "node_modules/bootstrap-icons/font/fonts/bootstrap-icons.woff2"
   },
   "resources/css/app.css": {
-    "file": "assets/app-DfD5XyHo.css",
+    "file": "assets/app-CoIKm8IK.css",
     "name": "app",
     "names": [
       "app.css"
@@ -88,7 +88,7 @@
     "isEntry": true
   },
   "resources/js/app.js": {
-    "file": "assets/app-BSbXn-rx.js",
+    "file": "assets/app-Df7ioAbN.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
@@ -97,7 +97,7 @@
       "resources/js/cheques/deliveries.js"
     ],
     "css": [
-      "assets/app-dXUeTGZ8.css",
+      "assets/app-DZbxJ3EU.css",
       "assets/welcome-Vd3gmU33.css",
       "assets/register-pending-LXepLUu1.css",
       "assets/subscription-BVFLvsFJ.css"
