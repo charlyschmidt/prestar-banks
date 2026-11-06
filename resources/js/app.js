@@ -262,3 +262,17 @@ if (document.readyState === 'loading') {
     initializeAeriaComponents();
 
 }
+
+if (document.querySelector('.account-movements-page')) {
+
+    import('./accounts/account-movements')
+        .catch(error => {
+
+            console.error(
+                'AERIA: error cargando movimientos por cuenta:',
+                error
+            );
+
+        });
+
+}

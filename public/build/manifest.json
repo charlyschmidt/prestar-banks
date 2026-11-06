@@ -87,15 +87,22 @@
     "src": "resources/css/welcome.css",
     "isEntry": true
   },
+  "resources/js/accounts/account-movements.js": {
+    "file": "assets/account-movements-BadSxe-9.js",
+    "name": "account-movements",
+    "src": "resources/js/accounts/account-movements.js",
+    "isDynamicEntry": true
+  },
   "resources/js/app.js": {
-    "file": "assets/app-Dkrl27eh.js",
+    "file": "assets/app-CVspMrHC.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
     "dynamicImports": [
       "resources/js/official-rates.js",
       "resources/js/cheques/deliveries.js",
-      "resources/js/clients/client-search.js"
+      "resources/js/clients/client-search.js",
+      "resources/js/accounts/account-movements.js"
     ],
     "css": [
       "assets/app-CHcsQZRD.css",
