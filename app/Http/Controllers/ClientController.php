@@ -14,8 +14,7 @@ class ClientController extends Controller
 {
     public function __construct(
         private readonly CompanyContextService $companyContext
-    ) {
-    }
+    ) {}
 
     /*
     |--------------------------------------------------------------------------
@@ -143,7 +142,7 @@ class ClientController extends Controller
         $validated['company_id'] = $companyId;
 
         $client = DB::transaction(
-            fn () => Client::create($validated)
+            fn() => Client::create($validated)
         );
 
         return redirect()
@@ -157,12 +156,59 @@ class ClientController extends Controller
     |--------------------------------------------------------------------------
     */
 
+
     public function show(string $client): View
     {
+        /*
+        |--------------------------------------------------------------------------
+        | Cliente de la empresa activa
+        |--------------------------------------------------------------------------
+        */
+
         $client = $this->findClient($client);
 
-        return view('clients.show', compact('client'));
+        /*
+        |--------------------------------------------------------------------------
+        | Historial de movimientos del cliente
+        |--------------------------------------------------------------------------
+        |
+        | Incluye movimientos de todas las jornadas.
+        |
+        | Restringimos por:
+        | - Empresa del cliente
+        | - ID del cliente
+        |
+        | Cargamos relaciones para evitar consultas N+1.
+        |
+        */
+
+        $movements = \App\Models\Transaction::query()
+            ->where('company_id', $client->company_id)
+            ->where('client_id', $client->id)
+            ->with([
+                'account',
+                'accountBalance',
+                'financialDay',
+                'user',
+            ])
+            ->orderByDesc('date')
+            ->orderByDesc('id')
+            ->paginate(
+                15,
+                ['*'],
+                'movements_page'
+            )
+            ->withQueryString();
+
+        return view(
+            'clients.show',
+            compact(
+                'client',
+                'movements'
+            )
+        );
     }
+
 
     /*
     |--------------------------------------------------------------------------
@@ -368,28 +414,28 @@ class ClientController extends Controller
             ],
         ], [
             'person_type.required' =>
-                'Seleccioná el tipo de persona.',
+            'Seleccioná el tipo de persona.',
 
             'first_name.required_if' =>
-                'El nombre es obligatorio para personas físicas.',
+            'El nombre es obligatorio para personas físicas.',
 
             'last_name.required_if' =>
-                'El apellido es obligatorio para personas físicas.',
+            'El apellido es obligatorio para personas físicas.',
 
             'business_name.required_if' =>
-                'La razón social es obligatoria para personas jurídicas.',
+            'La razón social es obligatoria para personas jurídicas.',
 
             'tax_id.digits' =>
-                'El CUIT/CUIL debe tener exactamente 11 dígitos.',
+            'El CUIT/CUIL debe tener exactamente 11 dígitos.',
 
             'tax_id.unique' =>
-                'Ya existe un cliente con este CUIT/CUIL en la empresa.',
+            'Ya existe un cliente con este CUIT/CUIL en la empresa.',
 
             'document_number.digits_between' =>
-                'El documento debe contener entre 6 y 12 dígitos.',
+            'El documento debe contener entre 6 y 12 dígitos.',
 
             'email.email' =>
-                'Ingresá una dirección de correo electrónico válida.',
+            'Ingresá una dirección de correo electrónico válida.',
         ]);
 
         /*
