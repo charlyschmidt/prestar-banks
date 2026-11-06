@@ -50,6 +50,9 @@ return Application::configure(basePath: dirname(__DIR__))
             'company.access' =>
             \App\Http\Middleware\EnsureCompanyHasAccess::class,
 
+            'cheques.admin' =>
+            \App\Http\Middleware\EnsureChequeSuperAdmin::class,
+
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

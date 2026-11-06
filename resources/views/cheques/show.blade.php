@@ -26,6 +26,8 @@
 
         $canConfirm = $status === 'draft' && $liquidation->transaction_id === null;
 
+        $canEdit = $canConfirm;
+
         $canDelete = in_array($status, ['draft', 'held'], true) && $liquidation->transaction_id === null;
 
         $accountBalances = $accountBalances ?? collect();
@@ -131,9 +133,20 @@
                     Resultado de liquidación
                 </div>
 
-                <span class="cheques-status {{ $status === 'held' ? 'cheques-status-held' : '' }}">
-                    {{ $statusLabel }}
-                </span>
+                <div class="d-flex align-items-center gap-2">                  
+
+                    @if ($status === 'draft' && $canEdit)
+                        <a href="{{ route('cheques.edit', $liquidation) }}" class="secondary-button cheques-edit-badge">
+                            <i class="bi bi-pencil-square"></i>
+                            Editar borrador
+                        </a>
+                    @endif
+
+                    <span class="cheques-status {{ $status === 'held' ? 'cheques-status-held' : '' }}">
+                        {{ $statusLabel }}
+                    </span>
+
+                </div>
 
             </div>
 
@@ -819,6 +832,13 @@
 
                 <div class="cheques-actions mt-4 d-flex align-items-center flex-wrap gap-3">
 
+                    {{-- Editar únicamente un borrador sin movimientos --}}
+                    @if ($canEdit)
+                        <a href="{{ route('cheques.edit', $liquidation) }}" class="secondary-button">
+                            <i class="bi bi-pencil-square"></i>
+                            Editar borrador
+                        </a>
+                    @endif
 
                     <button type="button" id="cheques-confirm-button"
                         data-amount="{{ $money($liquidation->net_amount) }}"
@@ -931,6 +951,7 @@
 
                     {{ match ($event->action) {
                         'created' => 'Operación registrada',
+                        'updated' => 'Borrador actualizado',
                         'held' => 'Operación retenida',
                         'released' => 'Retención liberada',
                         'confirmed' => 'Operación confirmada y dinero entregado',

@@ -452,6 +452,7 @@ class BalanceDayService
                 'accountBalance',
                 'user',
                 'apiKey',
+                'client',
             ])
             ->where(
                 'financial_day_id',

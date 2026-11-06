@@ -156,4 +156,15 @@ class Company extends Model
     {
         return $this->hasMany(CompanyApiKey::class);
     }
+
+    /*
+|--------------------------------------------------------------------------
+| Clientes
+|--------------------------------------------------------------------------
+*/
+
+    public function clients(): HasMany
+    {
+        return $this->hasMany(Client::class);
+    }
 }

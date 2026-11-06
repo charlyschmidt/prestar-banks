@@ -682,6 +682,7 @@ class AccountController extends Controller
             'accountBalance',
             'user',
             'executedBy',
+            'client',
         ])
             ->where(
                 'financial_day_id',

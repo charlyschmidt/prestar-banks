@@ -67,6 +67,7 @@ import '../css/reminders.css';
 import '../css/subscription.css';
 import '../css/subscription-dashboard.css';
 import '../css/settings-api.css';
+import '../css/clients/client-search.css';
 
 /*
 |--------------------------------------------------------------------------
@@ -105,9 +106,6 @@ import './accounts-create';
 |--------------------------------------------------------------------------
 | AERIA Finance — Cheques
 |--------------------------------------------------------------------------
-|
-| Acciones de las pantallas de cheques.
-|
 */
 
 import './cheques/show.js';
@@ -120,10 +118,10 @@ import './cheques/index.js';
 | Componentes Vue 3
 |--------------------------------------------------------------------------
 |
-| Se cargan solamente cuando existe su contenedor.
+| Cada componente se carga únicamente cuando
+| existe su contenedor dentro del DOM.
 |
-| Evitamos inicializaciones duplicadas y reducimos
-| el Javascript de las páginas que no los utilizan.
+| No montamos una aplicación Vue global.
 |
 */
 
@@ -134,6 +132,7 @@ import './cheques/index.js';
 */
 
 function loadOfficialRatesBar() {
+
     const container = document.getElementById(
         'official-rates-app'
     );
@@ -143,10 +142,12 @@ function loadOfficialRatesBar() {
     }
 
     import('./official-rates').catch(error => {
+
         console.error(
             'AERIA: no se pudo cargar la barra de cotizaciones.',
             error
         );
+
     });
 }
 
@@ -169,6 +170,7 @@ function loadOfficialRatesBar() {
 */
 
 function loadChequeDeliveries() {
+
     const container = document.getElementById(
         'cheque-deliveries-app'
     );
@@ -178,10 +180,53 @@ function loadChequeDeliveries() {
     }
 
     import('./cheques/deliveries').catch(error => {
+
         console.error(
             'AERIA: no se pudo cargar el módulo de entregas múltiples.',
             error
         );
+
+    });
+}
+
+/*
+|--------------------------------------------------------------------------
+| AERIA Clients — Buscador dinámico
+|--------------------------------------------------------------------------
+|
+| Disponible en formularios de movimientos.
+|
+| - Busca clientes de la empresa activa.
+| - No carga todo el padrón.
+| - Solicita resultados al servidor.
+| - Permite seleccionar un cliente.
+| - Guarda el ID en un input oculto.
+| - El cliente es opcional.
+|
+| La administración del padrón sigue siendo
+| exclusiva del Super Admin.
+|
+| Laravel valida empresa, permisos y estado.
+|
+*/
+
+function loadClientSearch() {
+
+    const container = document.getElementById(
+        'client-search-app'
+    );
+
+    if (!container) {
+        return;
+    }
+
+    import('./clients/client-search').catch(error => {
+
+        console.error(
+            'AERIA: no se pudo cargar el buscador de clientes.',
+            error
+        );
+
     });
 }
 
@@ -195,16 +240,25 @@ function loadChequeDeliveries() {
 */
 
 function initializeAeriaComponents() {
+
     loadOfficialRatesBar();
+
     loadChequeDeliveries();
+
+    loadClientSearch();
+
 }
 
 if (document.readyState === 'loading') {
+
     document.addEventListener(
         'DOMContentLoaded',
         initializeAeriaComponents,
         { once: true }
     );
+
 } else {
+
     initializeAeriaComponents();
+
 }

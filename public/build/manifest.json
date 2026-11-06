@@ -1,6 +1,6 @@
 {
-  "_runtime-dom.esm-bundler-BS1pH2QC.js": {
-    "file": "assets/runtime-dom.esm-bundler-BS1pH2QC.js",
+  "_runtime-dom.esm-bundler-DoUGyVbu.js": {
+    "file": "assets/runtime-dom.esm-bundler-DoUGyVbu.js",
     "name": "runtime-dom.esm-bundler"
   },
   "node_modules/bootstrap-icons/font/fonts/bootstrap-icons.woff": {
@@ -12,7 +12,7 @@
     "src": "node_modules/bootstrap-icons/font/fonts/bootstrap-icons.woff2"
   },
   "resources/css/app.css": {
-    "file": "assets/app-CoIKm8IK.css",
+    "file": "assets/app-zgJMsX4E.css",
     "name": "app",
     "names": [
       "app.css"
@@ -88,16 +88,17 @@
     "isEntry": true
   },
   "resources/js/app.js": {
-    "file": "assets/app-Df7ioAbN.js",
+    "file": "assets/app-Dkrl27eh.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
     "dynamicImports": [
       "resources/js/official-rates.js",
-      "resources/js/cheques/deliveries.js"
+      "resources/js/cheques/deliveries.js",
+      "resources/js/clients/client-search.js"
     ],
     "css": [
-      "assets/app-DZbxJ3EU.css",
+      "assets/app-CHcsQZRD.css",
       "assets/welcome-Vd3gmU33.css",
       "assets/register-pending-LXepLUu1.css",
       "assets/subscription-BVFLvsFJ.css"
@@ -108,12 +109,21 @@
     ]
   },
   "resources/js/cheques/deliveries.js": {
-    "file": "assets/deliveries-BWsJyyV7.js",
+    "file": "assets/deliveries-7tSQ0pcq.js",
     "name": "deliveries",
     "src": "resources/js/cheques/deliveries.js",
     "isDynamicEntry": true,
     "imports": [
-      "_runtime-dom.esm-bundler-BS1pH2QC.js"
+      "_runtime-dom.esm-bundler-DoUGyVbu.js"
+    ]
+  },
+  "resources/js/clients/client-search.js": {
+    "file": "assets/client-search-lR5OcqL1.js",
+    "name": "client-search",
+    "src": "resources/js/clients/client-search.js",
+    "isDynamicEntry": true,
+    "imports": [
+      "_runtime-dom.esm-bundler-DoUGyVbu.js"
     ]
   },
   "resources/js/guia-de-uso.js": {
@@ -123,12 +133,12 @@
     "isEntry": true
   },
   "resources/js/official-rates.js": {
-    "file": "assets/official-rates-BxReEZIc.js",
+    "file": "assets/official-rates-Bo907gfq.js",
     "name": "official-rates",
     "src": "resources/js/official-rates.js",
     "isDynamicEntry": true,
     "imports": [
-      "_runtime-dom.esm-bundler-BS1pH2QC.js"
+      "_runtime-dom.esm-bundler-DoUGyVbu.js"
     ]
   },
   "resources/js/welcome.js": {

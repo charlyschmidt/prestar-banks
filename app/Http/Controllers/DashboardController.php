@@ -6,10 +6,8 @@ use App\Services\BalanceDayService;
 use App\Services\CompanyContextService;
 use App\Models\Account;
 
-
 class DashboardController extends Controller
 {
-
     public function index(
         BalanceDayService $balanceDayService,
         CompanyContextService $companyContextService
@@ -23,19 +21,18 @@ class DashboardController extends Controller
 
 
         /*
-    |--------------------------------------------------------------------------
-    | Sin jornada abierta
-    |--------------------------------------------------------------------------
-    */
+        |--------------------------------------------------------------------------
+        | Sin jornada abierta
+        |--------------------------------------------------------------------------
+        */
 
         if (!$summary['has_day']) {
 
-
             /*
-        |--------------------------------------------------------------------------
-        | Onboarding inicial
-        |--------------------------------------------------------------------------
-        */
+            |--------------------------------------------------------------------------
+            | Onboarding inicial
+            |--------------------------------------------------------------------------
+            */
 
             if (
                 $company
@@ -54,12 +51,11 @@ class DashboardController extends Controller
                 );
             }
 
-
             /*
-        |--------------------------------------------------------------------------
-        | Funcionamiento habitual
-        |--------------------------------------------------------------------------
-        */
+            |--------------------------------------------------------------------------
+            | Funcionamiento habitual
+            |--------------------------------------------------------------------------
+            */
 
             return view(
                 'dashboard.no-day',
@@ -68,7 +64,6 @@ class DashboardController extends Controller
                 ]
             );
         }
-
 
         return view(
             'dashboard.index',
@@ -88,10 +83,10 @@ class DashboardController extends Controller
 
 
         /*
-    |--------------------------------------------------------------------------
-    | Sin jornada abierta
-    |--------------------------------------------------------------------------
-    */
+        |--------------------------------------------------------------------------
+        | Sin jornada abierta
+        |--------------------------------------------------------------------------
+        */
 
         if (!$summary['has_day']) {
 
@@ -101,25 +96,43 @@ class DashboardController extends Controller
         }
 
 
+        /*
+        |--------------------------------------------------------------------------
+        | Cargar relaciones necesarias
+        |--------------------------------------------------------------------------
+        |
+        | Los movimientos provienen del resumen financiero.
+        | Cargamos las relaciones necesarias para generar
+        | el JSON evitando consultas repetidas.
+        |
+        | Client pertenece al movimiento y a la empresa.
+        |
+        */
+
+        $movements = collect($summary['movements']);
+
+        $movements->each(function ($movement) {
+
+            $movement->loadMissing([
+                'account',
+                'accountBalance',
+                'user',
+                'apiKey',
+                'client',
+            ]);
+        });
+
+
         return response()->json([
 
             'has_day' => true,
 
 
             /*
-        |--------------------------------------------------------------------------
-        | Totales por moneda
-        |--------------------------------------------------------------------------
-        |
-        | Ejemplo:
-        |
-        | balance_total:
-        | {
-        |     ARS: 1500000,
-        |     USD: 2500
-        | }
-        |
-        */
+            |--------------------------------------------------------------------------
+            | Totales por moneda
+            |--------------------------------------------------------------------------
+            */
 
             'balance_total' =>
             $summary['balance_total'],
@@ -138,11 +151,6 @@ class DashboardController extends Controller
             |--------------------------------------------------------------------------
             | HTML de las tarjetas de cuentas
             |--------------------------------------------------------------------------
-            |
-            | Utilizamos el mismo Blade que renderiza el dashboard.
-            | Esto permite incorporar cuentas nuevas en tiempo real
-            | sin duplicar el diseño en JavaScript.
-            |
             */
 
             'accounts_html' => view(
@@ -153,12 +161,11 @@ class DashboardController extends Controller
             )->render(),
 
 
-
             /*
-        |--------------------------------------------------------------------------
-        | Cuentas
-        |--------------------------------------------------------------------------
-        */
+            |--------------------------------------------------------------------------
+            | Cuentas
+            |--------------------------------------------------------------------------
+            */
 
             'accounts' =>
             collect($summary['accounts'])
@@ -215,19 +222,41 @@ class DashboardController extends Controller
 
 
             /*
-        |--------------------------------------------------------------------------
-        | Movimientos
-        |--------------------------------------------------------------------------
-        */
+            |--------------------------------------------------------------------------
+            | Movimientos
+            |--------------------------------------------------------------------------
+            */
 
             'movements' =>
-            collect($summary['movements'])
+            $movements
                 ->map(function ($movement) {
 
                     return [
 
                         'id' =>
                         $movement->id,
+
+
+                        /*
+                            |--------------------------------------------------------------------------
+                            | Cliente asociado
+                            |--------------------------------------------------------------------------
+                            |
+                            | Es opcional. Enviamos solamente
+                            | UUID público y nombre para la UI.
+                            |
+                            */
+
+                        'client' => $movement->client
+                            ? [
+                                'uuid' =>
+                                $movement->client->uuid,
+
+                                'name' =>
+                                $movement->client->display_name,
+                            ]
+                            : null,
+
 
                         'account_balance_id' =>
                         $movement->account_balance_id,
@@ -264,10 +293,10 @@ class DashboardController extends Controller
 
 
                         /*
-                        |--------------------------------------------------------------------------
-                        | Origen
-                        |--------------------------------------------------------------------------
-                        */
+                            |--------------------------------------------------------------------------
+                            | Origen
+                            |--------------------------------------------------------------------------
+                            */
 
                         'source' =>
                         $movement->source,
@@ -286,29 +315,28 @@ class DashboardController extends Controller
                             : null,
 
 
-
                         /*
-                        |--------------------------------------------------------------------------
-                        | Cuenta
-                        |--------------------------------------------------------------------------
-                        */
+                            |--------------------------------------------------------------------------
+                            | Cuenta
+                            |--------------------------------------------------------------------------
+                            */
 
                         'account' => [
 
                             'id' =>
-                            $movement->account->id,
+                            $movement->account?->id,
 
                             'name' =>
-                            $movement->account->name,
+                            $movement->account?->name,
 
                         ],
 
 
                         /*
-                        |--------------------------------------------------------------------------
-                        | Moneda
-                        |--------------------------------------------------------------------------
-                        */
+                            |--------------------------------------------------------------------------
+                            | Moneda
+                            |--------------------------------------------------------------------------
+                            */
 
                         'account_balance' => [
 
@@ -322,10 +350,10 @@ class DashboardController extends Controller
 
 
                         /*
-                        |--------------------------------------------------------------------------
-                        | Usuario
-                        |--------------------------------------------------------------------------
-                        */
+                            |--------------------------------------------------------------------------
+                            | Usuario
+                            |--------------------------------------------------------------------------
+                            */
 
                         'user' => [
 

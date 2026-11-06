@@ -25,6 +25,18 @@
 /* =========================================================
    SIDEBAR - SUBMENÚ
 ========================================================= */
+/* ==========================================
+   SIDEBAR — SEPARADOR DE SECCIONES
+========================================== */
+
+.sidebar-divider {
+    height: 1px;
+    width: calc(100% - 32px);
+
+    margin: 14px 16px;
+
+    background: var(--company-border);
+}
 
 .sidebar-menu-group {
     width: 100%;

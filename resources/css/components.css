@@ -351,6 +351,17 @@ body[data-theme="light"] {
     justify-content: center;
 }
 
+/* Botones de acción deshabilitados */
+
+.primary-action-button:disabled,
+.primary-action-button[disabled] {
+    opacity: 0.4;
+    cursor: not-allowed;
+    filter: grayscale(65%);
+    box-shadow: none;
+    pointer-events: none;
+}
+
 
 /* ==========================
    TABLES

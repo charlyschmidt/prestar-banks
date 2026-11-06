@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\Concerns\BelongsToCompany;
 use App\Models\CompanyApiKey;
 
@@ -18,6 +19,9 @@ class Transaction extends Model
         'account_balance_id',
         'financial_day_id',
         'user_id',
+
+        'client_id',
+
         'type',
         'amount',
         'description',
@@ -36,7 +40,6 @@ class Transaction extends Model
 
     ];
 
-
     protected $casts = [
 
         'amount' => 'decimal:2',
@@ -53,7 +56,6 @@ class Transaction extends Model
 
     ];
 
-
     /*
     |--------------------------------------------------------------------------
     | Financial Day
@@ -68,7 +70,6 @@ class Transaction extends Model
         );
     }
 
-
     /*
     |--------------------------------------------------------------------------
     | Account
@@ -81,7 +82,6 @@ class Transaction extends Model
             Account::class
         );
     }
-
 
     /*
     |--------------------------------------------------------------------------
@@ -97,6 +97,25 @@ class Transaction extends Model
         );
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | Client
+    |--------------------------------------------------------------------------
+    |
+    | Asociación opcional con un cliente del padrón.
+    |
+    | El cliente debe pertenecer a la misma empresa
+    | que el movimiento. Esto se validará al guardar.
+    |
+    */
+
+    public function client(): BelongsTo
+    {
+        return $this->belongsTo(
+            Client::class,
+            'client_id'
+        );
+    }
 
     /*
     |--------------------------------------------------------------------------
@@ -111,7 +130,6 @@ class Transaction extends Model
         )->withTrashed();
     }
 
-
     /*
     |--------------------------------------------------------------------------
     | Executed By
@@ -125,6 +143,12 @@ class Transaction extends Model
             'executed_by'
         )->withTrashed();
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | API Key
+    |--------------------------------------------------------------------------
+    */
 
     public function apiKey()
     {

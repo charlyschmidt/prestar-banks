@@ -23,6 +23,8 @@ use App\Http\Controllers\ChequeLiquidationController;
 
 use App\Http\Controllers\ChequeLiquidationExportController;
 use App\Http\Controllers\ChequePortfolioController;
+use App\Http\Controllers\ClientController;
+use App\Http\Controllers\ClientLookupController;
 
 /*
 |--------------------------------------------------------------------------
@@ -349,220 +351,303 @@ Route::middleware('auth')->group(function () {
         |--------------------------------------------------------------------------
         */
 
-        Route::get('/cheques', [
-            ChequeLiquidationController::class,
-            'index'
-        ])->name('cheques.index');
+        // Todo el módulo de Cheques requiere Super Admin de la empresa activa.
+        Route::middleware('cheques.admin')->group(function () {
 
-        Route::get('/cheques/nueva', [
-            ChequeLiquidationController::class,
-            'create'
-        ])->name('cheques.create');
+            Route::get('/cheques', [
+                ChequeLiquidationController::class,
+                'index'
+            ])->name('cheques.index');
 
-        Route::post('/cheques/simular', [
-            ChequeLiquidationController::class,
-            'preview'
-        ])->name('cheques.preview');
+            Route::get('/cheques/nueva', [
+                ChequeLiquidationController::class,
+                'create'
+            ])->name('cheques.create');
 
-        Route::post('/cheques', [
-            ChequeLiquidationController::class,
-            'store'
-        ])->name('cheques.store');
+            Route::post('/cheques/simular', [
+                ChequeLiquidationController::class,
+                'preview'
+            ])->name('cheques.preview');
+
+            Route::post('/cheques', [
+                ChequeLiquidationController::class,
+                'store'
+            ])->name('cheques.store');
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | AERIA Cheques - Cartera de terceros
+            |--------------------------------------------------------------------------
+            |
+            | Consulta de cheques disponibles en cartera.
+            | No modifica estados ni movimientos financieros.
+            |
+            */
+
+            Route::get('/cheques/cartera', [
+                ChequePortfolioController::class,
+                'index'
+            ])->name('cheques.portfolio.index');
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | AERIA Cheques - Operaciones bancarias
+            |--------------------------------------------------------------------------
+            |
+            | Administración del ciclo bancario de cheques
+            | de terceros adquiridos por la financiera.
+            |
+            | Circuito:
+            |
+            | En cartera -> Depositado
+            | Depositado -> Acreditado
+            | Depositado -> Rechazado
+            |
+            | Los cheques entregados como medios de pago
+            | no pueden depositarse.
+            |
+            | Todas las operaciones deberán validar:
+            | - Empresa activa
+            | - Usuario autorizado
+            | - Estado actual
+            | - Cuenta bancaria correspondiente
+            | - Consistencia financiera
+            |
+            */
+
+            /*
+            |--------------------------------------------------------------------------
+            | Registrar depósito bancario
+            |--------------------------------------------------------------------------
+            */
+
+            Route::post('/cheques/cartera/{cheque}/depositar', [
+                ChequePortfolioController::class,
+                'deposit'
+            ])->whereUuid('cheque')
+                ->name('cheques.portfolio.deposit');
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Confirmar acreditación
+            |--------------------------------------------------------------------------
+            */
+
+            Route::post('/cheques/cartera/{cheque}/acreditar', [
+                ChequePortfolioController::class,
+                'accredit'
+            ])->whereUuid('cheque')
+                ->name('cheques.portfolio.accredit');
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Registrar rechazo bancario
+            |--------------------------------------------------------------------------
+            */
+
+            Route::post('/cheques/cartera/{cheque}/rechazar', [
+                ChequePortfolioController::class,
+                'reject'
+            ])->whereUuid('cheque')
+                ->name('cheques.portfolio.reject');
+
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Exportar liquidación a Excel
+            |--------------------------------------------------------------------------
+            |
+            | Descarga un XLSX con:
+            | - Resumen financiero
+            | - Detalle individual de todos los cheques
+            |
+            | Solo lectura. No modifica estados ni movimientos.
+            |
+            */
+
+            Route::get('/cheques/{liquidation}/excel', [
+                ChequeLiquidationExportController::class,
+                '__invoke'
+            ])->whereUuid('liquidation')
+                ->name('cheques.export');
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Editar liquidación en borrador
+            |--------------------------------------------------------------------------
+            |
+            | Estas rutas no modifican liquidaciones confirmadas.
+            | El controlador valida empresa activa, estado y movimientos.
+            |
+            */
+
+            Route::get('/cheques/{liquidation}/editar', [
+                ChequeLiquidationController::class,
+                'edit'
+            ])->whereUuid('liquidation')
+                ->name('cheques.edit');
+
+            Route::put('/cheques/{liquidation}', [
+                ChequeLiquidationController::class,
+                'update'
+            ])->whereUuid('liquidation')
+                ->name('cheques.update');
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Consultar liquidación por UUID
+            |--------------------------------------------------------------------------
+            */
+
+            Route::get('/cheques/{liquidation}', [
+                ChequeLiquidationController::class,
+                'show'
+            ])->whereUuid('liquidation')
+                ->name('cheques.show');
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Guardar medios de pago múltiples
+            |--------------------------------------------------------------------------
+            |
+            | Permite distribuir el neto entre:
+            |
+            | - Efectivo ARS, USD y EUR
+            | - Transferencias bancarias
+            | - Cheques de terceros disponibles en cartera
+            |
+            | Valida y guarda las entregas.
+            |
+            | NO genera movimientos financieros.
+            | NO modifica el estado de los cheques.
+            | NO confirma la liquidación.
+            |
+            */
+
+            Route::post('/cheques/{liquidation}/entregas', [
+                ChequeLiquidationController::class,
+                'saveDeliveries'
+            ])->whereUuid('liquidation')
+                ->name('cheques.deliveries.store');
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Confirmar liquidación
+            |--------------------------------------------------------------------------
+            |
+            | Procesa todos los medios de pago registrados.
+            |
+            | - Genera un egreso por cada entrega monetaria.
+            | - Descuenta saldos en la moneda correspondiente.
+            | - Marca como entregados los cheques de cartera.
+            | - Incorpora los cheques recibidos a cartera.
+            | - Confirma toda la operación atómicamente.
+            |
+            */
+
+            Route::post('/cheques/{liquidation}/confirmar', [
+                ChequeLiquidationController::class,
+                'confirm'
+            ])->whereUuid('liquidation')
+                ->name('cheques.confirm');
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Retener / liberar borradores
+            |--------------------------------------------------------------------------
+            */
+
+            Route::patch('/cheques/{liquidation}/retener', [
+                ChequeLiquidationController::class,
+                'hold'
+            ])->whereUuid('liquidation')
+                ->name('cheques.hold');
+
+            Route::patch('/cheques/{liquidation}/liberar', [
+                ChequeLiquidationController::class,
+                'release'
+            ])->whereUuid('liquidation')
+                ->name('cheques.release');
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Eliminar liquidaciones sin ejecución financiera
+            |--------------------------------------------------------------------------
+            */
+
+            Route::delete('/cheques/{liquidation}', [
+                ChequeLiquidationController::class,
+                'destroy'
+            ])->whereUuid('liquidation')
+                ->name('cheques.destroy');
+        });
+
+
 
 
         /*
-        |--------------------------------------------------------------------------
-        | AERIA Cheques - Cartera de terceros
-        |--------------------------------------------------------------------------
-        |
-        | Consulta de cheques disponibles en cartera.
-        | No modifica estados ni movimientos financieros.
-        |
-        */
+|--------------------------------------------------------------------------
+| AERIA Clients — Solo Super Admin
+|--------------------------------------------------------------------------
+|
+| Las URL utilizan UUID.
+| El ID numérico queda reservado para relaciones internas.
+|
+*/
 
-        Route::get('/cheques/cartera', [
-            ChequePortfolioController::class,
-            'index'
-        ])->name('cheques.portfolio.index');
+        Route::middleware('cheques.admin')->group(function () {
 
+            Route::get('/clients', [
+                ClientController::class,
+                'index'
+            ])->name('clients.index');
 
-        /*
-        |--------------------------------------------------------------------------
-        | AERIA Cheques - Operaciones bancarias
-        |--------------------------------------------------------------------------
-        |
-        | Administración del ciclo bancario de cheques
-        | de terceros adquiridos por la financiera.
-        |
-        | Circuito:
-        |
-        | En cartera -> Depositado
-        | Depositado -> Acreditado
-        | Depositado -> Rechazado
-        |
-        | Los cheques entregados como medios de pago
-        | no pueden depositarse.
-        |
-        | Todas las operaciones deberán validar:
-        | - Empresa activa
-        | - Usuario autorizado
-        | - Estado actual
-        | - Cuenta bancaria correspondiente
-        | - Consistencia financiera
-        |
-        */
+            Route::get('/clients/create', [
+                ClientController::class,
+                'create'
+            ])->name('clients.create');
 
-        /*
-        |--------------------------------------------------------------------------
-        | Registrar depósito bancario
-        |--------------------------------------------------------------------------
-        */
+            Route::post('/clients', [
+                ClientController::class,
+                'store'
+            ])->name('clients.store');
 
-        Route::post('/cheques/cartera/{cheque}/depositar', [
-            ChequePortfolioController::class,
-            'deposit'
-        ])->whereUuid('cheque')
-            ->name('cheques.portfolio.deposit');
+            Route::get('/clients/{client}', [
+                ClientController::class,
+                'show'
+            ])->whereUuid('client')
+                ->name('clients.show');
 
+            Route::get('/clients/{client}/edit', [
+                ClientController::class,
+                'edit'
+            ])->whereUuid('client')
+                ->name('clients.edit');
 
-        /*
-        |--------------------------------------------------------------------------
-        | Confirmar acreditación
-        |--------------------------------------------------------------------------
-        */
+            Route::put('/clients/{client}', [
+                ClientController::class,
+                'update'
+            ])->whereUuid('client')
+                ->name('clients.update');
 
-        Route::post('/cheques/cartera/{cheque}/acreditar', [
-            ChequePortfolioController::class,
-            'accredit'
-        ])->whereUuid('cheque')
-            ->name('cheques.portfolio.accredit');
+            Route::patch('/clients/{client}/toggle-status', [
+                ClientController::class,
+                'toggleStatus'
+            ])->whereUuid('client')
+                ->name('clients.toggle-status');
+        });
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | Registrar rechazo bancario
-        |--------------------------------------------------------------------------
-        */
-
-        Route::post('/cheques/cartera/{cheque}/rechazar', [
-            ChequePortfolioController::class,
-            'reject'
-        ])->whereUuid('cheque')
-            ->name('cheques.portfolio.reject');
-
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Exportar liquidación a Excel
-        |--------------------------------------------------------------------------
-        |
-        | Descarga un XLSX con:
-        | - Resumen financiero
-        | - Detalle individual de todos los cheques
-        |
-        | Solo lectura. No modifica estados ni movimientos.
-        |
-        */
-
-        Route::get('/cheques/{liquidation}/excel', [
-            ChequeLiquidationExportController::class,
-            '__invoke'
-        ])->whereUuid('liquidation')
-            ->name('cheques.export');
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Consultar liquidación por UUID
-        |--------------------------------------------------------------------------
-        */
-
-        Route::get('/cheques/{liquidation}', [
-            ChequeLiquidationController::class,
-            'show'
-        ])->whereUuid('liquidation')
-            ->name('cheques.show');
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Guardar medios de pago múltiples
-        |--------------------------------------------------------------------------
-        |
-        | Permite distribuir el neto entre:
-        |
-        | - Efectivo ARS, USD y EUR
-        | - Transferencias bancarias
-        | - Cheques de terceros disponibles en cartera
-        |
-        | Valida y guarda las entregas.
-        |
-        | NO genera movimientos financieros.
-        | NO modifica el estado de los cheques.
-        | NO confirma la liquidación.
-        |
-        */
-
-        Route::post('/cheques/{liquidation}/entregas', [
-            ChequeLiquidationController::class,
-            'saveDeliveries'
-        ])->whereUuid('liquidation')
-            ->name('cheques.deliveries.store');
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Confirmar liquidación
-        |--------------------------------------------------------------------------
-        |
-        | Procesa todos los medios de pago registrados.
-        |
-        | - Genera un egreso por cada entrega monetaria.
-        | - Descuenta saldos en la moneda correspondiente.
-        | - Marca como entregados los cheques de cartera.
-        | - Incorpora los cheques recibidos a cartera.
-        | - Confirma toda la operación atómicamente.
-        |
-        */
-
-        Route::post('/cheques/{liquidation}/confirmar', [
-            ChequeLiquidationController::class,
-            'confirm'
-        ])->whereUuid('liquidation')
-            ->name('cheques.confirm');
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Retener / liberar borradores
-        |--------------------------------------------------------------------------
-        */
-
-        Route::patch('/cheques/{liquidation}/retener', [
-            ChequeLiquidationController::class,
-            'hold'
-        ])->whereUuid('liquidation')
-            ->name('cheques.hold');
-
-        Route::patch('/cheques/{liquidation}/liberar', [
-            ChequeLiquidationController::class,
-            'release'
-        ])->whereUuid('liquidation')
-            ->name('cheques.release');
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Eliminar liquidaciones sin ejecución financiera
-        |--------------------------------------------------------------------------
-        */
-
-        Route::delete('/cheques/{liquidation}', [
-            ChequeLiquidationController::class,
-            'destroy'
-        ])->whereUuid('liquidation')
-            ->name('cheques.destroy');
 
 
 
@@ -696,6 +781,31 @@ Route::middleware('auth')->group(function () {
                     'updateAlerts'
                 ]
             )->name('accounts.alerts.update');
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | AERIA Clients — Búsqueda para movimientos
+            |--------------------------------------------------------------------------
+            |
+            | Disponible para todos los usuarios autorizados
+            | a operar movimientos de la empresa activa.
+            |
+            | - No permite administrar clientes.
+            | - Devuelve únicamente clientes activos.
+            | - Filtra por empresa activa.
+            | - Requiere una jornada financiera abierta.
+            | - Limita la frecuencia de consultas.
+            |
+            */
+
+            Route::get(
+                '/clients/lookup',
+                ClientLookupController::class
+            )
+                ->middleware('throttle:60,1')
+                ->name('clients.lookup');
+
 
 
             /*

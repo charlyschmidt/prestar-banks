@@ -18,15 +18,16 @@ use App\Events\TransactionExecuted;
 use App\Events\TransactionUpdated;
 use Illuminate\Support\Facades\Storage;
 use App\Services\TransactionService;
+use App\Services\CompanyContextService;
 
 class TransactionController extends Controller
 {
 
 
+
     public function index(FinancialDayService $financialDayService)
     {
         $day = $financialDayService->current();
-
 
         if (!$day) {
 
@@ -38,11 +39,27 @@ class TransactionController extends Controller
             );
         }
 
+        /*
+    |--------------------------------------------------------------------------
+    | Movimientos de la jornada actual
+    |--------------------------------------------------------------------------
+    |
+    | Incorporamos:
+    |
+    | - client: cliente asociado
+    | - accountBalance: moneda utilizada
+    |
+    | Cargamos las relaciones anticipadamente
+    | para evitar una consulta por cada movimiento.
+    |
+    */
 
         $transactions = Transaction::with([
             'account',
+            'accountBalance',
             'user',
-            'apiKey'
+            'apiKey',
+            'client',
         ])
             ->where(
                 'financial_day_id',
@@ -52,13 +69,12 @@ class TransactionController extends Controller
             ->orderBy('id', 'desc')
             ->get();
 
-
-
         return view(
             'transactions.index',
             compact('transactions')
         );
     }
+
 
 
 
@@ -141,6 +157,24 @@ class TransactionController extends Controller
     */
 
         $data = $request->validate([
+            /*
+            |--------------------------------------------------------------------------
+            | Cliente asociado (opcional)
+            |--------------------------------------------------------------------------
+            */
+
+            'client_id' => [
+                'nullable',
+                'integer',
+
+                Rule::exists('clients', 'id')
+                    ->where(function ($query) {
+                        $companyId = app(CompanyContextService::class)->id();
+
+                        $query->where('company_id', $companyId)
+                            ->where('is_active', true);
+                    }),
+            ],
 
             'account_id' => [
                 'required',
@@ -372,9 +406,10 @@ class TransactionController extends Controller
     |--------------------------------------------------------------------------
     */
 
-        $transaction->load(
-            'accountBalance'
-        );
+        $transaction->load([
+            'accountBalance',
+            'client',
+        ]);
 
 
         return view(
@@ -455,7 +490,31 @@ class TransactionController extends Controller
     */
 
         $data = $request->validate([
+            'client_id' => [
+                'nullable',
+                'integer',
 
+                Rule::exists('clients', 'id')
+                    ->where(function ($query) use ($transaction) {
+
+                        $companyId = app(
+                            \App\Services\CompanyContextService::class
+                        )->id();
+
+                        $query->where('company_id', $companyId)
+                            ->where(function ($clients) use ($transaction) {
+
+                                $clients->where('is_active', true);
+
+                                if ($transaction->client_id !== null) {
+                                    $clients->orWhere(
+                                        'id',
+                                        $transaction->client_id
+                                    );
+                                }
+                            });
+                    }),
+            ],
             'account_id' => [
                 'required',
                 'integer',
@@ -1263,31 +1322,28 @@ class TransactionController extends Controller
         ]);
     }
 
+
     public function detail(Transaction $transaction)
     {
         /*
     |--------------------------------------------------------------------------
-    | Seguridad
+    | Seguridad multiempresa
     |--------------------------------------------------------------------------
+    |
+    | Utilizamos la empresa activa de AERIA Finance,
+    | no el company_id del usuario.
+    |
     */
+
+        $companyId = app(
+            CompanyContextService::class
+        )->id();
 
         abort_unless(
-            $transaction->company_id === auth()->user()->company_id,
+            $companyId !== null
+                && (int) $transaction->company_id === (int) $companyId,
             403
         );
-
-
-        /*
-    |--------------------------------------------------------------------------
-    | Relaciones
-    |--------------------------------------------------------------------------
-    */
-
-        $transaction->loadMissing([
-            'account',
-            'accountBalance',
-        ]);
-
 
         /*
     |--------------------------------------------------------------------------
@@ -1301,11 +1357,48 @@ class TransactionController extends Controller
             404
         );
 
+        /*
+    |--------------------------------------------------------------------------
+    | Relaciones
+    |--------------------------------------------------------------------------
+    */
+
+        $transaction->loadMissing([
+            'account',
+            'accountBalance',
+            'client',
+        ]);
+
+        /*
+    |--------------------------------------------------------------------------
+    | Respuesta JSON
+    |--------------------------------------------------------------------------
+    */
 
         return response()->json([
 
             'id' =>
             $transaction->id,
+
+            /*
+        |--------------------------------------------------------------------------
+        | Cliente asociado
+        |--------------------------------------------------------------------------
+        |
+        | Puede ser nulo.
+        | Utilizamos UUID público y nombre.
+        |
+        */
+
+            'client' => $transaction->client
+                ? [
+                    'uuid' =>
+                    $transaction->client->uuid,
+
+                    'name' =>
+                    $transaction->client->display_name,
+                ]
+                : null,
 
             'amount' =>
             $transaction->amount,
@@ -1327,6 +1420,12 @@ class TransactionController extends Controller
             'executed_at' =>
             $transaction->executed_at?->format('d/m/Y H:i'),
 
+            /*
+        |--------------------------------------------------------------------------
+        | Cuenta de origen
+        |--------------------------------------------------------------------------
+        */
+
             'account' => [
 
                 'name' =>
@@ -1335,8 +1434,11 @@ class TransactionController extends Controller
 
                 'logo' =>
                 $transaction->account?->logo
-                    ? Storage::url($transaction->account->logo)
+                    ? Storage::url(
+                        $transaction->account->logo
+                    )
                     : null,
+
             ],
 
         ]);

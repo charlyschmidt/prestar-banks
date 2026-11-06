@@ -1143,15 +1143,24 @@ function addMovementToTable(event, animate = true) {
         </td>
 
 
+        <!-- DESCRIPCIÓN / CLIENTE -->
         <td>
 
             <strong>
                 ${escapeHtml(
-            movement.description
-            ||
-            'Sin descripción'
-        )}
+                    movement.description || 'Sin descripción'
+                )}
             </strong>
+
+            ${movement.client?.name
+                ? `
+                    <div class="text-muted small mt-1">
+                        <i class="bi bi-person me-1"></i>
+                        ${escapeHtml(movement.client.name)}
+                    </div>
+                `
+                : ''
+            }
 
         </td>
 
@@ -1796,6 +1805,14 @@ async function syncDashboard() {
 
                                         id:
                                             movement.id,
+
+                                        /*
+                                        |--------------------------------------------------------------------------
+                                        | Cliente asociado
+                                        |--------------------------------------------------------------------------
+                                        */
+
+                                        client: movement.client ?? null,
 
                                         account_balance_id:
                                             movement.account_balance_id,

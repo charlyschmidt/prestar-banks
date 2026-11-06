@@ -71,6 +71,7 @@ class TransactionCreated implements ShouldBroadcastNow
             'user',
             'financialDay',
             'apiKey',
+            'client',
         ]);
 
 
@@ -150,6 +151,34 @@ class TransactionCreated implements ShouldBroadcastNow
 
                 'id' =>
                 $this->transaction->id,
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | Cliente asociado
+                |--------------------------------------------------------------------------
+                |
+                | El cliente es opcional.
+                |
+                | Enviamos únicamente los datos necesarios
+                | para mostrarlo en las tablas de movimientos.
+                |
+                | No exponemos datos personales innecesarios
+                | ni el ID numérico interno del cliente.
+                |
+                */
+
+                'client' => $this->transaction->client
+                    ? [
+                        'uuid' =>
+                        $this->transaction->client->uuid,
+
+                        'name' =>
+                        $this->transaction->client->display_name,
+
+                    ]
+                    : null,
+
 
                 'account_balance_id' =>
                 $this->transaction->account_balance_id,

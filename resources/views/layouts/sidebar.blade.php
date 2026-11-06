@@ -112,11 +112,23 @@
             </a>
 
             @if (auth()->user()->isSuperAdmin())
+                <div class="sidebar-divider"></div>
+            @endif
+
+            {{-- CHEQUES Y CLIENTES — SOLO SUPER ADMIN --}}
+
+            @if (auth()->user()->isSuperAdmin())
                 <a href="{{ route('cheques.index') }}" class="{{ request()->routeIs('cheques.*') ? 'active' : '' }}">
 
                     <i class="bi bi-bank"></i>
-
                     Cheques
+
+                </a>
+
+                <a href="{{ route('clients.index') }}" class="{{ request()->routeIs('clients.*') ? 'active' : '' }}">
+
+                    <i class="bi bi-person-vcard"></i>
+                    Clientes
 
                 </a>
             @endif
@@ -325,13 +337,28 @@
 
         </a>
 
-        <a href="{{ route('cheques.index') }}" class="{{ request()->routeIs('cheques.*') ? 'active' : '' }}">
+        @if (auth()->user()->isSuperAdmin())
+            <div class="sidebar-divider"></div>
+        @endif
 
-            <i class="bi bi-bank"></i>
 
-            Cheques
+        {{-- CHEQUES Y CLIENTES — SOLO SUPER ADMIN --}}
 
-        </a>
+        @if (auth()->user()->isSuperAdmin())
+            <a href="{{ route('cheques.index') }}" class="{{ request()->routeIs('cheques.*') ? 'active' : '' }}">
+
+                <i class="bi bi-bank"></i>
+                Cheques
+
+            </a>
+
+            <a href="{{ route('clients.index') }}" class="{{ request()->routeIs('clients.*') ? 'active' : '' }}">
+
+                <i class="bi bi-person-vcard"></i>
+                Clientes
+
+            </a>
+        @endif
 
 
         @if (auth()->user()->isSuperAdmin())

@@ -1,3 +1,58 @@
+/*
+|--------------------------------------------------------------------------
+| AERIA Finance - Movimientos
+|--------------------------------------------------------------------------
+|
+| Gestión de movimientos en tiempo real.
+| Compatible con Laravel Echo / Reverb.
+|
+| Incluye:
+| - Clientes asociados
+| - Nuevos movimientos
+| - Actualización de movimientos
+| - Ejecución de transferencias
+| - Detalle de transferencias
+| - Permisos de acciones
+| - Numeración de movimientos
+|
+*/
+
+
+/*
+|--------------------------------------------------------------------------
+| Seguridad HTML
+|--------------------------------------------------------------------------
+*/
+
+function escapeTransactionHtml(value) {
+    const div = document.createElement('div');
+
+    div.textContent = String(value ?? '');
+
+    return div.innerHTML;
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Formatear importe
+|--------------------------------------------------------------------------
+*/
+
+function formatTransactionAmount(value) {
+    return Number(value ?? 0).toLocaleString('es-AR', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+    });
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Renumerar movimientos
+|--------------------------------------------------------------------------
+*/
+
 function renumberTransactions() {
 
     const tbody = document.getElementById(
@@ -25,37 +80,119 @@ function renumberTransactions() {
         }
 
     });
-
 }
+
+
+/*
+|--------------------------------------------------------------------------
+| Sincronizar tabla después de editar
+|--------------------------------------------------------------------------
+|
+| TransactionUpdated envía el ID del movimiento.
+| Recuperamos la tabla renderizada por Laravel.
+|
+| Esto mantiene los permisos y el diseño Blade.
+| No modificamos balances ni recargamos toda la página.
+|
+*/
+
+async function syncTransactionsTable() {
+
+    const tbody = document.getElementById(
+        'transactions-body'
+    );
+
+    if (!tbody) {
+        return;
+    }
+
+    try {
+
+        const response = await fetch(
+            window.location.href,
+            {
+                method: 'GET',
+
+                headers: {
+                    'Accept': 'text/html',
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+
+                credentials: 'same-origin',
+                cache: 'no-store',
+            }
+        );
+
+        if (!response.ok || response.redirected) {
+            throw new Error(
+                `Error sincronizando movimientos: HTTP ${response.status}`
+            );
+        }
+
+        const html = await response.text();
+
+        const serverDocument = new DOMParser()
+            .parseFromString(html, 'text/html');
+
+        const updatedBody = serverDocument.getElementById(
+            'transactions-body'
+        );
+
+        if (!updatedBody) {
+            throw new Error(
+                'La respuesta no contiene la tabla de movimientos.'
+            );
+        }
+
+        const newRows = Array.from(
+            updatedBody.childNodes
+        ).map(node => document.importNode(node, true));
+
+        tbody.replaceChildren(...newRows);
+
+        renumberTransactions();
+
+    } catch (error) {
+
+        console.error(
+            'Error sincronizando movimientos:',
+            error
+        );
+
+    }
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Marcar transferencia como ejecutada
+|--------------------------------------------------------------------------
+*/
 
 function markTransactionAsExecuted(transactionId) {
 
-    const row =
-        document.querySelector(
-            `tr[data-transaction-id="${transactionId}"]`
-        );
+    const row = document.querySelector(
+        `tr[data-transaction-id="${transactionId}"]`
+    );
 
     if (!row) {
         return;
     }
 
-
     /*
     |--------------------------------------------------------------------------
-    | Badge Ejecutada
+    | Mostrar badge
     |--------------------------------------------------------------------------
     */
 
-    const badge =
-        row.querySelector(
-            `[data-execution-badge="${transactionId}"]`
-        );
+    const badge = row.querySelector(
+        `[data-execution-badge="${transactionId}"]`
+    );
 
     if (badge) {
         badge.hidden = false;
         badge.style.display = '';
     }
-
 
     /*
     |--------------------------------------------------------------------------
@@ -63,42 +200,35 @@ function markTransactionAsExecuted(transactionId) {
     |--------------------------------------------------------------------------
     */
 
-    const actions =
-        row.querySelector(
-            '.table-actions'
-        );
+    const actions = row.querySelector(
+        '.table-actions'
+    );
 
     if (!actions) {
         return;
     }
 
-
     /*
     |--------------------------------------------------------------------------
-    | Eliminamos ejecutar / editar / eliminar
+    | Quitar ejecutar, editar y eliminar
     |--------------------------------------------------------------------------
     */
 
-    actions
-        .querySelectorAll(
-            '.execute-transaction-button, a[href*="/edit"], form'
-        )
-        .forEach(element => {
-            element.remove();
-        });
-
+    actions.querySelectorAll(
+        '.execute-transaction-button, a[href*="/edit"], form'
+    ).forEach(element => {
+        element.remove();
+    });
 
     /*
     |--------------------------------------------------------------------------
-    | Agregamos ojo
+    | Agregar detalle
     |--------------------------------------------------------------------------
     */
 
-    if (
-        !actions.querySelector(
-            '.view-transaction-button'
-        )
-    ) {
+    if (!actions.querySelector(
+        '.view-transaction-button'
+    )) {
 
         actions.insertAdjacentHTML(
             'afterbegin',
@@ -113,18 +243,21 @@ function markTransactionAsExecuted(transactionId) {
                 </button>
             `
         );
-
     }
-
 }
 
 
+/*
+|--------------------------------------------------------------------------
+| Abrir detalle de transferencia
+|--------------------------------------------------------------------------
+*/
+
 document.addEventListener('click', (event) => {
 
-    const button =
-        event.target.closest(
-            '.view-transaction-button'
-        );
+    const button = event.target.closest(
+        '.view-transaction-button'
+    );
 
     if (!button) {
         return;
@@ -133,8 +266,8 @@ document.addEventListener('click', (event) => {
     openTransactionDetail(
         button.dataset.transactionId
     );
-
 });
+
 
 async function openTransactionDetail(transactionId) {
 
@@ -146,7 +279,9 @@ async function openTransactionDetail(transactionId) {
                 headers: {
                     'Accept': 'application/json',
                     'X-Requested-With': 'XMLHttpRequest',
-                }
+                },
+
+                credentials: 'same-origin',
             }
         );
 
@@ -158,123 +293,169 @@ async function openTransactionDetail(transactionId) {
 
         const transaction = await response.json();
 
-
         /*
         |--------------------------------------------------------------------------
-        | Datos principales
+        | Importe
         |--------------------------------------------------------------------------
         */
 
         document.getElementById(
             'transaction-detail-amount'
         ).textContent =
-            `${transaction.currency} ${Number(transaction.amount).toLocaleString(
-                'es-AR',
-                {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                }
+            `${transaction.currency} ${formatTransactionAmount(
+                transaction.amount
             )}`;
 
+        /*
+        |--------------------------------------------------------------------------
+        | Ejecución
+        |--------------------------------------------------------------------------
+        */
 
         document.getElementById(
             'transaction-detail-executed-at'
         ).textContent =
             transaction.executed_at ?? '—';
 
+        /*
+        |--------------------------------------------------------------------------
+        | Cuenta de origen
+        |--------------------------------------------------------------------------
+        */
 
         document.getElementById(
             'transaction-detail-origin'
         ).textContent =
-            transaction.account?.name ?? 'Cuenta eliminada';
-
+            transaction.account?.name ??
+            'Cuenta eliminada';
 
         document.getElementById(
             'transaction-detail-origin-currency'
         ).textContent =
             `Cuenta de origen · ${transaction.currency}`;
 
+        /*
+        |--------------------------------------------------------------------------
+        | Banco de destino
+        |--------------------------------------------------------------------------
+        */
 
         document.getElementById(
             'transaction-detail-destination'
         ).textContent =
             transaction.destination_bank ?? '—';
 
+        /*
+        |--------------------------------------------------------------------------
+        | Fecha
+        |--------------------------------------------------------------------------
+        */
 
         document.getElementById(
             'transaction-detail-date'
         ).textContent =
             transaction.date ?? '—';
 
+        /*
+        |--------------------------------------------------------------------------
+        | Moneda
+        |--------------------------------------------------------------------------
+        */
 
         document.getElementById(
             'transaction-detail-currency'
         ).textContent =
             transaction.currency ?? '---';
 
+        /*
+        |--------------------------------------------------------------------------
+        | Descripción
+        |--------------------------------------------------------------------------
+        */
 
         document.getElementById(
             'transaction-detail-description'
         ).textContent =
-            transaction.description ?? 'Sin descripción';
-
+            transaction.description ??
+            'Sin descripción';
 
         document.getElementById(
             'transaction-detail-execution-date'
         ).textContent =
             transaction.executed_at ?? '—';
 
-
         /*
         |--------------------------------------------------------------------------
-        | Logo origen
+        | Cliente asociado
         |--------------------------------------------------------------------------
+        |
+        | Solo se actualiza si el modal tiene
+        | un elemento para mostrar el cliente.
+        |
+        | La vista y el endpoint se adaptarán
+        | en el siguiente paso.
+        |
         */
 
-        const logo =
-            document.getElementById(
-                'transaction-detail-origin-logo'
-            );
+        const clientElement = document.getElementById(
+            'transaction-detail-client'
+        );
 
-        const placeholder =
-            document.getElementById(
-                'transaction-detail-origin-placeholder'
-            );
+        if (clientElement) {
 
-
-        if (transaction.account?.logo) {
-
-            logo.src =
-                transaction.account.logo;
-
-            logo.alt =
-                transaction.account.name ?? '';
-
-            logo.style.display = '';
-
-            placeholder.style.display = 'none';
-
-        } else {
-
-            logo.src = '';
-
-            logo.style.display = 'none';
-
-            placeholder.style.display = '';
+            clientElement.textContent =
+                transaction.client?.name ??
+                'Sin cliente asociado';
 
         }
 
-
         /*
         |--------------------------------------------------------------------------
-        | Abrir modal
+        | Logo de origen
         |--------------------------------------------------------------------------
         */
 
-        const modalElement =
-            document.getElementById(
-                'transactionDetailModal'
-            );
+        const logo = document.getElementById(
+            'transaction-detail-origin-logo'
+        );
+
+        const placeholder = document.getElementById(
+            'transaction-detail-origin-placeholder'
+        );
+
+        if (logo && placeholder) {
+
+            if (transaction.account?.logo) {
+
+                logo.src = transaction.account.logo;
+
+                logo.alt =
+                    transaction.account.name ?? '';
+
+                logo.style.display = '';
+
+                placeholder.style.display = 'none';
+
+            } else {
+
+                logo.src = '';
+
+                logo.style.display = 'none';
+
+                placeholder.style.display = '';
+
+            }
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Mostrar modal
+        |--------------------------------------------------------------------------
+        */
+
+        const modalElement = document.getElementById(
+            'transactionDetailModal'
+        );
 
         const modal =
             bootstrap.Modal.getOrCreateInstance(
@@ -294,17 +475,30 @@ async function openTransactionDetail(transactionId) {
         });
 
     }
-
 }
+
+
+/*
+|--------------------------------------------------------------------------
+| Movimientos en tiempo real
+|--------------------------------------------------------------------------
+*/
 
 document.addEventListener('DOMContentLoaded', () => {
 
+    const tbody = document.getElementById(
+        'transactions-body'
+    );
 
-    if (!document.getElementById('transactions-body')) {
+    if (!tbody) {
         return;
     }
 
-
+    /*
+    |--------------------------------------------------------------------------
+    | Empresa activa
+    |--------------------------------------------------------------------------
+    */
 
     const companyId =
         document.body.dataset.companyId;
@@ -312,8 +506,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const transactionsPage =
         document.querySelector('.transactions-page');
 
-    const currentUserId =
-        Number(transactionsPage?.dataset.userId);
+    const currentUserId = Number(
+        transactionsPage?.dataset.userId
+    );
 
     const canExecuteTransactions =
         transactionsPage?.dataset.canExecute === '1';
@@ -322,11 +517,28 @@ document.addEventListener('DOMContentLoaded', () => {
         transactionsPage?.dataset.isSuperAdmin === '1';
 
     if (!companyId) {
+
         console.error(
             'No se encontró la empresa activa en movimientos'
         );
+
         return;
     }
+
+    if (!window.Echo) {
+
+        console.error(
+            'Laravel Echo no está disponible'
+        );
+
+        return;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Canal de empresa
+    |--------------------------------------------------------------------------
+    */
 
     const channelName =
         `dashboard.${companyId}`;
@@ -336,33 +548,38 @@ document.addEventListener('DOMContentLoaded', () => {
         channelName
     );
 
-    Echo.private(channelName)
+    window.Echo.private(channelName)
+
+        /*
+        |--------------------------------------------------------------------------
+        | Nuevo movimiento
+        |--------------------------------------------------------------------------
+        */
 
         .listen('.transaction.created', (event) => {
 
-
-            console.log(
-                'Nuevo movimiento:',
-                event
-            );
-
+            if (
+                String(event.companyId) !==
+                String(companyId)
+            ) {
+                return;
+            }
 
             const transaction = event.transaction;
             const account = event.account;
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | Evitar duplicados por eventos realtime
-            |--------------------------------------------------------------------------
-            */
 
             if (!transaction?.id || !account) {
                 return;
             }
 
-            const existingRow = document.querySelector(
-                `#transactions-body tr[data-transaction-id="${transaction.id}"]`
+            /*
+            |--------------------------------------------------------------------------
+            | Evitar duplicados
+            |--------------------------------------------------------------------------
+            */
+
+            const existingRow = tbody.querySelector(
+                `tr[data-transaction-id="${transaction.id}"]`
             );
 
             if (existingRow) {
@@ -371,54 +588,53 @@ document.addEventListener('DOMContentLoaded', () => {
 
             /*
             |--------------------------------------------------------------------------
-            | Identificar movimientos de cheques
+            | Tipo de movimiento
             |--------------------------------------------------------------------------
             */
 
             const isChequeLiquidation =
-                transaction.source === 'cheque_liquidation';
-
-
-
-
-            const tbody = document.getElementById(
-                'transactions-body'
-            );
-
+                transaction.source ===
+                'cheque_liquidation';
 
             const isIncome =
-                [
-                    'income'
-                ].includes(transaction.type);
+                transaction.type === 'income';
 
-            const transactionDate =
-                new Date(transaction.date);
-
-            const formattedDate =
-                transactionDate.toLocaleDateString('es-AR', {
-                    day: '2-digit',
-                    month: '2-digit',
-                });
-
-            const formattedTime =
-                transactionDate.toLocaleTimeString('es-AR', {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    hour12: false,
-                });
-
+            const isReserve =
+                transaction.type === 'reserve';
 
             /*
             |--------------------------------------------------------------------------
-            | Permisos de acciones sobre movimientos
+            | Fecha
             |--------------------------------------------------------------------------
-            |
-            | Las entregas de liquidaciones confirmadas
-            | no se ejecutan ni editan nuevamente.
-            |
-            | La autorización definitiva también debe
-            | existir en el backend Laravel.
-            |
+            */
+
+            const transactionDate = new Date(
+                transaction.date
+            );
+
+            const formattedDate =
+                transactionDate.toLocaleDateString(
+                    'es-AR',
+                    {
+                        day: '2-digit',
+                        month: '2-digit',
+                    }
+                );
+
+            const formattedTime =
+                transactionDate.toLocaleTimeString(
+                    'es-AR',
+                    {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: false,
+                    }
+                );
+
+            /*
+            |--------------------------------------------------------------------------
+            | Permisos
+            |--------------------------------------------------------------------------
             */
 
             const canExecute =
@@ -432,283 +648,360 @@ document.addEventListener('DOMContentLoaded', () => {
                 !transaction.executed_at &&
                 (
                     isSuperAdmin ||
-                    Number(transaction.user?.id) === currentUserId
+                    Number(transaction.user?.id) ===
+                    currentUserId
                 );
 
+            /*
+            |--------------------------------------------------------------------------
+            | Cliente
+            |--------------------------------------------------------------------------
+            */
+
+            const clientHtml = transaction.client?.name
+                ? `
+                    <div class="text-muted small mt-1">
+                        <i class="bi bi-person me-1"></i>
+                        ${escapeTransactionHtml(
+                            transaction.client.name
+                        )}
+                    </div>
+                `
+                : '';
+
+            /*
+            |--------------------------------------------------------------------------
+            | Tipo visual
+            |--------------------------------------------------------------------------
+            */
+
+            let typeHtml;
+
+            if (isIncome) {
+
+                typeHtml = `
+                    <span class="movement-income">
+                        <i class="bi bi-arrow-up"></i>
+                        Ingreso
+                    </span>
+                `;
+
+            } else if (isReserve) {
+
+                typeHtml = `
+                    <span class="tag reserve-tag">
+                        <i class="bi bi-lock"></i>
+                        Reserva
+                    </span>
+                `;
+
+            } else {
+
+                typeHtml = `
+                    <span class="movement-expense">
+                        <i class="bi bi-arrow-down"></i>
+                        Egreso
+                    </span>
+                `;
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | Origen del movimiento
+            |--------------------------------------------------------------------------
+            */
+
+            let sourceHtml = '';
+
+            if (isChequeLiquidation) {
+
+                sourceHtml = `
+                    <i class="bi bi-bank2"></i>
+                    <span>Liquidación de cheques</span>
+                `;
+
+            } else if (transaction.source === 'api') {
+
+                sourceHtml = `
+                    <i class="bi bi-plug"></i>
+                    <span>
+                        ${escapeTransactionHtml(
+                            transaction.api_key?.name ??
+                            'Integración API'
+                        )}
+                    </span>
+                `;
+
+            } else if (
+                transaction.source === 'import'
+            ) {
+
+                sourceHtml = `
+                    <i class="bi bi-file-earmark-arrow-up"></i>
+                    <span>Importación</span>
+                `;
+
+            } else {
+
+                const username =
+                    transaction.user?.email
+                        ? transaction.user.email.split('@')[0]
+                        : 'Sin registro';
+
+                sourceHtml = `
+                    <i class="bi bi-person-circle"></i>
+                    <span>
+                        ${escapeTransactionHtml(username)}
+                    </span>
+                `;
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | Banco destino
+            |--------------------------------------------------------------------------
+            */
+
+            const destinationHtml =
+                transaction.type === 'expense'
+                    ? `
+                        <div class="destination-bank">
+
+                            <i class="bi bi-bank"></i>
+
+                            <span>
+                                ${escapeTransactionHtml(
+                                    transaction.destination_bank ??
+                                    'No informado'
+                                )}
+                            </span>
+
+                        </div>
+
+                        <div
+                            class="execution-badge"
+                            data-execution-badge="${transaction.id}"
+                            ${transaction.executed_at
+                                ? ''
+                                : 'hidden'}
+                        >
+                            <i class="bi bi-check-circle-fill"></i>
+                            <span>Ejecutada</span>
+                        </div>
+                    `
+                    : `
+                        <span class="text-muted">
+                            —
+                        </span>
+                    `;
+
+            /*
+            |--------------------------------------------------------------------------
+            | Acciones
+            |--------------------------------------------------------------------------
+            */
+
+            let actionsHtml = '';
+
+            if (canExecute) {
+
+                actionsHtml += `
+                    <button
+                        type="button"
+                        class="icon-button execute-transaction-button"
+                        data-transaction-id="${transaction.id}"
+                        data-execute-url="/transactions/${transaction.id}/execute"
+                        title="Ejecutar transferencia"
+                    >
+                        <i class="bi bi-send-check"></i>
+                    </button>
+                `;
+            }
+
+            if (canManage) {
+
+                actionsHtml += `
+                    <a
+                        href="/transactions/${transaction.id}/edit"
+                        class="icon-button"
+                        title="Editar movimiento"
+                    >
+                        <i class="bi bi-pencil"></i>
+                    </a>
+                `;
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | Fila
+            |--------------------------------------------------------------------------
+            */
 
             const row = `
 
-            
-            <tr data-transaction-id="${transaction.id}">
+                <tr data-transaction-id="${transaction.id}">
 
-                <!-- CONTADOR -->
-                <td data-movement-counter>
-                    0
-                </td>
+                    <!-- CONTADOR -->
+                    <td data-movement-counter>
+                        0
+                    </td>
 
+                    <!-- FECHA -->
+                    <td>
 
-               <!-- FECHA -->
-                <td>
-                    <div class="movement-date">
-                        <strong>
-                            ${formattedDate}
-                        </strong>
+                        <div class="movement-date">
 
-                        <small>
-                            ${formattedTime}
-                        </small>
-                    </div>
-                </td>
+                            <strong>
+                                ${formattedDate}
+                            </strong>
 
+                            <small>
+                                ${formattedTime}
+                            </small>
 
-                <!-- CUENTA -->
-                <td>
+                        </div>
 
-                    <div class="account-cell">
+                    </td>
 
-                        ${account.logo
-                    ? `<img src="/storage/${account.logo}" alt="${account.name}">`
-                    : `
+                    <!-- CUENTA -->
+                    <td>
+
+                        <div class="account-cell">
+
+                            ${account.logo
+                                ? `
+                                    <img
+                                        src="/storage/${encodeURI(
+                                            String(account.logo)
+                                        ).replace(/"/g, '%22')}"
+                                        alt="${escapeTransactionHtml(
+                                            account.name
+                                        )}"
+                                    >
+                                `
+                                : `
                                     <div class="mini-logo">
                                         <i class="bi bi-bank"></i>
                                     </div>
                                 `
-                }
+                            }
 
-                        <span>
-                            ${account.name}
+                            <span>
+                                ${escapeTransactionHtml(
+                                    account.name
+                                )}
+                            </span>
+
+                        </div>
+
+                    </td>
+
+                    <!-- BANCO DESTINO -->
+                    <td>
+                        ${destinationHtml}
+                    </td>
+
+                    <!-- USUARIO / ORIGEN -->
+                    <td>
+
+                        <div class="movement-user">
+                            ${sourceHtml}
+                        </div>
+
+                    </td>
+
+                    <!-- MONEDA -->
+                    <td>
+
+                        <span class="movement-currency">
+                            ${escapeTransactionHtml(
+                                transaction.currency ?? '---'
+                            )}
                         </span>
 
-                    </div>
+                    </td>
 
-                </td>
+                    <!-- TIPO -->
+                    <td>
+                        ${typeHtml}
+                    </td>
 
+                    <!-- DESCRIPCIÓN / CLIENTE -->
+                    <td>
 
-                <!-- BANCO DESTINO -->
-                <td>
+                        ${escapeTransactionHtml(
+                            transaction.description ??
+                            'Sin descripción'
+                        )}
 
-                    ${transaction.type === 'expense'
+                        ${clientHtml}
 
-                    ? `
-                            <div class="destination-bank">
+                    </td>
 
-                                <i class="bi bi-bank"></i>
+                    <!-- MONTO -->
+                    <td class="text-end">
 
-                                <span>
-                                    ${transaction.destination_bank ?? 'No informado'}
-                                </span>
-
-                            </div>
-
-                            <div
-                                class="execution-badge"
-                                data-execution-badge="${transaction.id}"
-                                style="display: none;"
-                            >
-                                <i class="bi bi-check-circle-fill"></i>
-
-                                <span>
-                                    Ejecutada
-                                </span>
-                            </div>
-                        `
-
-                    : `
-                            <span class="text-muted">
-                                —
-                            </span>
-                        `
-                }
-
-                </td>
-
-
-               <!-- USUARIO / ORIGEN -->
-                <td>
-
-                    <div class="movement-user">
-
-                       
-                    ${isChequeLiquidation
+                        ${isIncome
                             ? `
-                        <i class="bi bi-bank2"></i>
-                        <span>Liquidación de cheques</span>
-                        `
-                                    : transaction.source === 'api'
-                                        ? `
-                            <i class="bi bi-plug"></i>
-                            <span>
-                                ${transaction.api_key?.name ?? 'Integración API'}
-                            </span>
-                        `
-                                : transaction.source === 'import'
-                                    ? `
-                            <i class="bi bi-file-earmark-arrow-up"></i>
-                            <span>Importación</span>
-                        `
-                                        : `
-                            <i class="bi bi-person-circle"></i>
-                            <span>
-                                ${transaction.user?.email
-                                            ? transaction.user.email.split('@')[0]
-                                            : 'Sin registro'
-                                        }
-                            </span>
-                        `
-                    }
-                    </div>
-
-                </td>
-
-               <!-- MONEDA -->
-                <td>
-                    <span class="movement-currency">
-                        ${transaction.currency ?? '---'}
-                    </span>
-                </td>
-
-
-                <!-- TIPO -->
-                <td>
-
-                    ${isIncome
-
-                    ? `
-                                <span class="movement-income">
-
-                                    <i class="bi bi-arrow-up"></i>
-
-                                    Ingreso
-
-                                </span>
-                            `
-
-                    : `
-                                <span class="movement-expense">
-
-                                    <i class="bi bi-arrow-down"></i>
-
-                                    Egreso
-
-                                </span>
-                            `
-                }
-
-                </td>
-
-
-                <!-- DESCRIPCIÓN -->
-                <td>
-
-                    ${transaction.description ?? 'Sin descripción'}
-
-                </td>
-
-
-                <!-- MONTO -->
-                <td class="text-end">
-
-                    ${isIncome
-
-                    ? `
                                 <span class="amount-income">
-
-                                    +
-                                    $${Number(transaction.amount).toLocaleString(
-                        'es-AR',
-                        {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2
-                        }
-                    )}
-
+                                    +$${formatTransactionAmount(
+                                        transaction.amount
+                                    )}
                                 </span>
                             `
-
-                    : `
+                            : `
                                 <span class="amount-expense">
-
-                                    -
-                                    $${Number(transaction.amount).toLocaleString(
-                        'es-AR',
-                        {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2
-                        }
-                    )}
-
+                                    -$${formatTransactionAmount(
+                                        transaction.amount
+                                    )}
                                 </span>
                             `
-                }
+                        }
 
-                </td>
+                    </td>
 
+                    <!-- ACCIONES -->
+                    <td>
 
-                <!-- ACCIONES -->
-                <td>
+                        <div class="table-actions">
+                            ${actionsHtml}
+                        </div>
 
-                    <div class="table-actions">
+                    </td>
 
-                        ${canExecute
-
-                    ? `
-                                    <button
-                                        type="button"
-                                        class="icon-button execute-transaction-button"
-                                        data-transaction-id="${transaction.id}"
-                                        data-execute-url="/transactions/${transaction.id}/execute"
-                                        title="Ejecutar transferencia"
-                                    >
-
-                                        <i class="bi bi-send-check"></i>
-
-                                    </button>
-                                `
-
-                    : ''
-                }
-
-                        ${canManage
-
-                    ? `
-                                    <a
-                                        href="/transactions/${transaction.id}/edit"
-                                        class="icon-button"
-                                        title="Editar movimiento"
-                                    >
-
-                                        <i class="bi bi-pencil"></i>
-
-                                    </a>
-                                `
-
-                    : ''
-                }
-
-                    </div>
-
-                </td>
-
-            </tr>
-
+                </tr>
             `;
 
+            /*
+            |--------------------------------------------------------------------------
+            | Insertar movimiento
+            |--------------------------------------------------------------------------
+            */
 
+            const emptyRow = tbody.querySelector(
+                'tr[data-empty-row]'
+            );
+
+            if (emptyRow) {
+                emptyRow.remove();
+            }
 
             tbody.insertAdjacentHTML(
                 'afterbegin',
                 row
             );
+
             renumberTransactions();
 
         })
 
-        .listen('.transaction.executed', (event) => {
+        /*
+        |--------------------------------------------------------------------------
+        | Transferencia ejecutada
+        |--------------------------------------------------------------------------
+        */
 
-            console.log(
-                'TRANSFERENCIA EJECUTADA RECIBIDA:',
-                event
-            );
+        .listen('.transaction.executed', (event) => {
 
             if (
                 String(event.companyId) !==
@@ -725,9 +1018,35 @@ document.addEventListener('DOMContentLoaded', () => {
                 event.transaction_id
             );
 
+        })
+
+        /*
+        |--------------------------------------------------------------------------
+        | Movimiento actualizado
+        |--------------------------------------------------------------------------
+        |
+        | El evento actual solo trae transaction_id.
+        | Volvemos a consultar la tabla del servidor.
+        |
+        */
+
+        .listen('.transaction.updated', (event) => {
+
+            console.log(
+                'Movimiento actualizado:',
+                event.transaction_id
+            );
+
+            if (!event.transaction_id) {
+                return;
+            }
+
+            syncTransactionsTable();
 
         });
+
 });
+
 
 /*
 |--------------------------------------------------------------------------
@@ -741,13 +1060,18 @@ document.addEventListener('click', async (event) => {
         '.execute-transaction-button'
     );
 
-
     if (!button) {
         return;
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | Confirmación
+    |--------------------------------------------------------------------------
+    */
 
     const result = await Swal.fire({
+
         icon: 'question',
 
         title: 'Confirmar transferencia',
@@ -763,20 +1087,32 @@ document.addEventListener('click', async (event) => {
         buttonsStyling: false,
 
         customClass: {
-            popup: 'aeria-swal',
-            title: 'aeria-swal-title',
-            htmlContainer: 'aeria-swal-text',
-            actions: 'aeria-swal-actions',
-            confirmButton: 'aeria-swal-confirm',
-            cancelButton: 'aeria-swal-cancel'
-        }
-    });
 
+            popup: 'aeria-swal',
+
+            title: 'aeria-swal-title',
+
+            htmlContainer: 'aeria-swal-text',
+
+            actions: 'aeria-swal-actions',
+
+            confirmButton: 'aeria-swal-confirm',
+
+            cancelButton: 'aeria-swal-cancel'
+
+        }
+
+    });
 
     if (!result.isConfirmed) {
         return;
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | Datos
+    |--------------------------------------------------------------------------
+    */
 
     const transactionId =
         button.dataset.transactionId;
@@ -784,15 +1120,7 @@ document.addEventListener('click', async (event) => {
     const executeUrl =
         button.dataset.executeUrl;
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | Bloquear botón mientras procesa
-    |--------------------------------------------------------------------------
-    */
-
     button.disabled = true;
-
 
     try {
 
@@ -800,13 +1128,17 @@ document.addEventListener('click', async (event) => {
             'meta[name="csrf-token"]'
         );
 
-
         if (!csrfToken) {
             throw new Error(
                 'No se encontró el token CSRF.'
             );
         }
 
+        /*
+        |--------------------------------------------------------------------------
+        | Ejecutar operación
+        |--------------------------------------------------------------------------
+        */
 
         const response = await fetch(
             executeUrl,
@@ -814,16 +1146,20 @@ document.addEventListener('click', async (event) => {
                 method: 'PATCH',
 
                 headers: {
+
                     'Accept': 'application/json',
+
                     'X-Requested-With': 'XMLHttpRequest',
+
                     'X-CSRF-TOKEN': csrfToken.content
-                }
+
+                },
+
+                credentials: 'same-origin',
             }
         );
 
-
         const data = await response.json();
-
 
         if (!response.ok) {
 
@@ -831,22 +1167,31 @@ document.addEventListener('click', async (event) => {
                 data.message ??
                 'No se pudo ejecutar la transferencia.'
             );
-
         }
 
+        /*
+        |--------------------------------------------------------------------------
+        | Actualizar interfaz
+        |--------------------------------------------------------------------------
+        */
 
         markTransactionAsExecuted(
             transactionId
         );
 
-
     } catch (error) {
 
         button.disabled = false;
 
-        alert(
-            error.message
-        );
+        Swal.fire({
+
+            icon: 'error',
+
+            title: 'Error al ejecutar',
+
+            text: error.message,
+
+        });
 
     }
 

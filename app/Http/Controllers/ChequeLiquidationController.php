@@ -262,6 +262,15 @@ class ChequeLiquidationController extends Controller
                     'max:100',
                 ],
 
+                // ID opcional: permite conservar el registro de un cheque existente.
+                'cheques.*.id' => [
+                    'sometimes',
+                    'nullable',
+                    'integer',
+                    'min:1',
+                    'distinct',
+                ],
+
                 'cheques.*.nominal_amount' => [
                     'required',
                     'numeric',
@@ -507,6 +516,253 @@ class ChequeLiquidationController extends Controller
                 'cheques' => $error->getMessage(),
             ]);
         }
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | EDITAR BORRADOR
+    |--------------------------------------------------------------------------
+    */
+
+    public function edit(ChequeLiquidation $liquidation): View
+    {
+        $this->ensureLiquidationCompany($liquidation);
+
+        abort_unless(
+            $liquidation->status === 'draft' &&
+                $liquidation->transaction_id === null,
+            403,
+            'Solo se pueden editar liquidaciones en borrador sin movimientos.'
+        );
+
+        $liquidation->load(['cheques' => fn ($query) => $query->orderBy('id')]);
+
+        $form = [
+            'client_name' => $liquidation->client_name,
+            'operation_date' => $liquidation->operation_date->format('Y-m-d'),
+            'annual_rate' => $liquidation->annual_rate,
+            'clearing_days' => $liquidation->clearing_days,
+            'cheque_tax_rate' => $liquidation->cheque_tax_rate,
+            'gross_income_rate' => $liquidation->gross_income_rate,
+            'vat_rate' => $liquidation->vat_rate,
+            'cheques' => $liquidation->cheques->map(fn ($cheque) => [
+                'id' => $cheque->id,
+                'nominal_amount' => $cheque->nominal_amount,
+                'due_date' => $cheque->due_date->format('Y-m-d'),
+                'format' => $cheque->format,
+                'bank' => $cheque->bank,
+                'issuer' => $cheque->issuer,
+                'number' => $cheque->number,
+                'annual_rate' => $cheque->annual_rate,
+                'clearing_days' => $cheque->clearing_days,
+                'cheque_tax_rate' => $cheque->cheque_tax_rate,
+                'gross_income_rate' => $cheque->gross_income_rate,
+                'vat_rate' => $cheque->vat_rate,
+            ])->all(),
+        ];
+
+        return view('cheques.create', [
+            'form' => $form,
+            'preview' => null,
+            'liquidation' => $liquidation,
+        ]);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | ACTUALIZAR BORRADOR
+    |--------------------------------------------------------------------------
+    |
+    | Operación atómica: la liquidación y sus cheques se modifican juntos.
+    | Si cambia el neto se descartan las entregas NO ejecutadas para que el
+    | usuario vuelva a distribuir el pago sobre el nuevo importe.
+    |
+    */
+
+    public function update(
+        Request $request,
+        ChequeLiquidation $liquidation,
+        ChequeLiquidationCalculator $calculator
+    ): RedirectResponse {
+        $companyId = $this->ensureLiquidationCompany($liquidation);
+        $form = $this->validated($request);
+        $result = $this->calculate($form, $calculator);
+
+        $amountFields = [
+            'calendar_days', 'clearing_days', 'term_days',
+            'annual_rate', 'cheque_tax_rate', 'gross_income_rate', 'vat_rate',
+            'nominal_amount', 'interest_amount', 'cheque_tax_amount',
+            'gross_income_amount', 'vat_amount', 'total_discount', 'net_amount',
+        ];
+
+        $amounts = array_intersect_key($result, array_flip($amountFields));
+        $paymentsReset = false;
+        $changed = false;
+
+        DB::transaction(function () use (
+            $liquidation, $companyId, $form, $result, $amounts, &$paymentsReset, &$changed
+        ) {
+            $locked = ChequeLiquidation::query()
+                ->where('company_id', $companyId)
+                ->whereKey($liquidation->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            if ($locked->status !== 'draft' || $locked->transaction_id !== null) {
+                throw ValidationException::withMessages([
+                    'status' => 'La liquidación ya no puede editarse.',
+                ]);
+            }
+
+            $existingCheques = $locked->cheques()
+                ->orderBy('id')
+                ->lockForUpdate()
+                ->get()
+                ->keyBy('id');
+
+            if ($existingCheques->contains(fn ($c) => $c->status !== 'draft')) {
+                throw ValidationException::withMessages([
+                    'cheques' => 'Existen cheques procesados; no se puede editar.',
+                ]);
+            }
+
+            $deliveries = $locked->deliveries()->lockForUpdate()->get();
+
+            if ($deliveries->contains(fn ($d) => $d->transaction_id !== null)) {
+                throw ValidationException::withMessages([
+                    'deliveries' => 'Existen entregas ejecutadas; no se puede editar.',
+                ]);
+            }
+
+            // Verificar todos los ID antes de escribir y evitar referencias cruzadas.
+            $providedIds = collect($form['cheques'])
+                ->pluck('id')
+                ->filter(fn ($id) => $id !== null && $id !== '')
+                ->map(fn ($id) => (int) $id);
+
+            if ($providedIds->unique()->count() !== $providedIds->count()) {
+                throw ValidationException::withMessages([
+                    'cheques' => 'Hay identificadores de cheques repetidos.',
+                ]);
+            }
+
+            foreach ($providedIds as $id) {
+                if (!$existingCheques->has($id)) {
+                    throw ValidationException::withMessages([
+                        'cheques' => 'Un cheque no pertenece a esta liquidación.',
+                    ]);
+                }
+            }
+
+            // Detectamos cambios también cuando el neto permanece igual.
+            $locked->fill(array_merge($amounts, [
+                'client_name' => trim($form['client_name']),
+                'operation_date' => $form['operation_date'],
+            ]));
+
+            if ($locked->isDirty()) {
+                $changed = true;
+            }
+
+            $locked->save();
+
+            $keptIds = [];
+
+            foreach ($result['items'] as $index => $item) {
+                $attributes = [
+                    'company_id' => $companyId,
+                    'kind' => 'third_party',
+                    'status' => 'draft',
+                    'format' => $item['format'],
+                    'bank' => $item['bank'] ?? null,
+                    'issuer' => $item['issuer'] ?? null,
+                    'number' => $item['number'] ?? null,
+                    'due_date' => $item['due_date'],
+                    'nominal_amount' => $item['nominal_amount'],
+                    'calendar_days' => $item['calendar_days'],
+                    'clearing_days' => $item['clearing_days'],
+                    'term_days' => $item['term_days'],
+                    'annual_rate' => $item['annual_rate'],
+                    'cheque_tax_rate' => $item['cheque_tax_rate'],
+                    'gross_income_rate' => $item['gross_income_rate'],
+                    'vat_rate' => $item['vat_rate'],
+                    'interest_amount' => $item['interest_amount'],
+                    'cheque_tax_amount' => $item['cheque_tax_amount'],
+                    'gross_income_amount' => $item['gross_income_amount'],
+                    'vat_amount' => $item['vat_amount'],
+                    'total_discount' => $item['total_discount'],
+                    'net_amount' => $item['net_amount'],
+                ];
+
+                $id = $form['cheques'][$index]['id'] ?? null;
+
+                if ($id !== null && $id !== '') {
+                    $cheque = $existingCheques->get((int) $id);
+                    $cheque->fill($attributes);
+
+                    if ($cheque->isDirty()) {
+                        $changed = true;
+                    }
+
+                    $cheque->save();
+                    $keptIds[] = (int) $cheque->id;
+                } else {
+                    $cheque = $locked->cheques()->create($attributes);
+                    $changed = true;
+                    $keptIds[] = (int) $cheque->id;
+                }
+            }
+
+            $removeIds = $existingCheques->keys()
+                ->map(fn ($id) => (int) $id)
+                ->diff($keptIds)
+                ->all();
+
+            if ($removeIds !== []) {
+                $changed = true;
+
+                // Los cheques en borrador no deben tener recordatorios activos.
+                $reminderCount = \App\Models\FinancialReminder::withoutGlobalScopes()
+                    ->whereIn('cheque_id', $removeIds)
+                    ->count();
+
+                if ($reminderCount > 0) {
+                    throw ValidationException::withMessages([
+                        'cheques' => 'No se puede quitar un cheque con recordatorios asociados.',
+                    ]);
+                }
+
+                $locked->cheques()->whereIn('id', $removeIds)->delete();
+            }
+
+            /*
+             * Una edición material invalida la distribución anterior,
+             * incluso cuando el neto calculado no cambia. Ningún pago
+             * ejecutado puede llegar aquí: se verificó arriba.
+             */
+            if ($changed) {
+                if ($deliveries->isNotEmpty()) {
+                    $locked->deliveries()->delete();
+                    $paymentsReset = true;
+                }
+
+                $locked->events()->create([
+                    'user_id' => auth()->id(),
+                    'action' => 'updated',
+                    'from_status' => 'draft',
+                    'to_status' => 'draft',
+                ]);
+            }
+
+        }, 3);
+
+        return redirect()
+            ->route('cheques.show', $liquidation)
+            ->with('success', $paymentsReset
+                ? 'Borrador actualizado. Volvé a guardar los medios de pago: se invalidó la distribución anterior.'
+                : ($changed
+                    ? 'Borrador actualizado correctamente. No se generaron movimientos financieros.'
+                    : 'El borrador no tenía cambios. No se modificaron los medios de pago.'));
     }
 
     /*
@@ -2674,10 +2930,30 @@ class ChequeLiquidationController extends Controller
                 ]);
             }
 
+            $cheques = $locked->cheques()->lockForUpdate()->get();
+            $deliveries = $locked->deliveries()->lockForUpdate()->get();
+
+            if (
+                $cheques->contains(fn ($cheque) => $cheque->status !== 'draft') ||
+                $deliveries->contains(fn ($delivery) => $delivery->transaction_id !== null)
+            ) {
+                throw ValidationException::withMessages([
+                    'status' => 'La operación contiene cheques o entregas ejecutadas.',
+                ]);
+            }
+
+            if (\App\Models\FinancialReminder::withoutGlobalScopes()
+                ->whereIn('cheque_id', $cheques->pluck('id')->all())
+                ->exists()) {
+                throw ValidationException::withMessages([
+                    'status' => 'No se puede borrar una operación con avisos de cheques asociados.',
+                ]);
+            }
+
+            // Primero las dependencias para respetar las claves foráneas.
+            $locked->deliveries()->delete();
             $locked->events()->delete();
-
             $locked->cheques()->delete();
-
             $locked->delete();
         });
 

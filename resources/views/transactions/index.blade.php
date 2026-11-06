@@ -210,7 +210,6 @@
                                 <td>
 
                                     @if ($transaction->type === 'expense')
-
                                         <div class="destination-bank">
 
                                             <i class="bi bi-bank"></i>
@@ -222,8 +221,7 @@
                                         </div>
 
 
-                                        <div class="execution-badge"
-                                            data-execution-badge="{{ $transaction->id }}"
+                                        <div class="execution-badge" data-execution-badge="{{ $transaction->id }}"
                                             @if (!$transaction->executed_at) style="display: none;" @endif>
 
                                             <i class="bi bi-check-circle-fill"></i>
@@ -233,13 +231,10 @@
                                             </span>
 
                                         </div>
-
                                     @else
-
                                         <span class="text-muted">
                                             —
                                         </span>
-
                                     @endif
 
                                 </td>
@@ -324,17 +319,27 @@
 
 
 
-                                {{-- DESCRIPCIÓN --}}
+
+                                {{-- DESCRIPCIÓN / CLIENTE --}}
 
                                 <td>
 
                                     <span class="transaction-description">
-
                                         {{ $transaction->description ?? 'Sin descripción' }}
-
                                     </span>
 
+                                    @if ($transaction->client)
+                                        <div class="text-muted small mt-1">
+
+                                            <i class="bi bi-person me-1"></i>
+
+                                            {{ $transaction->client->display_name }}
+
+                                        </div>
+                                    @endif
+
                                 </td>
+
 
 
 
@@ -665,6 +670,22 @@
                                 </strong>
 
                             </div>
+
+
+                            {{-- CLIENTE ASOCIADO --}}
+
+                            <div class="transaction-detail-item">
+
+                                <span>
+                                    Cliente asociado
+                                </span>
+
+                                <strong id="transaction-detail-client">
+                                    —
+                                </strong>
+
+                            </div>
+
 
                         </div>
 

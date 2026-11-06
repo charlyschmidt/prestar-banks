@@ -326,17 +326,29 @@
 
 
 
-                                {{-- CONCEPTO --}}
+
+                                {{-- CONCEPTO / CLIENTE --}}
 
                                 <td>
 
                                     <strong class="movement-description">
-
                                         {{ $movement->description ?: 'Sin descripción' }}
-
                                     </strong>
 
+                                    @if ($movement->client)
+
+                                        <div class="text-muted small mt-1">
+
+                                            <i class="bi bi-person me-1"></i>
+
+                                            {{ $movement->client->display_name }}
+
+                                        </div>
+
+                                    @endif
+
                                 </td>
+
 
 
 

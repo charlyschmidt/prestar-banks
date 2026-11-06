@@ -1,4 +1,3 @@
-
 @extends('layouts.app')
 
 @section('content')
@@ -12,6 +11,10 @@
 
     $form = $form ?? [];
     $preview = $preview ?? null;
+    $editing = isset($liquidation) && $liquidation !== null;
+    $saveRoute = $editing
+        ? route('cheques.update', $liquidation)
+        : route('cheques.store');
 
     $v = static fn(string $key, $fallback = '') =>
         old($key, $form[$key] ?? $fallback);
@@ -101,7 +104,7 @@
     <div class="page-header">
 
         <div>
-            <h1>Nueva liquidación</h1>
+            <h1>{{ $editing ? 'Editar liquidación #' . $liquidation->id : 'Nueva liquidación' }}</h1>
 
             <p>
                 Cheques de terceros ·
@@ -111,10 +114,11 @@
         </div>
 
         <a
-            href="{{ route('cheques.index') }}"
+            href="{{ $editing ? route('cheques.show', $liquidation) : route('cheques.index') }}"
             class="cheques-link"
         >
-            Volver al listado
+            <i class="bi bi-arrow-left"></i>
+            {{ $editing ? 'Volver a la liquidación' : 'Volver al listado' }}
         </a>
 
     </div>
@@ -373,12 +377,13 @@
                 <button
                     type="submit"
                     form="cheques-form"
-                    formaction="{{ route('cheques.store') }}"
+                    formaction="{{ $saveRoute }}"
+                    @if ($editing) name="_method" value="PUT" @endif
                     class="primary-action-button"
                 >
 
                     <i class="bi bi-check-lg"></i>
-                    Guardar operación
+                    {{ $editing ? 'Guardar cambios' : 'Guardar operación' }}
 
                 </button>
 
@@ -592,6 +597,15 @@
                         </button>
 
                     </div>
+
+                    {{-- Conservar ID al editar; los cheques nuevos no lo tienen. --}}
+                    @if ($editing && $cv('id'))
+                        <input
+                            type="hidden"
+                            name="cheques[{{ $index }}][id]"
+                            value="{{ $cv('id') }}"
+                        >
+                    @endif
 
                     {{-- CAMPOS DEL CHEQUE --}}
 
@@ -895,24 +909,25 @@
 
         <div class="cheques-actions mt-4">
 
+            @unless ($editing)
+                <button
+                    type="submit"
+                    class="secondary-button"
+                >
+                    <i class="bi bi-calculator"></i>
+                    Calcular liquidación
+                </button>
+            @endunless
+
             <button
                 type="submit"
-                class="secondary-button"
-            >
-
-                <i class="bi bi-calculator"></i>
-                Calcular liquidación
-
-            </button>
-
-            <button
-                type="submit"
-                formaction="{{ route('cheques.store') }}"
+                formaction="{{ $saveRoute }}"
+                @if ($editing) name="_method" value="PUT" @endif
                 class="primary-action-button"
             >
 
                 <i class="bi bi-check-lg"></i>
-                Guardar operación
+                {{ $editing ? 'Guardar cambios' : 'Guardar operación' }}
 
             </button>
 

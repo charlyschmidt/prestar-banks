@@ -2,6 +2,31 @@
 
 
 @section('content')
+    @php
+        /*
+        |--------------------------------------------------------------------------
+        | Cliente asociado al movimiento
+        |--------------------------------------------------------------------------
+        |
+        | Si Laravel vuelve al formulario por un error de validación,
+        | respetamos el client_id enviado anteriormente.
+        |
+        | La consulta se limita siempre a la empresa activa.
+        |
+        */
+
+        $companyId = app(\App\Services\CompanyContextService::class)->id();
+
+        $selectedClientId = old('client_id', $transaction->client_id);
+
+        $selectedClient = null;
+
+        if (filled($selectedClientId) && $companyId) {
+            $selectedClient = \App\Models\Client::query()->forCompany($companyId)->whereKey($selectedClientId)->first();
+        }
+    @endphp
+
+
     <div class="page-container">
 
 
@@ -127,20 +152,17 @@
 
                         <select name="type" id="transaction-type" class="dark-input" required>
 
-                            <option value="income"
-                                {{ old('type', $transaction->type) === 'income' ? 'selected' : '' }}>
+                            <option value="income" {{ old('type', $transaction->type) === 'income' ? 'selected' : '' }}>
                                 Ingreso
                             </option>
 
 
-                            <option value="expense"
-                                {{ old('type', $transaction->type) === 'expense' ? 'selected' : '' }}>
+                            <option value="expense" {{ old('type', $transaction->type) === 'expense' ? 'selected' : '' }}>
                                 Egreso
                             </option>
 
 
-                            <option value="reserve"
-                                {{ old('type', $transaction->type) === 'reserve' ? 'selected' : '' }}>
+                            <option value="reserve" {{ old('type', $transaction->type) === 'reserve' ? 'selected' : '' }}>
                                 Reserva
                             </option>
 
@@ -185,6 +207,32 @@
 
 
 
+                    {{-- =====================================================
+                         CLIENTE ASOCIADO
+                    ===================================================== --}}
+
+                    <div class="form-group">
+
+                        <div
+                            id="client-search-app"
+                            data-search-url="{{ route('clients.lookup') }}"
+                            data-client-id="{{ $selectedClient?->id ?? '' }}"
+                            data-client-name="{{ $selectedClient?->display_name ?? '' }}"
+                            data-client-tax-id="{{ $selectedClient?->tax_id ?? '' }}">
+                        </div>
+
+                        @error('client_id')
+                            <div class="text-danger small mt-2">
+
+                                <i class="bi bi-exclamation-circle me-1"></i>
+
+                                {{ $message }}
+
+                            </div>
+                        @enderror
+
+                    </div>
+
                     {{-- MONTO --}}
 
                     <div class="form-group">
@@ -194,8 +242,8 @@
                         </label>
 
                         <input type="text" name="amount" class="dark-input money-input"
-                            value="{{ old('amount', $transaction->amount) }}"
-                            inputmode="decimal" autocomplete="off" required>
+                            value="{{ old('amount', $transaction->amount) }}" inputmode="decimal" autocomplete="off"
+                            required>
 
                     </div>
 
@@ -269,10 +317,10 @@
 
     <script>
         /*
-            |--------------------------------------------------------------------------
-            | Cuenta + moneda
-            |--------------------------------------------------------------------------
-            */
+                |--------------------------------------------------------------------------
+                | Cuenta + moneda
+                |--------------------------------------------------------------------------
+                */
 
         const accountSelect =
             document.getElementById(

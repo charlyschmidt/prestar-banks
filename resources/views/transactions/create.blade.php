@@ -179,6 +179,25 @@
                     </div>
 
 
+                    {{-- =====================================================
+                        CLIENTE ASOCIADO
+                    ===================================================== --}}
+
+                    <div class="form-group">
+
+                        <div id="client-search-app" data-search-url="{{ route('clients.lookup') }}"
+                            data-client-id="{{ old('client_id', '') }}" data-client-name="" data-client-tax-id="">
+                        </div>
+
+                        @error('client_id')
+                            <div class="text-danger small mt-2">
+                                <i class="bi bi-exclamation-circle me-1"></i>
+                                {{ $message }}
+                            </div>
+                        @enderror
+
+                    </div>
+
 
                     {{-- MONTO --}}
 
@@ -271,10 +290,10 @@
 
     <script>
         /*
-                |--------------------------------------------------------------------------
-                | Cuenta + moneda
-                |--------------------------------------------------------------------------
-                */
+                    |--------------------------------------------------------------------------
+                    | Cuenta + moneda
+                    |--------------------------------------------------------------------------
+                    */
 
         const accountSelect =
             document.getElementById(
